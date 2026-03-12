@@ -21,3 +21,15 @@ export type Color =
   | "rose";
 
 export type Variant = "solid" | "outline" | "ghost" | "soft";
+
+export type ActionColor =
+  | "blue"
+  | "emerald"
+  | "amber"
+  | "red"
+  | "violet"
+  | "indigo"
+  | "sky"
+  | "rose"
+  | "orange"
+  | "zinc";

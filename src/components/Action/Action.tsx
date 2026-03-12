@@ -1,17 +1,201 @@
-import { forwardRef } from "react";
+import { forwardRef, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
+import { resolve } from "../../data/emoji-utils";
 import type { ActionProps } from "./Action.types";
+import type { ActionColor, Size } from "../../utils/types";
+
+// ---------------------------------------------------------------------------
+// Color classes
+// ---------------------------------------------------------------------------
+
+const colorClasses: Record<ActionColor, string> = {
+  blue: "bg-blue-500 text-white border border-blue-600 hover:bg-blue-600 dark:bg-blue-600 dark:border-blue-500 dark:hover:bg-blue-500",
+  emerald: "bg-emerald-500 text-white border border-emerald-600 hover:bg-emerald-600 dark:bg-emerald-600 dark:border-emerald-500 dark:hover:bg-emerald-500",
+  amber: "bg-amber-500 text-white border border-amber-600 hover:bg-amber-600 dark:bg-amber-600 dark:border-amber-500 dark:hover:bg-amber-500",
+  red: "bg-red-500 text-white border border-red-600 hover:bg-red-600 dark:bg-red-600 dark:border-red-500 dark:hover:bg-red-500",
+  violet: "bg-violet-500 text-white border border-violet-600 hover:bg-violet-600 dark:bg-violet-600 dark:border-violet-500 dark:hover:bg-violet-500",
+  indigo: "bg-indigo-500 text-white border border-indigo-600 hover:bg-indigo-600 dark:bg-indigo-600 dark:border-indigo-500 dark:hover:bg-indigo-500",
+  sky: "bg-sky-500 text-white border border-sky-600 hover:bg-sky-600 dark:bg-sky-600 dark:border-sky-500 dark:hover:bg-sky-500",
+  rose: "bg-rose-500 text-white border border-rose-600 hover:bg-rose-600 dark:bg-rose-600 dark:border-rose-500 dark:hover:bg-rose-500",
+  orange: "bg-orange-500 text-white border border-orange-600 hover:bg-orange-600 dark:bg-orange-600 dark:border-orange-500 dark:hover:bg-orange-500",
+  zinc: "bg-zinc-500 text-white border border-zinc-600 hover:bg-zinc-600 dark:bg-zinc-600 dark:border-zinc-500 dark:hover:bg-zinc-500",
+};
+
+const defaultClasses =
+  "bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700";
+
+const activeClasses =
+  "bg-blue-500 text-white border border-blue-600 hover:bg-blue-600 dark:bg-blue-600 dark:border-blue-500 dark:hover:bg-blue-500";
+
+const checkedClasses =
+  "bg-emerald-500 text-white border border-emerald-600 hover:bg-emerald-600 dark:bg-emerald-600 dark:border-emerald-500 dark:hover:bg-emerald-500";
+
+const warnClasses =
+  "bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700 dark:hover:bg-amber-900/50";
+
+// ---------------------------------------------------------------------------
+// Size helpers
+// ---------------------------------------------------------------------------
+
+const horizontalSize: Record<Size, string> = {
+  xs: "px-2 py-1 text-xs",
+  sm: "px-2 py-1 text-xs",
+  md: "px-3 py-1.5 text-sm",
+  lg: "px-4 py-2.5 text-base",
+  xl: "px-5 py-3 text-lg",
+};
+
+const verticalSize: Record<Size, string> = {
+  xs: "px-2 pt-5 pb-5 text-xs",
+  sm: "px-2 pt-5 pb-5 text-xs",
+  md: "px-3 pt-6 pb-6 text-sm",
+  lg: "px-4 pt-8 pb-8 text-base",
+  xl: "px-5 pt-9 pb-9 text-lg",
+};
+
+const circleSize: Record<Size, string> = {
+  xs: "w-7 h-7 text-xs",
+  sm: "w-8 h-8 text-xs",
+  md: "w-10 h-10 text-sm",
+  lg: "w-12 h-12 text-base",
+  xl: "w-14 h-14 text-lg",
+};
+
+const iconSize: Record<Size, string> = {
+  xs: "w-3 h-3",
+  sm: "w-3 h-3",
+  md: "w-4 h-4",
+  lg: "w-5 h-5",
+  xl: "w-6 h-6",
+};
+
+const avatarSize: Record<Size, string> = {
+  xs: "w-4 h-4",
+  sm: "w-4 h-4",
+  md: "w-5 h-5",
+  lg: "w-6 h-6",
+  xl: "w-7 h-7",
+};
+
+const alertIconSize: Record<Size, string> = {
+  xs: "w-2 h-2",
+  sm: "w-2.5 h-2.5",
+  md: "w-3 h-3",
+  lg: "w-4 h-4",
+  xl: "w-4 h-4",
+};
+
+const badgeSize: Record<Size, string> = {
+  xs: "text-[10px] px-1 min-w-[14px] h-3.5",
+  sm: "text-[10px] px-1.5 min-w-[16px] h-4",
+  md: "text-[11px] px-1.5 min-w-[18px] h-[18px]",
+  lg: "text-xs px-2 min-w-[22px] h-5",
+  xl: "text-xs px-2 min-w-[24px] h-5",
+};
+
+const verticalGap: Record<Size, string> = {
+  xs: "gap-1",
+  sm: "gap-1",
+  md: "gap-1.5",
+  lg: "gap-2",
+  xl: "gap-2",
+};
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function isColored(color?: ActionColor, active?: boolean, checked?: boolean): boolean {
+  return !!(color || active || checked);
+}
+
+function getColorClasses(
+  color?: ActionColor,
+  active?: boolean,
+  checked?: boolean,
+  warn?: boolean,
+): string {
+  if (color) return colorClasses[color];
+  if (checked) return checkedClasses;
+  if (active) return activeClasses;
+  if (warn) return warnClasses;
+  return defaultClasses;
+}
+
+function getIconColorClasses(
+  color?: ActionColor,
+  active?: boolean,
+  checked?: boolean,
+  warn?: boolean,
+): string {
+  if (color || active || checked) return "text-white";
+  if (warn) return "text-amber-600 dark:text-amber-400";
+  return "text-zinc-500 dark:text-zinc-400";
+}
+
+function getBadgeClasses(
+  color?: ActionColor,
+  active?: boolean,
+  checked?: boolean,
+  warn?: boolean,
+): string {
+  if (isColored(color, active, checked)) return "bg-white/20 text-white";
+  if (warn) return "bg-amber-200 text-amber-800 dark:bg-amber-800 dark:text-amber-200";
+  return "bg-zinc-200 text-zinc-700 dark:bg-zinc-600 dark:text-zinc-200";
+}
+
+// ---------------------------------------------------------------------------
+// Sort parsing
+// ---------------------------------------------------------------------------
+
+type ElementKey = "e" | "i" | "a" | "b";
+const DEFAULT_SORT = "eiab";
+
+function parseSortOrder(sort?: string): ElementKey[] {
+  const chars = (sort ?? DEFAULT_SORT).split("") as ElementKey[];
+  const valid: ElementKey[] = [];
+  const seen = new Set<string>();
+  for (const c of chars) {
+    if ("eiab".includes(c) && !seen.has(c)) {
+      valid.push(c);
+      seen.add(c);
+    }
+  }
+  // Add missing keys in default order
+  for (const c of DEFAULT_SORT.split("") as ElementKey[]) {
+    if (!seen.has(c)) valid.push(c);
+  }
+  return valid;
+}
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
 
 export const Action = forwardRef<HTMLButtonElement, ActionProps>(
   (
     {
       children,
       className,
-      color = "zinc",
+      variant = "default",
+      color,
       size = "md",
-      variant = "solid",
+      active,
+      checked,
+      warn,
+      alert: alertProp,
       icon,
       iconTrailing,
+      iconPlace = "left",
+      alertIcon,
+      alertIconTrailing,
+      emoji,
+      emojiTrailing,
+      avatar,
+      avatarTrailing,
+      badge,
+      badgeTrailing,
+      sort,
       loading = false,
       disabled,
       href,
@@ -19,26 +203,202 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
     },
     ref,
   ) => {
+    const isCircle = variant === "circle";
+    const isVertical = iconPlace === "top" || iconPlace === "bottom";
+    const isReversed = iconPlace === "right";
+
+    // -----------------------------------------------------------------------
+    // Sizing
+    // -----------------------------------------------------------------------
+    const sizeClass = isCircle
+      ? circleSize[size]
+      : isVertical
+        ? verticalSize[size]
+        : horizontalSize[size];
+
+    // -----------------------------------------------------------------------
+    // Build decorative elements
+    // -----------------------------------------------------------------------
+    const iconColorCls = getIconColorClasses(color, active, checked, warn);
+
+    const buildElement = (key: ElementKey, trailing: boolean): ReactNode => {
+      switch (key) {
+        case "e": {
+          const slug = trailing ? emojiTrailing : emoji;
+          if (!slug) return null;
+          const char = resolve(slug);
+          if (!char) return null;
+          return (
+            <span key={`emoji-${trailing ? "t" : "l"}`} data-action-emoji>
+              {char}
+            </span>
+          );
+        }
+        case "i": {
+          if (loading && !trailing) {
+            return (
+              <span
+                key="spinner"
+                className={cn("animate-spin border-2 border-current border-t-transparent rounded-full", iconSize[size])}
+              />
+            );
+          }
+          const iconNode = trailing ? iconTrailing : icon;
+          if (!iconNode) return null;
+          if (isVertical) {
+            const posClass =
+              iconPlace === "top" ? "top-1.5" : "bottom-1.5";
+            return (
+              <span
+                key={`icon-${trailing ? "t" : "l"}`}
+                className={cn(
+                  "absolute left-1/2 -translate-x-1/2",
+                  posClass,
+                  iconColorCls,
+                )}
+              >
+                {iconNode}
+              </span>
+            );
+          }
+          return (
+            <span
+              key={`icon-${trailing ? "t" : "l"}`}
+              className={cn("flex-shrink-0", iconColorCls)}
+            >
+              {iconNode}
+            </span>
+          );
+        }
+        case "a": {
+          if (!avatar) return null;
+          const isTrailing = avatarTrailing ?? trailing;
+          if (isTrailing !== trailing) return null;
+          return (
+            <img
+              key="avatar"
+              src={avatar}
+              alt=""
+              className={cn(avatarSize[size], "rounded-full object-cover flex-shrink-0")}
+              data-action-avatar
+            />
+          );
+        }
+        case "b": {
+          if (!badge) return null;
+          const isTrailing = badgeTrailing ?? trailing;
+          if (isTrailing !== trailing) return null;
+          return (
+            <span
+              key="badge"
+              className={cn(
+                "inline-flex items-center justify-center font-medium rounded-full",
+                badgeSize[size],
+                getBadgeClasses(color, active, checked, warn),
+              )}
+              data-action-badge
+            >
+              {badge}
+            </span>
+          );
+        }
+        default:
+          return null;
+      }
+    };
+
+    // Alert icon element
+    const renderAlertIcon = (trailing: boolean): ReactNode => {
+      if (!alertIcon) return null;
+      const isTrailing = alertIconTrailing ?? false;
+      if (isTrailing !== trailing) return null;
+      return (
+        <span
+          key="alert-icon"
+          className="relative inline-flex flex-shrink-0"
+          data-action-alert
+        >
+          <span className={cn(alertIconSize[size], "text-red-500 dark:text-red-400 animate-pulse")}>
+            {alertIcon}
+          </span>
+          <span
+            className={cn(
+              alertIconSize[size],
+              "absolute inset-0 text-red-400 dark:text-red-300 animate-ping opacity-75",
+            )}
+          >
+            {alertIcon}
+          </span>
+        </span>
+      );
+    };
+
+    const sortOrder = parseSortOrder(sort);
+
+    const leadingElements: ReactNode[] = [];
+    const trailingElements: ReactNode[] = [];
+
+    for (const key of sortOrder) {
+      const leading = buildElement(key, false);
+      if (leading) leadingElements.push(leading);
+      const trailing = buildElement(key, true);
+      if (trailing) trailingElements.push(trailing);
+    }
+
+    // Insert alert icon
+    const leadingAlert = renderAlertIcon(false);
+    if (leadingAlert) leadingElements.push(leadingAlert);
+    const trailingAlert = renderAlertIcon(true);
+    if (trailingAlert) trailingElements.push(trailingAlert);
+
+    // -----------------------------------------------------------------------
+    // Classes
+    // -----------------------------------------------------------------------
     const classes = cn(
-      "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors",
-      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current",
-      "disabled:opacity-50 disabled:pointer-events-none",
-      {
-        xs: "px-2 py-1 text-xs",
-        sm: "px-3 py-1.5 text-sm",
-        md: "px-4 py-2 text-sm",
-        lg: "px-5 py-2.5 text-base",
-        xl: "px-6 py-3 text-lg",
-      }[size],
+      "inline-flex items-center justify-center font-medium transition-all duration-200",
+      "focus:outline-none focus:ring-2 focus:ring-offset-1",
+      "disabled:opacity-50 disabled:cursor-not-allowed",
+      isCircle ? "rounded-full" : "rounded-lg",
+      sizeClass,
+      getColorClasses(color, active, checked, warn),
+      !isCircle && !isVertical && "gap-2",
+      !isCircle && isVertical && cn("relative", verticalGap[size]),
+      isReversed && !isVertical && "flex-row-reverse",
+      alertProp && "animate-pulse",
       className,
     );
 
+    // -----------------------------------------------------------------------
+    // Content
+    // -----------------------------------------------------------------------
+    const content = isCircle ? (
+      <>
+        {loading ? (
+          <span
+            className={cn(
+              "animate-spin border-2 border-current border-t-transparent rounded-full",
+              iconSize[size],
+            )}
+          />
+        ) : (
+          icon ?? children
+        )}
+      </>
+    ) : (
+      <>
+        {leadingElements}
+        {children != null && <span>{children}</span>}
+        {trailingElements}
+      </>
+    );
+
+    // -----------------------------------------------------------------------
+    // Render
+    // -----------------------------------------------------------------------
     if (href && !disabled) {
       return (
         <a href={href} className={classes}>
-          {icon}
-          {children}
-          {iconTrailing}
+          {content}
         </a>
       );
     }
@@ -50,13 +410,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
         disabled={disabled || loading}
         {...props}
       >
-        {loading ? (
-          <span className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
-        ) : (
-          icon
-        )}
-        {children}
-        {iconTrailing}
+        {content}
       </button>
     );
   },

@@ -2,13 +2,42 @@
 export { Action } from "./components/Action";
 export type { ActionProps } from "./components/Action";
 
-export { Carousel } from "./components/Carousel";
+export {
+  Field,
+  Input,
+  Textarea,
+  Select,
+  Checkbox,
+  CheckboxGroup,
+  RadioGroup,
+  Switch,
+  Slider,
+  DatePicker,
+} from "./components/inputs";
+export type {
+  InputBaseProps,
+  InputOption,
+  InputOptionGroup,
+  FieldProps,
+  InputProps,
+  TextareaProps,
+  SelectProps,
+  CheckboxProps,
+  CheckboxGroupProps,
+  RadioGroupProps,
+  SwitchProps,
+  SliderProps,
+  DatePickerProps,
+} from "./components/inputs";
+
+export { Carousel, useCarousel } from "./components/Carousel";
 export type {
   CarouselProps,
   CarouselSlideProps,
   CarouselControlsProps,
   CarouselStepsProps,
   CarouselPanelsProps,
+  CarouselContextValue,
 } from "./components/Carousel";
 
 export { ColorPicker } from "./components/ColorPicker";
@@ -35,7 +64,7 @@ export type {
 
 // Utilities
 export { cn } from "./utils/cn";
-export type { Size, Color, Variant } from "./utils/types";
+export type { Size, Color, Variant, ActionColor } from "./utils/types";
 
 // Hooks
 export { useControllableState } from "./hooks";
