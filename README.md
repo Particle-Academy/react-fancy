@@ -1,11 +1,11 @@
-# @fancy/react
+# @particle-academy/react-fancy
 
 React UI component library — the React port of the `fancy-flux` Blade/Livewire component library. The goal is **visual and behavioral parity** with fancy-flux.
 
 ## Installation
 
 ```bash
-pnpm add @fancy/react
+pnpm add @particle-academy/react-fancy
 ```
 
 Peer dependencies: `react >= 18`, `react-dom >= 18`.
@@ -13,17 +13,17 @@ Peer dependencies: `react >= 18`, `react-dom >= 18`.
 ## Usage
 
 ```tsx
-import { Action, Input, Select, Carousel } from "@fancy/react";
-import "@fancy/react/styles.css";
+import { Action, Input, Select, Carousel } from "@particle-academy/react-fancy";
+import "@particle-academy/react-fancy/styles.css";
 ```
 
 ## Commands
 
 ```bash
-pnpm --filter @fancy/react build    # Build with tsup (ESM + CJS + DTS)
-pnpm --filter @fancy/react dev      # Watch mode
-pnpm --filter @fancy/react lint     # Type-check (tsc --noEmit)
-pnpm --filter @fancy/react clean    # Remove dist/
+pnpm --filter @particle-academy/react-fancy build    # Build with tsup (ESM + CJS + DTS)
+pnpm --filter @particle-academy/react-fancy dev      # Watch mode
+pnpm --filter @particle-academy/react-fancy lint     # Type-check (tsc --noEmit)
+pnpm --filter @particle-academy/react-fancy clean    # Remove dist/
 ```
 
 The demo app consuming this package builds with Vite from the monorepo root:
@@ -127,5 +127,5 @@ Every component follows this structure:
 
 - tsup handles the build — ESM, CJS, and `.d.ts` generation.
 - `react` and `react-dom` are external peer dependencies, never bundled.
-- After any change, verify with `pnpm --filter @fancy/react build` before considering the work done.
+- After any change, verify with `pnpm --filter @particle-academy/react-fancy build` before considering the work done.
 - When updating a component, update its demo page in `resources/js/react-demos/pages/` to cover all new features.
