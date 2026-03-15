@@ -71,6 +71,7 @@ export function ChartLine({
   return (
     <div
       ref={containerRef}
+      data-react-fancy-chart-line=""
       className={cn("relative", className)}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setHoverInfo(null)}

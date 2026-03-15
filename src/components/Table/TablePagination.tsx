@@ -13,7 +13,7 @@ export function TablePagination({
   if (totalPages <= 1) return null;
 
   return (
-    <div className={cn("flex items-center justify-between px-4 py-3 text-sm", className)}>
+    <div data-react-fancy-table-pagination="" className={cn("flex items-center justify-between px-4 py-3 text-sm", className)}>
       <span className="text-zinc-500">
         Page {page + 1} of {totalPages}
       </span>

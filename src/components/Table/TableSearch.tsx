@@ -10,6 +10,7 @@ export function TableSearch({
 
   return (
     <input
+      data-react-fancy-table-search=""
       type="text"
       value={searchQuery}
       onChange={(e) => setSearchQuery(e.target.value)}

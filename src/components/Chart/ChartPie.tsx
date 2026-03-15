@@ -54,7 +54,7 @@ export function ChartPie({
   };
 
   return (
-    <div ref={containerRef} className={cn("relative inline-flex items-center gap-6", className)} onMouseMove={handleMouseMove}>
+    <div ref={containerRef} data-react-fancy-chart-pie="" className={cn("relative inline-flex items-center gap-6", className)} onMouseMove={handleMouseMove}>
       <svg width={size} height={size}>
         {slices.map((slice, i) => (
           <g key={slice.label}>

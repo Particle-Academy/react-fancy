@@ -8,6 +8,7 @@ export function TableColumn({ label, sortKey, className }: TableColumnProps) {
 
   return (
     <th
+      data-react-fancy-table-column=""
       className={cn(
         "px-4 py-3 text-left text-sm font-medium text-zinc-500 dark:text-zinc-400",
         sortKey && "cursor-pointer select-none",

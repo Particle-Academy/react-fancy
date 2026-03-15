@@ -5,7 +5,7 @@ import type { CarouselSlideProps } from "./Carousel.types";
 export const CarouselSlide = forwardRef<HTMLDivElement, CarouselSlideProps>(
   ({ children, className, name: _name }, ref) => {
     return (
-      <div ref={ref} className={cn("w-full", className)}>
+      <div ref={ref} data-react-fancy-carousel-slide="" className={cn("w-full", className)}>
         {children}
       </div>
     );

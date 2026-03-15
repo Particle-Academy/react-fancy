@@ -20,7 +20,7 @@ export function ContextMenuTrigger({
   );
 
   return (
-    <div onContextMenu={handleContextMenu} className={cn(className)}>
+    <div data-react-fancy-context-menu-trigger="" onContextMenu={handleContextMenu} className={cn(className)}>
       {children}
     </div>
   );

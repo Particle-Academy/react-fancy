@@ -44,7 +44,7 @@ export const CarouselPanels = forwardRef<HTMLDivElement, CarouselPanelsProps>(
 
     if (transition === "fade") {
       return (
-        <div ref={ref} className={cn("relative overflow-hidden", className)}>
+        <div ref={ref} data-react-fancy-carousel-panels="" className={cn("relative overflow-hidden", className)}>
           <div
             key={activeIndex}
             className={cn(
@@ -61,7 +61,7 @@ export const CarouselPanels = forwardRef<HTMLDivElement, CarouselPanelsProps>(
     }
 
     return (
-      <div ref={ref} className={cn("relative overflow-hidden", className)}>
+      <div ref={ref} data-react-fancy-carousel-panels="" className={cn("relative overflow-hidden", className)}>
         {slides[activeIndex]}
       </div>
     );

@@ -14,6 +14,7 @@ export function ContextMenuItem({
   return (
     <button
       type="button"
+      data-react-fancy-context-menu-item=""
       role="menuitem"
       disabled={disabled}
       aria-disabled={disabled}

@@ -24,7 +24,7 @@ export const CarouselControls = forwardRef<HTMLDivElement, CarouselControlsProps
 
     if (variant === "wizard") {
       return (
-        <div ref={ref} className={cn("flex items-center gap-2", className)}>
+        <div ref={ref} data-react-fancy-carousel-controls="" className={cn("flex items-center gap-2", className)}>
           <button
             type="button"
             onClick={prev}
@@ -59,7 +59,7 @@ export const CarouselControls = forwardRef<HTMLDivElement, CarouselControlsProps
     const nextDisabled = !loop && isLast;
 
     return (
-      <div ref={ref} className={cn("flex items-center gap-2", className)}>
+      <div ref={ref} data-react-fancy-carousel-controls="" className={cn("flex items-center gap-2", className)}>
         <button
           type="button"
           onClick={prev}

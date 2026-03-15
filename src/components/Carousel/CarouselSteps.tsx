@@ -13,7 +13,7 @@ export const CarouselSteps = forwardRef<HTMLDivElement, CarouselStepsProps>(
 
     if (variant === "wizard") {
       return (
-        <div ref={ref} className={cn("flex items-center gap-3", className)}>
+        <div ref={ref} data-react-fancy-carousel-steps="" className={cn("flex items-center gap-3", className)}>
           {Array.from({ length: totalSlides }, (_, i) => {
             const isActive = i === activeIndex;
             const isCompleted = i < activeIndex;
@@ -53,7 +53,7 @@ export const CarouselSteps = forwardRef<HTMLDivElement, CarouselStepsProps>(
 
     // Directional variant: dot indicators (default)
     return (
-      <div ref={ref} className={cn("flex items-center gap-1.5", className)}>
+      <div ref={ref} data-react-fancy-carousel-steps="" className={cn("flex items-center gap-1.5", className)}>
         {Array.from({ length: totalSlides }, (_, i) => (
           <button
             key={i}

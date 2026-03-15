@@ -57,7 +57,7 @@ export function ChartStackedBar({
     : { width, height };
 
   return (
-    <div ref={containerRef} className={cn("relative", className)} onMouseMove={handleMouseMove}>
+    <div ref={containerRef} data-react-fancy-chart-stacked-bar="" className={cn("relative", className)} onMouseMove={handleMouseMove}>
       <svg {...svgProps} height={responsive ? undefined : height}>
         {grid && (
           <ChartGrid

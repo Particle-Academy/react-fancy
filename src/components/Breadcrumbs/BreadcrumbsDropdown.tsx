@@ -23,7 +23,7 @@ export function BreadcrumbsDropdown({ items, activeLabel }: BreadcrumbsDropdownP
   useEscapeKey(() => setOpen(false), open);
 
   return (
-    <div ref={ref} className="relative flex md:hidden">
+    <div ref={ref} data-react-fancy-breadcrumbs-dropdown="" className="relative flex md:hidden">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
