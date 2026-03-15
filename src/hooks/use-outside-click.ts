@@ -14,10 +14,15 @@ export function useOutsideClick(
       handler(event);
     };
 
-    document.addEventListener("mousedown", listener);
-    document.addEventListener("touchstart", listener);
+    // Defer listener registration so the opening click event doesn't
+    // immediately trigger an outside-click close on the same frame.
+    const raf = requestAnimationFrame(() => {
+      document.addEventListener("mousedown", listener);
+      document.addEventListener("touchstart", listener);
+    });
 
     return () => {
+      cancelAnimationFrame(raf);
       document.removeEventListener("mousedown", listener);
       document.removeEventListener("touchstart", listener);
     };
