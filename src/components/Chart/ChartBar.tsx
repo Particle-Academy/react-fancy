@@ -16,6 +16,18 @@ export function ChartBar({
 
   return (
     <div className={cn("w-full", className)} data-react-fancy-chart-bar="">
+      {showValues && (
+        <div className="mb-1 flex gap-2">
+          {data.map((item) => (
+            <div
+              key={item.label}
+              className="flex-1 text-center text-xs font-medium text-zinc-500 dark:text-zinc-400"
+            >
+              {item.value}
+            </div>
+          ))}
+        </div>
+      )}
       <div
         className="flex items-end gap-2"
         style={{ height }}
@@ -27,14 +39,9 @@ export function ChartBar({
           return (
             <div
               key={item.label}
-              className="flex h-full flex-1 flex-col items-center justify-end gap-1"
+              className="flex h-full flex-1 items-end justify-center"
               data-react-fancy-chart-bar-column=""
             >
-              {showValues && (
-                <span className="text-xs font-medium text-zinc-500">
-                  {item.value}
-                </span>
-              )}
               <div
                 data-react-fancy-chart-bar-item=""
                 className="w-full rounded-t-md transition-all duration-500"

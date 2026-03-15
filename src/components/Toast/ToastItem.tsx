@@ -49,7 +49,7 @@ export function ToastItem({ data, onDismiss }: ToastItemProps) {
           {variant === "info" && <Info size={16} />}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium">{title}</p>
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{title}</p>
           {description && (
             <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
               {description}

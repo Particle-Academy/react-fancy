@@ -41,7 +41,7 @@ export function PopoverContent({ children, className }: PopoverContentProps) {
         }}
         data-react-fancy-popover=""
         className={cn(
-          "fixed z-50 rounded-xl border border-zinc-200 bg-white p-4 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
+          "fixed z-50 rounded-xl border border-zinc-200 bg-white p-4 text-zinc-700 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:shadow-zinc-950/50",
           animClass,
           className,
         )}

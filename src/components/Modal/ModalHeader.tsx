@@ -14,7 +14,7 @@ export function ModalHeader({ children, className }: ModalHeaderProps) {
         className,
       )}
     >
-      <div className="text-lg font-semibold">{children}</div>
+      <div className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{children}</div>
       <button
         type="button"
         onClick={close}

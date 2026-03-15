@@ -79,8 +79,8 @@ export function useFloatingPosition(
 ): FloatingPosition {
   const { placement = "bottom", offset = 8, enabled = true } = options;
   const [position, setPosition] = useState<FloatingPosition>({
-    x: 0,
-    y: 0,
+    x: -9999,
+    y: -9999,
     placement,
   });
 

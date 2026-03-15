@@ -112,14 +112,14 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
           role="combobox"
           aria-expanded={open}
           aria-autocomplete="list"
-          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-500"
+          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-zinc-500"
         />
         {open && (
           <Portal>
             <div
               ref={listRef}
               role="listbox"
-              className="fixed z-50 max-h-60 min-w-[8rem] overflow-y-auto rounded-xl border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 fancy-scale-in"
+              className="fixed z-50 max-h-60 min-w-[8rem] overflow-y-auto rounded-xl border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-zinc-950/50 fancy-scale-in"
               style={{
                 left: position.x,
                 top: position.y,
@@ -142,7 +142,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
                     disabled={option.disabled}
                     onClick={() => select(option.value)}
                     className={cn(
-                      "flex w-full items-center rounded-lg px-3 py-2 text-left text-sm transition-colors",
+                      "flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-zinc-700 transition-colors dark:text-zinc-200",
                       i === activeIndex
                         ? "bg-zinc-100 dark:bg-zinc-800"
                         : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
