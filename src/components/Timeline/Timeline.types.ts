@@ -1,7 +1,11 @@
 import type { ReactNode } from "react";
 
+export type TimelineOrientation = "vertical" | "horizontal";
+
 export interface TimelineProps {
   children: ReactNode;
+  /** Layout direction. Default: "vertical" */
+  orientation?: TimelineOrientation;
   className?: string;
 }
 

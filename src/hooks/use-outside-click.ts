@@ -4,6 +4,7 @@ export function useOutsideClick(
   ref: RefObject<HTMLElement | null>,
   handler: (event: MouseEvent | TouchEvent) => void,
   enabled: boolean = true,
+  ignoreRef?: RefObject<HTMLElement | null>,
 ): void {
   useEffect(() => {
     if (!enabled) return;
@@ -11,20 +12,18 @@ export function useOutsideClick(
     const listener = (event: MouseEvent | TouchEvent) => {
       const el = ref.current;
       if (!el || el.contains(event.target as Node)) return;
+      // Ignore clicks on the trigger/anchor element — the trigger's
+      // own onClick handler manages toggling.
+      if (ignoreRef?.current?.contains(event.target as Node)) return;
       handler(event);
     };
 
-    // Defer listener registration so the opening click event doesn't
-    // immediately trigger an outside-click close on the same frame.
-    const raf = requestAnimationFrame(() => {
-      document.addEventListener("mousedown", listener);
-      document.addEventListener("touchstart", listener);
-    });
+    document.addEventListener("mousedown", listener);
+    document.addEventListener("touchstart", listener);
 
     return () => {
-      cancelAnimationFrame(raf);
       document.removeEventListener("mousedown", listener);
       document.removeEventListener("touchstart", listener);
     };
-  }, [ref, handler, enabled]);
+  }, [ref, handler, enabled, ignoreRef]);
 }

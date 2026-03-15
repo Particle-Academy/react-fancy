@@ -20,7 +20,7 @@ export function PopoverContent({ children, className }: PopoverContentProps) {
   });
 
   const close = useCallback(() => setOpen(false), [setOpen]);
-  useOutsideClick(outsideRef, close, open);
+  useOutsideClick(outsideRef, close, open, anchorRef);
   useEscapeKey(close, open);
 
   const { mounted, className: animClass, ref: animRef } = useAnimation({

@@ -25,7 +25,7 @@ export function DropdownItems({ children, className }: DropdownItemsProps) {
     setActiveIndex(-1);
   }, [setOpen, setActiveIndex]);
 
-  useOutsideClick(outsideRef, close, open);
+  useOutsideClick(outsideRef, close, open, anchorRef);
   useEscapeKey(close, open);
 
   const { mounted, className: animClass, ref: animRef } = useAnimation({

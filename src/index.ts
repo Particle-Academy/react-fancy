@@ -114,7 +114,7 @@ export { Callout } from "./components/Callout";
 export type { CalloutProps } from "./components/Callout";
 
 export { Timeline } from "./components/Timeline";
-export type { TimelineProps, TimelineItemProps, TimelineBlockProps } from "./components/Timeline";
+export type { TimelineProps, TimelineItemProps, TimelineBlockProps, TimelineOrientation } from "./components/Timeline";
 
 // Phase 3: Overlay & Floating Components
 export { Tooltip } from "./components/Tooltip";

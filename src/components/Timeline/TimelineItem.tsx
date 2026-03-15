@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
 import { cn } from "../../utils/cn";
+import { useTimeline } from "./Timeline.context";
 import type { TimelineItemProps } from "./Timeline.types";
 
 const dotColorClasses: Record<NonNullable<TimelineItemProps["color"]>, string> = {
@@ -26,6 +27,34 @@ const ringColorClasses: Record<NonNullable<TimelineItemProps["color"]>, string> 
   zinc: "ring-zinc-400/30 dark:ring-zinc-500/30",
 };
 
+function Dot({ icon, color, active }: Pick<TimelineItemProps, "icon" | "color" | "active">) {
+  const c = color ?? "zinc";
+  if (icon) {
+    return (
+      <span
+        className={cn(
+          "flex h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-zinc-900",
+          iconColorClasses[c],
+          active && "ring-4",
+          active && ringColorClasses[c],
+        )}
+      >
+        {icon}
+      </span>
+    );
+  }
+  return (
+    <span
+      className={cn(
+        "h-3 w-3 rounded-full",
+        dotColorClasses[c],
+        active && "ring-4",
+        active && ringColorClasses[c],
+      )}
+    />
+  );
+}
+
 export const TimelineItem = forwardRef<HTMLDivElement, TimelineItemProps>(
   (
     {
@@ -37,6 +66,42 @@ export const TimelineItem = forwardRef<HTMLDivElement, TimelineItemProps>(
     },
     ref,
   ) => {
+    const { orientation, index } = useTimeline();
+
+    if (orientation === "horizontal") {
+      const isTop = index % 2 === 0;
+      return (
+        <div
+          ref={ref}
+          data-react-fancy-timeline-item=""
+          className={cn("relative flex flex-col items-center", className)}
+          style={{ minWidth: 120 }}
+        >
+          {/* Top content area */}
+          <div className={cn("flex min-h-[4rem] items-end pb-2", !isTop && "invisible")}>
+            {isTop && <div className="min-w-0 text-center">{children}</div>}
+          </div>
+
+          {/* Dot row with connecting line */}
+          <div className="relative flex w-full items-center justify-center">
+            {/* Left connector */}
+            <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+            <div className="relative z-10 flex shrink-0 items-center justify-center">
+              <Dot icon={icon} color={color} active={active} />
+            </div>
+            {/* Right connector */}
+            <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+          </div>
+
+          {/* Bottom content area */}
+          <div className={cn("flex min-h-[4rem] items-start pt-2", isTop && "invisible")}>
+            {!isTop && <div className="min-w-0 text-center">{children}</div>}
+          </div>
+        </div>
+      );
+    }
+
+    // Vertical (default)
     return (
       <div
         ref={ref}
@@ -47,28 +112,8 @@ export const TimelineItem = forwardRef<HTMLDivElement, TimelineItemProps>(
         <div className="absolute left-[11px] top-6 bottom-0 w-px bg-zinc-200 last:hidden dark:bg-zinc-700" />
 
         {/* Dot / Icon */}
-        <div className="relative z-10 flex shrink-0">
-          {icon ? (
-            <span
-              className={cn(
-                "flex h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-zinc-900",
-                iconColorClasses[color],
-                active && "ring-4",
-                active && ringColorClasses[color],
-              )}
-            >
-              {icon}
-            </span>
-          ) : (
-            <span
-              className={cn(
-                "mt-1.5 h-3 w-3 rounded-full",
-                dotColorClasses[color],
-                active && "ring-4",
-                active && ringColorClasses[color],
-              )}
-            />
-          )}
+        <div className="relative z-10 flex shrink-0 mt-1.5">
+          <Dot icon={icon} color={color} active={active} />
         </div>
 
         {/* Content */}
