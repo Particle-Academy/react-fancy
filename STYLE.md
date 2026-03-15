@@ -4,7 +4,16 @@ This guide is for AI agents and developers creating custom color themes or styli
 
 ## Setup
 
-Import the base styles in your app entry point:
+**1. Add `@source` to your CSS** so Tailwind v4 scans the library for class names (required for colors, variants, and dark mode to work):
+
+```css
+@import "tailwindcss";
+@source "../node_modules/@particle-academy/react-fancy/dist/**/*.js";
+```
+
+Without this, Tailwind won't generate CSS for classes used inside the library (e.g., Badge colors will be invisible, dark mode backgrounds won't apply).
+
+**2. Import the base styles** in your app entry point:
 
 ```tsx
 import "@particle-academy/react-fancy/styles.css";

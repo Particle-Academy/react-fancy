@@ -23,6 +23,15 @@ yarn add @particle-academy/react-fancy
 
 ## Usage
 
+Add the `@source` directive to your main CSS file so Tailwind v4 scans the component library for class names:
+
+```css
+@import "tailwindcss";
+@source "../node_modules/@particle-academy/react-fancy/dist/**/*.js";
+```
+
+Then import and use components:
+
 ```tsx
 import { Action, Input, Modal, Dropdown } from "@particle-academy/react-fancy";
 import "@particle-academy/react-fancy/styles.css";
