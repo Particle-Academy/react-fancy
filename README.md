@@ -5,12 +5,21 @@ React UI component library — the React port of the `fancy-flux` Blade/Livewire
 ## Installation
 
 ```bash
+# npm
+npm install @particle-academy/react-fancy
+
+# pnpm
 pnpm add @particle-academy/react-fancy
+
+# yarn
+yarn add @particle-academy/react-fancy
 ```
 
-Peer dependencies: `react >= 18`, `react-dom >= 18`.
+**Peer dependencies:** `react >= 18`, `react-dom >= 18`, `tailwindcss >= 4`
 
-Dependencies: `lucide-react` (default icon library, bundled externally).
+**Bundled dependencies:** `clsx`, `tailwind-merge`, `marked`
+
+**External dependency:** `lucide-react` (default icon library)
 
 ## Usage
 
