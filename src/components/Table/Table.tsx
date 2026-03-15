@@ -9,6 +9,7 @@ import { TableColumn } from "./TableColumn";
 import { TablePagination } from "./TablePagination";
 import { TableSearch } from "./TableSearch";
 import { TableTray } from "./TableTray";
+import { TableRowTray } from "./TableRowTray";
 import type { TableProps, TableContextValue } from "./Table.types";
 
 function TableRoot({ children, className }: TableProps) {
@@ -46,7 +47,7 @@ function TableRoot({ children, className }: TableProps) {
 
   return (
     <TableContext.Provider value={ctx}>
-      <div className={cn("overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700", className)}>
+      <div data-react-fancy-table="" className={cn("overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700", className)}>
         {children}
       </div>
     </TableContext.Provider>
@@ -62,4 +63,5 @@ export const Table = Object.assign(TableRoot, {
   Pagination: TablePagination,
   Search: TableSearch,
   Tray: TableTray,
+  RowTray: TableRowTray,
 });

@@ -18,6 +18,7 @@ export function Emoji({ name, emoji, size = "md", className }: EmojiProps) {
     <span
       role="img"
       aria-label={name ?? resolved}
+      data-react-fancy-emoji=""
       className={cn("inline-block leading-none", sizeClass, className)}
     >
       {resolved}

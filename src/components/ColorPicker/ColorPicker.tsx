@@ -1,85 +1,110 @@
+import { forwardRef, useId, useRef } from "react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
-import type { Color } from "../../utils/types";
 import type { ColorPickerProps } from "./ColorPicker.types";
 
-const DEFAULT_COLORS: Color[] = [
-  "zinc",
-  "red",
-  "orange",
-  "amber",
-  "yellow",
-  "lime",
-  "green",
-  "emerald",
-  "teal",
-  "cyan",
-  "sky",
-  "blue",
-  "indigo",
-  "violet",
-  "purple",
-  "fuchsia",
-  "pink",
-  "rose",
-];
+const DEFAULT_COLOR = "#3b82f6";
 
-const COLOR_MAP: Record<Color, string> = {
-  zinc: "bg-zinc-500",
-  red: "bg-red-500",
-  orange: "bg-orange-500",
-  amber: "bg-amber-500",
-  yellow: "bg-yellow-500",
-  lime: "bg-lime-500",
-  green: "bg-green-500",
-  emerald: "bg-emerald-500",
-  teal: "bg-teal-500",
-  cyan: "bg-cyan-500",
-  sky: "bg-sky-500",
-  blue: "bg-blue-500",
-  indigo: "bg-indigo-500",
-  violet: "bg-violet-500",
-  purple: "bg-purple-500",
-  fuchsia: "bg-fuchsia-500",
-  pink: "bg-pink-500",
-  rose: "bg-rose-500",
-};
+const SWATCH_SIZES = {
+  sm: "h-6 w-6",
+  md: "h-8 w-8",
+  lg: "h-10 w-10",
+} as const;
 
-export function ColorPicker({
-  value,
-  defaultValue = "blue",
-  onChange,
-  colors = DEFAULT_COLORS,
-  size = "md",
-  className,
-}: ColorPickerProps) {
-  const [selected, setSelected] = useControllableState(
-    value,
-    defaultValue,
-    onChange,
-  );
+const TEXT_SIZES = {
+  sm: "text-xs",
+  md: "text-sm",
+  lg: "text-base",
+} as const;
 
-  const swatchSize = { sm: "h-6 w-6", md: "h-8 w-8", lg: "h-10 w-10" }[size];
+export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
+  (
+    {
+      value,
+      defaultValue = DEFAULT_COLOR,
+      onChange,
+      presets,
+      size = "md",
+      variant = "outline",
+      disabled = false,
+      className,
+    },
+    ref,
+  ) => {
+    const [color, setColor] = useControllableState(
+      value,
+      defaultValue,
+      onChange,
+    );
 
-  return (
-    <div className={cn("flex flex-wrap gap-2", className)}>
-      {colors.map((color) => (
+    const inputRef = useRef<HTMLInputElement>(null);
+    const datalistId = useId();
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setColor(e.target.value);
+    };
+
+    const handleSwatchClick = () => {
+      if (!disabled) {
+        inputRef.current?.click();
+      }
+    };
+
+    return (
+      <div
+        ref={ref}
+        data-react-fancy-color-picker=""
+        className={cn("inline-flex items-center gap-2", className)}
+      >
         <button
-          key={color}
           type="button"
+          disabled={disabled}
+          onClick={handleSwatchClick}
           className={cn(
-            swatchSize,
-            "rounded-full transition-transform",
-            COLOR_MAP[color],
-            selected === color
-              ? "ring-2 ring-offset-2 ring-current scale-110"
-              : "hover:scale-110",
+            "relative shrink-0 rounded-full transition-shadow",
+            SWATCH_SIZES[size],
+            variant === "outline" &&
+              "ring-1 ring-zinc-300 dark:ring-zinc-600",
+            disabled
+              ? "cursor-not-allowed opacity-50"
+              : "cursor-pointer hover:ring-2 hover:ring-zinc-400 dark:hover:ring-zinc-500",
           )}
-          onClick={() => setSelected(color)}
-          aria-label={color}
-          aria-pressed={selected === color}
-        />
-      ))}
-    </div>
-  );
-}
+          style={{ backgroundColor: color }}
+          aria-label={`Selected color: ${color}`}
+        >
+          <input
+            ref={inputRef}
+            type="color"
+            value={color}
+            onChange={handleChange}
+            disabled={disabled}
+            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+            tabIndex={-1}
+            list={presets ? datalistId : undefined}
+          />
+        </button>
+
+        <span
+          className={cn(
+            "select-all font-mono uppercase",
+            TEXT_SIZES[size],
+            "text-zinc-700 dark:text-zinc-300",
+            disabled && "opacity-50",
+          )}
+        >
+          {color.toUpperCase()}
+        </span>
+
+        {presets && (
+          <datalist id={datalistId}>
+            {presets.map((preset) => (
+              <option key={preset} value={preset} />
+            ))}
+          </datalist>
+        )}
+      </div>
+    );
+  },
+);
+
+ColorPicker.displayName = "ColorPicker";

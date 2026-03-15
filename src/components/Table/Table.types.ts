@@ -38,6 +38,16 @@ export interface TableRowProps {
   children: ReactNode;
   className?: string;
   onClick?: () => void;
+  tray?: ReactNode;
+  trayTriggerPosition?: "start" | "end" | "hidden";
+  expanded?: boolean;
+  defaultExpanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
+}
+
+export interface TableRowTrayProps {
+  children: ReactNode;
+  className?: string;
 }
 
 export interface TableCellProps {

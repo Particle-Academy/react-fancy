@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { InputBaseProps } from "../inputs.types";
 
 interface SliderBaseProps extends InputBaseProps {
@@ -6,6 +7,8 @@ interface SliderBaseProps extends InputBaseProps {
   step?: number;
   showValue?: boolean;
   marks?: { value: number; label?: string }[];
+  prefix?: ReactNode;
+  suffix?: ReactNode;
 }
 
 export interface SliderSingleProps extends SliderBaseProps {

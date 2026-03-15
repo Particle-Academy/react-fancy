@@ -69,6 +69,8 @@ const SingleSlider = forwardRef<HTMLInputElement, SliderProps & { range?: false 
       step = 1,
       showValue,
       marks,
+      prefix,
+      suffix,
       ...rest
     },
     ref,
@@ -81,8 +83,9 @@ const SingleSlider = forwardRef<HTMLInputElement, SliderProps & { range?: false 
     );
 
     const slider = (
-      <div className={cn("flex flex-col gap-1", className)}>
+      <div data-react-fancy-slider="" className={cn("flex flex-col gap-1", className)}>
         <div className="flex items-center gap-3">
+          {prefix && <span className="shrink-0 text-sm text-zinc-500 dark:text-zinc-400" data-react-fancy-slider-prefix="">{prefix}</span>}
           <input
             ref={ref}
             id={id}
@@ -106,6 +109,7 @@ const SingleSlider = forwardRef<HTMLInputElement, SliderProps & { range?: false 
               }[size],
             )}
           />
+          {suffix && <span className="shrink-0 text-sm text-zinc-500 dark:text-zinc-400" data-react-fancy-slider-suffix="">{suffix}</span>}
           {showValue && (
             <span className="min-w-[3ch] text-right text-sm font-medium text-zinc-700 dark:text-zinc-300">
               {value}
@@ -148,6 +152,8 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
       step = 1,
       showValue,
       marks,
+      prefix,
+      suffix,
       ...rest
     },
     ref,
@@ -171,8 +177,9 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
     const rightPercent = ((value[1] - min) / (max - min)) * 100;
 
     const slider = (
-      <div className={cn("flex flex-col gap-1", className)}>
+      <div data-react-fancy-slider="" className={cn("flex flex-col gap-1", className)}>
         <div className="flex items-center gap-3">
+          {prefix && <span className="shrink-0 text-sm text-zinc-500 dark:text-zinc-400" data-react-fancy-slider-prefix="">{prefix}</span>}
           <div className="relative w-full">
             <div className="pointer-events-none absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-zinc-200 dark:bg-zinc-700" />
             <div
@@ -205,6 +212,7 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
             />
             <div className="h-6" />
           </div>
+          {suffix && <span className="shrink-0 text-sm text-zinc-500 dark:text-zinc-400" data-react-fancy-slider-suffix="">{suffix}</span>}
           {showValue && (
             <span className="min-w-[6ch] whitespace-nowrap text-right text-sm font-medium text-zinc-700 dark:text-zinc-300">
               {value[0]}–{value[1]}

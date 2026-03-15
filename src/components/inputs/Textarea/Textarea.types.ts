@@ -1,9 +1,10 @@
 import type { TextareaHTMLAttributes } from "react";
-import type { InputBaseProps } from "../inputs.types";
+import type { InputBaseProps, InputAffixProps } from "../inputs.types";
 
 export interface TextareaProps
   extends InputBaseProps,
-    Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> {
+    InputAffixProps,
+    Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size" | "prefix"> {
   autoResize?: boolean;
   minRows?: number;
   maxRows?: number;

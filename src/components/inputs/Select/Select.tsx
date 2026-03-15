@@ -1,6 +1,7 @@
 import { forwardRef, useId } from "react";
 import { cn } from "../../../utils/cn";
 import { Field } from "../Field";
+import { InputWrapper } from "../InputWrapper";
 import {
   dirtyClasses,
   errorClasses,
@@ -44,6 +45,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
       id,
       list,
       placeholder,
+      prefix,
+      suffix,
+      prefixPosition,
+      suffixPosition,
       onValueChange,
       onChange,
       ...props
@@ -54,44 +59,53 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     const selectId = id ?? autoId;
 
     const select = (
-      <select
-        ref={ref}
-        id={selectId}
-        disabled={disabled}
-        required={required}
-        className={cn(
-          inputBaseClasses,
-          inputSizeClasses[size],
-          dirtyClasses(dirty),
-          errorClasses(error),
-          "w-full appearance-none bg-no-repeat bg-[length:16px] bg-[right_8px_center]",
-          "bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%236b7280%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.23%207.21a.75.75%200%20011.06.02L10%2011.168l3.71-3.938a.75.75%200%20111.08%201.04l-4.25%204.5a.75.75%200%2001-1.08%200l-4.25-4.5a.75.75%200%2001.02-1.06z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E')]",
-          "pr-8",
-          className,
-        )}
-        onChange={(e) => {
-          onChange?.(e);
-          onValueChange?.(e.target.value);
-        }}
-        {...props}
+      <InputWrapper
+        prefix={prefix}
+        suffix={suffix}
+        prefixPosition={prefixPosition}
+        suffixPosition={suffixPosition}
+        size={size}
       >
-        {placeholder && (
-          <option value="" disabled>
-            {placeholder}
-          </option>
-        )}
-        {list.map((item, index) =>
-          isOptionGroup(item) ? (
-            <optgroup key={`group-${index}`} label={item.label}>
-              {item.options.map((opt, optIndex) =>
-                renderOption(opt, optIndex),
-              )}
-            </optgroup>
-          ) : (
-            renderOption(item, index)
-          ),
-        )}
-      </select>
+        <select
+          data-react-fancy-select=""
+          ref={ref}
+          id={selectId}
+          disabled={disabled}
+          required={required}
+          className={cn(
+            inputBaseClasses,
+            inputSizeClasses[size],
+            dirtyClasses(dirty),
+            errorClasses(error),
+            "w-full appearance-none bg-no-repeat bg-[length:16px] bg-[right_8px_center]",
+            "bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%236b7280%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.23%207.21a.75.75%200%20011.06.02L10%2011.168l3.71-3.938a.75.75%200%20111.08%201.04l-4.25%204.5a.75.75%200%2001-1.08%200l-4.25-4.5a.75.75%200%2001.02-1.06z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E')]",
+            "pr-8",
+            className,
+          )}
+          onChange={(e) => {
+            onChange?.(e);
+            onValueChange?.(e.target.value);
+          }}
+          {...props}
+        >
+          {placeholder && (
+            <option value="" disabled>
+              {placeholder}
+            </option>
+          )}
+          {list.map((item, index) =>
+            isOptionGroup(item) ? (
+              <optgroup key={`group-${index}`} label={item.label}>
+                {item.options.map((opt, optIndex) =>
+                  renderOption(opt, optIndex),
+                )}
+              </optgroup>
+            ) : (
+              renderOption(item, index)
+            ),
+          )}
+        </select>
+      </InputWrapper>
     );
 
     if (label || error || description) {

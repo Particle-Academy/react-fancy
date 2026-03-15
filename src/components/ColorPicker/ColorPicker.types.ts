@@ -1,10 +1,10 @@
-import type { Color } from "../../utils/types";
-
 export interface ColorPickerProps {
-  value?: Color;
-  defaultValue?: Color;
-  onChange?: (color: Color) => void;
-  colors?: Color[];
+  value?: string;
+  defaultValue?: string;
+  onChange?: (color: string) => void;
+  presets?: string[];
   size?: "sm" | "md" | "lg";
+  variant?: "outline" | "filled";
+  disabled?: boolean;
   className?: string;
 }

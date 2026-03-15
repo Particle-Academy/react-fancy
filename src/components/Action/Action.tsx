@@ -1,8 +1,25 @@
 import { forwardRef, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
 import { resolve } from "../../data/emoji-utils";
+import { Icon } from "../Icon/Icon";
 import type { ActionProps } from "./Action.types";
 import type { ActionColor, Size } from "../../utils/types";
+
+const iconSizeMap: Record<Size, "xs" | "sm" | "md" | "lg" | "xl"> = {
+  xs: "xs",
+  sm: "xs",
+  md: "sm",
+  lg: "md",
+  xl: "lg",
+};
+
+const alertIconSizeMap: Record<Size, "xs" | "sm" | "md" | "lg" | "xl"> = {
+  xs: "xs",
+  sm: "xs",
+  md: "xs",
+  lg: "sm",
+  xl: "sm",
+};
 
 // ---------------------------------------------------------------------------
 // Color classes
@@ -45,14 +62,6 @@ const horizontalSize: Record<Size, string> = {
   xl: "px-5 py-3 text-lg",
 };
 
-const verticalSize: Record<Size, string> = {
-  xs: "px-2 pt-5 pb-5 text-xs",
-  sm: "px-2 pt-5 pb-5 text-xs",
-  md: "px-3 pt-6 pb-6 text-sm",
-  lg: "px-4 pt-8 pb-8 text-base",
-  xl: "px-5 pt-9 pb-9 text-lg",
-};
-
 const circleSize: Record<Size, string> = {
   xs: "w-7 h-7 text-xs",
   sm: "w-8 h-8 text-xs",
@@ -93,12 +102,12 @@ const badgeSize: Record<Size, string> = {
   xl: "text-xs px-2 min-w-[24px] h-5",
 };
 
-const verticalGap: Record<Size, string> = {
-  xs: "gap-1",
-  sm: "gap-1",
-  md: "gap-1.5",
-  lg: "gap-2",
-  xl: "gap-2",
+const externalIconOffset: Record<Size, string> = {
+  xs: "0.75rem",
+  sm: "0.75rem",
+  md: "1rem",
+  lg: "1.25rem",
+  xl: "1.5rem",
 };
 
 // ---------------------------------------------------------------------------
@@ -142,6 +151,21 @@ function getBadgeClasses(
   if (isColored(color, active, checked)) return "bg-white/20 text-white";
   if (warn) return "bg-amber-200 text-amber-800 dark:bg-amber-800 dark:text-amber-200";
   return "bg-zinc-200 text-zinc-700 dark:bg-zinc-600 dark:text-zinc-200";
+}
+
+// ---------------------------------------------------------------------------
+// Placement parsing
+// ---------------------------------------------------------------------------
+
+type PlacementAxis = "left" | "right" | "top" | "bottom";
+
+function parsePlacement(iconPlace: string): { primary: PlacementAxis; secondary?: PlacementAxis } {
+  const parts = iconPlace.split(" ") as PlacementAxis[];
+  return { primary: parts[0], secondary: parts[1] };
+}
+
+function isVerticalPrimary(primary: PlacementAxis): boolean {
+  return primary === "top" || primary === "bottom";
 }
 
 // ---------------------------------------------------------------------------
@@ -204,17 +228,16 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
     ref,
   ) => {
     const isCircle = variant === "circle";
-    const isVertical = iconPlace === "top" || iconPlace === "bottom";
+    const { primary, secondary } = parsePlacement(iconPlace);
+    const isVertical = isVerticalPrimary(primary);
+    const isCompound = !!secondary;
+    const needsWrapper = isVertical || isCompound;
     const isReversed = iconPlace === "right";
 
     // -----------------------------------------------------------------------
-    // Sizing
+    // Sizing — always use horizontalSize for the button itself
     // -----------------------------------------------------------------------
-    const sizeClass = isCircle
-      ? circleSize[size]
-      : isVertical
-        ? verticalSize[size]
-        : horizontalSize[size];
+    const sizeClass = isCircle ? circleSize[size] : horizontalSize[size];
 
     // -----------------------------------------------------------------------
     // Build decorative elements
@@ -243,30 +266,16 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
               />
             );
           }
-          const iconNode = trailing ? iconTrailing : icon;
-          if (!iconNode) return null;
-          if (isVertical) {
-            const posClass =
-              iconPlace === "top" ? "top-1.5" : "bottom-1.5";
-            return (
-              <span
-                key={`icon-${trailing ? "t" : "l"}`}
-                className={cn(
-                  "absolute left-1/2 -translate-x-1/2",
-                  posClass,
-                  iconColorCls,
-                )}
-              >
-                {iconNode}
-              </span>
-            );
-          }
+          const iconSlug = trailing ? iconTrailing : icon;
+          if (!iconSlug) return null;
+          // For vertical/compound placements, icons render outside the button — not inside
+          if (needsWrapper) return null;
           return (
             <span
               key={`icon-${trailing ? "t" : "l"}`}
               className={cn("flex-shrink-0", iconColorCls)}
             >
-              {iconNode}
+              <Icon name={iconSlug} size={iconSizeMap[size]} />
             </span>
           );
         }
@@ -312,6 +321,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
       if (!alertIcon) return null;
       const isTrailing = alertIconTrailing ?? false;
       if (isTrailing !== trailing) return null;
+      const alertIconEl = <Icon name={alertIcon} size={alertIconSizeMap[size]} />;
       return (
         <span
           key="alert-icon"
@@ -319,7 +329,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
           data-action-alert
         >
           <span className={cn(alertIconSize[size], "text-red-500 dark:text-red-400 animate-pulse")}>
-            {alertIcon}
+            {alertIconEl}
           </span>
           <span
             className={cn(
@@ -327,7 +337,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
               "absolute inset-0 text-red-400 dark:text-red-300 animate-ping opacity-75",
             )}
           >
-            {alertIcon}
+            {alertIconEl}
           </span>
         </span>
       );
@@ -361,9 +371,9 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
       isCircle ? "rounded-full" : "rounded-lg",
       sizeClass,
       getColorClasses(color, active, checked, warn),
-      !isCircle && !isVertical && "gap-2",
-      !isCircle && isVertical && cn("relative", verticalGap[size]),
-      isReversed && !isVertical && "flex-row-reverse",
+      !isCircle && !needsWrapper && "gap-2",
+      !isCircle && needsWrapper && "gap-2",
+      isReversed && !needsWrapper && "flex-row-reverse",
       alertProp && "animate-pulse",
       className,
     );
@@ -381,7 +391,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
             )}
           />
         ) : (
-          icon ?? children
+          icon ? <Icon name={icon} size={iconSizeMap[size]} /> : children
         )}
       </>
     ) : (
@@ -393,26 +403,96 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
     );
 
     // -----------------------------------------------------------------------
-    // Render
+    // Build the button element
     // -----------------------------------------------------------------------
-    if (href && !disabled) {
-      return (
-        <a href={href} className={classes}>
-          {content}
-        </a>
-      );
-    }
-
-    return (
+    const buttonEl = href && !disabled ? (
+      <a href={href} className={classes} data-react-fancy-action="">
+        {content}
+      </a>
+    ) : (
       <button
         ref={ref}
         className={classes}
         disabled={disabled || loading}
+        data-react-fancy-action=""
         {...props}
       >
         {content}
       </button>
     );
+
+    // -----------------------------------------------------------------------
+    // Wrap for vertical/compound icon placement
+    // The icon is absolutely positioned so it never shifts the button.
+    // -----------------------------------------------------------------------
+    if (needsWrapper && (icon || iconTrailing)) {
+      const iconSlug = icon ?? iconTrailing;
+      const offset = externalIconOffset[size];
+
+      // Determine position styles for the icon
+      const posStyle: React.CSSProperties = { position: "absolute" };
+
+      // Primary axis: which side of the button
+      if (primary === "top") {
+        posStyle.bottom = "100%";
+        posStyle.marginBottom = "0.125rem";
+      } else if (primary === "bottom") {
+        posStyle.top = "100%";
+        posStyle.marginTop = "0.125rem";
+      } else if (primary === "left") {
+        posStyle.right = "100%";
+        posStyle.marginRight = "0.125rem";
+      } else if (primary === "right") {
+        posStyle.left = "100%";
+        posStyle.marginLeft = "0.125rem";
+      }
+
+      // Secondary axis: cross-axis alignment
+      if (isVerticalPrimary(primary)) {
+        // Vertical primary → secondary controls horizontal position
+        if (secondary === "left") {
+          posStyle.left = "0";
+        } else if (secondary === "right") {
+          posStyle.right = "0";
+        } else {
+          // center (default)
+          posStyle.left = "50%";
+          posStyle.transform = "translateX(-50%)";
+        }
+      } else {
+        // Horizontal primary → secondary controls vertical position
+        if (secondary === "top") {
+          posStyle.top = "0";
+        } else if (secondary === "bottom") {
+          posStyle.bottom = "0";
+        } else {
+          // center (default)
+          posStyle.top = "50%";
+          posStyle.transform = "translateY(-50%)";
+        }
+      }
+
+      const externalIcon = (
+        <span
+          className={cn("absolute flex-shrink-0", iconColorCls)}
+          style={posStyle}
+        >
+          <Icon name={iconSlug!} size={iconSizeMap[size]} />
+        </span>
+      );
+
+      return (
+        <span
+          data-react-fancy-action-group=""
+          className="relative inline-flex"
+        >
+          {buttonEl}
+          {externalIcon}
+        </span>
+      );
+    }
+
+    return buttonEl;
   },
 );
 

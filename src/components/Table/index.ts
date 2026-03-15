@@ -7,6 +7,7 @@ export { TableColumn } from "./TableColumn";
 export { TablePagination } from "./TablePagination";
 export { TableSearch } from "./TableSearch";
 export { TableTray } from "./TableTray";
+export { TableRowTray } from "./TableRowTray";
 export type {
   TableProps,
   TableHeadProps,
@@ -17,4 +18,5 @@ export type {
   TablePaginationProps,
   TableSearchProps,
   TableTrayProps,
+  TableRowTrayProps,
 } from "./Table.types";

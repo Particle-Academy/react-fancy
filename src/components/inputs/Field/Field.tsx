@@ -13,7 +13,7 @@ export function Field({
   className,
 }: FieldProps) {
   return (
-    <div className={cn("flex flex-col gap-1.5", className)}>
+    <div data-react-fancy-field="" className={cn("flex flex-col gap-1.5", className)}>
       {label && (
         <label
           htmlFor={htmlFor}

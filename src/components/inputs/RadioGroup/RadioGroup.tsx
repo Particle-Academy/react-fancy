@@ -39,6 +39,7 @@ export function RadioGroup<V = string>({
 
   const content = (
     <div
+      data-react-fancy-radio-group=""
       role="radiogroup"
       className={cn(
         "flex gap-3",

@@ -1,1 +1,11 @@
 export { useControllableState } from "./use-controllable-state";
+export { useOutsideClick } from "./use-outside-click";
+export { useEscapeKey } from "./use-escape-key";
+export { useFocusTrap } from "./use-focus-trap";
+export { useFloatingPosition } from "./use-floating-position";
+export { useAnimation } from "./use-animation";
+export { useId } from "./use-id";
+export { usePanZoom } from "./use-pan-zoom";
+export type { ViewportState } from "./use-pan-zoom";
+export { useNodeRegistry } from "./use-node-registry";
+export type { NodeRect } from "./use-node-registry";

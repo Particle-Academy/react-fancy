@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Size } from "../../utils/types";
 
 export type InputOption<V = string> =
@@ -20,4 +21,13 @@ export interface InputBaseProps {
   className?: string;
   id?: string;
   name?: string;
+}
+
+export type AffixPosition = "inside" | "outside";
+
+export interface InputAffixProps {
+  prefix?: ReactNode;
+  suffix?: ReactNode;
+  prefixPosition?: AffixPosition;
+  suffixPosition?: AffixPosition;
 }

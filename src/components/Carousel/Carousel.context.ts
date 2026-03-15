@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 import type { CarouselContextValue } from "./Carousel.types";
 
 export const CarouselContext = createContext<CarouselContextValue | null>(null);
+CarouselContext.displayName = "CarouselContext";
 
 export function useCarousel(): CarouselContextValue {
   const ctx = useContext(CarouselContext);

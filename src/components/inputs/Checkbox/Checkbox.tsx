@@ -49,7 +49,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     }[size];
 
     return (
-      <div className={cn("flex items-start gap-2", className)}>
+      <div data-react-fancy-checkbox="" className={cn("flex items-start gap-2", className)}>
         <div className="relative flex items-center">
           <input
             ref={(node) => {

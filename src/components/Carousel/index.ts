@@ -11,4 +11,5 @@ export type {
   CarouselStepsProps,
   CarouselPanelsProps,
   CarouselContextValue,
+  CarouselVariant,
 } from "./Carousel.types";

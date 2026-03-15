@@ -40,3 +40,143 @@
 .fancy-slide-right {
   animation: fancy-slide-right 0.3s ease-out;
 }
+
+/* Overlay / floating animations */
+
+@keyframes fancy-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fancy-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fancy-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fancy-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fancy-collapse-open {
+  from {
+    grid-template-rows: 0fr;
+  }
+  to {
+    grid-template-rows: 1fr;
+  }
+}
+
+@keyframes fancy-collapse-close {
+  from {
+    grid-template-rows: 1fr;
+  }
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+
+.fancy-scale-in {
+  animation: fancy-scale-in 0.15s ease-out;
+}
+
+.fancy-slide-up {
+  animation: fancy-slide-up 0.2s ease-out;
+}
+
+.fancy-fade-out {
+  animation: fancy-fade-out 0.15s ease-in forwards;
+}
+
+.fancy-toast-in {
+  animation: fancy-toast-in 0.3s ease-out;
+}
+
+.fancy-collapse-open {
+  animation: fancy-collapse-open 0.2s ease-out forwards;
+}
+
+.fancy-collapse-close {
+  animation: fancy-collapse-close 0.15s ease-in forwards;
+}
+
+/* Mobile flyout slide animations */
+
+@keyframes fancy-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fancy-slide-out-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes fancy-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fancy-slide-out-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.fancy-slide-in-left {
+  animation: fancy-slide-in-left 0.25s ease-out;
+}
+
+.fancy-slide-out-left {
+  animation: fancy-slide-out-left 0.2s ease-in forwards;
+}
+
+.fancy-slide-in-right {
+  animation: fancy-slide-in-right 0.25s ease-out;
+}
+
+.fancy-slide-out-right {
+  animation: fancy-slide-out-right 0.2s ease-in forwards;
+}

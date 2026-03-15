@@ -108,6 +108,7 @@ const SingleDatePicker = forwardRef<
 
     const input = (
       <input
+        data-react-fancy-date-picker=""
         ref={ref}
         id={id}
         type={inputType}
@@ -178,7 +179,7 @@ const RangeDatePicker = forwardRef<
     );
 
     const input = (
-      <div className={cn("flex items-center gap-2", className)}>
+      <div data-react-fancy-date-picker="" className={cn("flex items-center gap-2", className)}>
         <input
           ref={ref}
           id={id}

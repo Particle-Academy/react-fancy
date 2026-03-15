@@ -45,6 +45,7 @@ export function CheckboxGroup<V = string>({
 
   const content = (
     <div
+      data-react-fancy-checkbox-group=""
       className={cn(
         "flex gap-3",
         orientation === "vertical" ? "flex-col" : "flex-row flex-wrap",

@@ -54,31 +54,31 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
     );
 
     const trackSizes = {
-      xs: "h-4 w-7",
-      sm: "h-5 w-9",
-      md: "h-6 w-11",
-      lg: "h-7 w-[52px]",
-      xl: "h-8 w-[60px]",
+      xs: "h-3.5 w-6",
+      sm: "h-4 w-7",
+      md: "h-5 w-9",
+      lg: "h-6 w-11",
+      xl: "h-7 w-[52px]",
     }[size];
 
     const knobSizes = {
-      xs: "h-3 w-3",
-      sm: "h-4 w-4",
-      md: "h-5 w-5",
-      lg: "h-6 w-6",
-      xl: "h-7 w-7",
+      xs: "h-2.5 w-2.5",
+      sm: "h-3 w-3",
+      md: "h-4 w-4",
+      lg: "h-5 w-5",
+      xl: "h-6 w-6",
     }[size];
 
     const translateOn = {
-      xs: "translate-x-3",
-      sm: "translate-x-4",
-      md: "translate-x-5",
-      lg: "translate-x-6",
-      xl: "translate-x-7",
+      xs: "translate-x-2.5",
+      sm: "translate-x-3",
+      md: "translate-x-4",
+      lg: "translate-x-5",
+      xl: "translate-x-6",
     }[size];
 
     return (
-      <div className={cn("flex items-start gap-2", className)}>
+      <div data-react-fancy-switch="" className={cn("flex items-start gap-2", className)}>
         <button
           ref={ref}
           id={switchId}

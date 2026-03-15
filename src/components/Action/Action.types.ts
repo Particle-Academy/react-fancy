@@ -1,4 +1,4 @@
-import type { ReactNode, ButtonHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes } from "react";
 import type { ActionColor, Size } from "../../utils/types";
 
 export interface ActionProps
@@ -13,14 +13,17 @@ export interface ActionProps
   checked?: boolean;
   warn?: boolean;
   alert?: boolean;
-  /** Leading icon (ReactNode) */
-  icon?: ReactNode;
-  /** Trailing icon (convenience for right-side icon) */
-  iconTrailing?: ReactNode;
+  /** Leading icon slug (resolved via Icon component, e.g. "pencil", "chevron-right") */
+  icon?: string;
+  /** Trailing icon slug (convenience for right-side icon) */
+  iconTrailing?: string;
   /** Icon placement direction */
-  iconPlace?: "left" | "right" | "top" | "bottom";
-  /** Pulsing alert icon */
-  alertIcon?: ReactNode;
+  iconPlace?:
+    | "left" | "right" | "top" | "bottom"
+    | "top left" | "top right" | "bottom left" | "bottom right"
+    | "left top" | "left bottom" | "right top" | "right bottom";
+  /** Pulsing alert icon slug */
+  alertIcon?: string;
   /** Position alert icon on trailing side */
   alertIconTrailing?: boolean;
   /** Emoji slug (resolved via emoji-utils) */

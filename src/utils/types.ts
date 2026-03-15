@@ -33,3 +33,13 @@ export type ActionColor =
   | "rose"
   | "orange"
   | "zinc";
+
+export type Placement =
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "top-start"
+  | "top-end"
+  | "bottom-start"
+  | "bottom-end";
