@@ -77,6 +77,7 @@ npx vite build                      # Build demo app (verifies imports work)
 | RadioGroup | Radio button group |
 | Switch | Toggle switch |
 | Slider | Range slider (single and range modes) |
+| MultiSwitch | Segmented toggle between multiple options |
 | DatePicker | Date selection (single and range modes) |
 | Autocomplete | Input with filtered dropdown suggestions, async search, keyboard nav |
 | Pillbox | Tag/pill input with add/remove, backspace delete |
@@ -101,7 +102,7 @@ npx vite build                      # Build demo app (verifies imports work)
 | Profile | Avatar + name + subtitle layout |
 | Card | Container with Header, Body, Footer compound slots |
 | Callout | Alert/info box with icon, color, and dismissible support |
-| Timeline | Vertical event list with Item and Block sub-components |
+| Timeline | Stacked, alternating, and horizontal timeline with data-driven or compound API |
 
 ### Overlay & Floating
 
@@ -132,7 +133,18 @@ npx vite build                      # Build demo app (verifies imports work)
 | Composer | Chat-style message input composing textarea + actions |
 | Chart | SVG-based Bar and Donut charts |
 | Editor | Toolbar chrome wrapper for contentEditable |
-| Kanban | Drag-and-drop board with columns and cards (experimental) |
+| Kanban | Drag-and-drop board with columns and cards |
+| Canvas | Interactive node canvas with pan, zoom, and connections |
+| Diagram | Entity-relationship diagram with draggable nodes and relation lines |
+| ContentRenderer | Markdown/HTML content renderer |
+
+### Menus & Navigation
+
+| Component | Description |
+|-----------|-------------|
+| Menu | Hierarchical menu with nested items |
+| Sidebar | Collapsible sidebar navigation |
+| MobileMenu | Responsive mobile navigation overlay |
 
 ### Utilities & Hooks
 
