@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState, useCallback } from "react";
 import { cn } from "../../utils/cn";
 import { Canvas } from "../Canvas/Canvas";
 import { DiagramContext } from "./Diagram.context";
@@ -27,31 +27,84 @@ function DiagramRoot({
   const downloadableRef = useRef(downloadable);
   const importableRef = useRef(importable);
 
-  // Compute auto-layout positions for schema entities
-  const resolvedSchema = useMemo(() => {
+  // Normalize schema: default id to name, add id to relations
+  const normalizedSchema = useMemo(() => {
     if (!schema) return { entities: [], relations: [] };
+    const entities = schema.entities.map((e) => ({
+      ...e,
+      id: e.id ?? e.name,
+    }));
+    const relations = schema.relations.map((r, i) => ({
+      ...r,
+      id: r.id ?? `rel-${i}`,
+    }));
+    return { entities, relations };
+  }, [schema]);
 
-    const layout = computeDiagramLayout(schema);
-    const entities = schema.entities.map((entity) => {
-      // Only auto-layout if no explicit position
-      if (entity.x !== undefined && entity.y !== undefined) return entity;
-      const pos = layout.get(entity.id);
-      return pos ? { ...entity, x: pos.x, y: pos.y } : entity;
+  // Compute auto-layout positions for schema entities
+  const initialPositions = useMemo(() => {
+    if (normalizedSchema.entities.length === 0) return new Map<string, { x: number; y: number }>();
+
+    const layout = computeDiagramLayout(normalizedSchema);
+    const positions = new Map<string, { x: number; y: number }>();
+
+    for (const entity of normalizedSchema.entities) {
+      if (entity.x !== undefined && entity.y !== undefined) {
+        positions.set(entity.id, { x: entity.x, y: entity.y });
+      } else {
+        const pos = layout.get(entity.id);
+        positions.set(entity.id, pos ?? { x: 0, y: 0 });
+      }
+    }
+
+    return positions;
+  }, [normalizedSchema]);
+
+  // Compute a default viewport that centers all entities
+  // This avoids relying on fitOnMount which needs DOM measurements
+  const computedDefaultViewport = useMemo(() => {
+    if (defaultViewport) return defaultViewport;
+    if (initialPositions.size === 0) return { panX: 0, panY: 0, zoom: 1 };
+
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    initialPositions.forEach((pos) => {
+      minX = Math.min(minX, pos.x);
+      minY = Math.min(minY, pos.y);
+      // Estimate entity size: 220px wide, ~200px tall
+      maxX = Math.max(maxX, pos.x + 220);
+      maxY = Math.max(maxY, pos.y + 200);
     });
 
-    return { entities, relations: schema.relations };
-  }, [schema]);
+    const padding = 40;
+    // Offset pan so the content is roughly centered
+    // Since we don't know container size yet, just shift to make minX/minY visible
+    const panX = -minX + padding;
+    const panY = -minY + padding;
+
+    return { panX, panY, zoom: 1 };
+  }, [defaultViewport, initialPositions]);
+
+  // Mutable position state for dragging
+  const [entityPositions, setEntityPositions] = useState(initialPositions);
+
+  const handleEntityMove = useCallback((entityId: string, x: number, y: number) => {
+    setEntityPositions((prev) => {
+      const next = new Map(prev);
+      next.set(entityId, { x, y });
+      return next;
+    });
+  }, []);
 
   const ctx = useMemo<DiagramContextValue>(
     () => ({
       diagramType: type,
-      schema: resolvedSchema,
+      schema: normalizedSchema,
       downloadableRef,
       importableRef,
       exportFormats,
       onImport,
     }),
-    [type, resolvedSchema, exportFormats, onImport],
+    [type, normalizedSchema, exportFormats, onImport],
   );
 
   return (
@@ -59,35 +112,41 @@ function DiagramRoot({
       <div data-react-fancy-diagram="" className="relative h-full w-full">
         <Canvas
           viewport={viewport}
-          defaultViewport={defaultViewport}
+          defaultViewport={computedDefaultViewport}
           onViewportChange={onViewportChange}
           showGrid
+          fitOnMount
           className={cn("h-full w-full", className)}
         >
           {/* Schema-driven entities */}
-          {resolvedSchema.entities.map((entity) => (
-            <DiagramEntity
-              key={entity.id}
-              id={entity.id}
-              name={entity.name}
-              x={entity.x ?? 0}
-              y={entity.y ?? 0}
-            >
-              {entity.fields?.map((field) => (
-                <DiagramField
-                  key={field.name}
-                  name={field.name}
-                  type={field.type}
-                  primary={field.primary}
-                  foreign={field.foreign}
-                  nullable={field.nullable}
-                />
-              ))}
-            </DiagramEntity>
-          ))}
+          {normalizedSchema.entities.map((entity) => {
+            const pos = entityPositions.get(entity.id) ?? { x: 0, y: 0 };
+            return (
+              <DiagramEntity
+                key={entity.id}
+                id={entity.id}
+                name={entity.name}
+                x={pos.x}
+                y={pos.y}
+                draggable
+                onPositionChange={(nx, ny) => handleEntityMove(entity.id, nx, ny)}
+              >
+                {entity.fields?.map((field) => (
+                  <DiagramField
+                    key={field.name}
+                    name={field.name}
+                    type={field.type}
+                    primary={field.primary}
+                    foreign={field.foreign}
+                    nullable={field.nullable}
+                  />
+                ))}
+              </DiagramEntity>
+            );
+          })}
 
           {/* Schema-driven relations */}
-          {resolvedSchema.relations.map((rel) => (
+          {normalizedSchema.relations.map((rel) => (
             <DiagramRelation
               key={rel.id}
               from={rel.from}

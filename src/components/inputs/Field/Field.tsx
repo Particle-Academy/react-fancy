@@ -13,12 +13,12 @@ export function Field({
   className,
 }: FieldProps) {
   return (
-    <div data-react-fancy-field="" className={cn("flex flex-col gap-1.5", className)}>
+    <div data-react-fancy-field="" className={cn("flex flex-col gap-2", className)}>
       {label && (
         <label
           htmlFor={htmlFor}
           className={cn(
-            "font-medium text-zinc-700 dark:text-zinc-300",
+            "font-medium text-zinc-700 dark:text-zinc-100",
             labelSizeClasses[size],
           )}
         >

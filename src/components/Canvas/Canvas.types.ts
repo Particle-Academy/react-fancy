@@ -27,6 +27,8 @@ export interface CanvasProps {
   zoomable?: boolean;
   gridSize?: number;
   showGrid?: boolean;
+  /** Automatically fit all nodes into view on initial mount */
+  fitOnMount?: boolean;
   className?: string;
   style?: CSSProperties;
 }
@@ -36,6 +38,10 @@ export interface CanvasNodeProps {
   id: string;
   x: number;
   y: number;
+  /** Allow drag-to-move */
+  draggable?: boolean;
+  /** Called when the node is dragged to a new position */
+  onPositionChange?: (x: number, y: number) => void;
   className?: string;
   style?: CSSProperties;
 }

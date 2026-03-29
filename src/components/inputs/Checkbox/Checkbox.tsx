@@ -69,7 +69,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             onChange={(e) => setChecked(e.target.checked)}
             className={cn(
               sizeClasses,
-              "cursor-pointer rounded border border-zinc-300 bg-white text-blue-600 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-800",
+              "cursor-pointer rounded border border-zinc-300 bg-white text-blue-600 transition-[border-color,box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-[#1e1e24]",
               dirtyRingClasses(dirty),
               error && "border-red-500",
             )}
@@ -81,7 +81,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               <label
                 htmlFor={checkboxId}
                 className={cn(
-                  "cursor-pointer text-sm text-zinc-700 dark:text-zinc-300",
+                  "cursor-pointer text-sm text-zinc-700 dark:text-zinc-100",
                   disabled && "cursor-not-allowed opacity-50",
                 )}
               >

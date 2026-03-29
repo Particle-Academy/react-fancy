@@ -1,4 +1,4 @@
-import { useMemo, useRef, Children, type ReactElement } from "react";
+import { useMemo, useRef, useEffect, Children, type ReactElement } from "react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import { usePanZoom, type ViewportState } from "../../hooks/use-pan-zoom";
@@ -22,6 +22,7 @@ function CanvasRoot({
   pannable = true,
   zoomable = true,
   showGrid = false,
+  fitOnMount = false,
   className,
   style,
 }: CanvasProps) {
@@ -44,6 +45,38 @@ function CanvasRoot({
     [viewport, setViewport, registerNode, unregisterNode, nodeRects, registryVersion],
   );
 
+  // Auto-fit all nodes into view on mount once nodes are registered
+  const hasFitted = useRef(false);
+  useEffect(() => {
+    if (!fitOnMount || hasFitted.current || nodeRects.size === 0) return;
+    const container = containerRef.current;
+    if (!container || container.clientWidth === 0) return;
+
+    hasFitted.current = true;
+
+    // Use rAF to ensure layout is settled before measuring
+    requestAnimationFrame(() => {
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      nodeRects.forEach((r) => {
+        minX = Math.min(minX, r.x);
+        minY = Math.min(minY, r.y);
+        maxX = Math.max(maxX, r.x + r.width);
+        maxY = Math.max(maxY, r.y + r.height);
+      });
+
+      const padding = 40;
+      const contentW = maxX - minX + padding * 2;
+      const contentH = maxY - minY + padding * 2;
+      const cw = container.clientWidth;
+      const ch = container.clientHeight;
+      const zoom = Math.min(cw / contentW, ch / contentH, 1.5);
+      const panX = (cw - contentW * zoom) / 2 - minX * zoom + padding * zoom;
+      const panY = (ch - contentH * zoom) / 2 - minY * zoom + padding * zoom;
+
+      setViewport({ panX, panY, zoom });
+    });
+  }, [fitOnMount, nodeRects, registryVersion, setViewport]);
+
   // Separate edge children from node/other children
   const edges: ReactElement[] = [];
   const others: ReactElement[] = [];
@@ -52,9 +85,10 @@ function CanvasRoot({
   Children.forEach(children, (child) => {
     const el = child as ReactElement;
     if (!el || !el.type) return;
-    if (el.type === CanvasEdge) {
+    const elType = el.type as any;
+    if (elType === CanvasEdge || elType?._isCanvasEdge) {
       edges.push(el);
-    } else if (el.type === CanvasMinimap || el.type === CanvasControls) {
+    } else if (elType === CanvasMinimap || elType === CanvasControls) {
       overlays.push(el);
     } else {
       others.push(el);
@@ -100,22 +134,32 @@ function CanvasRoot({
           }}
         >
           <defs>
-            <marker id="canvas-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-              <path d="M0,0 L10,5 L0,10 Z" fill="currentColor" className="text-zinc-400 dark:text-zinc-500" />
+            {/* Generic markers */}
+            <marker id="canvas-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <path d="M0,0 L10,5 L0,10 Z" fill="#71717a" />
             </marker>
-            <marker id="canvas-circle" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-              <circle cx="5" cy="5" r="3.5" fill="currentColor" className="text-zinc-400 dark:text-zinc-500" />
+            <marker id="canvas-circle" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <circle cx="5" cy="5" r="3.5" fill="#71717a" />
             </marker>
-            <marker id="canvas-square" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-              <rect x="1.5" y="1.5" width="7" height="7" fill="currentColor" className="text-zinc-400 dark:text-zinc-500" />
+            <marker id="canvas-diamond" viewBox="0 0 12 12" refX="6" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+              <polygon points="6,0 12,6 6,12 0,6" fill="none" stroke="#71717a" strokeWidth="1.5" />
             </marker>
-            <marker id="canvas-crow-foot" viewBox="0 0 12 12" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
-              <line x1="0" y1="0" x2="12" y2="6" stroke="currentColor" strokeWidth="1.5" className="text-zinc-400 dark:text-zinc-500" />
-              <line x1="0" y1="12" x2="12" y2="6" stroke="currentColor" strokeWidth="1.5" className="text-zinc-400 dark:text-zinc-500" />
-              <line x1="0" y1="6" x2="12" y2="6" stroke="currentColor" strokeWidth="1.5" className="text-zinc-400 dark:text-zinc-500" />
+
+            {/* ERD: "one" perpendicular bar at path endpoint */}
+            <marker id="canvas-one" viewBox="0 0 2 16" refX="1" refY="8" markerWidth="2" markerHeight="14" orient="auto">
+              <line x1="1" y1="0" x2="1" y2="16" stroke="#71717a" strokeWidth="2" />
             </marker>
-            <marker id="canvas-diamond" viewBox="0 0 12 12" refX="6" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
-              <polygon points="6,0 12,6 6,12 0,6" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-zinc-400 dark:text-zinc-500" />
+
+            {/* ERD: crow's foot at path endpoint — fork fans backward along the line */}
+            {/* orient="auto" aligns x-axis with path direction at the endpoint.
+                At markerEnd the path goes left→right into the entity.
+                refX=16 places the rightmost edge at the endpoint (entity side).
+                Fan lines go from right (x=16, entity) back-left into the line. */}
+            <marker id="canvas-crow-foot" viewBox="0 0 16 16" refX="16" refY="8" markerWidth="14" markerHeight="14" orient="auto">
+              <line x1="16" y1="8" x2="0" y2="0" stroke="#71717a" strokeWidth="2" strokeLinecap="round" />
+              <line x1="16" y1="8" x2="0" y2="8" stroke="#71717a" strokeWidth="2" strokeLinecap="round" />
+              <line x1="16" y1="8" x2="0" y2="16" stroke="#71717a" strokeWidth="2" strokeLinecap="round" />
+              <line x1="16" y1="0" x2="16" y2="16" stroke="#71717a" strokeWidth="2" strokeLinecap="round" />
             </marker>
           </defs>
           {edges}

@@ -1,4 +1,82 @@
-/* @particle-academy/react-fancy — custom animations only; layout uses Tailwind classes */
+/* @particle-academy/react-fancy — base styles + animations */
+
+/* ─── Input & Field defaults ─────────────────────────────────────────────────
+   Better UX out of the box: spacing between stacked fields, smooth transitions,
+   and polished dark-mode defaults. All overridable via data-attribute selectors.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* Field spacing — adjacent fields get vertical breathing room */
+[data-react-fancy-field] + [data-react-fancy-field] {
+  margin-top: 1rem;
+}
+
+/* Smooth transitions on all text inputs, selects, and textareas */
+[data-react-fancy-input] input,
+[data-react-fancy-textarea],
+[data-react-fancy-select],
+[data-react-fancy-date-picker],
+[data-react-fancy-autocomplete] input,
+[data-react-fancy-pillbox],
+[data-react-fancy-otp-input] input,
+[data-react-fancy-time-picker] input,
+[data-react-fancy-color-picker] input {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+/* Dark-mode input refinements — slightly darker bg for contrast against page */
+.dark [data-react-fancy-input] input,
+.dark [data-react-fancy-textarea],
+.dark [data-react-fancy-select],
+.dark [data-react-fancy-date-picker],
+.dark [data-react-fancy-autocomplete] input,
+.dark [data-react-fancy-pillbox],
+.dark [data-react-fancy-otp-input] input,
+.dark [data-react-fancy-time-picker] input {
+  background-color: #1e1e24;
+  border-color: #3f3f46;
+}
+
+/* Dark-mode focus ring — brighter border + subtle glow */
+.dark [data-react-fancy-input] input:focus,
+.dark [data-react-fancy-textarea]:focus,
+.dark [data-react-fancy-select]:focus,
+.dark [data-react-fancy-date-picker]:focus,
+.dark [data-react-fancy-autocomplete] input:focus,
+.dark [data-react-fancy-otp-input] input:focus,
+.dark [data-react-fancy-time-picker] input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+}
+
+/* Dark-mode labels — brighter for readability */
+.dark [data-react-fancy-field] > label:first-child {
+  color: #f4f4f5;
+}
+
+/* Dark-mode checkbox & radio refinements */
+.dark [data-react-fancy-checkbox] input,
+.dark [data-react-fancy-radio-group] input {
+  background-color: #1e1e24;
+  border-color: #3f3f46;
+}
+
+/* Dark-mode switch unchecked track */
+.dark [data-react-fancy-switch] button[aria-checked="false"] {
+  background-color: #3f3f46;
+}
+
+/* Dark-mode input wrapper affixes */
+.dark [data-react-fancy-input-wrapper] > span:first-child,
+.dark [data-react-fancy-input-wrapper] > span:last-child {
+  border-color: #3f3f46;
+  background-color: #27272a;
+}
+
+/* Dark-mode date picker icon (calendar, clock) */
+.dark [data-react-fancy-date-picker]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+}
 
 @keyframes fancy-fade-in {
   from {

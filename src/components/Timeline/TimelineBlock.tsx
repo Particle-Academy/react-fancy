@@ -4,9 +4,9 @@ import { TimelineItem } from "./TimelineItem";
 import type { TimelineBlockProps } from "./Timeline.types";
 
 export const TimelineBlock = forwardRef<HTMLDivElement, TimelineBlockProps>(
-  ({ heading, children, icon, color = "zinc", active = false, className }, ref) => {
+  ({ heading, children, icon, emoji, color = "zinc", active = false, className }, ref) => {
     return (
-      <TimelineItem icon={icon} color={color} active={active}>
+      <TimelineItem icon={icon} emoji={emoji} color={color} active={active}>
         <div
           ref={ref}
           data-react-fancy-timeline-block=""

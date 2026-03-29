@@ -37,10 +37,22 @@ export function getAnchorPoint(rect: NodeRect, anchor: EdgeAnchor, otherRect?: N
 }
 
 export function bezierPath(from: Point, to: Point): string {
-  const dx = Math.abs(to.x - from.x) * 0.5;
-  const cp1x = from.x + (to.x > from.x ? dx : -dx);
-  const cp2x = to.x + (to.x > from.x ? -dx : dx);
-  return `M${from.x},${from.y} C${cp1x},${from.y} ${cp2x},${to.y} ${to.x},${to.y}`;
+  const dx = Math.abs(to.x - from.x);
+  const dy = Math.abs(to.y - from.y);
+
+  // Determine if the connection is more horizontal or vertical
+  if (dx > dy) {
+    // Horizontal: control points extend horizontally
+    const offset = dx * 0.5;
+    const cp1x = from.x + (to.x > from.x ? offset : -offset);
+    const cp2x = to.x + (to.x > from.x ? -offset : offset);
+    return `M${from.x},${from.y} C${cp1x},${from.y} ${cp2x},${to.y} ${to.x},${to.y}`;
+  }
+  // Vertical: control points extend vertically
+  const offset = Math.max(dy * 0.5, 30);
+  const cp1y = from.y + (to.y > from.y ? offset : -offset);
+  const cp2y = to.y + (to.y > from.y ? -offset : offset);
+  return `M${from.x},${from.y} C${from.x},${cp1y} ${to.x},${cp2y} ${to.x},${to.y}`;
 }
 
 export function stepPath(from: Point, to: Point): string {

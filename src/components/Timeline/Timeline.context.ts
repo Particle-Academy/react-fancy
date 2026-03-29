@@ -1,14 +1,18 @@
 import { createContext, useContext } from "react";
-import type { TimelineOrientation } from "./Timeline.types";
+import type { TimelineVariant } from "./Timeline.types";
 
 interface TimelineContextValue {
-  orientation: TimelineOrientation;
+  variant: TimelineVariant;
   index: number;
+  total: number;
+  animated: boolean;
 }
 
 export const TimelineContext = createContext<TimelineContextValue>({
-  orientation: "vertical",
+  variant: "stacked",
   index: 0,
+  total: 0,
+  animated: true,
 });
 
 export function useTimeline() {

@@ -69,7 +69,7 @@ export function MultiSwitch<V = string>({
       role="radiogroup"
       id={id}
       className={cn(
-        "relative inline-flex rounded-lg border border-zinc-300 bg-zinc-100 dark:border-zinc-600 dark:bg-zinc-800",
+        "relative inline-flex rounded-lg border border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800",
         dirty && "ring-2 ring-amber-400/50",
         error && "ring-2 ring-red-500/50",
         disabled && "opacity-50 cursor-not-allowed",

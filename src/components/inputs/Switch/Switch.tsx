@@ -90,7 +90,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           className={cn(
             "relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
             trackSizes,
-            checked ? trackColorMap[color] : "bg-zinc-200 dark:bg-zinc-700",
+            checked ? trackColorMap[color] : "bg-zinc-200 dark:bg-zinc-600",
             dirtyRingClasses(dirty),
             error && "ring-2 ring-red-500/50",
           )}
@@ -112,7 +112,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
               <label
                 htmlFor={switchId}
                 className={cn(
-                  "cursor-pointer text-sm text-zinc-700 dark:text-zinc-300",
+                  "cursor-pointer text-sm text-zinc-700 dark:text-zinc-100",
                   disabled && "cursor-not-allowed opacity-50",
                 )}
               >

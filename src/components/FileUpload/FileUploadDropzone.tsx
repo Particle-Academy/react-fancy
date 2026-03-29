@@ -40,7 +40,7 @@ export function FileUploadDropzone({
         "flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-colors",
         dragOver
           ? "border-blue-400 bg-blue-50 dark:border-blue-500 dark:bg-blue-950"
-          : "border-zinc-300 hover:border-zinc-400 dark:border-zinc-600 dark:hover:border-zinc-500",
+          : "border-zinc-300 hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-500",
         disabled && "cursor-not-allowed opacity-50",
         className,
       )}

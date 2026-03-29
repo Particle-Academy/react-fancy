@@ -273,7 +273,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
           return (
             <span
               key={`icon-${trailing ? "t" : "l"}`}
-              className={cn("flex-shrink-0", iconColorCls)}
+              className={cn("inline-flex items-center flex-shrink-0", iconColorCls)}
             >
               <Icon name={iconSlug} size={iconSizeMap[size]} />
             </span>
@@ -328,15 +328,10 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
           className="relative inline-flex flex-shrink-0"
           data-action-alert
         >
-          <span className={cn(alertIconSize[size], "text-red-500 dark:text-red-400 animate-pulse")}>
+          <span className="text-red-500 dark:text-red-400 animate-pulse">
             {alertIconEl}
           </span>
-          <span
-            className={cn(
-              alertIconSize[size],
-              "absolute inset-0 text-red-400 dark:text-red-300 animate-ping opacity-75",
-            )}
-          >
+          <span className="absolute inset-0 flex items-center justify-center text-red-400 dark:text-red-300 animate-ping opacity-75">
             {alertIconEl}
           </span>
         </span>

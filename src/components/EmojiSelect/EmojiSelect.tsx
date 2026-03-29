@@ -30,7 +30,7 @@ export function EmojiSelect({
     <div className={cn("relative inline-block", className)} data-react-fancy-emoji-select="">
       <button
         type="button"
-        className="flex items-center gap-2 rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600"
+        className="flex items-center gap-2 rounded-lg border border-zinc-300 px-3 py-2 text-sm transition-[border-color,box-shadow] duration-150 dark:border-zinc-700 dark:bg-[#1e1e24]"
         onClick={() => setOpen(!open)}
       >
         {selected ? (
@@ -47,7 +47,7 @@ export function EmojiSelect({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={placeholder}
-            className="mb-2 w-full rounded-md border border-zinc-200 px-2 py-1 text-sm dark:border-zinc-600 dark:bg-zinc-700"
+            className="mb-2 w-full rounded-md border border-zinc-200 px-2 py-1 text-sm transition-[border-color,box-shadow] duration-150 dark:border-zinc-700 dark:bg-[#1e1e24] dark:text-zinc-100"
             autoFocus
           />
           <div className="max-h-48 overflow-y-auto">

@@ -30,7 +30,7 @@ export function errorClasses(error?: string): string {
 }
 
 export const inputBaseClasses =
-  "border border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500";
+  "border border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-400 transition-[border-color,box-shadow] duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-[#1e1e24] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20";
 
 export function resolveOption<V = string>(
   option: InputOption<V>,

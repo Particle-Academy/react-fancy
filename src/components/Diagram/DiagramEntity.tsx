@@ -6,13 +6,17 @@ import { Children, type ReactElement } from "react";
 
 export function DiagramEntity({
   children,
-  id,
+  id: idProp,
   name,
   x = 0,
   y = 0,
   color = "bg-blue-600 dark:bg-blue-500",
+  draggable,
+  onPositionChange,
   className,
 }: DiagramEntityProps) {
+  const id = idProp ?? name;
+
   // Extract DiagramField children for rendering
   const fields: ReactElement<DiagramFieldProps>[] = [];
   const other: ReactElement[] = [];
@@ -28,7 +32,7 @@ export function DiagramEntity({
   });
 
   return (
-    <Canvas.Node id={id} x={x} y={y}>
+    <Canvas.Node id={id} x={x} y={y} draggable={draggable} onPositionChange={onPositionChange}>
       <div
         data-react-fancy-diagram-entity=""
         data-entity-id={id}

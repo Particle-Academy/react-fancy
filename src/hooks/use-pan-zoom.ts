@@ -56,6 +56,8 @@ export function usePanZoom({
 
     function handleWheel(e: WheelEvent) {
       if (!zoomableRef.current) return;
+      // Require Ctrl+wheel (or pinch gesture) to zoom — don't hijack normal page scroll
+      if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
 
       const rect = container!.getBoundingClientRect();

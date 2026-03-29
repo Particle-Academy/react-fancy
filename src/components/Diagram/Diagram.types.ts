@@ -14,7 +14,8 @@ export interface DiagramFieldData {
 }
 
 export interface DiagramEntityData {
-  id: string;
+  /** Unique identifier. Defaults to `name` if omitted. */
+  id?: string;
   name: string;
   fields?: DiagramFieldData[];
   x?: number;
@@ -22,7 +23,8 @@ export interface DiagramEntityData {
 }
 
 export interface DiagramRelationData {
-  id: string;
+  /** Unique identifier. Auto-generated if omitted. */
+  id?: string;
   from: string;
   to: string;
   fromField?: string;
@@ -62,11 +64,16 @@ export interface DiagramProps {
 
 export interface DiagramEntityProps {
   children?: ReactNode;
-  id: string;
+  /** Unique identifier. Defaults to `name` if omitted. */
+  id?: string;
   name: string;
   x?: number;
   y?: number;
   color?: string;
+  /** Allow drag-to-move */
+  draggable?: boolean;
+  /** Called when the entity is dragged to a new position */
+  onPositionChange?: (x: number, y: number) => void;
   className?: string;
 }
 

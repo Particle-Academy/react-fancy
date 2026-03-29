@@ -64,7 +64,7 @@ export function RadioGroup<V = string>({
               onChange={() => setValue(resolved.value)}
               className={cn(
                 sizeClasses,
-                "cursor-pointer border border-zinc-300 bg-white text-blue-600 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-800",
+                "cursor-pointer border border-zinc-300 bg-white text-blue-600 transition-[border-color,box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-[#1e1e24]",
                 dirtyRingClasses(dirty),
                 error && "border-red-500",
               )}
@@ -73,7 +73,7 @@ export function RadioGroup<V = string>({
               <label
                 htmlFor={optionId}
                 className={cn(
-                  "cursor-pointer text-sm text-zinc-700 dark:text-zinc-300",
+                  "cursor-pointer text-sm text-zinc-700 dark:text-zinc-100",
                   (disabled || resolved.disabled) &&
                     "cursor-not-allowed opacity-50",
                 )}

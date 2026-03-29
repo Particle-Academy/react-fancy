@@ -57,7 +57,7 @@ export const Pillbox = forwardRef<HTMLDivElement, PillboxProps>(
         data-react-fancy-pillbox=""
         ref={ref}
         className={cn(
-          "flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-2 transition-colors focus-within:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:focus-within:border-zinc-500",
+          "flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-2 transition-[border-color,box-shadow] duration-150 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/40 dark:border-zinc-700 dark:bg-[#1e1e24] dark:text-zinc-100 dark:focus-within:border-blue-400 dark:focus-within:ring-blue-400/20",
           disabled && "cursor-not-allowed opacity-50",
           className,
         )}
