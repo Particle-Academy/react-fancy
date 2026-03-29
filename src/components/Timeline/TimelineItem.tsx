@@ -127,21 +127,21 @@ export const TimelineItem = forwardRef<HTMLDivElement, TimelineItemProps>(
           ref={ref}
           data-react-fancy-timeline-item=""
           className={cn(
-            "flex gap-x-4 md:grid md:grid-cols-[1fr_1.5rem_1fr] md:gap-x-6",
-            !isLast && "pb-8",
+            "relative flex gap-x-4 md:grid md:grid-cols-[1fr_1.5rem_1fr] md:gap-x-6",
             animated && "transition duration-500 ease-out",
             animated && (visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"),
             className,
           )}
         >
-          {/* Dot + vertical line */}
-          <div className="flex shrink-0 flex-col items-center md:col-start-2 md:row-start-1">
-            <Dot icon={icon} emoji={emoji} color={color} active={active} />
-            {!isLast && <div className={cn("min-h-4 w-px flex-1 bg-zinc-200 dark:bg-zinc-700", isLargeDot && "mt-1")} />}
+          {/* Dot (sits on top of the background line) */}
+          <div className="relative z-10 flex w-8 shrink-0 justify-center md:col-start-2 md:row-start-1 md:w-auto md:justify-center">
+            {!isLargeDot ? <div className="mt-1.5"><Dot icon={icon} emoji={emoji} color={color} active={active} /></div> : <Dot icon={icon} emoji={emoji} color={color} active={active} />}
           </div>
 
           {/* Content */}
           <div className={cn(
+            "min-w-0 flex-1",
+            !isLast && "pb-8",
             isLargeDot && "pt-1",
             isEven ? "md:col-start-1 md:row-start-1 md:text-right" : "md:col-start-3",
           )}>
@@ -158,23 +158,21 @@ export const TimelineItem = forwardRef<HTMLDivElement, TimelineItemProps>(
         ref={ref}
         data-react-fancy-timeline-item=""
         className={cn(
-          "flex gap-x-4",
-          !isLast && "pb-8",
+          "relative flex gap-x-4",
           animated && "transition duration-500 ease-out",
           animated && (visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"),
           className,
         )}
       >
-        {/* Dot + vertical line */}
-        <div className="flex shrink-0 flex-col items-center">
+        {/* Dot (sits on top of the background line) */}
+        <div className="relative z-10 flex w-8 shrink-0 justify-center">
           {!isLargeDot
             ? <div className="mt-1.5"><Dot icon={icon} emoji={emoji} color={color} active={active} /></div>
             : <Dot icon={icon} emoji={emoji} color={color} active={active} />}
-          {!isLast && <div className={cn("min-h-4 w-px flex-1 bg-zinc-200 dark:bg-zinc-700", isLargeDot && "mt-1")} />}
         </div>
 
         {/* Content */}
-        <div className={cn(isLargeDot && "pt-1")}>
+        <div className={cn("min-w-0 flex-1", !isLast && "pb-8", isLargeDot && "pt-1")}>
           {date && <time className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{date}</time>}
           {children}
         </div>

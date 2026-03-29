@@ -54,7 +54,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
               data-react-fancy-tooltip=""
               role="tooltip"
               className={cn(
-                "fancy-fade-in pointer-events-none fixed z-50 max-w-xs rounded-lg bg-zinc-900 px-3 py-1.5 text-sm text-white shadow-lg dark:bg-zinc-100 dark:text-zinc-900",
+                "fancy-fade-in pointer-events-none fixed z-50 max-w-xs rounded-lg bg-zinc-900 px-3 py-1.5 text-sm text-white shadow-lg dark:bg-zinc-700 dark:text-zinc-100",
                 className,
               )}
               style={{ left: position.x, top: position.y }}
@@ -62,7 +62,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
               {content}
               <div
                 className={cn(
-                  "absolute h-2 w-2 rotate-45 bg-zinc-900 dark:bg-zinc-100",
+                  "absolute h-2 w-2 rotate-45 bg-zinc-900 dark:bg-zinc-700",
                   position.placement.startsWith("top") &&
                     "bottom-[-4px] left-1/2 -translate-x-1/2",
                   position.placement.startsWith("bottom") &&

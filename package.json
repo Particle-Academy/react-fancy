@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "React UI component library — React port of the fancy-flux Blade component library",
   "type": "module",
   "main": "./dist/index.cjs",

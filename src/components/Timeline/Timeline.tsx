@@ -25,6 +25,7 @@ const TimelineRoot = forwardRef<HTMLDivElement, TimelineProps>(
     }
 
     const isHorizontal = variant === "horizontal";
+    const isAlternating = variant === "alternating";
 
     // Build items from events prop (data-driven) or children (compound)
     const items = events
@@ -69,7 +70,18 @@ const TimelineRoot = forwardRef<HTMLDivElement, TimelineProps>(
             </div>
           </div>
         ) : (
-          <div>{content}</div>
+          /* Vertical variants: continuous background line behind all events */
+          <div className="relative">
+            {items.length > 1 && (
+              <div className={cn(
+                "absolute top-0 bottom-0 w-px bg-zinc-200 dark:bg-zinc-700",
+                isAlternating
+                  ? "left-4 md:left-1/2 md:-translate-x-px"
+                  : "left-4",
+              )} />
+            )}
+            {content}
+          </div>
         )}
       </div>
     );
