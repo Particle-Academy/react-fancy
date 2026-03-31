@@ -12,6 +12,8 @@ export interface EditorContextValue {
   placeholder?: string;
   /** Merged render extensions (global + instance). */
   extensions: RenderExtension[];
+  /** Initial HTML content to load into the editor on mount */
+  _initialHtml: string;
   /** @internal Called by EditorContent on input events */
   _onInput: () => void;
 }

@@ -1,13 +1,24 @@
 import { useCallback, useMemo, useRef } from "react";
+import { marked } from "marked";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks";
 import { EditorContext } from "./Editor.context";
 import { EditorToolbar } from "./EditorToolbar";
 import { EditorToolbarSeparator } from "./EditorToolbarSeparator";
 import { EditorContent } from "./EditorContent";
-import { htmlToMarkdown } from "./editor.utils";
+import { htmlToMarkdown, detectFormat } from "./editor.utils";
 import { mergeExtensions } from "../ContentRenderer/extensions";
 import type { EditorProps } from "./Editor.types";
+
+function toHtml(value: string, outputFormat: "html" | "markdown"): string {
+  if (!value) return "";
+  if (outputFormat === "html") return value;
+  // Markdown value — convert to HTML for contentEditable
+  const format = detectFormat(value);
+  if (format === "html") return value;
+  const result = marked.parse(value, { async: false }) as string;
+  return result.trim();
+}
 
 function EditorRoot({
   children,
@@ -22,6 +33,13 @@ function EditorRoot({
 }: EditorProps) {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [, setValue] = useControllableState(controlledValue, defaultValue, onChange);
+
+  const initialHtml = useMemo(
+    () => toHtml(controlledValue ?? defaultValue, outputFormat),
+    // Only compute once on mount — don't re-run when value changes from user input
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const extensions = useMemo(
     () => mergeExtensions(instanceExtensions),
@@ -87,6 +105,7 @@ function EditorRoot({
     lineSpacing,
     placeholder,
     extensions,
+    _initialHtml: initialHtml,
     _onInput: handleInput,
   };
 

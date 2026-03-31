@@ -1,11 +1,20 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { cn } from "../../utils/cn";
 import { useEditor } from "./Editor.context";
 import { proseClasses, extensionEditorClasses } from "./editor.utils";
 import type { EditorContentProps } from "./Editor.types";
 
 export function EditorContent({ className }: EditorContentProps) {
-  const { contentRef, lineSpacing, placeholder, extensions, _onInput } = useEditor();
+  const { contentRef, lineSpacing, placeholder, extensions, _initialHtml, _onInput } = useEditor();
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (el && _initialHtml && !initialized.current) {
+      el.innerHTML = _initialHtml;
+      initialized.current = true;
+    }
+  }, [contentRef, _initialHtml]);
 
   const extClasses = useMemo(
     () => extensionEditorClasses(extensions),
