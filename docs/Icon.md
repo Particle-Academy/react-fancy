@@ -1,0 +1,75 @@
+# Icon
+
+An icon container that resolves icon names from registered icon sets (Lucide by default).
+
+## Import
+
+```tsx
+import { Icon, registerIconSet, configureIcons } from "@particle-academy/react-fancy";
+```
+
+## Basic Usage
+
+```tsx
+<Icon name="rocket" />
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| name | `string` | - | Icon name to resolve from the registered icon set (e.g., `"rocket"`, `"arrow-right"`) |
+| size | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"md"` | Icon container size. Maps to: xs=12px, sm=16px, md=20px, lg=24px, xl=32px |
+| iconSet | `string` | - | Which registered icon set to use (defaults to the configured default) |
+
+Also extends all native `<span>` HTML attributes. When `children` are provided, they render instead of the resolved icon.
+
+## Icon Configuration
+
+### registerIconSet
+
+Register a custom icon set by name.
+
+```tsx
+import { registerIconSet } from "@particle-academy/react-fancy";
+
+registerIconSet("custom", {
+  resolve: (name) => MyCustomIconMap[name] ?? null,
+});
+```
+
+The `IconSet` interface requires a single `resolve` method:
+
+```ts
+interface IconSet {
+  resolve: (name: string) => ComponentType<{ className?: string; size?: number }> | null;
+}
+```
+
+### configureIcons
+
+Set the default icon set used when `iconSet` is not specified on `<Icon>`.
+
+```tsx
+import { configureIcons } from "@particle-academy/react-fancy";
+
+configureIcons({ defaultSet: "custom" });
+```
+
+The built-in default is `"lucide"`, which resolves kebab-case names (e.g., `"arrow-right"`) to Lucide React icons.
+
+## Examples
+
+### Different sizes
+
+```tsx
+<Icon name="star" size="xs" />
+<Icon name="star" size="md" />
+<Icon name="star" size="xl" />
+```
+
+### Using a specific icon set
+
+```tsx
+<Icon name="home" iconSet="custom" size="lg" />
+```

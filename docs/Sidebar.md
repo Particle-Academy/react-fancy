@@ -1,0 +1,88 @@
+# Sidebar
+
+A collapsible sidebar navigation with icon-only or letter-abbreviated collapsed mode, submenus, groups, and a toggle button.
+
+## Import
+
+```tsx
+import { Sidebar } from "@particle-academy/react-fancy";
+```
+
+## Basic Usage
+
+```tsx
+<Sidebar>
+  <Sidebar.Item href="/" icon={<HomeIcon />} active>Home</Sidebar.Item>
+  <Sidebar.Item href="/settings" icon={<GearIcon />}>Settings</Sidebar.Item>
+  <Sidebar.Group label="Projects">
+    <Sidebar.Item href="/project-a">Project A</Sidebar.Item>
+    <Sidebar.Item href="/project-b">Project B</Sidebar.Item>
+  </Sidebar.Group>
+  <Sidebar.Toggle />
+</Sidebar>
+```
+
+## Props
+
+### Sidebar (root)
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| collapsed | `boolean` | - | Controlled collapsed state |
+| defaultCollapsed | `boolean` | `false` | Default collapsed state (uncontrolled) |
+| onCollapsedChange | `(collapsed: boolean) => void` | - | Callback when collapsed state changes |
+| collapseMode | `"icons" \| "letters"` | `"icons"` | How items display when collapsed: icons only, or first 3 letters |
+| className | `string` | - | Additional CSS classes |
+
+### Sidebar.Item
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| children | `ReactNode` | - | Item label |
+| href | `string` | - | Link URL |
+| icon | `ReactNode` | - | Leading icon |
+| active | `boolean` | - | Active state highlight |
+| disabled | `boolean` | - | Disable the item |
+| badge | `ReactNode` | - | Trailing badge element |
+| onClick | `() => void` | - | Click handler |
+| className | `string` | - | Additional CSS classes |
+
+### Sidebar.Group
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| children | `ReactNode` | - | Grouped items |
+| label | `string` | - | Group heading |
+| className | `string` | - | Additional CSS classes |
+
+### Sidebar.Submenu
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| children | `ReactNode` | - | Submenu items |
+| label | `string` | - | Submenu trigger label (required) |
+| icon | `ReactNode` | - | Leading icon |
+| defaultOpen | `boolean` | - | Whether the submenu starts open |
+| className | `string` | - | Additional CSS classes |
+
+### Sidebar.Toggle
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| className | `string` | - | Additional CSS classes |
+
+## Collapsible Sidebar
+
+```tsx
+const [collapsed, setCollapsed] = useState(false);
+
+<Sidebar collapsed={collapsed} onCollapsedChange={setCollapsed} collapseMode="icons">
+  <Sidebar.Item icon={<HomeIcon />}>Dashboard</Sidebar.Item>
+  <Sidebar.Item icon={<UsersIcon />}>Users</Sidebar.Item>
+  <Sidebar.Submenu label="Reports" icon={<ChartIcon />} defaultOpen>
+    <Sidebar.Item>Monthly</Sidebar.Item>
+    <Sidebar.Item>Yearly</Sidebar.Item>
+  </Sidebar.Submenu>
+  <Sidebar.Toggle />
+</Sidebar>
+```

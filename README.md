@@ -56,109 +56,103 @@ npx vite build                      # Build demo app (verifies imports work)
 
 ### Core
 
-| Component | Description |
-|-----------|-------------|
-| Action | Button with colors, states, icons, emoji, avatar, badge, sort control |
-| Carousel | Slide carousel with directional/wizard variants, autoplay, loop |
-| ColorPicker | Native color input with swatch preview, hex display, presets |
-| Emoji | Emoji renderer from slugs |
-| EmojiSelect | Emoji search and selection dropdown |
-| Table | Data table with sorting, pagination, search, and tray |
+| Component | Description | Docs |
+|-----------|-------------|------|
+| Action | Button with colors, states, icons, emoji, avatar, badge, sort control | [docs](docs/Action.md) |
+| Carousel | Slide carousel with directional/wizard variants, autoplay, loop | [docs](docs/Carousel.md) |
+| ColorPicker | Native color input with swatch preview, hex display, presets | [docs](docs/ColorPicker.md) |
+| Emoji | Emoji renderer from slugs | [docs](docs/Emoji.md) |
+| EmojiSelect | Emoji search and selection dropdown | [docs](docs/EmojiSelect.md) |
+| Table | Data table with sorting, pagination, search, and tray | [docs](docs/Table.md) |
 
 ### Form Inputs
 
-| Component | Description |
-|-----------|-------------|
-| Field | Form field wrapper with label and error display |
-| Input | Text input |
-| Textarea | Multi-line text input |
-| Select | Dropdown select |
-| Checkbox / CheckboxGroup | Checkbox inputs |
-| RadioGroup | Radio button group |
-| Switch | Toggle switch |
-| Slider | Range slider (single and range modes) |
-| MultiSwitch | Segmented toggle between multiple options |
-| DatePicker | Date selection (single and range modes) |
-| Autocomplete | Input with filtered dropdown suggestions, async search, keyboard nav |
-| Pillbox | Tag/pill input with add/remove, backspace delete |
-| OtpInput | Single-digit OTP code input with auto-advance and paste support |
-| FileUpload | Drag-and-drop file upload with dropzone and file list |
-| TimePicker | Hour/minute/AM-PM time selection |
-| Calendar | Month grid with single, range, and multi-select modes |
+| Component | Description | Docs |
+|-----------|-------------|------|
+| Field | Form field wrapper with label and error display | [docs](docs/Field.md) |
+| Input | Text input | [docs](docs/Input.md) |
+| Textarea | Multi-line text input | [docs](docs/Textarea.md) |
+| Select | Native and listbox dropdown with multi-select support | [docs](docs/Select.md) |
+| Checkbox / CheckboxGroup | Checkbox inputs | [docs](docs/Checkbox.md) |
+| RadioGroup | Radio button group | [docs](docs/RadioGroup.md) |
+| Switch | Toggle switch | [docs](docs/Switch.md) |
+| Slider | Range slider (single and range modes) | [docs](docs/Slider.md) |
+| MultiSwitch | Segmented toggle between multiple options | [docs](docs/MultiSwitch.md) |
+| DatePicker | Date selection (single and range modes) | [docs](docs/DatePicker.md) |
+| Autocomplete | Input with filtered dropdown suggestions, async search, keyboard nav | [docs](docs/Autocomplete.md) |
+| Pillbox | Tag/pill input with add/remove, backspace delete | [docs](docs/Pillbox.md) |
+| OtpInput | Single-digit OTP code input with auto-advance and paste support | [docs](docs/OtpInput.md) |
+| FileUpload | Drag-and-drop file upload with dropzone and file list | [docs](docs/FileUpload.md) |
+| TimePicker | Hour/minute/AM-PM time selection | [docs](docs/TimePicker.md) |
+| Calendar | Month grid with single, range, and multi-select modes | [docs](docs/Calendar.md) |
 
 ### Display
 
-| Component | Description |
-|-----------|-------------|
-| Heading | Semantic heading (`h1`–`h6`) with size and weight props |
-| Text | Paragraph/span with size, color, weight, and `as` prop |
-| Separator | Horizontal/vertical divider with optional label |
-| Badge | Inline label with color, variant, size, and dot indicator |
-| Icon | Size wrapper around icon ReactNode |
-| Avatar | Image with fallback initials, size variants, status indicator |
-| Skeleton | Animated placeholder (rect, circle, text), pulse animation |
-| Progress | Bar and circular variants, indeterminate mode |
-| Brand | Logo + text lockup |
-| Profile | Avatar + name + subtitle layout |
-| Card | Container with Header, Body, Footer compound slots |
-| Callout | Alert/info box with icon, color, and dismissible support |
-| Timeline | Stacked, alternating, and horizontal timeline with data-driven or compound API |
+| Component | Description | Docs |
+|-----------|-------------|------|
+| Heading | Semantic heading (`h1`–`h6`) with size and weight props | [docs](docs/Heading.md) |
+| Text | Paragraph/span with size, color, weight, and `as` prop | [docs](docs/Text.md) |
+| Separator | Horizontal/vertical divider with optional label | [docs](docs/Separator.md) |
+| Badge | Inline label with color, variant, size, and dot indicator | [docs](docs/Badge.md) |
+| Icon | Size wrapper around icon ReactNode | [docs](docs/Icon.md) |
+| Avatar | Image with fallback initials, size variants, status indicator | [docs](docs/Avatar.md) |
+| Skeleton | Animated placeholder (rect, circle, text), pulse animation | [docs](docs/Skeleton.md) |
+| Progress | Bar and circular variants, indeterminate mode | [docs](docs/Progress.md) |
+| Brand | Logo + text lockup | [docs](docs/Brand.md) |
+| Profile | Avatar + name + subtitle layout | [docs](docs/Profile.md) |
+| Card | Container with Header, Body, Footer compound slots | [docs](docs/Card.md) |
+| Callout | Alert/info box with icon, color, and dismissible support | [docs](docs/Callout.md) |
+| Timeline | Stacked, alternating, and horizontal timeline with data-driven or compound API | [docs](docs/Timeline.md) |
 
 ### Overlay & Floating
 
-| Component | Description |
-|-----------|-------------|
-| Tooltip | Hover/focus tooltip with arrow and placement control |
-| Popover | Click-triggered floating panel |
-| Dropdown | Popover with keyboard-navigable menu items |
-| ContextMenu | Right-click triggered dropdown |
-| Modal | Full-screen backdrop dialog with focus trap and scroll lock |
-| Toast | Notification stack with auto-dismiss, variants, and position options |
-| Command | `Cmd+K` command palette with search and keyboard navigation |
+| Component | Description | Docs |
+|-----------|-------------|------|
+| Tooltip | Hover/focus tooltip with arrow and placement control | [docs](docs/Tooltip.md) |
+| Popover | Click or hover floating panel | [docs](docs/Popover.md) |
+| Dropdown | Popover with keyboard-navigable menu items | [docs](docs/Dropdown.md) |
+| ContextMenu | Right-click triggered dropdown | [docs](docs/ContextMenu.md) |
+| Modal | Full-screen backdrop dialog with focus trap and scroll lock | [docs](docs/Modal.md) |
+| Toast | Notification stack with auto-dismiss, variants, and position options | [docs](docs/Toast.md) |
+| Command | `Cmd+K` command palette with search and keyboard navigation | [docs](docs/Command.md) |
 
 ### Navigation & Layout
 
-| Component | Description |
-|-----------|-------------|
-| Tabs | Tabbed content with underline, pills, and boxed variants |
-| Accordion | Collapsible content sections (single/multiple mode) |
-| Breadcrumbs | Navigation breadcrumb trail with separator |
-| Navbar | Responsive navigation bar with hamburger collapse |
-| Pagination | Page navigation with prev/next and ellipsis |
+| Component | Description | Docs |
+|-----------|-------------|------|
+| Tabs | Tabbed content with underline, pills, and boxed variants | [docs](docs/Tabs.md) |
+| Accordion | Collapsible content sections (single/multiple mode) | [docs](docs/Accordion.md) |
+| Breadcrumbs | Navigation breadcrumb trail with separator | [docs](docs/Breadcrumbs.md) |
+| Navbar | Responsive navigation bar with hamburger collapse | [docs](docs/Navbar.md) |
+| Pagination | Page navigation with prev/next and ellipsis | [docs](docs/Pagination.md) |
 
 ### Rich Content
 
-| Component | Description |
-|-----------|-------------|
-| Composer | Chat-style message input composing textarea + actions |
-| Chart | SVG-based Bar and Donut charts |
-| Editor | Toolbar chrome wrapper for contentEditable |
-| Kanban | Drag-and-drop board with columns and cards |
-| Canvas | Interactive node canvas with pan, zoom, and connections |
-| Diagram | Entity-relationship diagram with draggable nodes and relation lines |
-| ContentRenderer | Markdown/HTML content renderer |
+| Component | Description | Docs |
+|-----------|-------------|------|
+| Composer | Chat-style message input composing textarea + actions | [docs](docs/Composer.md) |
+| Chart | SVG-based Bar, Line, Area, Pie, Donut, and Sparkline charts | [docs](docs/Chart.md) |
+| Editor | Toolbar chrome wrapper for contentEditable | [docs](docs/Editor.md) |
+| Kanban | Drag-and-drop board with columns and cards | [docs](docs/Kanban.md) |
+| Canvas | Interactive node canvas with pan, zoom, and connections | [docs](docs/Canvas.md) |
+| Diagram | Entity-relationship diagram with draggable nodes and relation lines | [docs](docs/Diagram.md) |
+| ContentRenderer | Markdown/HTML content renderer | [docs](docs/ContentRenderer.md) |
 
 ### Menus & Navigation
 
-| Component | Description |
-|-----------|-------------|
-| Menu | Hierarchical menu with nested items |
-| Sidebar | Collapsible sidebar navigation |
-| MobileMenu | Responsive mobile navigation overlay |
+| Component | Description | Docs |
+|-----------|-------------|------|
+| Menu | Hierarchical menu with nested items | [docs](docs/Menu.md) |
+| Sidebar | Collapsible sidebar navigation | [docs](docs/Sidebar.md) |
+| MobileMenu | Responsive mobile navigation overlay | [docs](docs/MobileMenu.md) |
 
 ### Utilities & Hooks
 
-| Export | Description |
-|--------|-------------|
-| Portal | `createPortal` wrapper with automatic dark mode propagation |
-| `cn()` | `clsx` + `tailwind-merge` for conditional class composition |
-| `useControllableState` | Controlled/uncontrolled state management |
-| `useFloatingPosition` | Anchor-relative positioning for floating elements |
-| `useOutsideClick` | Close on click outside handler |
-| `useEscapeKey` | Close on Escape key handler |
-| `useFocusTrap` | Tab-cycle focus within container |
-| `useAnimation` | Enter/exit CSS transitions with unmount |
-| `useId` | Stable ID generation |
+| Export | Description | Docs |
+|--------|-------------|------|
+| Portal | `createPortal` wrapper with automatic dark mode propagation | [docs](docs/Portal.md) |
+| `cn()` | `clsx` + `tailwind-merge` for conditional class composition | [docs](docs/utilities.md) |
+| Hooks | useControllableState, useFloatingPosition, useOutsideClick, useEscapeKey, useFocusTrap, useAnimation, useId, usePanZoom | [docs](docs/hooks.md) |
 
 ## Customization
 
