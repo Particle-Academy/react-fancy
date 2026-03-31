@@ -18,6 +18,8 @@ export interface EditorToolbarProps {
 
 export interface EditorContentProps {
   className?: string;
+  /** Max height in px before scrolling. When set, content area becomes scrollable. */
+  maxHeight?: number;
 }
 
 export interface EditorProps {

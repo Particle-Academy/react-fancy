@@ -4,7 +4,7 @@ import { useEditor } from "./Editor.context";
 import { proseClasses, extensionEditorClasses } from "./editor.utils";
 import type { EditorContentProps } from "./Editor.types";
 
-export function EditorContent({ className }: EditorContentProps) {
+export function EditorContent({ className, maxHeight }: EditorContentProps) {
   const { contentRef, lineSpacing, placeholder, extensions, _initialHtml, _onInput } = useEditor();
   const initialized = useRef(false);
 
@@ -29,10 +29,14 @@ export function EditorContent({ className }: EditorContentProps) {
       data-react-fancy-editor-content=""
       data-placeholder={placeholder}
       onInput={_onInput}
-      style={{ lineHeight: lineSpacing }}
+      style={{
+        lineHeight: lineSpacing,
+        maxHeight: maxHeight ? `${maxHeight}px` : undefined,
+      }}
       className={cn(
         "min-h-[120px] px-4 py-3 text-sm outline-none",
         "focus:outline-none",
+        maxHeight && "overflow-y-auto",
         proseClasses,
         extClasses,
         "empty:before:content-[attr(data-placeholder)] empty:before:text-zinc-400 empty:before:pointer-events-none",
