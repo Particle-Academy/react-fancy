@@ -354,6 +354,14 @@ export type {
   DiagramContextValue,
 } from "./components/Diagram";
 
+export { TreeNav, useTreeNav } from "./components/TreeNav";
+export type {
+  TreeNavProps,
+  TreeNodeData,
+  TreeNodeProps,
+  TreeNavContextValue,
+} from "./components/TreeNav";
+
 // Utilities
 export { cn } from "./utils/cn";
 export type { Size, Color, Variant, ActionColor, Placement } from "./utils/types";
