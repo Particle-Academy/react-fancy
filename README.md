@@ -125,7 +125,7 @@ npx vite build                      # Build demo app (verifies imports work)
 | Breadcrumbs | Navigation breadcrumb trail with separator | [docs](docs/Breadcrumbs.md) |
 | Navbar | Responsive navigation bar with hamburger collapse | [docs](docs/Navbar.md) |
 | Pagination | Page navigation with prev/next and ellipsis | [docs](docs/Pagination.md) |
-| TreeNav | Hierarchical file/folder tree with expand/collapse, selection, and extension-based icons | — |
+| TreeNav | Hierarchical file/folder tree with expand/collapse, selection, and extension-based icons | [docs](docs/TreeNav.md) |
 
 ### Rich Content
 
