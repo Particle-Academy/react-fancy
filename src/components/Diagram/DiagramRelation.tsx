@@ -4,7 +4,7 @@ import type { DiagramRelationProps } from "./Diagram.types";
 import { useDiagram } from "./Diagram.context";
 
 const HEADER_HEIGHT = 36;
-const FIELD_HEIGHT = 28;
+const FIELD_HEIGHT = 29; // 28px content (py-1 + text-sm) + 1px border-t
 const SYMBOL_SIZE = 12; // how far the ERD symbol extends from the entity edge
 
 interface Point {
@@ -133,77 +133,43 @@ export function DiagramRelation({
       ? HEADER_HEIGHT + toFieldIdx * FIELD_HEIGHT + FIELD_HEIGHT / 2
       : toRect.height / 2;
 
-    // Determine connection sides
+    // Always connect from entity sides at field-level Y (standard ERD convention).
+    // This ensures connectors and crow's feet mount at the correct field rows
+    // regardless of whether entities are arranged horizontally or vertically.
     const fromCx = fromRect.x + fromRect.width / 2;
     const toCx = toRect.x + toRect.width / 2;
-    const fromCy = fromRect.y + fromRect.height / 2;
-    const toCy = toRect.y + toRect.height / 2;
-    const dx = Math.abs(fromCx - toCx);
-    const dy = Math.abs(fromCy - toCy);
 
     let fromPt: Point, toPt: Point;
     let fromDir: "left" | "right" | "up" | "down";
     let toDir: "left" | "right" | "up" | "down";
 
-    if (dx > dy * 0.5) {
-      // Horizontal-ish: connect sides
-      if (fromCx < toCx) {
-        fromPt = { x: fromRect.x + fromRect.width, y: fromRect.y + fromFieldY };
-        toPt = { x: toRect.x, y: toRect.y + toFieldY };
-        fromDir = "right";
-        toDir = "left";
-      } else {
-        fromPt = { x: fromRect.x, y: fromRect.y + fromFieldY };
-        toPt = { x: toRect.x + toRect.width, y: toRect.y + toFieldY };
-        fromDir = "left";
-        toDir = "right";
-      }
+    if (fromCx <= toCx) {
+      fromPt = { x: fromRect.x + fromRect.width, y: fromRect.y + fromFieldY };
+      toPt = { x: toRect.x, y: toRect.y + toFieldY };
+      fromDir = "right";
+      toDir = "left";
     } else {
-      // Vertical: connect top/bottom
-      if (fromCy < toCy) {
-        fromPt = { x: fromRect.x + fromRect.width / 2, y: fromRect.y + fromRect.height };
-        toPt = { x: toRect.x + toRect.width / 2, y: toRect.y };
-        fromDir = "down";
-        toDir = "up";
-      } else {
-        fromPt = { x: fromRect.x + fromRect.width / 2, y: fromRect.y };
-        toPt = { x: toRect.x + toRect.width / 2, y: toRect.y + toRect.height };
-        fromDir = "up";
-        toDir = "down";
-      }
+      fromPt = { x: fromRect.x, y: fromRect.y + fromFieldY };
+      toPt = { x: toRect.x + toRect.width, y: toRect.y + toFieldY };
+      fromDir = "left";
+      toDir = "right";
     }
 
     // Offset endpoints outward by symbol size so symbols sit outside the entity
     const offsetFrom = { ...fromPt };
     const offsetTo = { ...toPt };
-    switch (fromDir) {
-      case "right": offsetFrom.x += SYMBOL_SIZE; break;
-      case "left": offsetFrom.x -= SYMBOL_SIZE; break;
-      case "down": offsetFrom.y += SYMBOL_SIZE; break;
-      case "up": offsetFrom.y -= SYMBOL_SIZE; break;
-    }
-    switch (toDir) {
-      case "right": offsetTo.x += SYMBOL_SIZE; break;
-      case "left": offsetTo.x -= SYMBOL_SIZE; break;
-      case "down": offsetTo.y += SYMBOL_SIZE; break;
-      case "up": offsetTo.y -= SYMBOL_SIZE; break;
-    }
+    if (fromDir === "right") offsetFrom.x += SYMBOL_SIZE;
+    else offsetFrom.x -= SYMBOL_SIZE;
+    if (toDir === "left") offsetTo.x -= SYMBOL_SIZE;
+    else offsetTo.x += SYMBOL_SIZE;
 
-    // Bezier curve between the offset points
+    // Bezier curve with horizontal control points
     const adx = Math.abs(offsetTo.x - offsetFrom.x);
     const ady = Math.abs(offsetTo.y - offsetFrom.y);
-    let linePath: string;
-    if (adx > ady) {
-      const off = adx * 0.4;
-      const cp1x = offsetFrom.x + (offsetTo.x > offsetFrom.x ? off : -off);
-      const cp2x = offsetTo.x + (offsetTo.x > offsetFrom.x ? -off : off);
-      linePath = `M${offsetFrom.x},${offsetFrom.y} C${cp1x},${offsetFrom.y} ${cp2x},${offsetTo.y} ${offsetTo.x},${offsetTo.y}`;
-    } else {
-      const off = Math.max(ady * 0.4, 20);
-      const cp1y = offsetFrom.y + (offsetTo.y > offsetFrom.y ? off : -off);
-      const cp2y = offsetTo.y + (offsetTo.y > offsetFrom.y ? -off : off);
-      linePath = `M${offsetFrom.x},${offsetFrom.y} C${offsetFrom.x},${cp1y} ${offsetTo.x},${cp2y} ${offsetTo.x},${offsetTo.y}`;
-    }
+    const off = Math.max(adx * 0.4, ady * 0.25, 40);
+    const cp1x = offsetFrom.x + (fromDir === "right" ? off : -off);
+    const cp2x = offsetTo.x + (toDir === "left" ? -off : off);
+    const linePath = `M${offsetFrom.x},${offsetFrom.y} C${cp1x},${offsetFrom.y} ${cp2x},${offsetTo.y} ${offsetTo.x},${offsetTo.y}`;
 
     const startSymbol = getSymbolPath(type, "start", fromPt, fromDir);
     const endSymbol = getSymbolPath(type, "end", toPt, toDir);
