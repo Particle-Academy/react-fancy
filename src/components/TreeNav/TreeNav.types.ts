@@ -17,6 +17,15 @@ export interface TreeNodeData {
   disabled?: boolean;
 }
 
+/** Where the dragged node will land relative to the drop target */
+export type DropPosition = "before" | "after" | "inside";
+
+export interface DragState {
+  draggedNodeId: string | null;
+  dropTargetId: string | null;
+  dropPosition: DropPosition | null;
+}
+
 export interface TreeNavProps {
   /** Tree data */
   nodes: TreeNodeData[];
@@ -26,6 +35,10 @@ export interface TreeNavProps {
   onSelect?: (id: string, node: TreeNodeData) => void;
   /** Callback when a node is right-clicked */
   onNodeContextMenu?: (e: React.MouseEvent, node: TreeNodeData) => void;
+  /** Enable drag-and-drop reordering (default: false) */
+  draggable?: boolean;
+  /** Callback when a node is moved via drag and drop */
+  onNodeMove?: (sourceId: string, targetId: string, position: DropPosition) => void;
   /** Controlled expanded node IDs */
   expandedIds?: string[];
   /** Default expanded node IDs (uncontrolled) */
@@ -50,6 +63,12 @@ export interface TreeNavContextValue {
   toggle: (id: string) => void;
   indentSize: number;
   showIcons: boolean;
+  draggable: boolean;
+  dragState: DragState;
+  setDragState: (state: DragState) => void;
+  onNodeMove?: (sourceId: string, targetId: string, position: DropPosition) => void;
+  nodes: TreeNodeData[];
+  expandNode: (id: string) => void;
 }
 
 export interface TreeNodeProps {

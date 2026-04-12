@@ -360,6 +360,7 @@ export type {
   TreeNodeData,
   TreeNodeProps,
   TreeNavContextValue,
+  DropPosition,
 } from "./components/TreeNav";
 
 // Utilities

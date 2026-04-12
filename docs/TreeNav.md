@@ -49,6 +49,8 @@ const files: TreeNodeData[] = [
 | selectedId | `string` | - | Currently selected node ID |
 | onSelect | `(id: string, node: TreeNodeData) => void` | - | Selection callback |
 | onNodeContextMenu | `(e: React.MouseEvent, node: TreeNodeData) => void` | - | Right-click callback per node |
+| draggable | `boolean` | `false` | Enable drag-and-drop reordering |
+| onNodeMove | `(sourceId: string, targetId: string, position: DropPosition) => void` | - | Callback when a node is moved via drag-and-drop |
 | expandedIds | `string[]` | - | Controlled expanded node IDs |
 | defaultExpandedIds | `string[]` | - | Initial expanded nodes (uncontrolled) |
 | onExpandedChange | `(ids: string[]) => void` | - | Callback when expanded state changes |
@@ -141,6 +143,39 @@ Override with the `icon` field on any node:
 ```tsx
 { id: "special", label: "config", icon: <GearIcon /> }
 ```
+
+## Drag and Drop
+
+Enable drag-and-drop reordering with the `draggable` prop. The tree itself is never mutated — your `onNodeMove` callback receives the source, target, and position, and you update state accordingly.
+
+```tsx
+import { TreeNav } from "@particle-academy/react-fancy";
+import type { TreeNodeData, DropPosition } from "@particle-academy/react-fancy";
+
+const [files, setFiles] = useState<TreeNodeData[]>(initialFiles);
+
+function handleNodeMove(sourceId: string, targetId: string, position: DropPosition) {
+  // position is "before", "after", or "inside" (folders only)
+  setFiles((prev) => moveNode(prev, sourceId, targetId, position));
+}
+
+<TreeNav
+  nodes={files}
+  draggable
+  onNodeMove={handleNodeMove}
+/>
+```
+
+**Drop positions:**
+- `"before"` — insert above the target node (thin blue line indicator)
+- `"after"` — insert below the target node (thin blue line indicator)
+- `"inside"` — drop into a folder (blue highlight on the folder)
+
+**Built-in safety:**
+- Cannot drop a node onto itself
+- Cannot drop a node into its own descendants
+- Folders auto-expand after 500ms when dragging over them
+- Disabled nodes cannot be dragged
 
 ## Context Menu
 

@@ -1,6 +1,7 @@
+import { useRef, useEffect, useCallback } from "react";
 import { cn } from "../../utils/cn";
 import { useTreeNav } from "./TreeNav.context";
-import type { TreeNodeProps } from "./TreeNav.types";
+import type { TreeNodeProps, TreeNodeData, DropPosition } from "./TreeNav.types";
 
 const EXT_COLORS: Record<string, string> = {
   ts: "#3178c6",
@@ -61,13 +62,86 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Utilities
+// ---------------------------------------------------------------------------
+
+function isDescendantOf(
+  nodes: TreeNodeData[],
+  ancestorId: string,
+  targetId: string,
+): boolean {
+  function findNode(haystack: TreeNodeData[], id: string): TreeNodeData | undefined {
+    for (const n of haystack) {
+      if (n.id === id) return n;
+      if (n.children) {
+        const found = findNode(n.children, id);
+        if (found) return found;
+      }
+    }
+    return undefined;
+  }
+
+  function hasDescendant(node: TreeNodeData, id: string): boolean {
+    if (!node.children) return false;
+    for (const child of node.children) {
+      if (child.id === id) return true;
+      if (hasDescendant(child, id)) return true;
+    }
+    return false;
+  }
+
+  const ancestor = findNode(nodes, ancestorId);
+  return ancestor ? hasDescendant(ancestor, targetId) : false;
+}
+
+function computeDropPosition(
+  e: React.DragEvent,
+  isFolder: boolean,
+): DropPosition {
+  const rect = e.currentTarget.getBoundingClientRect();
+  const offsetY = e.clientY - rect.top;
+  const third = rect.height / 3;
+
+  if (offsetY < third) return "before";
+  if (offsetY > third * 2) return "after";
+  return isFolder ? "inside" : "after";
+}
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
 export function TreeNode({ node, depth }: TreeNodeProps) {
-  const { selectedId, onSelect, onNodeContextMenu, expandedIds, toggle, indentSize, showIcons } = useTreeNav();
+  const {
+    selectedId, onSelect, onNodeContextMenu, expandedIds, toggle, indentSize, showIcons,
+    draggable, dragState, setDragState, onNodeMove, nodes, expandNode,
+  } = useTreeNav();
 
   const isFolder = node.type === "folder" || (node.children && node.children.length > 0);
   const isExpanded = expandedIds.includes(node.id);
   const isSelected = selectedId === node.id;
   const paddingLeft = depth * indentSize + 4;
+
+  const isDragging = dragState.draggedNodeId === node.id;
+  const isDropTarget = dragState.dropTargetId === node.id;
+  const dropPosition = isDropTarget ? dragState.dropPosition : null;
+
+  // Auto-expand timer for folders during drag
+  const autoExpandTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearAutoExpand = useCallback(() => {
+    if (autoExpandTimer.current) {
+      clearTimeout(autoExpandTimer.current);
+      autoExpandTimer.current = null;
+    }
+  }, []);
+
+  useEffect(() => clearAutoExpand, [clearAutoExpand]);
+
+  // ---------------------------------------------------------------------------
+  // Click handlers
+  // ---------------------------------------------------------------------------
 
   const handleClick = () => {
     if (node.disabled) return;
@@ -84,10 +158,108 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
     }
   };
 
+  // ---------------------------------------------------------------------------
+  // Drag source handlers
+  // ---------------------------------------------------------------------------
+
+  const handleDragStart = useCallback((e: React.DragEvent) => {
+    e.dataTransfer.setData("text/plain", node.id);
+    e.dataTransfer.effectAllowed = "move";
+    // Set state async so the browser captures the element for the drag ghost first
+    requestAnimationFrame(() => {
+      setDragState({ draggedNodeId: node.id, dropTargetId: null, dropPosition: null });
+    });
+  }, [node.id, setDragState]);
+
+  const handleDragEnd = useCallback(() => {
+    clearAutoExpand();
+    setDragState({ draggedNodeId: null, dropTargetId: null, dropPosition: null });
+  }, [clearAutoExpand, setDragState]);
+
+  // ---------------------------------------------------------------------------
+  // Drop target handlers (on outer div)
+  // ---------------------------------------------------------------------------
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    if (!dragState.draggedNodeId) return;
+    const sourceId = dragState.draggedNodeId;
+    if (sourceId === node.id) return;
+    if (isDescendantOf(nodes, sourceId, node.id)) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "move";
+
+    const position = computeDropPosition(e, !!isFolder);
+
+    // Auto-expand collapsed folders when hovering "inside"
+    if (isFolder && !isExpanded && position === "inside") {
+      if (!autoExpandTimer.current) {
+        autoExpandTimer.current = setTimeout(() => {
+          expandNode(node.id);
+          autoExpandTimer.current = null;
+        }, 500);
+      }
+    } else {
+      clearAutoExpand();
+    }
+
+    if (dragState.dropTargetId !== node.id || dragState.dropPosition !== position) {
+      setDragState({ draggedNodeId: sourceId, dropTargetId: node.id, dropPosition: position });
+    }
+  }, [dragState, node.id, isFolder, isExpanded, nodes, setDragState, expandNode, clearAutoExpand]);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      clearAutoExpand();
+      if (dragState.dropTargetId === node.id) {
+        setDragState({ ...dragState, dropTargetId: null, dropPosition: null });
+      }
+    }
+  }, [dragState, node.id, setDragState, clearAutoExpand]);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    clearAutoExpand();
+
+    const sourceId = dragState.draggedNodeId;
+    const position = dragState.dropPosition;
+    if (!sourceId || !position) return;
+    if (sourceId === node.id) return;
+    if (isDescendantOf(nodes, sourceId, node.id)) return;
+
+    onNodeMove?.(sourceId, node.id, position);
+    setDragState({ draggedNodeId: null, dropTargetId: null, dropPosition: null });
+  }, [dragState, node.id, nodes, onNodeMove, setDragState, clearAutoExpand]);
+
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
+
+  const canDrag = draggable && !node.disabled;
+
   return (
-    <div data-react-fancy-tree-node="">
+    <div
+      data-react-fancy-tree-node=""
+      onDragOver={draggable ? handleDragOver : undefined}
+      onDragLeave={draggable ? handleDragLeave : undefined}
+      onDrop={draggable ? handleDrop : undefined}
+    >
+      {/* Before drop indicator */}
+      {isDropTarget && dropPosition === "before" && (
+        <div
+          data-react-fancy-tree-drop-indicator="before"
+          className="pointer-events-none h-0.5 rounded-full bg-blue-500"
+          style={{ marginLeft: paddingLeft }}
+        />
+      )}
+
       <button
         type="button"
+        draggable={canDrag}
+        onDragStart={canDrag ? handleDragStart : undefined}
+        onDragEnd={canDrag ? handleDragEnd : undefined}
         onClick={handleClick}
         onContextMenu={handleContextMenu}
         disabled={node.disabled}
@@ -97,6 +269,9 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
             ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
             : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
           node.disabled && "pointer-events-none opacity-40",
+          isDragging && "opacity-50",
+          canDrag && "cursor-grab active:cursor-grabbing",
+          isDropTarget && dropPosition === "inside" && "bg-blue-500/10 ring-1 ring-blue-500/30 ring-inset",
         )}
         style={{ paddingLeft }}
       >
@@ -109,6 +284,15 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
         )}
         <span className="truncate">{node.label}</span>
       </button>
+
+      {/* After drop indicator */}
+      {isDropTarget && dropPosition === "after" && (
+        <div
+          data-react-fancy-tree-drop-indicator="after"
+          className="pointer-events-none h-0.5 rounded-full bg-blue-500"
+          style={{ marginLeft: paddingLeft }}
+        />
+      )}
 
       {isFolder && isExpanded && node.children && (
         <div data-react-fancy-tree-node-children="">

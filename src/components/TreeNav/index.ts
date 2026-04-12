@@ -5,4 +5,5 @@ export type {
   TreeNodeData,
   TreeNodeProps,
   TreeNavContextValue,
+  DropPosition,
 } from "./TreeNav.types";
