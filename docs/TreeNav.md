@@ -48,6 +48,7 @@ const files: TreeNodeData[] = [
 | nodes | `TreeNodeData[]` | - | Tree data (required) |
 | selectedId | `string` | - | Currently selected node ID |
 | onSelect | `(id: string, node: TreeNodeData) => void` | - | Selection callback |
+| onNodeContextMenu | `(e: React.MouseEvent, node: TreeNodeData) => void` | - | Right-click callback per node |
 | expandedIds | `string[]` | - | Controlled expanded node IDs |
 | defaultExpandedIds | `string[]` | - | Initial expanded nodes (uncontrolled) |
 | onExpandedChange | `(ids: string[]) => void` | - | Callback when expanded state changes |
@@ -140,6 +141,48 @@ Override with the `icon` field on any node:
 ```tsx
 { id: "special", label: "config", icon: <GearIcon /> }
 ```
+
+## Context Menu
+
+Use `onNodeContextMenu` with the `ContextMenu` component to add right-click menus per node:
+
+```tsx
+import { TreeNav, ContextMenu } from "@particle-academy/react-fancy";
+
+const [ctxNode, setCtxNode] = useState<TreeNodeData | null>(null);
+
+<ContextMenu>
+  <ContextMenu.Trigger>
+    <TreeNav
+      nodes={files}
+      selectedId={selectedFile}
+      onSelect={handleSelect}
+      onNodeContextMenu={(e, node) => setCtxNode(node)}
+    />
+  </ContextMenu.Trigger>
+  <ContextMenu.Content>
+    {ctxNode?.type === "folder" ? (
+      <>
+        <ContextMenu.Item>New File</ContextMenu.Item>
+        <ContextMenu.Item>New Folder</ContextMenu.Item>
+      </>
+    ) : (
+      <>
+        <ContextMenu.Item onClick={() => openFile(ctxNode)}>
+          Open File
+        </ContextMenu.Item>
+        <ContextMenu.Item onClick={() => copyName(ctxNode)}>
+          Copy File Name
+        </ContextMenu.Item>
+        <ContextMenu.Separator />
+        <ContextMenu.Item danger>Delete</ContextMenu.Item>
+      </>
+    )}
+  </ContextMenu.Content>
+</ContextMenu>
+```
+
+The `onNodeContextMenu` callback fires with the mouse event and the node data. Wrap TreeNav in `ContextMenu.Trigger` to let the ContextMenu handle positioning and open/close — the callback just tracks which node was right-clicked so you can render different menu items for files vs folders.
 
 ## IDE Layout Example
 
