@@ -19,6 +19,7 @@ function TreeNavRoot({
   nodes,
   selectedId,
   onSelect,
+  onNodeContextMenu,
   expandedIds: controlledExpanded,
   defaultExpandedIds,
   onExpandedChange,
@@ -51,8 +52,8 @@ function TreeNavRoot({
   );
 
   const ctx = useMemo(
-    () => ({ selectedId, onSelect, expandedIds, toggle, indentSize, showIcons }),
-    [selectedId, onSelect, expandedIds, toggle, indentSize, showIcons],
+    () => ({ selectedId, onSelect, onNodeContextMenu, expandedIds, toggle, indentSize, showIcons }),
+    [selectedId, onSelect, onNodeContextMenu, expandedIds, toggle, indentSize, showIcons],
   );
 
   return (

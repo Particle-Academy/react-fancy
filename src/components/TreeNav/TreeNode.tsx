@@ -62,7 +62,7 @@ function ChevronIcon({ open }: { open: boolean }) {
 }
 
 export function TreeNode({ node, depth }: TreeNodeProps) {
-  const { selectedId, onSelect, expandedIds, toggle, indentSize, showIcons } = useTreeNav();
+  const { selectedId, onSelect, onNodeContextMenu, expandedIds, toggle, indentSize, showIcons } = useTreeNav();
 
   const isFolder = node.type === "folder" || (node.children && node.children.length > 0);
   const isExpanded = expandedIds.includes(node.id);
@@ -77,11 +77,19 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
     onSelect?.(node.id, node);
   };
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    if (onNodeContextMenu) {
+      e.preventDefault();
+      onNodeContextMenu(e, node);
+    }
+  };
+
   return (
     <div data-react-fancy-tree-node="">
       <button
         type="button"
         onClick={handleClick}
+        onContextMenu={handleContextMenu}
         disabled={node.disabled}
         className={cn(
           "flex w-full items-center gap-1 rounded-md py-0.5 text-left text-[13px] transition-colors",

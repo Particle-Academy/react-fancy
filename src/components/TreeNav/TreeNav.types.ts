@@ -24,6 +24,8 @@ export interface TreeNavProps {
   selectedId?: string;
   /** Callback when a node is selected */
   onSelect?: (id: string, node: TreeNodeData) => void;
+  /** Callback when a node is right-clicked */
+  onNodeContextMenu?: (e: React.MouseEvent, node: TreeNodeData) => void;
   /** Controlled expanded node IDs */
   expandedIds?: string[];
   /** Default expanded node IDs (uncontrolled) */
@@ -43,6 +45,7 @@ export interface TreeNavProps {
 export interface TreeNavContextValue {
   selectedId?: string;
   onSelect?: (id: string, node: TreeNodeData) => void;
+  onNodeContextMenu?: (e: React.MouseEvent, node: TreeNodeData) => void;
   expandedIds: string[];
   toggle: (id: string) => void;
   indentSize: number;
