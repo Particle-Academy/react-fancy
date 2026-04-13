@@ -84,7 +84,7 @@ export type { SeparatorProps } from "./components/Separator";
 export { Badge } from "./components/Badge";
 export type { BadgeProps } from "./components/Badge";
 
-export { Icon, registerIconSet, configureIcons } from "./components/Icon";
+export { Icon, registerIcons, registerIconSet, configureIcons } from "./components/Icon";
 export type { IconProps, IconSet } from "./components/Icon";
 
 export { Avatar } from "./components/Avatar";
