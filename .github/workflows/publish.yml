@@ -20,21 +20,15 @@ jobs:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
 
+      # npm Trusted Publishing (OIDC) requires npm 11.5.1 or later.
+      - name: Upgrade npm
+        run: npm install -g npm@latest
+
       - name: Install
         run: npm install
 
       - name: Build
         run: npm run build
-
-      - name: Debug OIDC claims
-        run: |
-          TOKEN=$(curl -sLS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm:registry.npmjs.org" | jq -r .value)
-          echo "Header:"
-          echo "$TOKEN" | cut -d. -f1 | base64 -d 2>/dev/null | jq .
-          echo ""
-          echo "Payload:"
-          echo "$TOKEN" | cut -d. -f2 | base64 -d 2>/dev/null | jq .
 
       - name: Publish
         run: npm publish --provenance --access public
