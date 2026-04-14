@@ -3,8 +3,8 @@ import type { ActionColor, Size } from "../../utils/types";
 
 export interface ActionProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "color"> {
-  /** Shape variant */
-  variant?: "default" | "circle";
+  /** Shape/fill variant */
+  variant?: "default" | "circle" | "ghost";
   /** Standalone color (overrides state colors) */
   color?: ActionColor;
   size?: Size;

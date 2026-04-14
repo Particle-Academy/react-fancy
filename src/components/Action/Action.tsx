@@ -50,6 +50,32 @@ const checkedClasses =
 const warnClasses =
   "bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700 dark:hover:bg-amber-900/50";
 
+// Ghost variant: transparent background, colored text, subtle hover
+const ghostColorClasses: Record<ActionColor, string> = {
+  blue: "bg-transparent text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/50",
+  emerald: "bg-transparent text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/50",
+  amber: "bg-transparent text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/50",
+  red: "bg-transparent text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/50",
+  violet: "bg-transparent text-violet-600 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-950/50",
+  indigo: "bg-transparent text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/50",
+  sky: "bg-transparent text-sky-600 hover:bg-sky-50 dark:text-sky-400 dark:hover:bg-sky-950/50",
+  rose: "bg-transparent text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/50",
+  orange: "bg-transparent text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-950/50",
+  zinc: "bg-transparent text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800",
+};
+
+const ghostDefaultClasses =
+  "bg-transparent text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800";
+
+const ghostActiveClasses =
+  "bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-950";
+
+const ghostCheckedClasses =
+  "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300 dark:hover:bg-emerald-950";
+
+const ghostWarnClasses =
+  "bg-transparent text-amber-700 hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-amber-950/50";
+
 // ---------------------------------------------------------------------------
 // Size helpers
 // ---------------------------------------------------------------------------
@@ -123,7 +149,15 @@ function getColorClasses(
   active?: boolean,
   checked?: boolean,
   warn?: boolean,
+  ghost?: boolean,
 ): string {
+  if (ghost) {
+    if (color) return ghostColorClasses[color];
+    if (checked) return ghostCheckedClasses;
+    if (active) return ghostActiveClasses;
+    if (warn) return ghostWarnClasses;
+    return ghostDefaultClasses;
+  }
   if (color) return colorClasses[color];
   if (checked) return checkedClasses;
   if (active) return activeClasses;
@@ -136,7 +170,12 @@ function getIconColorClasses(
   active?: boolean,
   checked?: boolean,
   warn?: boolean,
+  ghost?: boolean,
 ): string {
+  if (ghost) {
+    // Ghost variant: icon inherits currentColor from the button text
+    return "text-current";
+  }
   if (color || active || checked) return "text-white";
   if (warn) return "text-amber-600 dark:text-amber-400";
   return "text-zinc-500 dark:text-zinc-400";
@@ -147,7 +186,11 @@ function getBadgeClasses(
   active?: boolean,
   checked?: boolean,
   warn?: boolean,
+  ghost?: boolean,
 ): string {
+  if (ghost) {
+    return "bg-current/10 text-current";
+  }
   if (isColored(color, active, checked)) return "bg-white/20 text-white";
   if (warn) return "bg-amber-200 text-amber-800 dark:bg-amber-800 dark:text-amber-200";
   return "bg-zinc-200 text-zinc-700 dark:bg-zinc-600 dark:text-zinc-200";
@@ -228,6 +271,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
     ref,
   ) => {
     const isCircle = variant === "circle";
+    const isGhost = variant === "ghost";
     const { primary, secondary } = parsePlacement(iconPlace);
     const isVertical = isVerticalPrimary(primary);
     const isCompound = !!secondary;
@@ -242,7 +286,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
     // -----------------------------------------------------------------------
     // Build decorative elements
     // -----------------------------------------------------------------------
-    const iconColorCls = getIconColorClasses(color, active, checked, warn);
+    const iconColorCls = getIconColorClasses(color, active, checked, warn, isGhost);
 
     const buildElement = (key: ElementKey, trailing: boolean): ReactNode => {
       switch (key) {
@@ -303,7 +347,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
               className={cn(
                 "inline-flex items-center justify-center font-medium rounded-full",
                 badgeSize[size],
-                getBadgeClasses(color, active, checked, warn),
+                getBadgeClasses(color, active, checked, warn, isGhost),
               )}
               data-action-badge
             >
@@ -365,7 +409,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
       "disabled:opacity-50 disabled:cursor-not-allowed",
       isCircle ? "rounded-full" : "rounded-lg",
       sizeClass,
-      getColorClasses(color, active, checked, warn),
+      getColorClasses(color, active, checked, warn, isGhost),
       !isCircle && !needsWrapper && "gap-2",
       !isCircle && needsWrapper && "gap-2",
       isReversed && !needsWrapper && "flex-row-reverse",
