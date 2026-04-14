@@ -60,6 +60,7 @@ A visual separator between toolbar groups. No props.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | className | `string` | - | Additional CSS classes |
+| maxHeight | `number` | - | Max height in px before scrolling. When set, the content area becomes scrollable. |
 
 ## Markdown Output
 
@@ -70,14 +71,81 @@ A visual separator between toolbar groups. No props.
 </Editor>
 ```
 
+## Scrollable Editor
+
+Constrain the editor's height and let it scroll instead of growing the page:
+
+```tsx
+<Editor defaultValue={longHtml}>
+  <Editor.Toolbar />
+  <Editor.Content maxHeight={320} />
+</Editor>
+```
+
+## useEditor Hook
+
+Access editor state and commands from a child component (typically used inside a custom toolbar):
+
+```tsx
+import { useEditor } from "@particle-academy/react-fancy";
+
+function CustomToolbarButtons() {
+  const { exec } = useEditor();
+  return (
+    <>
+      <button onClick={() => exec("bold")}>B</button>
+      <Editor.Toolbar.Separator />
+      <button onClick={() => exec("formatBlock", "h1")}>H1</button>
+    </>
+  );
+}
+```
+
+### EditorContextValue
+
+| Property | Type | Description |
+|----------|------|-------------|
+| exec | `(command: string, arg?: string) => void` | Execute a `document.execCommand`-style formatting command |
+| insertText | `(text: string) => void` | Insert text at the current cursor position |
+| wrapSelection | `(before: string, after: string) => void` | Wrap the selection with before/after strings |
+| contentRef | `RefObject<HTMLDivElement \| null>` | Ref to the editable content element |
+| outputFormat | `"html" \| "markdown"` | Current output format |
+| lineSpacing | `number` | Current line spacing |
+| placeholder | `string` | Current placeholder text |
+| extensions | `RenderExtension[]` | Merged render extensions (global + instance) |
+
+## Render Extensions
+
+Render extensions let you embed custom React components inline using tag names you choose (e.g., `<alert>`, `<questions>`, `<thinking>`). The same extensions work in both `Editor` and `ContentRenderer`.
+
+```tsx
+import type { RenderExtension, RenderExtensionProps } from "@particle-academy/react-fancy";
+
+function AlertRenderer({ content, attributes }: RenderExtensionProps) {
+  const variant = attributes.type || "info";
+  return <div className={`alert alert-${variant}`}>{content}</div>;
+}
+
+const extensions: RenderExtension[] = [
+  { tag: "alert", component: AlertRenderer },
+];
+
+<Editor extensions={extensions} defaultValue='<alert type="info">Hello</alert>'>
+  <Editor.Toolbar />
+  <Editor.Content />
+</Editor>
+```
+
+Register extensions globally with `registerExtension` (applies to all instances) or pass them per-instance via the `extensions` prop. Per-instance extensions are merged with global ones.
+
 ## Custom Toolbar
 
 ```tsx
 <Editor defaultValue="">
   <Editor.Toolbar>
-    <button onClick={() => exec("bold")}>B</button>
+    <CustomToolbarButtons />
     <Editor.Toolbar.Separator />
-    <button onClick={() => exec("italic")}>I</button>
+    <MoreButtons />
   </Editor.Toolbar>
   <Editor.Content />
 </Editor>

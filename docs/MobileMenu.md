@@ -8,6 +8,12 @@ Mobile navigation components with two variants: a slide-out flyout panel and a f
 import { MobileMenu } from "@particle-academy/react-fancy";
 ```
 
+## Import
+
+```tsx
+import { MobileMenu, Icon } from "@particle-academy/react-fancy";
+```
+
 ## Flyout
 
 A slide-out panel from the left or right edge.
@@ -18,9 +24,9 @@ const [open, setOpen] = useState(false);
 <button onClick={() => setOpen(true)}>Menu</button>
 
 <MobileMenu.Flyout open={open} onClose={() => setOpen(false)} side="left" title="Menu">
-  <MobileMenu.Item href="/" icon={<HomeIcon />} active>Home</MobileMenu.Item>
-  <MobileMenu.Item href="/about" icon={<InfoIcon />}>About</MobileMenu.Item>
-  <MobileMenu.Item href="/contact" icon={<MailIcon />}>Contact</MobileMenu.Item>
+  <MobileMenu.Item href="/" icon={<Icon name="home" />} active>Home</MobileMenu.Item>
+  <MobileMenu.Item href="/about" icon={<Icon name="info" />}>About</MobileMenu.Item>
+  <MobileMenu.Item href="/contact" icon={<Icon name="mail" />}>Contact</MobileMenu.Item>
 </MobileMenu.Flyout>
 ```
 
@@ -30,9 +36,9 @@ A fixed bottom navigation bar for mobile.
 
 ```tsx
 <MobileMenu.BottomBar>
-  <MobileMenu.Item href="/" icon={<HomeIcon />} active>Home</MobileMenu.Item>
-  <MobileMenu.Item href="/search" icon={<SearchIcon />}>Search</MobileMenu.Item>
-  <MobileMenu.Item href="/profile" icon={<UserIcon />}>Profile</MobileMenu.Item>
+  <MobileMenu.Item href="/" icon={<Icon name="home" />} active>Home</MobileMenu.Item>
+  <MobileMenu.Item href="/search" icon={<Icon name="search" />}>Search</MobileMenu.Item>
+  <MobileMenu.Item href="/profile" icon={<Icon name="user" />}>Profile</MobileMenu.Item>
 </MobileMenu.BottomBar>
 ```
 

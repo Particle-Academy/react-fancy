@@ -5,7 +5,13 @@ An icon container that resolves icon names from registered icon sets (Lucide by 
 ## Import
 
 ```tsx
-import { Icon, registerIconSet, configureIcons } from "@particle-academy/react-fancy";
+import {
+  Icon,
+  registerIcons,
+  registerIconSet,
+  configureIcons,
+} from "@particle-academy/react-fancy";
+import type { IconSet } from "@particle-academy/react-fancy";
 ```
 
 ## Basic Usage
@@ -26,9 +32,29 @@ Also extends all native `<span>` HTML attributes. When `children` are provided, 
 
 ## Icon Configuration
 
+Three APIs configure icons: `registerIcons` for tree-shakeable individual Lucide icons, `registerIconSet` for custom icon libraries, and `configureIcons` for choosing the default set.
+
+### registerIcons
+
+Register individual icon components into the built-in `"lucide"` set by their kebab-case name. This is the recommended way to opt into tree-shaking — only the icons you import are bundled.
+
+```tsx
+import { registerIcons } from "@particle-academy/react-fancy";
+import { Home, Settings, Mail } from "lucide-react";
+
+registerIcons({ Home, Settings, Mail });
+
+// Then use them via their kebab-case names:
+<Icon name="home" />
+<Icon name="settings" />
+<Icon name="mail" />
+```
+
+Call this once at app startup (e.g., in `setup-icons.ts`).
+
 ### registerIconSet
 
-Register a custom icon set by name.
+Register a complete custom icon set by name.
 
 ```tsx
 import { registerIconSet } from "@particle-academy/react-fancy";

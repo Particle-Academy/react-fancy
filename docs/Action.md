@@ -18,7 +18,7 @@ import { Action } from "@particle-academy/react-fancy";
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| variant | `"default" \| "circle"` | `"default"` | Shape variant |
+| variant | `"default" \| "circle" \| "ghost"` | `"default"` | Shape/fill variant. `"ghost"` is transparent with subtle hover. |
 | color | `ActionColor` | - | Standalone color (overrides state colors). One of: `"blue"`, `"emerald"`, `"amber"`, `"red"`, `"violet"`, `"indigo"`, `"sky"`, `"rose"`, `"orange"`, `"zinc"` |
 | size | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"md"` | Button size |
 | active | `boolean` | - | Active state (blue highlight) |
@@ -73,4 +73,11 @@ Also extends all native `<button>` HTML attributes (except `color`).
 <Action href="/docs" iconTrailing="arrow-right">
   Read docs
 </Action>
+```
+
+### Ghost variant
+
+```tsx
+<Action variant="ghost" color="red" icon="trash-2">Delete</Action>
+<Action variant="ghost" icon="download">Export</Action>
 ```

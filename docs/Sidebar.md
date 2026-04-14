@@ -11,9 +11,11 @@ import { Sidebar } from "@particle-academy/react-fancy";
 ## Basic Usage
 
 ```tsx
+import { Sidebar, Icon } from "@particle-academy/react-fancy";
+
 <Sidebar>
-  <Sidebar.Item href="/" icon={<HomeIcon />} active>Home</Sidebar.Item>
-  <Sidebar.Item href="/settings" icon={<GearIcon />}>Settings</Sidebar.Item>
+  <Sidebar.Item href="/" icon={<Icon name="home" size="sm" />} active>Home</Sidebar.Item>
+  <Sidebar.Item href="/settings" icon={<Icon name="settings" size="sm" />}>Settings</Sidebar.Item>
   <Sidebar.Group label="Projects">
     <Sidebar.Item href="/project-a">Project A</Sidebar.Item>
     <Sidebar.Item href="/project-b">Project B</Sidebar.Item>
@@ -77,12 +79,30 @@ import { Sidebar } from "@particle-academy/react-fancy";
 const [collapsed, setCollapsed] = useState(false);
 
 <Sidebar collapsed={collapsed} onCollapsedChange={setCollapsed} collapseMode="icons">
-  <Sidebar.Item icon={<HomeIcon />}>Dashboard</Sidebar.Item>
-  <Sidebar.Item icon={<UsersIcon />}>Users</Sidebar.Item>
-  <Sidebar.Submenu label="Reports" icon={<ChartIcon />} defaultOpen>
+  <Sidebar.Item icon={<Icon name="home" size="sm" />}>Dashboard</Sidebar.Item>
+  <Sidebar.Item icon={<Icon name="users" size="sm" />}>Users</Sidebar.Item>
+  <Sidebar.Submenu label="Reports" icon={<Icon name="bar-chart-3" size="sm" />} defaultOpen>
     <Sidebar.Item>Monthly</Sidebar.Item>
     <Sidebar.Item>Yearly</Sidebar.Item>
   </Sidebar.Submenu>
   <Sidebar.Toggle />
 </Sidebar>
+```
+
+### collapseMode
+
+- `"icons"` (default) — only the icon is shown when collapsed; falls back to the first 3 letters if no icon is provided
+- `"letters"` — the first 3 letters of the label are always shown
+
+## useSidebar Hook
+
+Access collapsed state from any child component:
+
+```tsx
+import { useSidebar } from "@particle-academy/react-fancy";
+
+function CollapseAware() {
+  const { collapsed, setCollapsed } = useSidebar();
+  return <button onClick={() => setCollapsed(!collapsed)}>Toggle</button>;
+}
 ```

@@ -42,12 +42,12 @@ Extends all native `<input>` attributes (except `size`, `type`, `prefix`).
 ### With leading icon
 
 ```tsx
-import { Search } from "lucide-react";
+import { Input, Icon } from "@particle-academy/react-fancy";
 
 <Input
   label="Search"
   type="search"
-  leading={<Search size={16} />}
+  leading={<Icon name="search" size="sm" />}
   placeholder="Search..."
 />
 ```
