@@ -2,6 +2,12 @@
   "name": "@particle-academy/react-fancy",
   "version": "2.2.1",
   "description": "React UI component library — React port of the fancy-flux Blade component library",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Particle-Academy/react-fancy.git"
+  },
+  "homepage": "https://github.com/Particle-Academy/react-fancy#readme",
+  "bugs": "https://github.com/Particle-Academy/react-fancy/issues",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
