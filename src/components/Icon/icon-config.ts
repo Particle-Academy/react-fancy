@@ -1,5 +1,8 @@
 import type { ComponentType } from "react";
+import * as LucideIcons from "lucide-react";
 import type { IconSet } from "./icon-config.types";
+
+type IconComponent = ComponentType<{ className?: string; size?: number }>;
 
 const registry = new Map<string, IconSet>();
 let defaultSetName = "lucide";
@@ -9,6 +12,17 @@ function kebabToPascal(str: string): string {
     .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join("");
+}
+
+/**
+ * Fallback resolver: look up any lucide-react icon by its kebab-case name
+ * without requiring the consumer to call `registerIcons()` first. Overrides
+ * registered via `registerIcons()` still win.
+ */
+function resolveFromLucide(name: string): IconComponent | null {
+  const pascal = kebabToPascal(name);
+  const icon = (LucideIcons as unknown as Record<string, IconComponent | undefined>)[pascal];
+  return typeof icon === "function" || (icon && typeof icon === "object") ? (icon as IconComponent) : null;
 }
 
 /**
@@ -58,8 +72,11 @@ export function configureIcons(options: { defaultSet?: string }): void {
 export function resolveIcon(
   name: string,
   setName?: string,
-): ComponentType<{ className?: string; size?: number }> | null {
-  const set = registry.get(setName ?? defaultSetName);
-  if (!set) return null;
-  return set.resolve(name);
+): IconComponent | null {
+  const resolvedSet = setName ?? defaultSetName;
+  const set = registry.get(resolvedSet);
+  const registered = set ? set.resolve(name) : null;
+  if (registered) return registered;
+  if (resolvedSet === "lucide") return resolveFromLucide(name);
+  return null;
 }

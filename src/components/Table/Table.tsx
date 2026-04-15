@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
+import { Children, isValidElement, useCallback, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { cn } from "../../utils/cn";
 import { TableContext } from "./Table.context";
 import { TableHead } from "./TableHead";
@@ -48,9 +49,33 @@ function TableRoot({ children, className }: TableProps) {
   return (
     <TableContext.Provider value={ctx}>
       <div data-react-fancy-table="" className={cn("overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700", className)}>
-        {children}
+        {splitTableChildren(children)}
       </div>
     </TableContext.Provider>
+  );
+}
+
+function splitTableChildren(children: ReactNode): ReactNode {
+  const before: ReactNode[] = [];
+  const inside: ReactNode[] = [];
+  const after: ReactNode[] = [];
+  let seenTableContent = false;
+
+  Children.forEach(children, (child) => {
+    if (isValidElement(child) && (child.type === TableHead || child.type === TableBody)) {
+      inside.push(child);
+      seenTableContent = true;
+      return;
+    }
+    (seenTableContent ? after : before).push(child);
+  });
+
+  return (
+    <>
+      {before}
+      {inside.length > 0 && <table className="w-full border-collapse">{inside}</table>}
+      {after}
+    </>
   );
 }
 

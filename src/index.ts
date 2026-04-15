@@ -382,4 +382,16 @@ export {
 export type { NodeRect } from "./hooks";
 
 // Data
-export { EMOJI_DATA, EMOJI_ENTRIES, resolve, search, find } from "./data";
+export {
+  EMOJI_DATA,
+  EMOJI_ENTRIES,
+  EMOJI_CATEGORY_ORDER,
+  resolve,
+  search,
+  find,
+  skinTones,
+  hasSkinTones,
+  applyTone,
+  SKIN_TONES,
+} from "./data";
+export type { EmojiEntry, EmojiCategory, EmojiCategoryKey, EmojiFlatEntry, SkinTone } from "./data";

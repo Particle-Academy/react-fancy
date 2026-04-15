@@ -1,11 +1,12 @@
 import { cn } from "../../utils/cn";
-import { resolve } from "../../data/emoji-utils";
+import { applyTone, resolve } from "../../data/emoji-utils";
 import type { EmojiProps } from "./Emoji.types";
 
-export function Emoji({ name, emoji, size = "md", className }: EmojiProps) {
-  const resolved = emoji ?? (name ? resolve(name) : undefined);
+export function Emoji({ name, emoji, tone, size = "md", className }: EmojiProps) {
+  const base = emoji ?? (name ? resolve(name) : undefined);
+  if (!base) return null;
 
-  if (!resolved) return null;
+  const resolved = tone ? applyTone(base, tone) : base;
 
   const sizeClass = {
     sm: "text-base",
