@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
 import { Portal } from "../Portal";
 import { useContextMenu } from "./ContextMenu.context";
@@ -14,10 +14,31 @@ export function ContextMenuContent({
 }: ContextMenuContentProps) {
   const { open, setOpen, position } = useContextMenu();
   const menuRef = useRef<HTMLDivElement>(null);
+  const [adjusted, setAdjusted] = useState<{ x: number; y: number }>(position);
 
   const close = useCallback(() => setOpen(false), [setOpen]);
   useOutsideClick(menuRef, close, open);
   useEscapeKey(close, open);
+
+  // Clamp position to viewport after mount
+  useEffect(() => {
+    const node = menuRef.current;
+    if (!open || !node) {
+      setAdjusted(position);
+      return;
+    }
+    requestAnimationFrame(() => {
+      const rect = node.getBoundingClientRect();
+      const pad = 8;
+      let x = position.x;
+      let y = position.y;
+      if (x + rect.width > window.innerWidth - pad) x = window.innerWidth - rect.width - pad;
+      if (y + rect.height > window.innerHeight - pad) y = window.innerHeight - rect.height - pad;
+      if (x < pad) x = pad;
+      if (y < pad) y = pad;
+      setAdjusted({ x, y });
+    });
+  }, [open, position]);
 
   const { mounted, className: animClass, ref: animRef } = useAnimation({
     open,
@@ -41,7 +62,7 @@ export function ContextMenuContent({
           animClass,
           className,
         )}
-        style={{ left: position.x, top: position.y }}
+        style={{ left: adjusted.x, top: adjusted.y }}
       >
         <MenuGroupProvider>
           {children}

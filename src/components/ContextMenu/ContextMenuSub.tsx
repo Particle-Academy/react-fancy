@@ -123,11 +123,31 @@ export function ContextMenuSubContent({ children, className }: ContextMenuSubCon
   const { open } = useContext(ContextMenuSubContext);
   const ref = useRef<HTMLDivElement>(null);
   const [flipLeft, setFlipLeft] = useState(false);
+  const [topOffset, setTopOffset] = useState(0);
+  const [maxH, setMaxH] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (!open || !ref.current) return;
+    const pad = 8;
     const rect = ref.current.getBoundingClientRect();
-    setFlipLeft(rect.right > window.innerWidth - 8);
+
+    // Horizontal: flip left if overflowing right
+    setFlipLeft(rect.right > window.innerWidth - pad);
+
+    // Vertical: shift up if overflowing bottom, cap height if still too tall
+    const overflow = rect.bottom - (window.innerHeight - pad);
+    if (overflow > 0) {
+      const shifted = Math.min(overflow, rect.top - pad);
+      setTopOffset(-shifted);
+      if (overflow > shifted) {
+        setMaxH(window.innerHeight - pad * 2);
+      } else {
+        setMaxH(undefined);
+      }
+    } else {
+      setTopOffset(0);
+      setMaxH(undefined);
+    }
   }, [open]);
 
   if (!open) return null;
@@ -138,10 +158,12 @@ export function ContextMenuSubContent({ children, className }: ContextMenuSubCon
       data-react-fancy-context-menu-sub-content=""
       role="menu"
       className={cn(
-        "absolute top-0 z-50 min-w-[8rem] rounded-xl border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
+        "absolute z-50 min-w-[8rem] rounded-xl border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
         flipLeft ? "right-full mr-1" : "left-full ml-1",
+        maxH && "overflow-y-auto",
         className,
       )}
+      style={{ top: topOffset, maxHeight: maxH }}
     >
       <MenuGroupProvider>
         {children}
