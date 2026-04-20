@@ -1,6 +1,35 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
 import type { ContextMenuSubProps, ContextMenuSubTriggerProps, ContextMenuSubContentProps } from "./ContextMenu.types";
+
+// ---------------------------------------------------------------------------
+// Sibling coordination: parent tracks which sub is active so opening one
+// immediately closes any previously-open sibling.
+// ---------------------------------------------------------------------------
+
+interface MenuGroupContextValue {
+  activeSubId: string | null;
+  setActiveSub: (id: string | null) => void;
+}
+
+const MenuGroupContext = createContext<MenuGroupContextValue>({
+  activeSubId: null,
+  setActiveSub: () => {},
+});
+
+/** Wrap sibling Subs so only one is open at a time. Placed inside Content/SubContent. */
+export function MenuGroupProvider({ children }: { children: React.ReactNode }) {
+  const [activeSubId, setActiveSub] = useState<string | null>(null);
+  return (
+    <MenuGroupContext.Provider value={{ activeSubId, setActiveSub }}>
+      {children}
+    </MenuGroupContext.Provider>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Sub components
+// ---------------------------------------------------------------------------
 
 interface SubContextValue {
   open: boolean;
@@ -15,19 +44,27 @@ const ContextMenuSubContext = createContext<SubContextValue>({
 });
 
 export function ContextMenuSub({ children }: ContextMenuSubProps) {
-  const [open, setOpen] = useState(false);
+  const id = useId();
+  const { activeSubId, setActiveSub } = useContext(MenuGroupContext);
+  const open = activeSubId === id;
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeRef = useRef(activeSubId);
+  activeRef.current = activeSubId;
+
+  const setOpen = useCallback((v: boolean) => {
+    if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
+    setActiveSub(v ? id : null);
+  }, [id, setActiveSub]);
 
   const scheduleClose = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    closeTimer.current = setTimeout(() => setOpen(false), 150);
-  }, []);
+    closeTimer.current = setTimeout(() => {
+      if (activeRef.current === id) setActiveSub(null);
+    }, 150);
+  }, [id, setActiveSub]);
 
   const cancelClose = useCallback(() => {
-    if (closeTimer.current) {
-      clearTimeout(closeTimer.current);
-      closeTimer.current = null;
-    }
+    if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
   }, []);
 
   useEffect(() => () => {
@@ -106,7 +143,9 @@ export function ContextMenuSubContent({ children, className }: ContextMenuSubCon
         className,
       )}
     >
-      {children}
+      <MenuGroupProvider>
+        {children}
+      </MenuGroupProvider>
     </div>
   );
 }

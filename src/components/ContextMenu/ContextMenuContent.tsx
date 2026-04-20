@@ -5,6 +5,7 @@ import { useContextMenu } from "./ContextMenu.context";
 import { useOutsideClick } from "../../hooks/use-outside-click";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import { useAnimation } from "../../hooks/use-animation";
+import { MenuGroupProvider } from "./ContextMenuSub";
 import type { ContextMenuContentProps } from "./ContextMenu.types";
 
 export function ContextMenuContent({
@@ -42,7 +43,9 @@ export function ContextMenuContent({
         )}
         style={{ left: position.x, top: position.y }}
       >
-        {children}
+        <MenuGroupProvider>
+          {children}
+        </MenuGroupProvider>
       </div>
     </Portal>
   );
