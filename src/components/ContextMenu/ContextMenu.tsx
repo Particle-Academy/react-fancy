@@ -4,6 +4,7 @@ import { ContextMenuTrigger } from "./ContextMenuTrigger";
 import { ContextMenuContent } from "./ContextMenuContent";
 import { ContextMenuItem } from "./ContextMenuItem";
 import { ContextMenuSeparator } from "./ContextMenuSeparator";
+import { ContextMenuSub, ContextMenuSubTrigger, ContextMenuSubContent } from "./ContextMenuSub";
 import type { ContextMenuProps } from "./ContextMenu.types";
 
 function ContextMenuRoot({ children }: ContextMenuProps) {
@@ -27,4 +28,7 @@ export const ContextMenu = Object.assign(ContextMenuRoot, {
   Content: ContextMenuContent,
   Item: ContextMenuItem,
   Separator: ContextMenuSeparator,
+  Sub: ContextMenuSub,
+  SubTrigger: ContextMenuSubTrigger,
+  SubContent: ContextMenuSubContent,
 });

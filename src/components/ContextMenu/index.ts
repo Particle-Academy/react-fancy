@@ -6,5 +6,8 @@ export type {
   ContextMenuContentProps,
   ContextMenuItemProps,
   ContextMenuSeparatorProps,
+  ContextMenuSubProps,
+  ContextMenuSubTriggerProps,
+  ContextMenuSubContentProps,
   ContextMenuContextValue,
 } from "./ContextMenu.types";

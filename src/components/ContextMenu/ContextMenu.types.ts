@@ -31,3 +31,17 @@ export interface ContextMenuItemProps {
 export interface ContextMenuSeparatorProps {
   className?: string;
 }
+
+export interface ContextMenuSubProps {
+  children: ReactNode;
+}
+
+export interface ContextMenuSubTriggerProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export interface ContextMenuSubContentProps {
+  children: ReactNode;
+  className?: string;
+}
