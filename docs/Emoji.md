@@ -20,6 +20,7 @@ import { Emoji } from "@particle-academy/react-fancy";
 |------|------|---------|-------------|
 | name | `string` | - | Emoji slug resolved via the built-in emoji utils |
 | emoji | `string` | - | Direct emoji character (takes precedence over `name` resolution) |
+| tone | `SkinTone` | - | Skin tone variant: `"light"`, `"medium-light"`, `"medium"`, `"medium-dark"`, `"dark"` |
 | size | `"sm" \| "md" \| "lg" \| "xl"` | `"md"` | Display size. Maps to: sm=text-base, md=text-2xl, lg=text-4xl, xl=text-6xl |
 | className | `string` | - | Additional CSS classes |
 
@@ -38,3 +39,11 @@ Returns `null` if neither `emoji` nor `name` resolves to a character.
 ```tsx
 <Emoji emoji="👋" size="xl" />
 ```
+
+### With skin tone
+
+```tsx
+<Emoji name="waving-hand" tone="medium-dark" />
+```
+
+If the emoji doesn't support skin tones, the `tone` prop is ignored and the base character renders.

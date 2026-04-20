@@ -30,27 +30,34 @@ import type { IconSet } from "@particle-academy/react-fancy";
 
 Also extends all native `<span>` HTML attributes. When `children` are provided, they render instead of the resolved icon.
 
-## Icon Configuration
+## Lucide Icons (zero setup)
 
-Three APIs configure icons: `registerIcons` for tree-shakeable individual Lucide icons, `registerIconSet` for custom icon libraries, and `configureIcons` for choosing the default set.
+All [Lucide](https://lucide.dev) icons work out of the box with kebab-case names. No registration required.
 
-### registerIcons
+```tsx
+<Icon name="rocket" />
+<Icon name="arrow-right" size="lg" />
+<Icon name="trash-2" />
+```
 
-Register individual icon components into the built-in `"lucide"` set by their kebab-case name. This is the recommended way to opt into tree-shaking — only the icons you import are bundled.
+The package auto-resolves any Lucide icon name at runtime via a namespace fallback. This bundles all Lucide icons (~100 KB gzipped). If bundle size is critical, use `registerIcons` to opt into tree-shaking instead (see below).
+
+## Advanced Icon Configuration
+
+Three APIs configure icons: `registerIcons` for tree-shakeable subsets, `registerIconSet` for custom icon libraries, and `configureIcons` for choosing the default set.
+
+### registerIcons (tree-shaking)
+
+Register specific Lucide icons to override the auto-resolve fallback. Registered icons take precedence; unregistered names still fall back to the full Lucide set.
+
+For tree-shaking (if you want to exclude the full Lucide bundle), set up a custom icon set via `registerIconSet` instead.
 
 ```tsx
 import { registerIcons } from "@particle-academy/react-fancy";
 import { Home, Settings, Mail } from "lucide-react";
 
 registerIcons({ Home, Settings, Mail });
-
-// Then use them via their kebab-case names:
-<Icon name="home" />
-<Icon name="settings" />
-<Icon name="mail" />
 ```
-
-Call this once at app startup (e.g., in `setup-icons.ts`).
 
 ### registerIconSet
 
