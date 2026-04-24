@@ -23,6 +23,15 @@ export interface SelectProps
   onValuesChange?: (values: string[]) => void;
   /** Enable search/filter within the dropdown (listbox variant only) */
   searchable?: boolean;
+  /**
+   * Allow creating new options by typing in the dropdown's text input
+   * (listbox variant only). Automatically enables the text input.
+   */
+  creatable?: boolean;
+  /** Callback invoked when a new option is created from user input */
+  onCreate?: (label: string) => void;
+  /** Label prefix for the "Create" affordance. Default: "Create" */
+  createLabel?: string;
   /** Suffix for the selected count display. Default: "selected" */
   selectedSuffix?: string;
   /** Selection indicator style. Default: "check" */

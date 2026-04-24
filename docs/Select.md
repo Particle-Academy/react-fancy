@@ -1,6 +1,6 @@
 # Select
 
-Dropdown select with two variants: a native `<select>` element and a custom listbox with search, multi-select, and indicator support.
+Dropdown select with two variants: a native `<select>` element and a custom listbox with search, creatable inputs, multi-select, and indicator support.
 
 ## Import
 
@@ -48,6 +48,9 @@ Extends native `<select>` attributes (except `size`, `prefix`, `multiple`).
 | `defaultValues` | `string[]` | - | Default multi-select values (uncontrolled) |
 | `onValuesChange` | `(values: string[]) => void` | - | Callback for multi-select changes |
 | `searchable` | `boolean` | `false` | Show search/filter input in the dropdown |
+| `creatable` | `boolean` | `false` | Show a text input that accepts new values not already in `list`. Implies a text input. |
+| `onCreate` | `(label: string) => void` | - | Fires when a new option is created from user input |
+| `createLabel` | `string` | `"Create"` | Prefix for the "Create X" affordance |
 | `selectedSuffix` | `string` | `"selected"` | Suffix for the count display (e.g. "3 selected") |
 | `indicator` | `"check" \| "checkbox"` | `"check"` | Selection indicator style |
 | `prefix` | `ReactNode` | - | Affix before the select |
@@ -118,5 +121,32 @@ const [selected, setSelected] = useState<string[]>([]);
     { label: "Cars", options: ["Sedan", "SUV", "Truck"] },
     { label: "Bikes", options: ["Sport", "Cruiser"] },
   ]}
+/>
+```
+
+### Creatable listbox
+
+Add new values by typing. Works with both single and multi-select. The dropdown's text input doubles as a search input, so typing filters existing options and shows a `+ Create "…"` row when no exact match exists. Press Enter or click the row to commit.
+
+```tsx
+// Single-select: closes after creating
+<Select
+  variant="listbox"
+  creatable
+  label="Category"
+  list={categories}
+  value={value}
+  onValueChange={setValue}
+/>
+
+// Multi-select (tag-input pattern): keeps the dropdown open for more additions
+<Select
+  multiple
+  creatable
+  label="Tags"
+  list={tags}
+  values={selectedTags}
+  onValuesChange={setSelectedTags}
+  onCreate={(label) => console.log("created", label)}
 />
 ```

@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useId, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { cn } from "../../../utils/cn";
 import { Field } from "../Field";
 import { InputWrapper } from "../InputWrapper";
@@ -69,12 +69,21 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
       suffixPosition,
       onValueChange,
       onChange,
+      value,
+      defaultValue,
       ...props
     },
     ref,
   ) => {
     const autoId = useId();
     const selectId = id ?? autoId;
+
+    // When a placeholder is provided but no value/defaultValue, default to ""
+    // so the disabled placeholder <option> is the initial selection instead of
+    // the browser auto-picking the first real option.
+    const isControlled = value !== undefined;
+    const resolvedDefault =
+      !isControlled && defaultValue === undefined && placeholder ? "" : defaultValue;
 
     const select = (
       <InputWrapper
@@ -105,6 +114,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
             onValueChange?.(e.target.value);
           }}
           {...props}
+          {...(isControlled ? { value } : { defaultValue: resolvedDefault })}
         >
           {placeholder && (
             <option value="" disabled>
@@ -169,6 +179,9 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
       onValueChange,
       onValuesChange,
       searchable = false,
+      creatable = false,
+      onCreate,
+      createLabel = "Create",
       selectedSuffix = "selected",
       indicator = "check",
       value: controlledSingleValue,
@@ -179,10 +192,14 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
     const autoId = useId();
     const selectId = id ?? autoId;
 
+    // Creatable implies a text input, which is also the search input.
+    const textInputEnabled = searchable || creatable;
+
     // ── State ──────────────────────────────────────────────
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [activeIndex, setActiveIndex] = useState(-1);
+    const [createdOptions, setCreatedOptions] = useState<InputOption[]>([]);
 
     // Single-select state
     const [singleValue, setSingleValue] = useState<string>(
@@ -207,7 +224,6 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
     // ── Refs ───────────────────────────────────────────────
     const anchorRef = useRef<HTMLButtonElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
-    const wrapperRef = useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
 
     const position = useFloatingPosition(anchorRef, listRef, {
@@ -222,25 +238,40 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
       setActiveIndex(-1);
     }, []);
 
-    useOutsideClick(wrapperRef, close, open);
+    // Outside-click guards the dropdown (in a Portal) against its own clicks,
+    // with the trigger button ignored since it toggles open/closed itself.
+    useOutsideClick(listRef, close, open, anchorRef);
     useEscapeKey(close, open);
 
-    // Focus search on open
+    // Focus text input on open
     useEffect(() => {
-      if (open && searchable) {
+      if (open && textInputEnabled) {
         requestAnimationFrame(() => searchRef.current?.focus());
       }
-    }, [open, searchable]);
+    }, [open, textInputEnabled]);
 
     // ── Options ────────────────────────────────────────────
-    const allOptions = flattenOptions(list);
-    const resolvedOptions = allOptions.map(resolveOption);
+    const resolvedOptions = useMemo(() => {
+      const base = flattenOptions(list).map(resolveOption);
+      const created = createdOptions.map(resolveOption);
+      return [...base, ...created];
+    }, [list, createdOptions]);
 
     const filtered = search
       ? resolvedOptions.filter((o) =>
           o.label.toLowerCase().includes(search.toLowerCase()),
         )
       : resolvedOptions;
+
+    // Exact-match check to decide whether to show the "Create X" row
+    const canCreate =
+      creatable &&
+      search.trim().length > 0 &&
+      !resolvedOptions.some(
+        (o) =>
+          o.label.toLowerCase() === search.trim().toLowerCase() ||
+          o.value === search.trim(),
+      );
 
     // ── Selection ──────────────────────────────────────────
     const isSelected = (value: string): boolean => {
@@ -264,6 +295,27 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
       },
       [multiple, currentMulti, onValuesChange, onValueChange, close],
     );
+
+    const handleCreate = useCallback(() => {
+      const label = search.trim();
+      if (!label) return;
+      const value = label;
+      const newOption: InputOption = { value, label };
+      setCreatedOptions((prev) => [...prev, newOption]);
+      onCreate?.(label);
+      setSearch("");
+      if (multiple) {
+        const next = [...currentMulti, value];
+        setMultiValues(next);
+        onValuesChange?.(next);
+        // Keep dropdown open for multi-select; refocus input
+        requestAnimationFrame(() => searchRef.current?.focus());
+      } else {
+        setSingleValue(value);
+        onValueChange?.(value);
+        close();
+      }
+    }, [search, multiple, currentMulti, onCreate, onValuesChange, onValueChange, close]);
 
     // ── Display text ───────────────────────────────────────
     const getDisplayText = (): string => {
@@ -298,10 +350,15 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setActiveIndex((i) => Math.max(i - 1, 0));
-      } else if (e.key === "Enter" && activeIndex >= 0) {
-        e.preventDefault();
-        const item = filtered[activeIndex];
-        if (item && !item.disabled) toggleOption(item.value as string);
+      } else if (e.key === "Enter") {
+        if (activeIndex >= 0) {
+          e.preventDefault();
+          const item = filtered[activeIndex];
+          if (item && !item.disabled) toggleOption(item.value as string);
+        } else if (canCreate) {
+          e.preventDefault();
+          handleCreate();
+        }
       }
     };
 
@@ -357,8 +414,8 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
             width: anchorRef.current?.offsetWidth,
           }}
         >
-          {searchable && (
-            <div className="px-2 pb-1">
+          {textInputEnabled && (
+            <div className="px-2 pb-1 pt-1">
               <input
                 ref={searchRef}
                 type="text"
@@ -368,15 +425,28 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
                   setActiveIndex(-1);
                 }}
                 onKeyDown={handleKeyDown}
-                placeholder="Search..."
+                placeholder={creatable && !searchable ? "Type to add…" : "Search…"}
                 className="w-full rounded-md border-0 bg-zinc-100 px-2.5 py-1.5 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
               />
             </div>
           )}
 
-          {filtered.length === 0 ? (
+          {canCreate && (
+            <button
+              type="button"
+              onClick={handleCreate}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
+            >
+              <svg className="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 3a.75.75 0 01.75.75v5.5h5.5a.75.75 0 010 1.5h-5.5v5.5a.75.75 0 01-1.5 0v-5.5h-5.5a.75.75 0 010-1.5h5.5v-5.5A.75.75 0 0110 3z" clipRule="evenodd" />
+              </svg>
+              <span className="truncate">{createLabel} &quot;{search.trim()}&quot;</span>
+            </button>
+          )}
+
+          {filtered.length === 0 && !canCreate ? (
             <div className="px-3 py-2 text-sm text-zinc-400">No results found</div>
-          ) : (
+          ) : filtered.length === 0 ? null : (
             filtered.map((option, i) => {
               const selected = isSelected(option.value as string);
               return (
@@ -440,7 +510,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
     );
 
     const content = (
-      <div ref={wrapperRef} className="relative">
+      <div className="relative">
         {trigger}
         {dropdown}
       </div>
