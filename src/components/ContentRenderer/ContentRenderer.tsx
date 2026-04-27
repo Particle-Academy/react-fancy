@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { marked } from "marked";
 import { cn } from "../../utils/cn";
+import { sanitizeHtml } from "../../utils/sanitize";
 import { proseClasses, detectFormat } from "../Editor/editor.utils";
 import { mergeExtensions } from "./extensions";
 import { RenderedContent } from "./RenderedContent";
@@ -12,6 +13,7 @@ export function ContentRenderer({
   lineSpacing = 1.6,
   className,
   extensions: instanceExtensions,
+  unsafe = false,
 }: ContentRendererProps) {
   const extensions = useMemo(
     () => mergeExtensions(instanceExtensions),
@@ -20,13 +22,11 @@ export function ContentRenderer({
 
   const html = useMemo(() => {
     const resolvedFormat = format === "auto" ? detectFormat(value) : format;
-
-    if (resolvedFormat === "markdown") {
-      return marked.parse(value, { async: false }) as string;
-    }
-
-    return value;
-  }, [value, format]);
+    const raw = resolvedFormat === "markdown"
+      ? (marked.parse(value, { async: false }) as string)
+      : value;
+    return unsafe ? raw : sanitizeHtml(raw);
+  }, [value, format, unsafe]);
 
   const hasExtensions = extensions.length > 0;
 
@@ -37,7 +37,7 @@ export function ContentRenderer({
       className={cn("text-sm", proseClasses, className)}
     >
       {hasExtensions ? (
-        <RenderedContent html={html} extensions={extensions} />
+        <RenderedContent html={html} extensions={extensions} unsafe={unsafe} />
       ) : (
         <div dangerouslySetInnerHTML={{ __html: html }} />
       )}

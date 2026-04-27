@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef } from "react";
 import { marked } from "marked";
 import { cn } from "../../utils/cn";
+import { sanitizeHtml } from "../../utils/sanitize";
 import { useControllableState } from "../../hooks";
 import { EditorContext } from "./Editor.context";
 import { EditorToolbar } from "./EditorToolbar";
@@ -10,14 +11,16 @@ import { htmlToMarkdown, detectFormat } from "./editor.utils";
 import { mergeExtensions } from "../ContentRenderer/extensions";
 import type { EditorProps } from "./Editor.types";
 
-function toHtml(value: string, outputFormat: "html" | "markdown"): string {
+function toHtml(value: string, outputFormat: "html" | "markdown", unsafe: boolean): string {
   if (!value) return "";
-  if (outputFormat === "html") return value;
-  // Markdown value — convert to HTML for contentEditable
-  const format = detectFormat(value);
-  if (format === "html") return value;
-  const result = marked.parse(value, { async: false }) as string;
-  return result.trim();
+  const raw = (() => {
+    if (outputFormat === "html") return value;
+    // Markdown value — convert to HTML for contentEditable
+    const format = detectFormat(value);
+    if (format === "html") return value;
+    return (marked.parse(value, { async: false }) as string).trim();
+  })();
+  return unsafe ? raw : sanitizeHtml(raw);
 }
 
 function EditorRoot({
@@ -30,12 +33,13 @@ function EditorRoot({
   lineSpacing = 1.6,
   placeholder,
   extensions: instanceExtensions,
+  unsafe = false,
 }: EditorProps) {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [, setValue] = useControllableState(controlledValue, defaultValue, onChange);
 
   const initialHtml = useMemo(
-    () => toHtml(controlledValue ?? defaultValue, outputFormat),
+    () => toHtml(controlledValue ?? defaultValue, outputFormat, unsafe),
     // Only compute once on mount — don't re-run when value changes from user input
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],

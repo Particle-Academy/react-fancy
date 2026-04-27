@@ -1,10 +1,17 @@
 import { useMemo } from "react";
+import { sanitizeHtml } from "../../utils/sanitize";
 import type { RenderExtension } from "./extensions";
 import { parseSegments, mergeExtensions } from "./extensions";
 
 interface RenderedContentProps {
   html: string;
   extensions?: RenderExtension[];
+  /**
+   * If true, html is rendered as-is without per-segment sanitization. Caller
+   * (ContentRenderer) is expected to have already sanitized — or explicitly
+   * opted out — at the top level.
+   */
+  unsafe?: boolean;
 }
 
 /**
@@ -12,7 +19,11 @@ interface RenderedContentProps {
  * Plain HTML segments use dangerouslySetInnerHTML; custom-tag segments
  * are rendered via their registered React component.
  */
-export function RenderedContent({ html, extensions: instanceExtensions }: RenderedContentProps) {
+export function RenderedContent({
+  html,
+  extensions: instanceExtensions,
+  unsafe = false,
+}: RenderedContentProps) {
   const extensions = useMemo(
     () => mergeExtensions(instanceExtensions),
     [instanceExtensions],
@@ -23,9 +34,12 @@ export function RenderedContent({ html, extensions: instanceExtensions }: Render
     [html, extensions],
   );
 
+  const renderHtml = (content: string): string =>
+    unsafe ? content : sanitizeHtml(content);
+
   // Fast path: no extensions matched — single dangerouslySetInnerHTML
   if (segments.length === 1 && segments[0].type === "html") {
-    return <div dangerouslySetInnerHTML={{ __html: segments[0].content }} />;
+    return <div dangerouslySetInnerHTML={{ __html: renderHtml(segments[0].content) }} />;
   }
 
   // No content at all
@@ -38,7 +52,7 @@ export function RenderedContent({ html, extensions: instanceExtensions }: Render
       {segments.map((segment, i) => {
         if (segment.type === "html") {
           return segment.content ? (
-            <div key={i} dangerouslySetInnerHTML={{ __html: segment.content }} />
+            <div key={i} dangerouslySetInnerHTML={{ __html: renderHtml(segment.content) }} />
           ) : null;
         }
 

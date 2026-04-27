@@ -1,5 +1,6 @@
 import { forwardRef, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
+import { sanitizeHref } from "../../utils/sanitize";
 import { resolve } from "../../data/emoji-utils";
 import { Icon } from "../Icon/Icon";
 import type { ActionProps } from "./Action.types";
@@ -444,8 +445,9 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
     // -----------------------------------------------------------------------
     // Build the button element
     // -----------------------------------------------------------------------
-    const buttonEl = href && !disabled ? (
-      <a href={href} className={classes} data-react-fancy-action="">
+    const safeHref = sanitizeHref(href);
+    const buttonEl = safeHref && !disabled ? (
+      <a href={safeHref} className={classes} data-react-fancy-action="">
         {content}
       </a>
     ) : (

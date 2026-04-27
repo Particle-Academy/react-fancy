@@ -33,4 +33,12 @@ export interface EditorProps {
   placeholder?: string;
   /** Per-instance render extensions. Merged with any globally-registered extensions. */
   extensions?: RenderExtension[];
+  /**
+   * Skip HTML sanitization of the initial value. By default the initial markdown/HTML
+   * is sanitized to remove `<script>`, `<iframe>`, event handlers, and `javascript:`
+   * URIs before being placed into contentEditable. Pass `unsafe` only when the
+   * initial value is fully trusted.
+   * @default false
+   */
+  unsafe?: boolean;
 }

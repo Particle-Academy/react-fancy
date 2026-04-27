@@ -365,6 +365,7 @@ export type {
 
 // Utilities
 export { cn } from "./utils/cn";
+export { sanitizeHtml, sanitizeHref } from "./utils/sanitize";
 export type { Size, Color, Variant, ActionColor, Placement } from "./utils/types";
 
 // Hooks

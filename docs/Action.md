@@ -39,7 +39,7 @@ import { Action } from "@particle-academy/react-fancy";
 | sort | `string` | `"eiab"` | Sort order of decorative elements: `e`=emoji, `i`=icon, `a`=avatar, `b`=badge |
 | loading | `boolean` | `false` | Show loading spinner (disables the button) |
 | disabled | `boolean` | - | Disable the button |
-| href | `string` | - | Render as an anchor tag instead of a button |
+| href | `string` | - | Render as an anchor tag instead of a button. Sanitized to a safe-protocol allow-list (since v2.5.0) — `javascript:`, `data:`, `vbscript:` are silently dropped and the component renders a `<button>` instead of an `<a>`. |
 
 Also extends all native `<button>` HTML attributes (except `color`).
 
