@@ -336,6 +336,11 @@ export type {
 
 export { Kanban, useKanban } from "./components/Kanban";
 export type {
+  KanbanColumnHandleProps,
+  KanbanCardMoveHandler,
+  KanbanColumnMoveHandler,
+} from "./components/Kanban";
+export type {
   KanbanProps,
   KanbanColumnProps,
   KanbanCardProps,

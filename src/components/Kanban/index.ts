@@ -4,5 +4,8 @@ export type {
   KanbanProps,
   KanbanColumnProps,
   KanbanCardProps,
+  KanbanColumnHandleProps,
   KanbanContextValue,
+  KanbanCardMoveHandler,
+  KanbanColumnMoveHandler,
 } from "./Kanban.types";
