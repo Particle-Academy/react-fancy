@@ -118,6 +118,7 @@ const [open, setOpen] = useState<string[]>(["wishlist"]);
 | `pinned` | `boolean` | `false` | Never collapses; doesn't need a Trigger |
 | `className` | `string` | - | Class on the section's outer container |
 | `openClassName` / `closedClassName` | `string` | - | Class applied per state |
+| `unstyled` | `boolean` | `false` | Skip the default flex layout (`items-center`, `gap-1`, row/col by orientation). Use for full-bleed panel sections where the trigger should stretch to fill the panel. *Since v2.7.0.* |
 
 ### AccordionPanel.Trigger
 
@@ -133,3 +134,8 @@ const [open, setOpen] = useState<string[]>(["wishlist"]);
 |------|------|---------|-------------|
 | `children` | `ReactNode` | **required** | Open-state content |
 | `className` | `string` | - | Layout class on the content container |
+| `unstyled` | `boolean` | `false` | Skip the default flex layout. Same intent as `Section.unstyled` — for full-bleed panel content (chat panes, canvas surfaces). *Since v2.7.0.* |
+
+## Hitbox
+
+The default open-state Trigger renders as a thin 1px divider on the section's trailing edge, but the **clickable hitbox is 12px wide** (`w-3` / `h-3`) so users don't have to land pixel-perfect on the line. The visible 1px line darkens on hover and an inset chevron fades in. *Since v2.7.0.*

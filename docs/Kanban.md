@@ -41,6 +41,7 @@ import { Kanban } from "@particle-academy/react-fancy";
 | id | `string` | - | Unique column identifier (required) |
 | title | `string` | - | Column header text |
 | className | `string` | - | Additional CSS classes |
+| unstyled | `boolean` | `false` | Skip the default visuals (background, padding, min-height, fixed `w-72`) so you can render your own surface around the children. The drop target, drag-over ring, and column id wiring are kept. *Since v2.7.0.* |
 
 ### Kanban.Card
 
@@ -49,6 +50,28 @@ import { Kanban } from "@particle-academy/react-fancy";
 | id | `string` | - | Unique card identifier (required) |
 | children | `ReactNode` | - | Card content |
 | className | `string` | - | Additional CSS classes |
+| unstyled | `boolean` | `false` | Skip the default border / padding / shadow so you can wrap your own `<Card>` (or any surface) inside. Drag handlers and `draggable` stay in place. *Since v2.7.0.* |
+
+## Composing custom card visuals
+
+When you want full control over the card body — e.g. wrapping a `<Card>` with avatars, badges, dropdown menus — pass `unstyled` so the Kanban wrapper just provides drag plumbing:
+
+```tsx
+<Kanban.Card id={card.id} unstyled>
+  <Card variant="elevated" padding="none" className="overflow-hidden">
+    {/* your fancy card body */}
+  </Card>
+</Kanban.Card>
+```
+
+Same pattern works for columns when you want a custom column shell:
+
+```tsx
+<Kanban.Column id="doing" unstyled className="w-80 rounded-xl bg-zinc-50 p-3 ring-1 ring-zinc-200">
+  <MyColumnHeader title="In progress" wipLimit={3} />
+  {cards.map((c) => <Kanban.Card key={c.id} id={c.id} unstyled>...</Kanban.Card>)}
+</Kanban.Column>
+```
 
 ## Stateful Example
 
