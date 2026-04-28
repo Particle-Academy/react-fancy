@@ -1,4 +1,4 @@
-import { Children, Fragment, isValidElement, useCallback, useEffect, useRef, useState } from "react";
+import { Children, isValidElement, useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
 import { KanbanCard } from "./KanbanCard";
 import { useKanban, KanbanColumnContext } from "./Kanban.context";
@@ -8,25 +8,47 @@ const DEFAULT_COLUMN_CLASSES =
   "min-h-[200px] w-72 rounded-xl bg-zinc-50 p-3 dark:bg-zinc-800/50";
 
 /**
- * Count direct Kanban.Card descendants in the children tree. Used by
- * `hideWhenEmpty` and `wipLimit` to know how many real cards live in
- * the column without conflating decorative children (column handles,
- * headers, etc.).
+ * Deep-recurse through the children tree counting Kanban.Card descendants
+ * regardless of wrapping (Fragment, ContextMenu, motion.div, custom HOCs,
+ * etc.). Used by `hideWhenEmpty` and the WIP-limit count chip.
  */
 function countCardChildren(children: React.ReactNode): number {
   let n = 0;
   Children.forEach(children, (child) => {
     if (!isValidElement(child)) return;
-    // Walk one level deep — Kanban.Card may be wrapped in Fragment or div.
     if (child.type === KanbanCard) {
       n += 1;
       return;
     }
-    if (child.type === Fragment) {
-      n += countCardChildren((child.props as { children?: React.ReactNode }).children);
-    }
+    const inner = (child.props as { children?: React.ReactNode }).children;
+    if (inner !== undefined) n += countCardChildren(inner);
   });
   return n;
+}
+
+/**
+ * Find the document-order index of a Kanban.Card with the given id, deep-
+ * recursing through wrappers. Used by same-column reorder to compute the
+ * post-removal insert position.
+ */
+function findCardIndex(children: React.ReactNode, cardId: string): number {
+  let idx = -1;
+  let i = 0;
+  function walk(nodes: React.ReactNode): void {
+    Children.forEach(nodes, (child) => {
+      if (idx !== -1) return;
+      if (!isValidElement(child)) return;
+      if (child.type === KanbanCard) {
+        if ((child.props as { id?: string }).id === cardId) idx = i;
+        i += 1;
+        return;
+      }
+      const inner = (child.props as { children?: React.ReactNode }).children;
+      if (inner !== undefined) walk(inner);
+    });
+  }
+  walk(children);
+  return idx;
 }
 
 export function KanbanColumn({
@@ -41,29 +63,63 @@ export function KanbanColumn({
   const { onCardMove, draggedCard, dragSource, registerColumn } = useKanban();
   const [dragOver, setDragOver] = useState(false);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
+  const [dropY, setDropY] = useState<number | null>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => registerColumn(id), [id, registerColumn]);
 
-  // Compute drop index from mouse Y by walking direct card children.
-  const updateDropIndex = useCallback((clientY: number) => {
+  /**
+   * Compute drop position from mouse Y. Walks the *DOM* (not the React
+   * tree) and queries `[data-react-fancy-kanban-card]` so wrappers
+   * (ContextMenu, custom Card surfaces, motion.div) don't break the
+   * indicator placement.
+   */
+  const updateDrop = useCallback((clientY: number) => {
     const container = cardsRef.current;
     if (!container) {
       setDropIndex(null);
+      setDropY(null);
       return;
     }
-    const cards = container.querySelectorAll<HTMLElement>(
-      ":scope > [data-react-fancy-kanban-card]",
+
+    // Limit to cards belonging to THIS column — important if a card
+    // happens to nest a sub-board (rare, but cheap to defend).
+    const all = Array.from(
+      container.querySelectorAll<HTMLElement>(
+        "[data-react-fancy-kanban-card]",
+      ),
     );
+    const cards = all.filter(
+      (el) =>
+        el.closest("[data-react-fancy-kanban-column]") ===
+        cardsRef.current?.closest("[data-react-fancy-kanban-column]"),
+    );
+
+    const containerRect = container.getBoundingClientRect();
+
+    if (cards.length === 0) {
+      setDropIndex(0);
+      setDropY(0);
+      return;
+    }
+
     let idx = cards.length;
+    let yRel = 0;
     for (let i = 0; i < cards.length; i++) {
       const rect = cards[i]!.getBoundingClientRect();
       if (clientY < rect.top + rect.height / 2) {
         idx = i;
+        yRel = rect.top - containerRect.top;
         break;
       }
     }
+    if (idx === cards.length) {
+      const last = cards[cards.length - 1]!.getBoundingClientRect();
+      yRel = last.bottom - containerRect.top;
+    }
+
     setDropIndex(idx);
+    setDropY(yRel);
   }, []);
 
   const handleDragOver = useCallback(
@@ -73,17 +129,16 @@ export function KanbanColumn({
       e.preventDefault();
       e.stopPropagation();
       setDragOver(true);
-      updateDropIndex(e.clientY);
+      updateDrop(e.clientY);
     },
-    [draggedCard, updateDropIndex],
+    [draggedCard, updateDrop],
   );
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
-    // Only clear when leaving the column entirely, not when crossing
-    // child boundaries.
     if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
     setDragOver(false);
     setDropIndex(null);
+    setDropY(null);
   }, []);
 
   const handleDrop = useCallback(
@@ -93,19 +148,16 @@ export function KanbanColumn({
       e.stopPropagation();
       const target = dropIndex ?? 0;
 
-      if (dragSource && draggedCard) {
-        // For same-column reorder, account for the source card being
-        // removed before re-insertion.
+      if (dragSource) {
         let finalIdx = target;
         if (dragSource === id) {
           const srcIdx = findCardIndex(children, draggedCard);
-          if (srcIdx !== -1 && target > srcIdx) {
-            finalIdx = target - 1;
-          }
+          if (srcIdx !== -1 && target > srcIdx) finalIdx = target - 1;
           if (srcIdx === finalIdx) {
-            // No-op move
+            // No-op
             setDragOver(false);
             setDropIndex(null);
+            setDropY(null);
             return;
           }
         }
@@ -114,41 +166,19 @@ export function KanbanColumn({
 
       setDragOver(false);
       setDropIndex(null);
+      setDropY(null);
     },
     [draggedCard, dragSource, dropIndex, id, onCardMove, children],
   );
 
   const cardCount = countCardChildren(children);
-  if (hideWhenEmpty && cardCount === 0 && !draggedCard) {
-    return null;
-  }
+  if (hideWhenEmpty && cardCount === 0 && !draggedCard) return null;
 
-  // Walk children, interleaving the drop indicator at the computed
-  // index. We track the "card index seen so far" so the indicator lands
-  // before the right card even when non-card children (handles, custom
-  // headers) are interleaved.
-  let cardSeen = 0;
-  const showIndicator = draggedCard !== null && dropIndex !== null && dragOver;
-
-  const renderedChildren = Children.toArray(children).map((child, i) => {
-    const isCard = isValidElement(child) && child.type === KanbanCard;
-    const indicator =
-      showIndicator && isCard && cardSeen === dropIndex ? (
-        <DropIndicator key={`drop-${i}`} />
-      ) : null;
-    if (isCard) cardSeen += 1;
-    return (
-      <Fragment key={i}>
-        {indicator}
-        {child}
-      </Fragment>
-    );
-  });
-
-  // Trailing indicator when dropping at the end.
-  if (showIndicator && dropIndex === cardCount) {
-    renderedChildren.push(<DropIndicator key="drop-end" />);
-  }
+  const showIndicator =
+    draggedCard !== null &&
+    dropIndex !== null &&
+    dropY !== null &&
+    dragOver;
 
   const overWip = wipLimit !== undefined && cardCount > wipLimit;
 
@@ -185,8 +215,21 @@ export function KanbanColumn({
             </span>
           </h3>
         )}
-        <div ref={cardsRef} className="flex flex-1 flex-col gap-2">
-          {renderedChildren}
+
+        {/* Cards container — `relative` so the drop indicator overlay
+            can position itself in the container's coordinate space.
+            Children are rendered untouched so any wrapper hierarchy
+            (ContextMenu, motion.div, etc.) keeps working. */}
+        <div ref={cardsRef} className="relative flex flex-1 flex-col gap-2">
+          {children}
+
+          {showIndicator && (
+            <div
+              data-react-fancy-kanban-drop-indicator=""
+              style={{ top: dropY }}
+              className="pointer-events-none absolute left-0 right-0 h-0.5 -translate-y-1/2 rounded-full bg-blue-500/80 shadow-[0_0_0_3px_rgba(59,130,246,0.15)]"
+            />
+          )}
         </div>
       </div>
     </KanbanColumnContext.Provider>
@@ -194,35 +237,3 @@ export function KanbanColumn({
 }
 
 KanbanColumn.displayName = "KanbanColumn";
-
-// ── Drop indicator ──────────────────────────────────────────────────────
-
-function DropIndicator() {
-  return (
-    <div
-      data-react-fancy-kanban-drop-indicator=""
-      className="h-0.5 -my-1 rounded-full bg-blue-500/80"
-    />
-  );
-}
-
-// ── Helpers ─────────────────────────────────────────────────────────────
-
-function findCardIndex(
-  children: React.ReactNode,
-  cardId: string,
-): number {
-  let idx = -1;
-  let i = 0;
-  Children.forEach(children, (child) => {
-    if (idx !== -1) return;
-    if (!isValidElement(child)) return;
-    if (child.type === KanbanCard) {
-      if ((child.props as { id?: string }).id === cardId) {
-        idx = i;
-      }
-      i += 1;
-    }
-  });
-  return idx;
-}
