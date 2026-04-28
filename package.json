@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "React UI component library — React port of the fancy-flux Blade component library",
   "repository": {
     "type": "git",

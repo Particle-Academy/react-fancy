@@ -3,6 +3,24 @@ export { Action } from "./components/Action";
 export type { ActionProps } from "./components/Action";
 
 export {
+  AccordionPanel,
+  AccordionPanelSection,
+  AccordionPanelTrigger,
+  AccordionPanelContent,
+  useAccordionPanel,
+  useAccordionSection,
+} from "./components/AccordionPanel";
+export type {
+  AccordionPanelProps,
+  AccordionPanelSectionProps,
+  AccordionPanelTriggerProps,
+  AccordionPanelContentProps,
+  AccordionOrientation,
+  SectionRenderable,
+  SectionRenderState,
+} from "./components/AccordionPanel";
+
+export {
   Field,
   Input,
   Textarea,
