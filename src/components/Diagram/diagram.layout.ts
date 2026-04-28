@@ -17,11 +17,20 @@ function getEntityHeight(fieldCount: number): number {
  * - Row 0: entities with no incoming relations (roots)
  * - Row 1: entities that only have relations from row 0, etc.
  */
+/**
+ * Resolve the stable id for an entity. Per the type contract, `id` defaults
+ * to `name` when omitted. Normalizing once at the top keeps `string | undefined`
+ * propagation out of every downstream Map/Set.
+ */
+function resolveEntityId(entity: { id?: string; name: string }): string {
+  return entity.id ?? entity.name;
+}
+
 export function computeDiagramLayout(
   schema: DiagramSchema,
 ): Map<string, { x: number; y: number }> {
   const positions = new Map<string, { x: number; y: number }>();
-  const entityIds = new Set(schema.entities.map((e) => e.id));
+  const entityIds = new Set(schema.entities.map(resolveEntityId));
 
   // Build adjacency: incoming edges per entity
   const incoming = new Map<string, Set<string>>();
@@ -50,7 +59,7 @@ export function computeDiagramLayout(
 
   // If all entities have incoming relations (cycle), start with the first entity
   if (queue.length === 0 && entityIds.size > 0) {
-    const firstId = schema.entities[0].id;
+    const firstId = resolveEntityId(schema.entities[0]);
     rowAssignment.set(firstId, 0);
     assigned.add(firstId);
     queue.push(firstId);
@@ -100,7 +109,7 @@ export function computeDiagramLayout(
   // Build a lookup for field counts
   const fieldCounts = new Map<string, number>();
   for (const entity of schema.entities) {
-    fieldCounts.set(entity.id, entity.fields?.length ?? 0);
+    fieldCounts.set(resolveEntityId(entity), entity.fields?.length ?? 0);
   }
 
   // Compute positions row by row

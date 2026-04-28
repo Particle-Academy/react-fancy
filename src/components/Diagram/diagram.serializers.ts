@@ -207,9 +207,9 @@ function deserializeERD(input: string): DiagramSchema {
       const toEntity = entities.find((e) => e.name === toName);
       if (fromEntity && toEntity) {
         relations.push({
-          id: `${fromEntity.id}_${toEntity.id}`,
-          from: fromEntity.id,
-          to: toEntity.id,
+          id: `${fromEntity.id ?? fromEntity.name}_${toEntity.id ?? toEntity.name}`,
+          from: fromEntity.id ?? fromEntity.name,
+          to: toEntity.id ?? toEntity.name,
           type: parseERDMarker(marker),
           label,
         });
@@ -308,9 +308,9 @@ function deserializeUML(input: string): DiagramSchema {
               ? "one-to-many"
               : "many-to-many";
         relations.push({
-          id: `${fromEntity.id}_${toEntity.id}`,
-          from: fromEntity.id,
-          to: toEntity.id,
+          id: `${fromEntity.id ?? fromEntity.name}_${toEntity.id ?? toEntity.name}`,
+          from: fromEntity.id ?? fromEntity.name,
+          to: toEntity.id ?? toEntity.name,
           type,
           label,
         });
@@ -354,9 +354,9 @@ function deserializeDFD(input: string): DiagramSchema {
       const toEntity = entities.find((e) => e.name === toName);
       if (fromEntity && toEntity) {
         relations.push({
-          id: `${fromEntity.id}_${toEntity.id}`,
-          from: fromEntity.id,
-          to: toEntity.id,
+          id: `${fromEntity.id ?? fromEntity.name}_${toEntity.id ?? toEntity.name}`,
+          from: fromEntity.id ?? fromEntity.name,
+          to: toEntity.id ?? toEntity.name,
           type: "one-to-many",
           label,
         });
