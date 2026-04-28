@@ -50,6 +50,14 @@ export interface AccordionPanelSectionProps {
   /** Class applied only when the section is collapsed */
   closedClassName?: string;
   /**
+   * Skip the default flex layout (items-center + gap-1 + flex-row/col).
+   * Use this for full-bleed panel sections that need their children
+   * to stretch (e.g. a chat sidebar where the trigger should fill
+   * full panel height). The data attributes, section context, and
+   * conditional render of children stay in place.
+   */
+  unstyled?: boolean;
+  /**
    * Children. Compose with `<AccordionPanel.Trigger>` and
    * `<AccordionPanel.Content>` — Trigger always renders, Content only
    * renders when the section is open.

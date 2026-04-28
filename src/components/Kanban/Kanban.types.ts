@@ -27,10 +27,22 @@ export interface KanbanColumnProps {
   id: string;
   title?: string;
   className?: string;
+  /**
+   * Skip the column's default visuals (background, padding, min-height, fixed
+   * width) so the consumer can render their own surface around the children.
+   * Drop-target behaviour, drag-over ring, and column id wiring are kept.
+   */
+  unstyled?: boolean;
 }
 
 export interface KanbanCardProps {
   children: ReactNode;
   id: string;
   className?: string;
+  /**
+   * Skip the card's default visuals (border, padding, shadow, hover styles).
+   * Drag handlers and the `draggable` attribute remain so a consumer can
+   * wrap their own Card / Surface inside.
+   */
+  unstyled?: boolean;
 }

@@ -3,7 +3,10 @@ import { cn } from "../../utils/cn";
 import { useKanban, useKanbanColumn } from "./Kanban.context";
 import type { KanbanCardProps } from "./Kanban.types";
 
-export function KanbanCard({ children, id, className }: KanbanCardProps) {
+const DEFAULT_CARD_CLASSES =
+  "rounded-lg border border-zinc-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900";
+
+export function KanbanCard({ children, id, className, unstyled }: KanbanCardProps) {
   const { setDraggedCard, setDragSource } = useKanban();
   const columnId = useKanbanColumn();
 
@@ -24,7 +27,9 @@ export function KanbanCard({ children, id, className }: KanbanCardProps) {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       className={cn(
-        "cursor-grab rounded-lg border border-zinc-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md active:cursor-grabbing dark:border-zinc-700 dark:bg-zinc-900",
+        // Drag affordance — kept even when unstyled so users still see grab cursors.
+        "cursor-grab active:cursor-grabbing",
+        !unstyled && DEFAULT_CARD_CLASSES,
         className,
       )}
     >

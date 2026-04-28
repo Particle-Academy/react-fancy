@@ -22,6 +22,7 @@ export function AccordionPanelSection({
   className,
   openClassName,
   closedClassName,
+  unstyled,
   children,
 }: AccordionPanelSectionProps) {
   const panel = useAccordionPanel();
@@ -50,7 +51,8 @@ export function AccordionPanelSection({
         data-pinned={pinned ? "" : undefined}
         data-orientation={orientation}
         className={cn(
-          "flex shrink-0 items-center gap-1",
+          "flex shrink-0",
+          !unstyled && "items-center gap-1",
           orientation === "horizontal" ? "flex-row" : "flex-col",
           className,
           open ? openClassName : closedClassName,

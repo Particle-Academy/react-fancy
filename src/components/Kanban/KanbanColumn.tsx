@@ -3,11 +3,15 @@ import { cn } from "../../utils/cn";
 import { useKanban, KanbanColumnContext } from "./Kanban.context";
 import type { KanbanColumnProps } from "./Kanban.types";
 
+const DEFAULT_COLUMN_CLASSES =
+  "min-h-[200px] w-72 rounded-xl bg-zinc-50 p-3 dark:bg-zinc-800/50";
+
 export function KanbanColumn({
   children,
   id,
   title,
   className,
+  unstyled,
 }: KanbanColumnProps) {
   const { onCardMove, draggedCard, dragSource } = useKanban();
   const [dragOver, setDragOver] = useState(false);
@@ -38,7 +42,8 @@ export function KanbanColumn({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         className={cn(
-          "flex min-h-[200px] w-72 flex-col rounded-xl bg-zinc-50 p-3 dark:bg-zinc-800/50",
+          "flex flex-col",
+          !unstyled && DEFAULT_COLUMN_CLASSES,
           dragOver && "ring-2 ring-blue-400 ring-inset",
           className,
         )}

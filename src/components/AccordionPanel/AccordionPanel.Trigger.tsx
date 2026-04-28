@@ -50,8 +50,11 @@ export function AccordionPanelTrigger({
   // Default rendering ----------------------------------------------------
 
   if (open) {
-    // Trailing-edge divider. Click to collapse the section. Hover reveals
-    // a chevron pointing back toward the content that will disappear.
+    // Trailing-edge divider. The visible line is 1px (rendered via the
+    // ::before pseudo-element so it stays narrow); the button's actual
+    // hitbox is much wider (w-3 / h-3 = 12px) so users don't have to land
+    // pixel-perfect on the line. Hovering the hitbox highlights the line
+    // and reveals an inset chevron signalling "click to collapse".
     return (
       <button
         type="button"
@@ -64,14 +67,16 @@ export function AccordionPanelTrigger({
           "group relative flex shrink-0 items-center justify-center cursor-pointer",
           "text-zinc-500 dark:text-zinc-500",
           "hover:text-zinc-900 dark:hover:text-zinc-100",
+          // Wide hitbox + thin visible line (drawn via ::before).
           orientation === "horizontal"
-            ? "w-px self-stretch hover:w-3 mx-1"
-            : "h-px self-stretch hover:h-3 my-1",
-          "before:absolute before:inset-0 before:bg-zinc-200 dark:before:bg-zinc-700",
+            ? "w-3 self-stretch"
+            : "h-3 self-stretch",
+          "before:absolute before:bg-zinc-200 dark:before:bg-zinc-700",
+          "before:transition-colors group-hover:before:bg-zinc-400 dark:group-hover:before:bg-zinc-500",
           orientation === "horizontal"
-            ? "before:w-px before:left-1/2 before:-translate-x-1/2"
-            : "before:h-px before:top-1/2 before:-translate-y-1/2",
-          "transition-all duration-150",
+            ? "before:top-0 before:bottom-0 before:w-px before:left-1/2 before:-translate-x-1/2"
+            : "before:left-0 before:right-0 before:h-px before:top-1/2 before:-translate-y-1/2",
+          "transition-colors",
           className,
         )}
       >
