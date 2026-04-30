@@ -49,8 +49,10 @@ const files: TreeNodeData[] = [
 | selectedId | `string` | - | Currently selected node ID |
 | onSelect | `(id: string, node: TreeNodeData) => void` | - | Selection callback |
 | onNodeContextMenu | `(e: React.MouseEvent, node: TreeNodeData) => void` | - | Right-click callback per node |
-| draggable | `boolean` | `false` | Enable drag-and-drop reordering |
-| onNodeMove | `(sourceId: string, targetId: string, position: DropPosition) => void` | - | Callback when a node is moved via drag-and-drop |
+| draggable | `boolean` | `false` | Enable drag-and-drop reordering of tree nodes |
+| onNodeMove | `(sourceId: string, targetId: string, position: DropPosition) => void` | - | Callback when a node is moved via drag-and-drop within the tree |
+| acceptExternalDrops | `boolean` | `false` | Accept drops from outside the tree — OS files, items dragged from other components, etc. |
+| onExternalDrop | `(event: React.DragEvent, target: TreeNodeData, position: DropPosition) => void` | - | Fires on external drop. Read `event.dataTransfer.files` for OS file drops or `event.dataTransfer.getData(type)` for custom MIME payloads. |
 | expandedIds | `string[]` | - | Controlled expanded node IDs |
 | defaultExpandedIds | `string[]` | - | Initial expanded nodes (uncontrolled) |
 | onExpandedChange | `(ids: string[]) => void` | - | Callback when expanded state changes |
@@ -176,6 +178,29 @@ function handleNodeMove(sourceId: string, targetId: string, position: DropPositi
 - Cannot drop a node into its own descendants
 - Folders auto-expand after 500ms when dragging over them
 - Disabled nodes cannot be dragged
+
+## External Drops (files, cross-component)
+
+Set `acceptExternalDrops` and supply `onExternalDrop` to accept payloads from outside the tree — OS files dragged from the desktop, items dragged from a Kanban card, anything that ships a `dataTransfer`. The same `before` / `after` / `inside` indicators apply, and folders still auto-expand.
+
+```tsx
+<TreeNav
+  nodes={files}
+  acceptExternalDrops
+  onExternalDrop={(event, target, position) => {
+    // OS file drop?
+    if (event.dataTransfer.files.length > 0) {
+      uploadFiles(event.dataTransfer.files, target.id);
+      return;
+    }
+    // Custom payload from another component?
+    const payload = event.dataTransfer.getData("application/x-card-id");
+    if (payload) attachCardToNode(payload, target.id, position);
+  }}
+/>
+```
+
+`acceptExternalDrops` and `draggable` are independent — enable either, both, or neither. With both on, internal drag-reorder and external drops coexist; the handler distinguishes via the absence of an internal drag source.
 
 ## Context Menu
 

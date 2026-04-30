@@ -9,4 +9,5 @@ export type {
   CanvasContextValue,
   ViewportState,
   EdgeAnchor,
+  GridStyle,
 } from "./Canvas.types";

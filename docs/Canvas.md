@@ -37,8 +37,11 @@ import { Canvas } from "@particle-academy/react-fancy";
 | maxZoom | `number` | `3` | Maximum zoom level |
 | pannable | `boolean` | `true` | Enable panning (click+drag on background) |
 | zoomable | `boolean` | `true` | Enable zoom (Ctrl+scroll) |
-| gridSize | `number` | - | Grid cell size in px |
-| showGrid | `boolean` | `false` | Display dot grid background |
+| gridSize | `number` | `20` | Grid cell size in canvas-space pixels |
+| showGrid | `boolean` | `false` | Display the canvas grid background |
+| gridStyle | `'dots' \| 'lines' \| 'none'` | `'dots'` | Grid pattern when shown. `'none'` hides the grid even when `showGrid` is true |
+| gridColor | `string` | `'rgb(161 161 170 / 0.3)'` | Any CSS color for grid dots/lines |
+| snapToGrid | `boolean` | `false` | Snap dragged nodes to the grid |
 | fitOnMount | `boolean` | `false` | Auto-fit all nodes into view on mount |
 | className | `string` | - | Additional CSS classes |
 | style | `CSSProperties` | - | Inline styles |

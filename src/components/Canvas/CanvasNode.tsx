@@ -4,7 +4,7 @@ import { useCanvas } from "./Canvas.context";
 import type { CanvasNodeProps } from "./Canvas.types";
 
 export function CanvasNode({ children, id, x, y, draggable, onPositionChange, className, style }: CanvasNodeProps) {
-  const { registerNode, unregisterNode, viewport } = useCanvas();
+  const { registerNode, unregisterNode, viewport, gridSize, snapToGrid } = useCanvas();
   const nodeRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const dragStart = useRef({ mouseX: 0, mouseY: 0, nodeX: 0, nodeY: 0 });
@@ -44,9 +44,15 @@ export function CanvasNode({ children, id, x, y, draggable, onPositionChange, cl
       if (!isDragging.current) return;
       const dx = (e.clientX - dragStart.current.mouseX) / viewport.zoom;
       const dy = (e.clientY - dragStart.current.mouseY) / viewport.zoom;
-      onPositionChange?.(dragStart.current.nodeX + dx, dragStart.current.nodeY + dy);
+      let nx = dragStart.current.nodeX + dx;
+      let ny = dragStart.current.nodeY + dy;
+      if (snapToGrid && gridSize > 0) {
+        nx = Math.round(nx / gridSize) * gridSize;
+        ny = Math.round(ny / gridSize) * gridSize;
+      }
+      onPositionChange?.(nx, ny);
     },
-    [viewport.zoom, onPositionChange],
+    [viewport.zoom, onPositionChange, snapToGrid, gridSize],
   );
 
   const handlePointerUp = useCallback(() => {

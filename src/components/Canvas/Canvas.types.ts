@@ -14,7 +14,13 @@ export interface CanvasContextValue {
   nodeRects: Map<string, NodeRect>;
   registryVersion: number;
   containerRef: React.RefObject<HTMLDivElement | null>;
+  /** Grid spacing in canvas-space pixels (unaffected by zoom). */
+  gridSize: number;
+  /** When true, dragged nodes snap their top-left corner to the grid. */
+  snapToGrid: boolean;
 }
+
+export type GridStyle = "dots" | "lines" | "none";
 
 export interface CanvasProps {
   children: ReactNode;
@@ -25,8 +31,17 @@ export interface CanvasProps {
   maxZoom?: number;
   pannable?: boolean;
   zoomable?: boolean;
+  /** Grid spacing in canvas-space pixels. Defaults to 20. */
   gridSize?: number;
+  /** Show/hide the canvas grid. Defaults to false. */
   showGrid?: boolean;
+  /** Grid pattern when shown — dots (default), lines, or none. Setting this
+   *  to "none" hides the grid even when `showGrid` is true. */
+  gridStyle?: GridStyle;
+  /** Grid color (any CSS color). Defaults to a faint zinc. */
+  gridColor?: string;
+  /** Snap dragged nodes to the grid. Defaults to false. */
+  snapToGrid?: boolean;
   /** Automatically fit all nodes into view on initial mount */
   fitOnMount?: boolean;
   className?: string;

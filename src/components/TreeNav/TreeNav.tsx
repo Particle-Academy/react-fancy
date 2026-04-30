@@ -28,6 +28,8 @@ function TreeNavRoot({
   onNodeContextMenu,
   draggable = false,
   onNodeMove,
+  acceptExternalDrops = false,
+  onExternalDrop,
   expandedIds: controlledExpanded,
   defaultExpandedIds,
   onExpandedChange,
@@ -80,18 +82,20 @@ function TreeNavRoot({
   const ctx = useMemo(
     () => ({
       selectedId, onSelect, onNodeContextMenu, expandedIds, toggle, indentSize, showIcons,
-      draggable, dragState, setDragState, onNodeMove, nodes, expandNode,
+      draggable, dragState, setDragState, onNodeMove, acceptExternalDrops, onExternalDrop, nodes, expandNode,
     }),
     [selectedId, onSelect, onNodeContextMenu, expandedIds, toggle, indentSize, showIcons,
-     draggable, dragState, onNodeMove, nodes, expandNode],
+     draggable, dragState, onNodeMove, acceptExternalDrops, onExternalDrop, nodes, expandNode],
   );
+
+  const dropEnabled = draggable || acceptExternalDrops;
 
   return (
     <TreeNavContext.Provider value={ctx}>
       <nav
         data-react-fancy-tree-nav=""
         className={cn("flex flex-col gap-0.5 py-1 text-sm", className)}
-        onDragEnd={draggable ? handleDragEnd : undefined}
+        onDragEnd={dropEnabled ? handleDragEnd : undefined}
       >
         {nodes.map((node) => (
           <TreeNode key={node.id} node={node} depth={0} />

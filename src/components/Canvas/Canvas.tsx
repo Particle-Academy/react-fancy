@@ -22,6 +22,10 @@ function CanvasRoot({
   pannable = true,
   zoomable = true,
   showGrid = false,
+  gridStyle = "dots",
+  gridSize = 20,
+  gridColor = "rgb(161 161 170 / 0.3)",
+  snapToGrid = false,
   fitOnMount = false,
   className,
   style,
@@ -41,8 +45,8 @@ function CanvasRoot({
   });
 
   const ctx = useMemo(
-    () => ({ viewport, setViewport, registerNode, unregisterNode, nodeRects, registryVersion, containerRef }),
-    [viewport, setViewport, registerNode, unregisterNode, nodeRects, registryVersion],
+    () => ({ viewport, setViewport, registerNode, unregisterNode, nodeRects, registryVersion, containerRef, gridSize, snapToGrid }),
+    [viewport, setViewport, registerNode, unregisterNode, nodeRects, registryVersion, gridSize, snapToGrid],
   );
 
   // Auto-fit all nodes into view on mount once nodes are registered
@@ -108,11 +112,21 @@ function CanvasRoot({
         <div
           data-canvas-bg=""
           className="absolute inset-0"
-          style={showGrid ? {
-            backgroundImage: `radial-gradient(circle, rgb(161 161 170 / 0.3) 1px, transparent 1px)`,
-            backgroundSize: `${20 * viewport.zoom}px ${20 * viewport.zoom}px`,
-            backgroundPosition: `${viewport.panX}px ${viewport.panY}px`,
-          } : undefined}
+          style={
+            showGrid && gridStyle !== "none"
+              ? gridStyle === "lines"
+                ? {
+                    backgroundImage: `linear-gradient(to right, ${gridColor} 1px, transparent 1px), linear-gradient(to bottom, ${gridColor} 1px, transparent 1px)`,
+                    backgroundSize: `${gridSize * viewport.zoom}px ${gridSize * viewport.zoom}px`,
+                    backgroundPosition: `${viewport.panX}px ${viewport.panY}px`,
+                  }
+                : {
+                    backgroundImage: `radial-gradient(circle, ${gridColor} 1px, transparent 1px)`,
+                    backgroundSize: `${gridSize * viewport.zoom}px ${gridSize * viewport.zoom}px`,
+                    backgroundPosition: `${viewport.panX}px ${viewport.panY}px`,
+                  }
+              : undefined
+          }
         />
 
         {/* Transformed layer for nodes */}

@@ -39,6 +39,15 @@ export interface TreeNavProps {
   draggable?: boolean;
   /** Callback when a node is moved via drag and drop */
   onNodeMove?: (sourceId: string, targetId: string, position: DropPosition) => void;
+  /** Accept drops from outside the tree — OS files, items from other
+   *  components, etc. When true, drag-over is allowed for any data source
+   *  and `onExternalDrop` fires on drop. (default: false) */
+  acceptExternalDrops?: boolean;
+  /** Called when an external drag (file or cross-component) is dropped on
+   *  a node. The raw event lets you read `event.dataTransfer.files` for OS
+   *  file drops or `event.dataTransfer.getData(type)` for custom MIME
+   *  payloads from other components. */
+  onExternalDrop?: (event: React.DragEvent, target: TreeNodeData, position: DropPosition) => void;
   /** Controlled expanded node IDs */
   expandedIds?: string[];
   /** Default expanded node IDs (uncontrolled) */
@@ -67,6 +76,8 @@ export interface TreeNavContextValue {
   dragState: DragState;
   setDragState: (state: DragState) => void;
   onNodeMove?: (sourceId: string, targetId: string, position: DropPosition) => void;
+  acceptExternalDrops: boolean;
+  onExternalDrop?: (event: React.DragEvent, target: TreeNodeData, position: DropPosition) => void;
   nodes: TreeNodeData[];
   expandNode: (id: string) => void;
 }

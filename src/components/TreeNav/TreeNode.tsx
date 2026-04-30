@@ -115,7 +115,7 @@ function computeDropPosition(
 export function TreeNode({ node, depth }: TreeNodeProps) {
   const {
     selectedId, onSelect, onNodeContextMenu, expandedIds, toggle, indentSize, showIcons,
-    draggable, dragState, setDragState, onNodeMove, nodes, expandNode,
+    draggable, dragState, setDragState, onNodeMove, acceptExternalDrops, onExternalDrop, nodes, expandNode,
   } = useTreeNav();
 
   const isFolder = node.type === "folder" || (node.children && node.children.length > 0);
@@ -180,15 +180,21 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
   // Drop target handlers (on outer div)
   // ---------------------------------------------------------------------------
 
+  const isExternalDrag = !dragState.draggedNodeId;
+
   const handleDragOver = useCallback((e: React.DragEvent) => {
-    if (!dragState.draggedNodeId) return;
-    const sourceId = dragState.draggedNodeId;
-    if (sourceId === node.id) return;
-    if (isDescendantOf(nodes, sourceId, node.id)) return;
+    if (isExternalDrag) {
+      // External drop accepted only when host opted in.
+      if (!acceptExternalDrops) return;
+    } else {
+      const sourceId = dragState.draggedNodeId!;
+      if (sourceId === node.id) return;
+      if (isDescendantOf(nodes, sourceId, node.id)) return;
+    }
 
     e.preventDefault();
     e.stopPropagation();
-    e.dataTransfer.dropEffect = "move";
+    e.dataTransfer.dropEffect = isExternalDrag ? "copy" : "move";
 
     const position = computeDropPosition(e, !!isFolder);
 
@@ -205,9 +211,9 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
     }
 
     if (dragState.dropTargetId !== node.id || dragState.dropPosition !== position) {
-      setDragState({ draggedNodeId: sourceId, dropTargetId: node.id, dropPosition: position });
+      setDragState({ draggedNodeId: dragState.draggedNodeId, dropTargetId: node.id, dropPosition: position });
     }
-  }, [dragState, node.id, isFolder, isExpanded, nodes, setDragState, expandNode, clearAutoExpand]);
+  }, [dragState, isExternalDrag, acceptExternalDrops, node.id, isFolder, isExpanded, nodes, setDragState, expandNode, clearAutoExpand]);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     if (!e.currentTarget.contains(e.relatedTarget as Node)) {
@@ -224,27 +230,34 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
     clearAutoExpand();
 
     const sourceId = dragState.draggedNodeId;
-    const position = dragState.dropPosition;
-    if (!sourceId || !position) return;
-    if (sourceId === node.id) return;
-    if (isDescendantOf(nodes, sourceId, node.id)) return;
+    const position = dragState.dropPosition ?? computeDropPosition(e, !!isFolder);
 
-    onNodeMove?.(sourceId, node.id, position);
+    if (sourceId) {
+      // Internal node move.
+      if (sourceId === node.id) return;
+      if (isDescendantOf(nodes, sourceId, node.id)) return;
+      onNodeMove?.(sourceId, node.id, position);
+    } else if (acceptExternalDrops) {
+      // External drop — files, items from other components, etc.
+      onExternalDrop?.(e, node, position);
+    }
+
     setDragState({ draggedNodeId: null, dropTargetId: null, dropPosition: null });
-  }, [dragState, node.id, nodes, onNodeMove, setDragState, clearAutoExpand]);
+  }, [dragState, node, isFolder, nodes, onNodeMove, acceptExternalDrops, onExternalDrop, setDragState, clearAutoExpand]);
 
   // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
 
   const canDrag = draggable && !node.disabled;
+  const dropEnabled = draggable || acceptExternalDrops;
 
   return (
     <div
       data-react-fancy-tree-node=""
-      onDragOver={draggable ? handleDragOver : undefined}
-      onDragLeave={draggable ? handleDragLeave : undefined}
-      onDrop={draggable ? handleDrop : undefined}
+      onDragOver={dropEnabled ? handleDragOver : undefined}
+      onDragLeave={dropEnabled ? handleDragLeave : undefined}
+      onDrop={dropEnabled ? handleDrop : undefined}
     >
       {/* Before drop indicator */}
       {isDropTarget && dropPosition === "before" && (
