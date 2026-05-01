@@ -90,9 +90,41 @@ const schema = {
 | to | `string` | - | Target entity id (required) |
 | fromField | `string` | - | Source field name |
 | toField | `string` | - | Target field name |
-| type | `RelationType` | - | `"one-to-one"`, `"one-to-many"`, or `"many-to-many"` (required) |
-| label | `string` | - | Edge label |
+| type | `RelationType` | - | Shorthand that sets `fromMarker` / `toMarker` / `lineStyle`. See **Relation types** below |
+| fromMarker | `MarkerType` | depends on `type` | Marker shape at the source end |
+| toMarker | `MarkerType` | depends on `type` | Marker shape at the target end |
+| lineStyle | `'solid' \| 'dashed' \| 'dotted'` | from `type` | Line stroke style |
+| routing | `'manhattan' \| 'bezier' \| 'straight'` | `'manhattan'` | Path routing algorithm |
+| color | `string` | `'#71717a'` | Stroke color |
+| strokeWidth | `number` | `2` | Stroke width |
+| label | `string` | - | Edge label rendered at the path midpoint |
 | className | `string` | - | Additional CSS classes |
+
+### Relation types (`type` shorthand)
+
+| Type | fromMarker | toMarker | lineStyle |
+|------|-----------|----------|-----------|
+| `one-to-one` | one | one | solid |
+| `one-to-many` | one | many | solid |
+| `many-to-one` | many | one | solid |
+| `many-to-many` | many | many | solid |
+| `association` | none | arrow | solid |
+| `aggregation` | diamond-open | none | solid |
+| `composition` | diamond | none | solid |
+| `inheritance` | none | triangle-open | solid |
+| `implementation` | none | triangle-open | dashed |
+| `dependency` | none | arrow | dashed |
+| `custom` | (caller's `fromMarker`) | (caller's `toMarker`) | solid |
+
+### MarkerType
+
+`'none'`, `'arrow'`, `'arrow-open'`, `'circle'`, `'circle-open'`, `'square'`, `'square-open'`, `'diamond'`, `'diamond-open'`, `'triangle'`, `'triangle-open'`, `'one'`, `'many'`, `'optional-one'`, `'optional-many'`, `'cross'`, or any string starting with `emoji:` (e.g. `'emoji:🎯'`) for an emoji/text marker.
+
+### Routing
+
+- **manhattan** (default) — right-angle elbows. Picks the side of each entity that faces the other, with a vertical (or horizontal) mid-line that automatically dodges entities lying along the path. Best for ERD/UML.
+- **bezier** — smooth cubic curve with horizontal/vertical control points perpendicular to each side.
+- **straight** — direct line between the two anchor points.
 
 ### Diagram.Toolbar
 

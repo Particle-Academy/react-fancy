@@ -2,7 +2,45 @@ import type { ReactNode } from "react";
 import type { ViewportState } from "../Canvas/Canvas.types";
 
 export type DiagramType = "erd" | "flowchart" | "general";
-export type RelationType = "one-to-one" | "one-to-many" | "many-to-many";
+
+/** ERD/UML shorthand — sets fromMarker/toMarker (and lineStyle for some). */
+export type RelationType =
+  | "one-to-one"
+  | "one-to-many"
+  | "many-to-one"
+  | "many-to-many"
+  | "association"      // none → arrow
+  | "aggregation"      // diamond-open → none
+  | "composition"      // diamond → none
+  | "inheritance"      // none → triangle-open (UML — solid line)
+  | "implementation"   // none → triangle-open (UML — dashed)
+  | "dependency"       // none → arrow (dashed)
+  | "custom";          // requires fromMarker + toMarker
+
+/** Shape painted at each line endpoint. Strings prefixed `emoji:` render the
+ *  rest of the string as text at the endpoint (e.g. `emoji:🎯`). */
+export type MarkerType =
+  | "none"
+  | "arrow"
+  | "arrow-open"
+  | "circle"
+  | "circle-open"
+  | "square"
+  | "square-open"
+  | "diamond"
+  | "diamond-open"
+  | "triangle"
+  | "triangle-open"
+  | "one"
+  | "many"
+  | "optional-one"
+  | "optional-many"
+  | "cross"
+  | (string & {});
+
+export type LineStyle = "solid" | "dashed" | "dotted";
+export type RoutingMode = "manhattan" | "bezier" | "straight";
+
 export type ExportFormat = "erd" | "uml" | "dfd";
 
 export interface DiagramFieldData {
@@ -30,6 +68,11 @@ export interface DiagramRelationData {
   fromField?: string;
   toField?: string;
   type: RelationType;
+  fromMarker?: MarkerType;
+  toMarker?: MarkerType;
+  lineStyle?: LineStyle;
+  routing?: RoutingMode;
+  color?: string;
   label?: string;
 }
 
@@ -91,7 +134,20 @@ export interface DiagramRelationProps {
   to: string;
   fromField?: string;
   toField?: string;
-  type: RelationType;
+  /** ERD/UML shorthand. Provides defaults for fromMarker/toMarker/lineStyle. */
+  type?: RelationType;
+  /** Override start endpoint marker. */
+  fromMarker?: MarkerType;
+  /** Override end endpoint marker. */
+  toMarker?: MarkerType;
+  /** Line style — solid (default), dashed, dotted. */
+  lineStyle?: LineStyle;
+  /** Routing algorithm — manhattan (default), bezier, straight. */
+  routing?: RoutingMode;
+  /** Stroke color. Defaults to a zinc gray. */
+  color?: string;
+  /** Stroke width. Default 2. */
+  strokeWidth?: number;
   label?: string;
   className?: string;
 }
