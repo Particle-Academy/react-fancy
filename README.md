@@ -2,6 +2,26 @@
 
 React UI component library — the React port of the `fancy-flux` Blade/Livewire component library. The goal is **visual and behavioral parity** with fancy-flux.
 
+## Migration to v3
+
+`Canvas` and `Diagram` were moved out of react-fancy in v3.0.0 to keep this package focused on generic React UI. They live in companion packages now:
+
+```diff
+- import { Canvas, useCanvas } from "@particle-academy/react-fancy";
++ import { Canvas, useCanvas } from "@particle-academy/fancy-3d/canvas";
+```
+
+```diff
+- import { Diagram } from "@particle-academy/react-fancy";
++ import { Diagram } from "@particle-academy/fancy-echarts";
+//   …or one of the new specialized presets:
+//   DataDiagram, Flowchart, Mindmap, OrgChart
+```
+
+`<Canvas>` in fancy-3d is now engine-pluggable (`engine="dom" | "babylon" | CustomEngine`) and ships with built-in adapters for DOM/Web3D (default) and Babylon. fancy-echarts' diagram exports include four schema-driven specialized presets sharing one routing/marker engine.
+
+Everything else in react-fancy is unchanged.
+
 ## Installation
 
 ```bash

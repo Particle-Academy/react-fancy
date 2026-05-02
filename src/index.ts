@@ -347,35 +347,10 @@ export type {
   KanbanContextValue,
 } from "./components/Kanban";
 
-// Phase 7: Spatial Components
-export { Canvas, useCanvas } from "./components/Canvas";
-export type {
-  CanvasProps,
-  CanvasNodeProps,
-  CanvasEdgeProps,
-  CanvasMinimapProps,
-  CanvasControlsProps,
-  CanvasContextValue,
-  ViewportState,
-  EdgeAnchor,
-} from "./components/Canvas";
-
-export { Diagram, useDiagram } from "./components/Diagram";
-export type {
-  DiagramProps,
-  DiagramEntityProps,
-  DiagramFieldProps,
-  DiagramRelationProps,
-  DiagramToolbarProps,
-  DiagramSchema,
-  DiagramEntityData,
-  DiagramFieldData,
-  DiagramRelationData,
-  DiagramType,
-  RelationType,
-  ExportFormat,
-  DiagramContextValue,
-} from "./components/Diagram";
+// Spatial components (Canvas, Diagram) moved to companion packages in v3.0.0:
+//   - Canvas  → @particle-academy/fancy-3d/canvas
+//   - Diagram → @particle-academy/fancy-echarts (plus DataDiagram, Flowchart,
+//     Mindmap, OrgChart presets)
 
 export { TreeNav, useTreeNav } from "./components/TreeNav";
 export type {
