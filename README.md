@@ -2,6 +2,10 @@
 
 React UI component library — the React port of the `fancy-flux` Blade/Livewire component library. The goal is **visual and behavioral parity** with fancy-flux.
 
+## Inertia.js integration
+
+Using react-fancy with Inertia? Install the [`@particle-academy/fancy-inertia`](https://github.com/Particle-Academy/fancy-inertia) adapter — it ships a single `<FancyAppRoot>` provider that mounts `Toast.Provider` (and the modal portal root) above the Inertia outlet, plus `useFancyForm()` for one-line wiring of react-fancy form fields to Inertia's `useForm()` server-validated state, plus a `<FancyClientOnly>` boundary for SSR-skip needs. See [fancy-inertia/docs/SSR.md](https://github.com/Particle-Academy/fancy-inertia/blob/main/docs/SSR.md) for the per-component SSR-safety matrix.
+
 ## Migration to v3
 
 `Canvas` and `Diagram` were moved out of react-fancy in v3.0.0 to keep this package focused on generic React UI. They live in companion packages now:
