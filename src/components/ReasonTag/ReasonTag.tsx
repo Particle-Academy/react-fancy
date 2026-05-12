@@ -172,7 +172,7 @@ export function ReasonTag({
           )}
           {onFollowUp && (
             <div className="flex justify-end pt-1">
-              <Action size="sm" variant="outline" onClick={onFollowUp}>
+              <Action size="sm" variant="ghost" onClick={onFollowUp}>
                 ask follow-up
               </Action>
             </div>

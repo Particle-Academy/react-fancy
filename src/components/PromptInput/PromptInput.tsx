@@ -339,7 +339,7 @@ export function PromptInput({
       <div className="flex items-center gap-2 border-t border-zinc-200 bg-zinc-50/60 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/40">
         <Tooltip content="Drop files here, or click">
           <Action
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => {
               /* host can wire its own file picker; default no-op */
