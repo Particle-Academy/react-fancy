@@ -394,3 +394,16 @@ export {
   SKIN_TONES,
 } from "./data";
 export type { EmojiEntry, EmojiCategory, EmojiCategoryKey, EmojiFlatEntry, SkinTone } from "./data";
+
+// Human+ primitives (promoted from /dreaming, 2026-05-12)
+export { ReasonTag } from "./components/ReasonTag";
+export type { ReasonTagProps, ReasonTagSource, ReasonTagTheme } from "./components/ReasonTag";
+
+export { MoodMeter } from "./components/MoodMeter";
+export type { MoodMeterProps } from "./components/MoodMeter";
+
+export { PromptInput } from "./components/PromptInput";
+export type { PromptInputProps, PromptCmd, PromptMention, PromptAttachment } from "./components/PromptInput";
+
+export { MagicWand } from "./components/MagicWand";
+export type { MagicWandProps, MagicWandAction, MagicWandSelection, MagicWandAppearance } from "./components/MagicWand";
