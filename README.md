@@ -163,6 +163,17 @@ npx vite build                      # Build demo app (verifies imports work)
 | Diagram | Entity-relationship diagram with draggable nodes and relation lines | [docs](docs/Diagram.md) |
 | ContentRenderer | Markdown/HTML content renderer | [docs](docs/ContentRenderer.md) |
 
+### Human+ Primitives
+
+Components for surfaces where humans and AI agents trade control fluidly. Each promoted from the [`dreaming`](https://github.com/Particle-Academy/pa-ux-sandbox/tree/dreaming) sandbox after the API stabilized.
+
+| Component | Description | Docs |
+|-----------|-------------|------|
+| ReasonTag | Wrap any value with hover/click affordance revealing reason, confidence tier, and sources | [docs](docs/ReasonTag.md) |
+| MoodMeter | 2D value+confidence pad; halo radius shrinks as confidence rises | [docs](docs/MoodMeter.md) |
+| PromptInput | Chat composer with `/` commands, `@` mentions, drop-to-attach, ⌘+Enter, token budget meter | [docs](docs/PromptInput.md) |
+| MagicWand | Selection-anchored floating toolbar with pluggable AI actions that replace highlighted text in-place | [docs](docs/MagicWand.md) |
+
 ### Menus & Navigation
 
 | Component | Description | Docs |
