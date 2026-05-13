@@ -91,10 +91,10 @@ function valueElementAdapter(
         }
       };
       const el = ref.current;
-      if (el) el.addEventListener("keydown", fn);
+      if (el) el.addEventListener("keydown", fn as EventListener);
       return () => {
         const el2 = ref.current;
-        if (el2) el2.removeEventListener("keydown", fn);
+        if (el2) el2.removeEventListener("keydown", fn as EventListener);
       };
     },
   };
@@ -207,10 +207,10 @@ export function contentEditableAdapter(
         }
       };
       const el = ref.current;
-      if (el) el.addEventListener("keydown", fn);
+      if (el) el.addEventListener("keydown", fn as EventListener);
       return () => {
         const el2 = ref.current;
-        if (el2) el2.removeEventListener("keydown", fn);
+        if (el2) el2.removeEventListener("keydown", fn as EventListener);
       };
     },
   };
