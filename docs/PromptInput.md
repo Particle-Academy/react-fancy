@@ -50,6 +50,7 @@ import { PromptInput } from "@particle-academy/react-fancy";
 | charsPerToken | `number` | `4` | Rough estimator for the token meter. |
 | mentionColor | `Record<string, string>` | sensible defaults | Override the chip colour per mention kind. |
 | maxHeight | `number` | `280` | Max textarea height in pixels. |
+| aboveInput | `ReactNode` | — | Rendered inside the rounded shell, above the textarea. Use this for a drawer of tools/files/prompts/etc. so the drawer and composer share one visual panel — see [ChatDrawer](./ChatDrawer.md). Added in `3.2.0`. |
 
 ## Types
 

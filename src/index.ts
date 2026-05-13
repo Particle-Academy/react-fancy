@@ -405,5 +405,24 @@ export type { MoodMeterProps } from "./components/MoodMeter";
 export { PromptInput } from "./components/PromptInput";
 export type { PromptInputProps, PromptCmd, PromptMention, PromptAttachment } from "./components/PromptInput";
 
+export { ChatDrawer } from "./components/ChatDrawer";
+export type { ChatDrawerProps, ChatDrawerTab } from "./components/ChatDrawer";
+
+export {
+  InputTag,
+  textareaAdapter,
+  inputAdapter,
+  contentEditableAdapter,
+  controlledAdapter,
+} from "./components/InputTag";
+export type {
+  InputTagProps,
+  InputTagAdapter,
+  InputTagAdapterState,
+  InputTagTrigger,
+  InputTagTriggers,
+  ControlledAdapterHandle,
+} from "./components/InputTag";
+
 export { MagicWand } from "./components/MagicWand";
 export type { MagicWandProps, MagicWandAction, MagicWandSelection, MagicWandAppearance } from "./components/MagicWand";

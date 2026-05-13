@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Action } from "../Action";
 import { Tooltip } from "../Tooltip";
 
@@ -49,6 +49,12 @@ export interface PromptInputProps {
   mentionColor?: Record<string, string>;
   /** Optional max textarea height in px. Defaults to 280. */
   maxHeight?: number;
+  /**
+   * Rendered INSIDE the rounded shell, ABOVE the attachments bar and
+   * textarea. Use this slot for a drawer of tools/files/prompts/etc. so
+   * the drawer and composer share one visual panel. See {@link ChatDrawer}.
+   */
+  aboveInput?: ReactNode;
 }
 
 const DEFAULT_MENTION_COLOR: Record<string, string> = {
@@ -67,6 +73,7 @@ export function PromptInput({
   charsPerToken = 4,
   mentionColor,
   maxHeight = 280,
+  aboveInput,
 }: PromptInputProps) {
   const [text, setText] = useState("");
   const [attachments, setAttachments] = useState<PromptAttachment[]>([]);
@@ -234,6 +241,11 @@ export function PromptInput({
           : "border-zinc-200 dark:border-zinc-800"
       } bg-white dark:bg-zinc-900`}
     >
+      {aboveInput && (
+        <div className="border-b border-zinc-200 dark:border-zinc-800">
+          {aboveInput}
+        </div>
+      )}
       {attachments.length > 0 && (
         <div className="flex flex-wrap gap-1.5 border-b border-zinc-200 px-3 py-2 dark:border-zinc-800">
           {attachments.map((a) => (
