@@ -63,7 +63,7 @@ Each trigger character maps to a config:
   "/": {
     items: COMMANDS,
     insert: (item, query) => `${item.name} `,   // replaces "/<query>" with this
-    filter?: (item, query) => boolean,           // default: prefix match against name/id
+    filter?: (item, query) => boolean,           // default: case-insensitive substring match against name/id
     render?: (item, active) => ReactNode,        // default: item.name | item.id
     keyOf?: (item) => string,                    // default: same as render fallback
     label?: "Commands",                          // optional header
