@@ -1,6 +1,6 @@
 # @particle-academy/react-fancy
 
-React UI component library — the React port of the `fancy-flux` Blade/Livewire component library. The goal is **visual and behavioral parity** with fancy-flux.
+React UI component library for **Human+ UX** — controlled, agent-bridgeable primitives that humans and agents share. Every component exposes `value` / `onChange`, stable handles, and JSON-friendly props so MCP bridges can drive the UI without DOM scraping.
 
 ## Inertia.js integration
 
@@ -240,7 +240,7 @@ src/
 
 - `Size` — `"xs" | "sm" | "md" | "lg" | "xl"`
 - `Color` — Full Tailwind color palette (17 colors)
-- `ActionColor` — Subset of 10 standalone colors matching fancy-flux
+- `ActionColor` — Subset of 10 standalone colors used by Action and friends
 - `Variant` — `"solid" | "outline" | "ghost" | "soft"`
 - `Placement` — `"top" | "bottom" | "left" | "right"` + start/end variants
 
@@ -268,16 +268,23 @@ Every component follows this structure:
 
 Use `lucide-react` as the default icon library. It is a dependency of this package and marked as external in tsup. Components should import icons directly (e.g., `import { X, ChevronDown } from "lucide-react"`).
 
-### Parity with fancy-flux
+### Human+ UX contract
 
-- **Always reference the corresponding Blade component** in `packages/fancy-flux/stubs/resources/views/flux/` when implementing or updating a component. Match the Tailwind classes, color values, state logic, and dark mode support exactly.
-- React-specific additions (e.g., `loading` spinner, `href` anchor rendering) are fine — they don't exist in Blade but are idiomatic in React.
-- Icons are passed as `ReactNode` (not string names like Blade's `<flux:icon>`). This is the correct React pattern.
+Every interactive component must:
+
+- Expose **`value` + `onChange`** so an agent can read and write state. No internal-only state for anything an agent might want to inspect or change.
+- Carry **stable handles** — `id`, `data-react-fancy-*` attributes, or a selector prop — so MCP bridges can address elements without guessing DOM structure.
+- Accept **JSON-friendly props** — arrays of objects, primitives, simple discriminated unions. Avoid forcing React children for things the agent needs to populate.
+- Support a **bridgeable surface**: a `register<Surface>Bridge(server, { adapter })` (in `agent-integrations`) should be sketchable in one sitting.
+- Broadcast **`AgentActivity`** events for mutations so presence, undo, and coaching layers can compose.
+- Provide **trust-but-verify** hooks for destructive actions — agents propose, humans confirm via `pendingMode` / staged-write affordances.
+
+Purely visual primitives (labels, dividers, layout shells) only owe the first bullet.
 
 ### Styling
 
 - **Tailwind v4** — CSS-first config. Use `@import "tailwindcss"` not `@tailwind` directives.
-- **Dark mode** — Every color variant must include `dark:` equivalents. Check fancy-flux for the exact classes. Portal components get dark mode automatically via the Portal wrapper.
+- **Dark mode** — Every color variant must include `dark:` equivalents. Portal components get dark mode automatically via the Portal wrapper.
 - **No component library deps** — Only `clsx`, `tailwind-merge`, and `lucide-react`. Don't add Radix, Headless UI, or similar.
 - Class maps should be `Record<Size, string>` (or similar) constants outside the component function, not inline.
 
