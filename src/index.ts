@@ -134,6 +134,9 @@ export type { CalloutProps } from "./components/Callout";
 export { Timeline } from "./components/Timeline";
 export type { TimelineProps, TimelineItemProps, TimelineBlockProps, TimelineEvent, TimelineVariant, TimelineOrientation } from "./components/Timeline";
 
+export { TimeGrid } from "./components/TimeGrid";
+export type { TimeGridProps, TimeGridTone } from "./components/TimeGrid";
+
 // Phase 3: Overlay & Floating Components
 export { Tooltip } from "./components/Tooltip";
 export type { TooltipProps } from "./components/Tooltip";
