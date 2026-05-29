@@ -131,6 +131,9 @@ export type {
 export { Callout } from "./components/Callout";
 export type { CalloutProps } from "./components/Callout";
 
+export { StickyNote } from "./components/StickyNote";
+export type { StickyNoteProps, StickyNoteColor } from "./components/StickyNote";
+
 export { Timeline } from "./components/Timeline";
 export type { TimelineProps, TimelineItemProps, TimelineBlockProps, TimelineEvent, TimelineVariant, TimelineOrientation } from "./components/Timeline";
 
