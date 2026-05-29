@@ -21,10 +21,14 @@ export function ContentRenderer({
   );
 
   const html = useMemo(() => {
-    const resolvedFormat = format === "auto" ? detectFormat(value) : format;
+    // Guard nullish input: marked.parse throws "input parameter is undefined
+    // or null", which (inside this useMemo during render) would crash the whole
+    // React tree. Treat missing content as empty.
+    const safe = value ?? "";
+    const resolvedFormat = format === "auto" ? detectFormat(safe) : format;
     const raw = resolvedFormat === "markdown"
-      ? (marked.parse(value, { async: false }) as string)
-      : value;
+      ? (marked.parse(safe, { async: false }) as string)
+      : safe;
     return unsafe ? raw : sanitizeHtml(raw);
   }, [value, format, unsafe]);
 
