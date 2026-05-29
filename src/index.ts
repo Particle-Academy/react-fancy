@@ -232,6 +232,9 @@ export type {
   NavbarContextValue,
 } from "./components/Navbar";
 
+export { Orb } from "./components/Orb";
+export type { OrbProps } from "./components/Orb";
+
 export { Pagination } from "./components/Pagination";
 export type { PaginationProps } from "./components/Pagination";
 
@@ -312,6 +315,9 @@ export type {
   MenuOrientation,
   MenuContextValue,
 } from "./components/Menu";
+
+export { SeedMark } from "./components/SeedMark";
+export type { SeedMarkProps } from "./components/SeedMark";
 
 export { Sidebar, useSidebar } from "./components/Sidebar";
 export type {

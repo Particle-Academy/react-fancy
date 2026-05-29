@@ -258,3 +258,16 @@
 .fancy-slide-out-right {
   animation: fancy-slide-out-right 0.2s ease-in forwards;
 }
+
+/* ─── Orb agent-presence pulse ───────────────────────────────────────────────
+   Slow breathe animation used by the Orb component when pulse=true.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+@keyframes fancy-orb-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.92); }
+}
+
+.fancy-orb-pulse {
+  animation: fancy-orb-pulse 2.4s ease-in-out infinite;
+}
