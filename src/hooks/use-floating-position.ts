@@ -95,20 +95,30 @@ export function useFloatingPosition(
   }, [anchorRef, floatingRef, placement, offset]);
 
   // Use layoutEffect + rAF to ensure the floating element has been painted
-  // and has real dimensions before we measure it
+  // and has real dimensions before we measure it.
+  //
+  // The floating element can mount a frame or two AFTER `enabled` flips — e.g.
+  // when an enter animation (useAnimation) gates its render. If we only measured
+  // once, `floatingRef.current` would still be null at that moment, `update()`
+  // would no-op, and the popover would stick at its off-screen initial position
+  // (-9999). So we re-measure across a few frames until the element is actually
+  // in the DOM. (This race surfaced as dropdowns "not opening" — the menu was
+  // mounted but parked off-screen.)
   useLayoutEffect(() => {
     if (!enabled) return;
 
-    // First attempt right away (works if element already has dimensions)
-    update();
-
-    // Second attempt after browser paint (handles first-render case)
-    const raf = requestAnimationFrame(() => {
+    let raf = 0;
+    let frames = 0;
+    const measure = () => {
       update();
-    });
+      if (!floatingRef.current && frames++ < 20) {
+        raf = requestAnimationFrame(measure);
+      }
+    };
+    measure();
 
     return () => cancelAnimationFrame(raf);
-  }, [update, enabled]);
+  }, [update, enabled, floatingRef]);
 
   // Scroll/resize listeners in a regular effect
   useEffect(() => {
