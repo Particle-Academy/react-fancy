@@ -131,6 +131,9 @@ export type {
 export { Callout } from "./components/Callout";
 export type { CalloutProps } from "./components/Callout";
 
+export { FauxClient } from "./components/FauxClient";
+export type { FauxClientProps } from "./components/FauxClient";
+
 export { StickyNote } from "./components/StickyNote";
 export type { StickyNoteProps, StickyNoteColor } from "./components/StickyNote";
 
