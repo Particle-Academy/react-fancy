@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useState, type RefObject } from "react";
+import { useCallback, useEffect, useState, type RefObject } from "react";
 import type { Placement } from "../utils/types";
 
 interface FloatingPosition {
@@ -91,26 +91,42 @@ export function useFloatingPosition(
 
     const anchorRect = anchor.getBoundingClientRect();
     const floatingRect = floating.getBoundingClientRect();
-    setPosition(getPosition(anchorRect, floatingRect, placement, offset));
+    const next = getPosition(anchorRect, floatingRect, placement, offset);
+    // Bail out when nothing changed so this can run after every commit
+    // (below) without causing an infinite render loop.
+    setPosition((prev) =>
+      prev.x === next.x && prev.y === next.y && prev.placement === next.placement
+        ? prev
+        : next,
+    );
   }, [anchorRef, floatingRef, placement, offset]);
 
-  // Use layoutEffect + rAF to ensure the floating element has been painted
-  // and has real dimensions before we measure it
-  useLayoutEffect(() => {
-    if (!enabled) return;
+  // Re-measure after every commit while open.
+  //
+  // The floating element mounts a frame or two AFTER `enabled` flips — its
+  // render is gated behind a state flip (e.g. useAnimation's `mounted`), so at
+  // the moment `enabled` turns true the floating ref is still null and a single
+  // measurement no-ops, leaving the popover parked at its off-screen sentinel.
+  //
+  // A passive effect with no deps runs after *every* commit — including the one
+  // that finally mounts the floating element — and, crucially, keeps running in
+  // hidden/background tabs where `requestAnimationFrame` is paused. The bail-out
+  // in `update` makes the steady-state calls free, so this both fixes the
+  // late-mount race and survives tab-visibility throttling.
+  useEffect(() => {
+    if (enabled) update();
+  });
 
-    // First attempt right away (works if element already has dimensions)
-    update();
+  // Park off-screen when closed so the next open re-measures from scratch.
+  useEffect(() => {
+    if (!enabled) {
+      setPosition((prev) =>
+        prev.x === -9999 ? prev : { x: -9999, y: -9999, placement },
+      );
+    }
+  }, [enabled, placement]);
 
-    // Second attempt after browser paint (handles first-render case)
-    const raf = requestAnimationFrame(() => {
-      update();
-    });
-
-    return () => cancelAnimationFrame(raf);
-  }, [update, enabled]);
-
-  // Scroll/resize listeners in a regular effect
+  // Reposition on scroll/resize while open.
   useEffect(() => {
     if (!enabled) return;
 

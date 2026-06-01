@@ -1,6 +1,30 @@
 # @particle-academy/react-fancy
 
-React UI component library — the React port of the `fancy-flux` Blade/Livewire component library. The goal is **visual and behavioral parity** with fancy-flux.
+React UI component library for **Human+ UX** — controlled, agent-bridgeable primitives that humans and agents share. Every component exposes `value` / `onChange`, stable handles, and JSON-friendly props so MCP bridges can drive the UI without DOM scraping.
+
+## Inertia.js integration
+
+Using react-fancy with Inertia? Install the [`@particle-academy/fancy-inertia`](https://github.com/Particle-Academy/fancy-inertia) adapter — it ships a single `<FancyAppRoot>` provider that mounts `Toast.Provider` (and the modal portal root) above the Inertia outlet, plus `useFancyForm()` for one-line wiring of react-fancy form fields to Inertia's `useForm()` server-validated state, plus a `<FancyClientOnly>` boundary for SSR-skip needs. See [fancy-inertia/docs/SSR.md](https://github.com/Particle-Academy/fancy-inertia/blob/main/docs/SSR.md) for the per-component SSR-safety matrix.
+
+## Migration to v3
+
+`Canvas` and `Diagram` were moved out of react-fancy in v3.0.0 to keep this package focused on generic React UI. They live in companion packages now:
+
+```diff
+- import { Canvas, useCanvas } from "@particle-academy/react-fancy";
++ import { Canvas, useCanvas } from "@particle-academy/fancy-3d/canvas";
+```
+
+```diff
+- import { Diagram } from "@particle-academy/react-fancy";
++ import { Diagram } from "@particle-academy/fancy-echarts";
+//   …or one of the new specialized presets:
+//   DataDiagram, Flowchart, Mindmap, OrgChart
+```
+
+`<Canvas>` in fancy-3d is now engine-pluggable (`engine="dom" | "babylon" | CustomEngine`) and ships with built-in adapters for DOM/Web3D (default) and Babylon. fancy-echarts' diagram exports include four schema-driven specialized presets sharing one routing/marker engine.
+
+Everything else in react-fancy is unchanged.
 
 ## Installation
 
@@ -139,6 +163,17 @@ npx vite build                      # Build demo app (verifies imports work)
 | Diagram | Entity-relationship diagram with draggable nodes and relation lines | [docs](docs/Diagram.md) |
 | ContentRenderer | Markdown/HTML content renderer | [docs](docs/ContentRenderer.md) |
 
+### Human+ Primitives
+
+Components for surfaces where humans and AI agents trade control fluidly. Each promoted from the [`dreaming`](https://github.com/Particle-Academy/pa-ux-sandbox/tree/dreaming) sandbox after the API stabilized.
+
+| Component | Description | Docs |
+|-----------|-------------|------|
+| ReasonTag | Wrap any value with hover/click affordance revealing reason, confidence tier, and sources | [docs](docs/ReasonTag.md) |
+| MoodMeter | 2D value+confidence pad; halo radius shrinks as confidence rises | [docs](docs/MoodMeter.md) |
+| PromptInput | Chat composer with `/` commands, `@` mentions, drop-to-attach, ⌘+Enter, token budget meter | [docs](docs/PromptInput.md) |
+| MagicWand | Selection-anchored floating toolbar with pluggable AI actions that replace highlighted text in-place | [docs](docs/MagicWand.md) |
+
 ### Menus & Navigation
 
 | Component | Description | Docs |
@@ -205,7 +240,7 @@ src/
 
 - `Size` — `"xs" | "sm" | "md" | "lg" | "xl"`
 - `Color` — Full Tailwind color palette (17 colors)
-- `ActionColor` — Subset of 10 standalone colors matching fancy-flux
+- `ActionColor` — Subset of 10 standalone colors used by Action and friends
 - `Variant` — `"solid" | "outline" | "ghost" | "soft"`
 - `Placement` — `"top" | "bottom" | "left" | "right"` + start/end variants
 
@@ -233,16 +268,23 @@ Every component follows this structure:
 
 Use `lucide-react` as the default icon library. It is a dependency of this package and marked as external in tsup. Components should import icons directly (e.g., `import { X, ChevronDown } from "lucide-react"`).
 
-### Parity with fancy-flux
+### Human+ UX contract
 
-- **Always reference the corresponding Blade component** in `packages/fancy-flux/stubs/resources/views/flux/` when implementing or updating a component. Match the Tailwind classes, color values, state logic, and dark mode support exactly.
-- React-specific additions (e.g., `loading` spinner, `href` anchor rendering) are fine — they don't exist in Blade but are idiomatic in React.
-- Icons are passed as `ReactNode` (not string names like Blade's `<flux:icon>`). This is the correct React pattern.
+Every interactive component must:
+
+- Expose **`value` + `onChange`** so an agent can read and write state. No internal-only state for anything an agent might want to inspect or change.
+- Carry **stable handles** — `id`, `data-react-fancy-*` attributes, or a selector prop — so MCP bridges can address elements without guessing DOM structure.
+- Accept **JSON-friendly props** — arrays of objects, primitives, simple discriminated unions. Avoid forcing React children for things the agent needs to populate.
+- Support a **bridgeable surface**: a `register<Surface>Bridge(server, { adapter })` (in `agent-integrations`) should be sketchable in one sitting.
+- Broadcast **`AgentActivity`** events for mutations so presence, undo, and coaching layers can compose.
+- Provide **trust-but-verify** hooks for destructive actions — agents propose, humans confirm via `pendingMode` / staged-write affordances.
+
+Purely visual primitives (labels, dividers, layout shells) only owe the first bullet.
 
 ### Styling
 
 - **Tailwind v4** — CSS-first config. Use `@import "tailwindcss"` not `@tailwind` directives.
-- **Dark mode** — Every color variant must include `dark:` equivalents. Check fancy-flux for the exact classes. Portal components get dark mode automatically via the Portal wrapper.
+- **Dark mode** — Every color variant must include `dark:` equivalents. Portal components get dark mode automatically via the Portal wrapper.
 - **No component library deps** — Only `clsx`, `tailwind-merge`, and `lucide-react`. Don't add Radix, Headless UI, or similar.
 - Class maps should be `Record<Size, string>` (or similar) constants outside the component function, not inline.
 

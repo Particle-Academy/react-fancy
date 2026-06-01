@@ -131,8 +131,17 @@ export type {
 export { Callout } from "./components/Callout";
 export type { CalloutProps } from "./components/Callout";
 
+export { FauxClient } from "./components/FauxClient";
+export type { FauxClientProps } from "./components/FauxClient";
+
+export { StickyNote } from "./components/StickyNote";
+export type { StickyNoteProps, StickyNoteColor } from "./components/StickyNote";
+
 export { Timeline } from "./components/Timeline";
 export type { TimelineProps, TimelineItemProps, TimelineBlockProps, TimelineEvent, TimelineVariant, TimelineOrientation } from "./components/Timeline";
+
+export { TimeGrid } from "./components/TimeGrid";
+export type { TimeGridProps, TimeGridTone } from "./components/TimeGrid";
 
 // Phase 3: Overlay & Floating Components
 export { Tooltip } from "./components/Tooltip";
@@ -350,35 +359,10 @@ export type {
   KanbanContextValue,
 } from "./components/Kanban";
 
-// Phase 7: Spatial Components
-export { Canvas, useCanvas } from "./components/Canvas";
-export type {
-  CanvasProps,
-  CanvasNodeProps,
-  CanvasEdgeProps,
-  CanvasMinimapProps,
-  CanvasControlsProps,
-  CanvasContextValue,
-  ViewportState,
-  EdgeAnchor,
-} from "./components/Canvas";
-
-export { Diagram, useDiagram } from "./components/Diagram";
-export type {
-  DiagramProps,
-  DiagramEntityProps,
-  DiagramFieldProps,
-  DiagramRelationProps,
-  DiagramToolbarProps,
-  DiagramSchema,
-  DiagramEntityData,
-  DiagramFieldData,
-  DiagramRelationData,
-  DiagramType,
-  RelationType,
-  ExportFormat,
-  DiagramContextValue,
-} from "./components/Diagram";
+// Spatial components (Canvas, Diagram) moved to companion packages in v3.0.0:
+//   - Canvas  → @particle-academy/fancy-3d/canvas
+//   - Diagram → @particle-academy/fancy-echarts (plus DataDiagram, Flowchart,
+//     Mindmap, OrgChart presets)
 
 export { TreeNav, useTreeNav } from "./components/TreeNav";
 export type {
@@ -422,3 +406,35 @@ export {
   SKIN_TONES,
 } from "./data";
 export type { EmojiEntry, EmojiCategory, EmojiCategoryKey, EmojiFlatEntry, SkinTone } from "./data";
+
+// Human+ primitives (promoted from /dreaming, 2026-05-12)
+export { ReasonTag } from "./components/ReasonTag";
+export type { ReasonTagProps, ReasonTagSource, ReasonTagTheme } from "./components/ReasonTag";
+
+export { MoodMeter } from "./components/MoodMeter";
+export type { MoodMeterProps } from "./components/MoodMeter";
+
+export { PromptInput } from "./components/PromptInput";
+export type { PromptInputProps, PromptCmd, PromptMention, PromptAttachment } from "./components/PromptInput";
+
+export { ChatDrawer } from "./components/ChatDrawer";
+export type { ChatDrawerProps, ChatDrawerTab } from "./components/ChatDrawer";
+
+export {
+  InputTag,
+  textareaAdapter,
+  inputAdapter,
+  contentEditableAdapter,
+  controlledAdapter,
+} from "./components/InputTag";
+export type {
+  InputTagProps,
+  InputTagAdapter,
+  InputTagAdapterState,
+  InputTagTrigger,
+  InputTagTriggers,
+  ControlledAdapterHandle,
+} from "./components/InputTag";
+
+export { MagicWand } from "./components/MagicWand";
+export type { MagicWandProps, MagicWandAction, MagicWandSelection, MagicWandAppearance } from "./components/MagicWand";

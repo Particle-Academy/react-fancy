@@ -1,7 +1,7 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "2.10.0",
-  "description": "React UI component library — React port of the fancy-flux Blade component library",
+  "version": "3.5.0",
+  "description": "React UI component library for Human+ UX — controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Particle-Academy/react-fancy.git"
@@ -52,7 +52,7 @@
     "components",
     "ui",
     "tailwind",
-    "fancy-flux"
+    "human-plus-ux"
   ],
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
