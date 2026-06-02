@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
+import type { Color } from "../../utils/types";
 
 export interface CalloutProps {
   children: ReactNode;
-  color?: "blue" | "green" | "amber" | "red" | "zinc";
+  color?: Color;
   icon?: ReactNode;
   dismissible?: boolean;
   onDismiss?: () => void;

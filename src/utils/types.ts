@@ -40,17 +40,8 @@ export const COLORS = [
 
 export type Variant = "solid" | "outline" | "ghost" | "soft";
 
-export type ButtonColor =
-  | "blue"
-  | "emerald"
-  | "amber"
-  | "red"
-  | "violet"
-  | "indigo"
-  | "sky"
-  | "rose"
-  | "orange"
-  | "zinc";
+/** Button accepts the full Tailwind v4 palette (alias of {@link Color}). */
+export type ButtonColor = Color;
 
 /**
  * @deprecated Renamed to {@link ButtonColor}. `ActionColor` remains as an alias

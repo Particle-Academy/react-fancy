@@ -24,7 +24,7 @@ import { Button } from "@particle-academy/react-fancy";
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | variant | `"default" \| "circle" \| "ghost"` | `"default"` | Shape/fill variant. `"ghost"` is transparent with subtle hover. |
-| color | `ButtonColor` | - | Standalone color (overrides state colors). One of: `"blue"`, `"emerald"`, `"amber"`, `"red"`, `"violet"`, `"indigo"`, `"sky"`, `"rose"`, `"orange"`, `"zinc"` |
+| color | `ButtonColor` (= `Color`) | - | Standalone color (overrides state colors) — the full Tailwind v4 palette — 5 grays (`slate`, `gray`, `zinc`, `neutral`, `stone`) + every hue (`red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, `rose`). |
 | size | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"md"` | Button size |
 | active | `boolean` | - | Active state (blue highlight) |
 | checked | `boolean` | - | Checked state (emerald highlight) |

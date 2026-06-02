@@ -5,6 +5,10 @@ import { resolve } from "../../data/emoji-utils";
 import { Icon } from "../Icon/Icon";
 import type { ButtonProps } from "./Button.types";
 import type { ButtonColor, Size } from "../../utils/types";
+import {
+  buttonColorClasses as colorClasses,
+  buttonGhostClasses as ghostColorClasses,
+} from "./Button.colors";
 
 const iconSizeMap: Record<Size, "xs" | "sm" | "md" | "lg" | "xl"> = {
   xs: "xs",
@@ -24,20 +28,11 @@ const alertIconSizeMap: Record<Size, "xs" | "sm" | "md" | "lg" | "xl"> = {
 
 // ---------------------------------------------------------------------------
 // Color classes
+//
+// Solid + ghost color maps live in ./Button.colors (AUTO-GENERATED, all 22
+// Tailwind v4 hues as literal strings). The state-color classes below
+// (default/active/checked/warn) branch on flags, not specific colors.
 // ---------------------------------------------------------------------------
-
-const colorClasses: Record<ButtonColor, string> = {
-  blue: "bg-blue-500 text-white border border-blue-600 hover:bg-blue-600 dark:bg-blue-600 dark:border-blue-500 dark:hover:bg-blue-500",
-  emerald: "bg-emerald-500 text-white border border-emerald-600 hover:bg-emerald-600 dark:bg-emerald-600 dark:border-emerald-500 dark:hover:bg-emerald-500",
-  amber: "bg-amber-500 text-white border border-amber-600 hover:bg-amber-600 dark:bg-amber-600 dark:border-amber-500 dark:hover:bg-amber-500",
-  red: "bg-red-500 text-white border border-red-600 hover:bg-red-600 dark:bg-red-600 dark:border-red-500 dark:hover:bg-red-500",
-  violet: "bg-violet-500 text-white border border-violet-600 hover:bg-violet-600 dark:bg-violet-600 dark:border-violet-500 dark:hover:bg-violet-500",
-  indigo: "bg-indigo-500 text-white border border-indigo-600 hover:bg-indigo-600 dark:bg-indigo-600 dark:border-indigo-500 dark:hover:bg-indigo-500",
-  sky: "bg-sky-500 text-white border border-sky-600 hover:bg-sky-600 dark:bg-sky-600 dark:border-sky-500 dark:hover:bg-sky-500",
-  rose: "bg-rose-500 text-white border border-rose-600 hover:bg-rose-600 dark:bg-rose-600 dark:border-rose-500 dark:hover:bg-rose-500",
-  orange: "bg-orange-500 text-white border border-orange-600 hover:bg-orange-600 dark:bg-orange-600 dark:border-orange-500 dark:hover:bg-orange-500",
-  zinc: "bg-zinc-500 text-white border border-zinc-600 hover:bg-zinc-600 dark:bg-zinc-600 dark:border-zinc-500 dark:hover:bg-zinc-500",
-};
 
 const defaultClasses =
   "bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700";
@@ -50,20 +45,6 @@ const checkedClasses =
 
 const warnClasses =
   "bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700 dark:hover:bg-amber-900/50";
-
-// Ghost variant: transparent background, colored text, subtle hover
-const ghostColorClasses: Record<ButtonColor, string> = {
-  blue: "bg-transparent text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/50",
-  emerald: "bg-transparent text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/50",
-  amber: "bg-transparent text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/50",
-  red: "bg-transparent text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/50",
-  violet: "bg-transparent text-violet-600 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-950/50",
-  indigo: "bg-transparent text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/50",
-  sky: "bg-transparent text-sky-600 hover:bg-sky-50 dark:text-sky-400 dark:hover:bg-sky-950/50",
-  rose: "bg-transparent text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/50",
-  orange: "bg-transparent text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-950/50",
-  zinc: "bg-transparent text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800",
-};
 
 const ghostDefaultClasses =
   "bg-transparent text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800";

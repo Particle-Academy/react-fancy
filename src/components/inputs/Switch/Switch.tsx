@@ -3,27 +3,7 @@ import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { dirtyRingClasses } from "../inputs.utils";
 import type { SwitchProps } from "./Switch.types";
-
-const trackColorMap: Record<string, string> = {
-  zinc: "bg-zinc-500",
-  red: "bg-red-500",
-  orange: "bg-orange-500",
-  amber: "bg-amber-500",
-  yellow: "bg-yellow-500",
-  lime: "bg-lime-500",
-  green: "bg-green-500",
-  emerald: "bg-emerald-500",
-  teal: "bg-teal-500",
-  cyan: "bg-cyan-500",
-  sky: "bg-sky-500",
-  blue: "bg-blue-500",
-  indigo: "bg-indigo-500",
-  violet: "bg-violet-500",
-  purple: "bg-purple-500",
-  fuchsia: "bg-fuchsia-500",
-  pink: "bg-pink-500",
-  rose: "bg-rose-500",
-};
+import { switchTrack } from "./Switch.colors";
 
 export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
   (
@@ -90,7 +70,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           className={cn(
             "relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
             trackSizes,
-            checked ? trackColorMap[color] : "bg-zinc-200 dark:bg-zinc-600",
+            checked ? switchTrack[color] : "bg-zinc-200 dark:bg-zinc-600",
             dirtyRingClasses(dirty),
             error && "ring-2 ring-red-500/50",
           )}
