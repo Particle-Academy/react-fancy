@@ -22,7 +22,7 @@ export type Color =
 
 export type Variant = "solid" | "outline" | "ghost" | "soft";
 
-export type ActionColor =
+export type ButtonColor =
   | "blue"
   | "emerald"
   | "amber"
@@ -33,6 +33,12 @@ export type ActionColor =
   | "rose"
   | "orange"
   | "zinc";
+
+/**
+ * @deprecated Renamed to {@link ButtonColor}. `ActionColor` remains as an alias
+ * for backward compatibility and will be removed in a future major version.
+ */
+export type ActionColor = ButtonColor;
 
 export type Placement =
   | "top"

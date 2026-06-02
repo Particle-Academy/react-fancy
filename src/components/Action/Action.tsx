@@ -3,8 +3,8 @@ import { cn } from "../../utils/cn";
 import { sanitizeHref } from "../../utils/sanitize";
 import { resolve } from "../../data/emoji-utils";
 import { Icon } from "../Icon/Icon";
-import type { ActionProps } from "./Action.types";
-import type { ActionColor, Size } from "../../utils/types";
+import type { ButtonProps } from "./Action.types";
+import type { ButtonColor, Size } from "../../utils/types";
 
 const iconSizeMap: Record<Size, "xs" | "sm" | "md" | "lg" | "xl"> = {
   xs: "xs",
@@ -26,7 +26,7 @@ const alertIconSizeMap: Record<Size, "xs" | "sm" | "md" | "lg" | "xl"> = {
 // Color classes
 // ---------------------------------------------------------------------------
 
-const colorClasses: Record<ActionColor, string> = {
+const colorClasses: Record<ButtonColor, string> = {
   blue: "bg-blue-500 text-white border border-blue-600 hover:bg-blue-600 dark:bg-blue-600 dark:border-blue-500 dark:hover:bg-blue-500",
   emerald: "bg-emerald-500 text-white border border-emerald-600 hover:bg-emerald-600 dark:bg-emerald-600 dark:border-emerald-500 dark:hover:bg-emerald-500",
   amber: "bg-amber-500 text-white border border-amber-600 hover:bg-amber-600 dark:bg-amber-600 dark:border-amber-500 dark:hover:bg-amber-500",
@@ -52,7 +52,7 @@ const warnClasses =
   "bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700 dark:hover:bg-amber-900/50";
 
 // Ghost variant: transparent background, colored text, subtle hover
-const ghostColorClasses: Record<ActionColor, string> = {
+const ghostColorClasses: Record<ButtonColor, string> = {
   blue: "bg-transparent text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/50",
   emerald: "bg-transparent text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/50",
   amber: "bg-transparent text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/50",
@@ -141,12 +141,12 @@ const externalIconOffset: Record<Size, string> = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function isColored(color?: ActionColor, active?: boolean, checked?: boolean): boolean {
+function isColored(color?: ButtonColor, active?: boolean, checked?: boolean): boolean {
   return !!(color || active || checked);
 }
 
 function getColorClasses(
-  color?: ActionColor,
+  color?: ButtonColor,
   active?: boolean,
   checked?: boolean,
   warn?: boolean,
@@ -167,7 +167,7 @@ function getColorClasses(
 }
 
 function getIconColorClasses(
-  color?: ActionColor,
+  color?: ButtonColor,
   active?: boolean,
   checked?: boolean,
   warn?: boolean,
@@ -183,7 +183,7 @@ function getIconColorClasses(
 }
 
 function getBadgeClasses(
-  color?: ActionColor,
+  color?: ButtonColor,
   active?: boolean,
   checked?: boolean,
   warn?: boolean,
@@ -240,7 +240,7 @@ function parseSortOrder(sort?: string): ElementKey[] {
 // Component
 // ---------------------------------------------------------------------------
 
-export const Action = forwardRef<HTMLButtonElement, ActionProps>(
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       children,
@@ -447,7 +447,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
     // -----------------------------------------------------------------------
     const safeHref = sanitizeHref(href);
     const buttonEl = safeHref && !disabled ? (
-      <a href={safeHref} className={classes} data-react-fancy-action="">
+      <a href={safeHref} className={classes} data-react-fancy-button="" data-react-fancy-action="">
         {content}
       </a>
     ) : (
@@ -455,6 +455,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
         ref={ref}
         className={classes}
         disabled={disabled || loading}
+        data-react-fancy-button=""
         data-react-fancy-action=""
         {...props}
       >
@@ -537,4 +538,11 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
   },
 );
 
-Action.displayName = "Action";
+Button.displayName = "Button";
+
+/**
+ * @deprecated Renamed to {@link Button}. `Action` remains as an alias for
+ * backward compatibility and will be removed in a future major version.
+ * Prefer importing `Button` from "@particle-academy/react-fancy".
+ */
+export const Action = Button;

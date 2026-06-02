@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Action } from "../Action";
+import { Button } from "../Action";
 import { Tooltip } from "../Tooltip";
 
 /**
@@ -350,7 +350,7 @@ export function PromptInput({
 
       <div className="flex items-center gap-2 border-t border-zinc-200 bg-zinc-50/60 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/40">
         <Tooltip content="Drop files here, or click">
-          <Action
+          <Button
             variant="ghost"
             size="sm"
             onClick={() => {
@@ -358,7 +358,7 @@ export function PromptInput({
             }}
           >
             📎 attach
-          </Action>
+          </Button>
         </Tooltip>
         <div className="ml-2 flex items-center gap-1.5">
           <div className="h-1.5 w-24 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
@@ -384,9 +384,9 @@ export function PromptInput({
               to send
             </span>
           )}
-          <Action color="violet" size="sm" onClick={submit}>
+          <Button color="violet" size="sm" onClick={submit}>
             send →
-          </Action>
+          </Button>
         </div>
       </div>
     </div>

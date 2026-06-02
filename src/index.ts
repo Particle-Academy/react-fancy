@@ -1,6 +1,8 @@
 // Components
-export { Action } from "./components/Action";
-export type { ActionProps } from "./components/Action";
+// `Button` is the canonical name; `Action` is the original name, kept as a
+// deprecated alias for backward compatibility (removed in a future major).
+export { Button, Action } from "./components/Action";
+export type { ButtonProps, ActionProps } from "./components/Action";
 
 export {
   AccordionPanel,
@@ -373,7 +375,7 @@ export type {
 // Utilities
 export { cn } from "./utils/cn";
 export { sanitizeHtml, sanitizeHref } from "./utils/sanitize";
-export type { Size, Color, Variant, ActionColor, Placement } from "./utils/types";
+export type { Size, Color, Variant, ButtonColor, ActionColor, Placement } from "./utils/types";
 
 // Hooks
 export {
