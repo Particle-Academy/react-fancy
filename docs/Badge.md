@@ -18,7 +18,7 @@ import { Badge } from "@particle-academy/react-fancy";
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| color | `"zinc" \| "red" \| "blue" \| "green" \| "amber" \| "violet" \| "rose"` | `"zinc"` | Badge color |
+| color | `Color` | `"zinc"` | Any color in the full Tailwind v4 palette — the 5 grays (`slate`, `gray`, `zinc`, `neutral`, `stone`) + every hue (`red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, `rose`). |
 | variant | `"solid" \| "outline" \| "soft"` | `"soft"` | Visual variant |
 | size | `"sm" \| "md" \| "lg"` | `"md"` | Badge size |
 | dot | `boolean` | `false` | Show a small dot indicator before text |

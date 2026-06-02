@@ -5,21 +5,27 @@ import type { TimelineItemProps } from "./Timeline.types";
 import type { Color } from "../../utils/types";
 
 const dotColorClasses: Record<Color, string> = {
+  slate: "bg-slate-400 dark:bg-slate-600", gray: "bg-gray-400 dark:bg-gray-600",
+  zinc: "bg-zinc-300 dark:bg-zinc-600", neutral: "bg-neutral-400 dark:bg-neutral-600",
+  stone: "bg-stone-400 dark:bg-stone-600",
   red: "bg-red-500", orange: "bg-orange-500", amber: "bg-amber-500",
   yellow: "bg-yellow-500", lime: "bg-lime-500", green: "bg-green-500",
   emerald: "bg-emerald-500", teal: "bg-teal-500", cyan: "bg-cyan-500",
   sky: "bg-sky-500", blue: "bg-blue-500", indigo: "bg-indigo-500",
   violet: "bg-violet-500", purple: "bg-purple-500", fuchsia: "bg-fuchsia-500",
-  pink: "bg-pink-500", rose: "bg-rose-500", zinc: "bg-zinc-300 dark:bg-zinc-600",
+  pink: "bg-pink-500", rose: "bg-rose-500",
 };
 
 const ringColorClasses: Record<Color, string> = {
+  slate: "ring-slate-400/30", gray: "ring-gray-400/30",
+  zinc: "ring-zinc-400/30 dark:ring-zinc-500/30", neutral: "ring-neutral-400/30",
+  stone: "ring-stone-400/30",
   red: "ring-red-500/30", orange: "ring-orange-500/30", amber: "ring-amber-500/30",
   yellow: "ring-yellow-500/30", lime: "ring-lime-500/30", green: "ring-green-500/30",
   emerald: "ring-emerald-500/30", teal: "ring-teal-500/30", cyan: "ring-cyan-500/30",
   sky: "ring-sky-500/30", blue: "ring-blue-500/30", indigo: "ring-indigo-500/30",
   violet: "ring-violet-500/30", purple: "ring-purple-500/30", fuchsia: "ring-fuchsia-500/30",
-  pink: "ring-pink-500/30", rose: "ring-rose-500/30", zinc: "ring-zinc-400/30 dark:ring-zinc-500/30",
+  pink: "ring-pink-500/30", rose: "ring-rose-500/30",
 };
 
 function Dot({ icon, emoji, color, active }: Pick<TimelineItemProps, "icon" | "emoji" | "color" | "active">) {
