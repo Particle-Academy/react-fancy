@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "../Action";
+import { Button } from "../Button";
 import { Badge } from "../Badge";
 import { Textarea } from "../inputs/Textarea/Textarea";
 

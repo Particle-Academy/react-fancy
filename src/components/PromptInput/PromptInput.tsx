@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Button } from "../Action";
+import { Button } from "../Button";
 import { Tooltip } from "../Tooltip";
 
 /**

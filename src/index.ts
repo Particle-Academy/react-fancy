@@ -1,8 +1,8 @@
 // Components
 // `Button` is the canonical name; `Action` is the original name, kept as a
 // deprecated alias for backward compatibility (removed in a future major).
-export { Button, Action } from "./components/Action";
-export type { ButtonProps, ActionProps } from "./components/Action";
+export { Button, Action } from "./components/Button";
+export type { ButtonProps, ActionProps } from "./components/Button";
 
 export {
   AccordionPanel,

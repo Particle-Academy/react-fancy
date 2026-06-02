@@ -3,7 +3,7 @@ import { cn } from "../../utils/cn";
 import { sanitizeHref } from "../../utils/sanitize";
 import { resolve } from "../../data/emoji-utils";
 import { Icon } from "../Icon/Icon";
-import type { ButtonProps } from "./Action.types";
+import type { ButtonProps } from "./Button.types";
 import type { ButtonColor, Size } from "../../utils/types";
 
 const iconSizeMap: Record<Size, "xs" | "sm" | "md" | "lg" | "xl"> = {

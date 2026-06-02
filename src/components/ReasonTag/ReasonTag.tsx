@@ -1,5 +1,5 @@
 import { Popover } from "../Popover";
-import { Button } from "../Action";
+import { Button } from "../Button";
 
 /**
  * ReasonTag — wraps any value with a small affordance that reveals the
