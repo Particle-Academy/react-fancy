@@ -57,7 +57,7 @@ Add the `@source` directive to your main CSS file so Tailwind v4 scans the compo
 Then import and use components:
 
 ```tsx
-import { Action, Input, Modal, Dropdown } from "@particle-academy/react-fancy";
+import { Button, Input, Modal, Dropdown } from "@particle-academy/react-fancy";
 import "@particle-academy/react-fancy/styles.css";
 ```
 
@@ -82,7 +82,8 @@ npx vite build                      # Build demo app (verifies imports work)
 
 | Component | Description | Docs |
 |-----------|-------------|------|
-| Action | Button with colors, states, icons, emoji, avatar, badge, sort control | [docs](docs/Action.md) |
+| Button | Button with colors, states, icons, emoji, avatar, badge, sort control | [docs](docs/Button.md) |
+| ~~Action~~ | Deprecated alias of `Button` (kept for backward compatibility) | [docs](docs/Action.md) |
 | Carousel | Slide carousel with directional/wizard variants, autoplay, loop | [docs](docs/Carousel.md) |
 | ColorPicker | Native color input with swatch preview, hex display, presets | [docs](docs/ColorPicker.md) |
 | Emoji | Emoji renderer from slugs | [docs](docs/Emoji.md) |
@@ -240,7 +241,7 @@ src/
 
 - `Size` — `"xs" | "sm" | "md" | "lg" | "xl"`
 - `Color` — Full Tailwind color palette (17 colors)
-- `ActionColor` — Subset of 10 standalone colors used by Action and friends
+- `ButtonColor` — Subset of 10 standalone colors used by `Button` and friends (legacy alias: `ActionColor`)
 - `Variant` — `"solid" | "outline" | "ghost" | "soft"`
 - `Placement` — `"top" | "bottom" | "left" | "right"` + start/end variants
 

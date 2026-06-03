@@ -1,29 +1,22 @@
-# Action (deprecated alias of [Button](./Button.md))
-
-> ⚠️ **Deprecated.** `Action` has been renamed to **`Button`**. It remains an
-> alias for backward compatibility and will be removed in a future major
-> version. The two are the exact same component — migrate at your own pace:
->
-> ```diff
-> - import { Action } from "@particle-academy/react-fancy";
-> + import { Button } from "@particle-academy/react-fancy";
-> ```
->
-> `ActionProps` → `ButtonProps`, `ActionColor` → `ButtonColor` (also deprecated
-> aliases). Full, current documentation lives in **[Button](./Button.md)**.
+# Button
 
 A versatile button component with support for icons, emojis, avatars, badges, loading states, and color variants.
+
+> **Naming:** `Button` is the canonical name. It was originally shipped as
+> `Action`, which remains available as a **deprecated alias** for backward
+> compatibility and will be removed in a future major version. New code should
+> import `Button`. See [Action](./Action.md).
 
 ## Import
 
 ```tsx
-import { Action } from "@particle-academy/react-fancy"; // deprecated — prefer Button
+import { Button } from "@particle-academy/react-fancy";
 ```
 
 ## Basic Usage
 
 ```tsx
-<Action>Click me</Action> // identical to <Button>Click me</Button>
+<Button>Click me</Button>
 ```
 
 ## Props
@@ -31,7 +24,7 @@ import { Action } from "@particle-academy/react-fancy"; // deprecated — prefer
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | variant | `"default" \| "circle" \| "ghost"` | `"default"` | Shape/fill variant. `"ghost"` is transparent with subtle hover. |
-| color | `ActionColor` | - | Standalone color (overrides state colors). One of: `"blue"`, `"emerald"`, `"amber"`, `"red"`, `"violet"`, `"indigo"`, `"sky"`, `"rose"`, `"orange"`, `"zinc"` |
+| color | `ButtonColor` (= `Color`) | - | Standalone color (overrides state colors) — the full Tailwind v4 palette — 5 grays (`slate`, `gray`, `zinc`, `neutral`, `stone`) + every hue (`red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, `rose`). |
 | size | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"md"` | Button size |
 | active | `boolean` | - | Active state (blue highlight) |
 | checked | `boolean` | - | Checked state (emerald highlight) |
@@ -55,41 +48,44 @@ import { Action } from "@particle-academy/react-fancy"; // deprecated — prefer
 
 Also extends all native `<button>` HTML attributes (except `color`).
 
+`ButtonProps` is the prop type; `ButtonColor` is the color-name union. The legacy
+`ActionProps` / `ActionColor` names remain as deprecated aliases.
+
 ## Examples
 
 ### Icon button with color
 
 ```tsx
-<Action icon="pencil" color="blue" size="lg">
+<Button icon="pencil" color="blue" size="lg">
   Edit
-</Action>
+</Button>
 ```
 
 ### Circle icon button
 
 ```tsx
-<Action variant="circle" icon="plus" color="emerald" />
+<Button variant="circle" icon="plus" color="emerald" />
 ```
 
 ### Loading state with badge
 
 ```tsx
-<Action loading badge="3" badgeTrailing>
+<Button loading badge="3" badgeTrailing>
   Messages
-</Action>
+</Button>
 ```
 
 ### Link button with trailing icon
 
 ```tsx
-<Action href="/docs" iconTrailing="arrow-right">
+<Button href="/docs" iconTrailing="arrow-right">
   Read docs
-</Action>
+</Button>
 ```
 
 ### Ghost variant
 
 ```tsx
-<Action variant="ghost" color="red" icon="trash-2">Delete</Action>
-<Action variant="ghost" icon="download">Export</Action>
+<Button variant="ghost" color="red" icon="trash-2">Delete</Button>
+<Button variant="ghost" icon="download">Export</Button>
 ```

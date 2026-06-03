@@ -1,5 +1,5 @@
 import { Popover } from "../Popover";
-import { Action } from "../Action";
+import { Button } from "../Button";
 
 /**
  * ReasonTag — wraps any value with a small affordance that reveals the
@@ -172,9 +172,9 @@ export function ReasonTag({
           )}
           {onFollowUp && (
             <div className="flex justify-end pt-1">
-              <Action size="sm" variant="ghost" onClick={onFollowUp}>
+              <Button size="sm" variant="ghost" onClick={onFollowUp}>
                 ask follow-up
-              </Action>
+              </Button>
             </div>
           )}
         </div>

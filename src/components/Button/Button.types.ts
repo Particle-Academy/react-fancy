@@ -1,12 +1,12 @@
 import type { ButtonHTMLAttributes } from "react";
-import type { ActionColor, Size } from "../../utils/types";
+import type { ButtonColor, Size } from "../../utils/types";
 
-export interface ActionProps
+export interface ButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "color"> {
   /** Shape/fill variant */
   variant?: "default" | "circle" | "ghost";
   /** Standalone color (overrides state colors) */
-  color?: ActionColor;
+  color?: ButtonColor;
   size?: Size;
   /** Behavioral states */
   active?: boolean;
@@ -46,3 +46,9 @@ export interface ActionProps
   /** Render as anchor tag */
   href?: string;
 }
+
+/**
+ * @deprecated Renamed to {@link ButtonProps}. `ActionProps` remains as an alias
+ * for backward compatibility and will be removed in a future major version.
+ */
+export type ActionProps = ButtonProps;

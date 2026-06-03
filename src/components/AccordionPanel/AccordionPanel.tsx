@@ -13,10 +13,10 @@ import type { AccordionPanelProps } from "./AccordionPanel.types";
  * Use the compound parts:
  *   <AccordionPanel orientation="horizontal" defaultValue={["wishlist"]}>
  *     <AccordionPanel.Section id="home" pinned>
- *       <Action icon="home" />
+ *       <Button icon="home" />
  *     </AccordionPanel.Section>
  *     <AccordionPanel.Section id="wishlist">
- *       <Action icon="list">Wishlist</Action>
+ *       <Button icon="list">Wishlist</Button>
  *     </AccordionPanel.Section>
  *   </AccordionPanel>
  *

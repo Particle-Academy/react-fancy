@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Action } from "../Action";
+import { Button } from "../Button";
 import { Badge } from "../Badge";
 import { Textarea } from "../inputs/Textarea/Textarea";
 
@@ -187,7 +187,7 @@ function Wand({
           )}
         </span>
         {actions.map((a) => (
-          <Action
+          <Button
             key={a.id}
             size="sm"
             variant="ghost"
@@ -201,7 +201,7 @@ function Wand({
                 {a.tag}
               </span>
             )}
-          </Action>
+          </Button>
         ))}
       </div>
       <div className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-px">

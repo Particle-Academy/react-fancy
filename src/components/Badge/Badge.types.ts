@@ -1,8 +1,9 @@
 import type { HTMLAttributes } from "react";
+import type { Color } from "../../utils/types";
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  /** Badge color */
-  color?: "zinc" | "red" | "blue" | "green" | "amber" | "violet" | "rose";
+  /** Badge color — any color in the Tailwind v4 palette. */
+  color?: Color;
   /** Visual variant */
   variant?: "solid" | "outline" | "soft";
   /** Badge size */
