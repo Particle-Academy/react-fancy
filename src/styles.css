@@ -25,57 +25,103 @@
 }
 
 /* Dark-mode input refinements — slightly darker bg for contrast against page */
-.dark [data-react-fancy-input] input,
-.dark [data-react-fancy-textarea],
-.dark [data-react-fancy-select],
-.dark [data-react-fancy-date-picker],
-.dark [data-react-fancy-autocomplete] input,
-.dark [data-react-fancy-pillbox],
-.dark [data-react-fancy-otp-input] input,
-.dark [data-react-fancy-time-picker] input {
+/* ─── Inherent dark-mode defaults ────────────────────────────────────────────
+   Every rule below is wrapped in :where() so it carries ZERO specificity, which
+   buys two properties at once:
+     1. Inherent — a sensible dark appearance ships out of the box, even when the
+        consumer's Tailwind build doesn't generate react-fancy's `dark:` utility
+        classes (e.g. they didn't @source the package). This is what lets the
+        overlays (Dropdown, Menu, Popover, …) go dark on their own.
+     2. Override-friendly — because specificity is 0, ANY consumer override wins:
+        a plain `dark:bg-…` utility, a custom class, or the component's own
+        `dark:` class (when it IS generated) all take precedence — no !important,
+        no need to target the data-attribute.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* Inputs / selects / textareas — darker bg for contrast against the page */
+:where(.dark [data-react-fancy-input] input),
+:where(.dark [data-react-fancy-textarea]),
+:where(.dark [data-react-fancy-select]),
+:where(.dark [data-react-fancy-date-picker]),
+:where(.dark [data-react-fancy-autocomplete] input),
+:where(.dark [data-react-fancy-pillbox]),
+:where(.dark [data-react-fancy-otp-input] input),
+:where(.dark [data-react-fancy-time-picker] input) {
   background-color: #1e1e24;
   border-color: #3f3f46;
 }
 
-/* Dark-mode focus ring — brighter border + subtle glow */
-.dark [data-react-fancy-input] input:focus,
-.dark [data-react-fancy-textarea]:focus,
-.dark [data-react-fancy-select]:focus,
-.dark [data-react-fancy-date-picker]:focus,
-.dark [data-react-fancy-autocomplete] input:focus,
-.dark [data-react-fancy-otp-input] input:focus,
-.dark [data-react-fancy-time-picker] input:focus {
+/* Focus ring — brighter border + subtle glow */
+:where(.dark [data-react-fancy-input] input:focus),
+:where(.dark [data-react-fancy-textarea]:focus),
+:where(.dark [data-react-fancy-select]:focus),
+:where(.dark [data-react-fancy-date-picker]:focus),
+:where(.dark [data-react-fancy-autocomplete] input:focus),
+:where(.dark [data-react-fancy-otp-input] input:focus),
+:where(.dark [data-react-fancy-time-picker] input:focus) {
   border-color: #60a5fa;
   box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
 }
 
-/* Dark-mode labels — brighter for readability */
-.dark [data-react-fancy-field] > label:first-child {
+/* Field labels — brighter for readability */
+:where(.dark [data-react-fancy-field] > label:first-child) {
   color: #f4f4f5;
 }
 
-/* Dark-mode checkbox & radio refinements */
-.dark [data-react-fancy-checkbox] input,
-.dark [data-react-fancy-radio-group] input {
+/* Checkbox & radio */
+:where(.dark [data-react-fancy-checkbox] input),
+:where(.dark [data-react-fancy-radio-group] input) {
   background-color: #1e1e24;
   border-color: #3f3f46;
 }
 
-/* Dark-mode switch unchecked track */
-.dark [data-react-fancy-switch] button[aria-checked="false"] {
+/* Switch unchecked track */
+:where(.dark [data-react-fancy-switch] button[aria-checked="false"]) {
   background-color: #3f3f46;
 }
 
-/* Dark-mode input wrapper affixes */
-.dark [data-react-fancy-input-wrapper] > span:first-child,
-.dark [data-react-fancy-input-wrapper] > span:last-child {
+/* Input wrapper affixes */
+:where(.dark [data-react-fancy-input-wrapper] > span:first-child),
+:where(.dark [data-react-fancy-input-wrapper] > span:last-child) {
   border-color: #3f3f46;
   background-color: #27272a;
 }
 
-/* Dark-mode date picker icon (calendar, clock) */
-.dark [data-react-fancy-date-picker]::-webkit-calendar-picker-indicator {
+/* Date picker icon (calendar, clock) */
+:where(.dark [data-react-fancy-date-picker]::-webkit-calendar-picker-indicator) {
   filter: invert(0.8);
+}
+
+/* ─── Overlays — inherent dark surfaces ──────────────────────────────────────
+   Dropdown / Menu / Popover / ContextMenu / MobileMenu flyout / Modal / Toast.
+   Mirrors the components' own `dark:` utilities (zinc-900 surface, zinc-700
+   border, zinc-300 text) so overlays render correctly in dark mode WITHOUT the
+   consumer @sourcing react-fancy. When those utilities ARE generated they win
+   (specificity 0 here), so there's no drift or double-styling. */
+:where(.dark [data-react-fancy-dropdown]),
+:where(.dark [data-react-fancy-menu]),
+:where(.dark [data-react-fancy-popover]),
+:where(.dark [data-react-fancy-context-menu]),
+:where(.dark [data-react-fancy-context-menu-sub-content]),
+:where(.dark [data-react-fancy-mobile-menu-flyout]),
+:where(.dark [data-react-fancy-modal]),
+:where(.dark [data-react-fancy-toast-item]) {
+  background-color: #18181b; /* zinc-900 */
+  border-color: #3f3f46; /* zinc-700 */
+  color: #d4d4d8; /* zinc-300 */
+}
+
+/* Overlay item hover states */
+:where(.dark [data-react-fancy-dropdown-item]:hover),
+:where(.dark [data-react-fancy-menu-item]:hover),
+:where(.dark [data-react-fancy-context-menu-item]:hover) {
+  background-color: #27272a; /* zinc-800 */
+}
+
+/* Overlay separators */
+:where(.dark [data-react-fancy-dropdown-separator]),
+:where(.dark [data-react-fancy-context-menu-separator]) {
+  background-color: #3f3f46; /* zinc-700 */
 }
 
 @keyframes fancy-fade-in {
