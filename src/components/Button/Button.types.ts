@@ -45,6 +45,16 @@ export interface ButtonProps
   disabled?: boolean;
   /** Render as anchor tag */
   href?: string;
+  /**
+   * Collapse to icon-only when squeezed — injects the minimal Tailwind classes
+   * (`sr-only sm:not-sr-only`) onto the label so it stays screen-reader
+   * accessible but visually hidden on small screens. The label is also directly
+   * targetable via `data-react-fancy-button-label` for a custom breakpoint, e.g.
+   * `className="[&_[data-react-fancy-button-label]]:hidden md:[&_[data-react-fancy-button-label]]:inline"`.
+   */
+  responsive?: boolean;
+  /** Extra classes for the label wrapper — alignment, responsive hiding, etc. */
+  labelClassName?: string;
 }
 
 /**
