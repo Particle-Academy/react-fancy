@@ -248,6 +248,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       loading = false,
       disabled,
       href,
+      responsive,
+      labelClassName,
       ...props
     },
     ref,
@@ -386,7 +388,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // Classes
     // -----------------------------------------------------------------------
     const classes = cn(
-      "inline-flex items-center justify-center font-medium transition-all duration-200",
+      // `text-left` overrides the UA <button> center default so a wrapped,
+      // width-constrained multi-word label stacks left-aligned. Overridable —
+      // twMerge lets a `text-center` / `text-right` in `className` win.
+      "inline-flex items-center justify-center text-left font-medium transition-all duration-200",
       "focus:outline-none focus:ring-2 focus:ring-offset-1",
       "disabled:opacity-50 disabled:cursor-not-allowed",
       isCircle ? "rounded-full" : "rounded-lg",
@@ -418,7 +423,22 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ) : (
       <>
         {leadingElements}
-        {children != null && <span>{children}</span>}
+        {children != null && (
+          <span
+            data-react-fancy-button-label=""
+            className={cn(
+              // min-w-0 lets the label shrink + wrap inside the flex row instead
+              // of overflowing and shoving the icon out of place.
+              "min-w-0",
+              // `responsive` collapses to icon-only when squeezed, while keeping
+              // the label readable to screen readers.
+              responsive && "sr-only sm:not-sr-only",
+              labelClassName,
+            )}
+          >
+            {children}
+          </span>
+        )}
         {trailingElements}
       </>
     );
