@@ -427,9 +427,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           <span
             data-react-fancy-button-label=""
             className={cn(
-              // min-w-0 lets the label shrink + wrap inside the flex row instead
-              // of overflowing and shoving the icon out of place.
-              "min-w-0",
+              // A button label must stay on one line. When a host flex layout
+              // squeezes the button, `whitespace-nowrap` keeps the label and any
+              // trailing icon/arrow together instead of wrapping and stacking the
+              // icon below it (the classic "send" over "→" break). `min-w-0` keeps
+              // the span shrinkable so `truncate`/ellipsis still works; multi-line
+              // wrapping is opt-in via `labelClassName` ("whitespace-normal") or
+              // the `responsive` prop.
+              "min-w-0 whitespace-nowrap",
               // `responsive` collapses to icon-only when squeezed, while keeping
               // the label readable to screen readers.
               responsive && "sr-only sm:not-sr-only",

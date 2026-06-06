@@ -353,6 +353,7 @@ export function PromptInput({
           <Button
             variant="ghost"
             size="sm"
+            className="shrink-0"
             onClick={() => {
               /* host can wire its own file picker; default no-op */
             }}
@@ -360,8 +361,8 @@ export function PromptInput({
             📎 attach
           </Button>
         </Tooltip>
-        <div className="ml-2 flex items-center gap-1.5">
-          <div className="h-1.5 w-24 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
+        <div className="ml-2 flex min-w-0 items-center gap-1.5 overflow-hidden">
+          <div className="h-1.5 w-24 shrink overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
             <div
               className="h-full rounded-full transition-all"
               style={{ width: `${ratio * 100}%`, backgroundColor: meterColor }}
@@ -371,7 +372,7 @@ export function PromptInput({
             {fmtTokens(tokens)} / {fmtTokens(budgetTokens)}
           </span>
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           {showHint && (
             <span className="hidden text-[10px] text-zinc-500 sm:inline">
               <kbd className="rounded border border-zinc-300 bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
@@ -384,7 +385,7 @@ export function PromptInput({
               to send
             </span>
           )}
-          <Button color="violet" size="sm" onClick={submit}>
+          <Button color="violet" size="sm" className="shrink-0" onClick={submit}>
             send →
           </Button>
         </div>

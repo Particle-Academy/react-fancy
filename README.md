@@ -1,5 +1,7 @@
 # @particle-academy/react-fancy
 
+[![Fancified](art/fancified.svg)](https://particle.academy)
+
 React UI component library for **Human+ UX** — controlled, agent-bridgeable primitives that humans and agents share. Every component exposes `value` / `onChange`, stable handles, and JSON-friendly props so MCP bridges can drive the UI without DOM scraping.
 
 ## Inertia.js integration
