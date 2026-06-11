@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, TdHTMLAttributes } from "react";
 
 export interface TableColumn<T = any> {
   key: string;
@@ -50,9 +50,13 @@ export interface TableRowTrayProps {
   className?: string;
 }
 
-export interface TableCellProps {
-  children: ReactNode;
-  className?: string;
+/**
+ * Extends the native cell attributes so `colSpan`/`rowSpan` (full-span
+ * empty-state rows, trays) plus `onClick`, `style`, `scope`, `data-*`, etc. are
+ * forwarded onto the underlying `<td>`/`<th>` instead of silently dropped.
+ */
+export interface TableCellProps extends TdHTMLAttributes<HTMLTableCellElement> {
+  /** Render a `<th>` header cell instead of a `<td>`. */
   header?: boolean;
 }
 

@@ -1,7 +1,7 @@
 import { cn } from "../../utils/cn";
 import type { TableCellProps } from "./Table.types";
 
-export function TableCell({ children, className, header }: TableCellProps) {
+export function TableCell({ children, className, header, ...rest }: TableCellProps) {
   const Tag = header ? "th" : "td";
   return (
     <Tag
@@ -11,6 +11,7 @@ export function TableCell({ children, className, header }: TableCellProps) {
         header && "text-left font-medium text-zinc-500 dark:text-zinc-400",
         className,
       )}
+      {...rest}
     >
       {children}
     </Tag>
