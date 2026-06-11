@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 export type TabsVariant = "underline" | "pills" | "boxed";
 
@@ -22,7 +22,7 @@ export interface TabsListProps {
   className?: string;
 }
 
-export interface TabsTabProps {
+export interface TabsTabProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value"> {
   children: ReactNode;
   value: string;
   disabled?: boolean;

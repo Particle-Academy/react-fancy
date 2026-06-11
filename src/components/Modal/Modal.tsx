@@ -24,6 +24,7 @@ function ModalRoot({
   onClose,
   size = "md",
   className,
+  ...rest
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -72,6 +73,7 @@ function ModalRoot({
             data-react-fancy-modal=""
             role="dialog"
             aria-modal="true"
+            {...rest}
             className={cn(
               "relative flex w-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-zinc-900",
               SIZE_MAP[size],

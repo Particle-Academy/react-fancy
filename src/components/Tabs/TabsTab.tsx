@@ -7,6 +7,8 @@ export function TabsTab({
   value,
   disabled = false,
   className,
+  onClick,
+  ...rest
 }: TabsTabProps) {
   const { activeTab, setActiveTab, variant } = useTabs();
   const isActive = activeTab === value;
@@ -19,7 +21,8 @@ export function TabsTab({
       disabled={disabled}
       aria-selected={isActive}
       tabIndex={isActive ? 0 : -1}
-      onClick={() => !disabled && setActiveTab(value)}
+      onClick={(e) => { if (!disabled) setActiveTab(value); onClick?.(e); }}
+      {...rest}
       className={cn(
         "text-sm font-medium transition-colors",
         disabled && "cursor-not-allowed opacity-50",

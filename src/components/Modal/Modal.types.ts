@@ -1,11 +1,11 @@
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
 export interface ModalContextValue {
   open: boolean;
   close: () => void;
 }
 
-export interface ModalProps {
+export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   children: ReactNode;
   open: boolean;
   onClose: () => void;
