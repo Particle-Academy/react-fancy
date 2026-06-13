@@ -15,20 +15,25 @@ interface InputWrapperProps {
   insideSuffixPadding?: string;
 }
 
+// NOTE: these must be COMPLETE, static class strings. Tailwind only detects
+// utilities it can see verbatim in the source — building the arbitrary variant
+// at runtime (e.g. `[&_input]:${"pl-9"}`) means `[&_input]:pl-9` is never
+// emitted to CSS, so the inside affix gets no padding and overlaps the text
+// (issue #6). Keep input/select/textarea spelled out here.
 const insidePaddingLeft: Record<Size, string> = {
-  xs: "pl-7",
-  sm: "pl-8",
-  md: "pl-9",
-  lg: "pl-10",
-  xl: "pl-11",
+  xs: "[&_input]:pl-7 [&_select]:pl-7 [&_textarea]:pl-7",
+  sm: "[&_input]:pl-8 [&_select]:pl-8 [&_textarea]:pl-8",
+  md: "[&_input]:pl-9 [&_select]:pl-9 [&_textarea]:pl-9",
+  lg: "[&_input]:pl-10 [&_select]:pl-10 [&_textarea]:pl-10",
+  xl: "[&_input]:pl-11 [&_select]:pl-11 [&_textarea]:pl-11",
 };
 
 const insidePaddingRight: Record<Size, string> = {
-  xs: "pr-7",
-  sm: "pr-8",
-  md: "pr-9",
-  lg: "pr-10",
-  xl: "pr-11",
+  xs: "[&_input]:pr-7 [&_select]:pr-7 [&_textarea]:pr-7",
+  sm: "[&_input]:pr-8 [&_select]:pr-8 [&_textarea]:pr-8",
+  md: "[&_input]:pr-9 [&_select]:pr-9 [&_textarea]:pr-9",
+  lg: "[&_input]:pr-10 [&_select]:pr-10 [&_textarea]:pr-10",
+  xl: "[&_input]:pr-11 [&_select]:pr-11 [&_textarea]:pr-11",
 };
 
 const affixOutsideClasses =
@@ -77,7 +82,7 @@ export function InputWrapper({
               hasOutsidePrefix && !hasOutsideSuffix && "[&_input]:rounded-l-none [&_select]:rounded-l-none [&_textarea]:rounded-l-none",
               !hasOutsidePrefix && hasOutsideSuffix && "[&_input]:rounded-r-none [&_select]:rounded-r-none [&_textarea]:rounded-r-none",
               hasOutsidePrefix && hasOutsideSuffix && "[&_input]:rounded-none [&_select]:rounded-none [&_textarea]:rounded-none",
-              hasInsidePrefix && `[&_input]:${insidePaddingLeft[size]} [&_select]:${insidePaddingLeft[size]} [&_textarea]:${insidePaddingLeft[size]}`,
+              hasInsidePrefix && insidePaddingLeft[size],
             )}
           >
             {children}
@@ -108,8 +113,8 @@ export function InputWrapper({
       <div
         className={cn(
           "w-full",
-          hasInsidePrefix && `[&_input]:${insidePaddingLeft[size]} [&_select]:${insidePaddingLeft[size]} [&_textarea]:${insidePaddingLeft[size]}`,
-          hasInsideSuffix && `[&_input]:${insidePaddingRight[size]} [&_select]:${insidePaddingRight[size]} [&_textarea]:${insidePaddingRight[size]}`,
+          hasInsidePrefix && insidePaddingLeft[size],
+          hasInsideSuffix && insidePaddingRight[size],
         )}
       >
         {children}
