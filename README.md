@@ -303,3 +303,9 @@ Purely visual primitives (labels, dividers, layout shells) only owe the first bu
 - `react`, `react-dom`, and `lucide-react` are external dependencies, never bundled.
 - After any change, verify with `pnpm --filter @particle-academy/react-fancy build` before considering the work done.
 - When updating a component, update its demo page in `resources/js/react-demos/pages/` to cover all new features.
+
+---
+
+## ⭐ Star Fancy UI
+
+If this package is useful to you, a quick ⭐ on the repo really helps us build a better kit. Thank you!
