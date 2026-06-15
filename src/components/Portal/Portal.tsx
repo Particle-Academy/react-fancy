@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 export interface PortalProps {
   children: ReactNode;
@@ -7,7 +7,18 @@ export interface PortalProps {
 }
 
 export function Portal({ children, container }: PortalProps) {
-  if (typeof document === "undefined") return null;
+  // Render nothing on the server AND on the client's first (hydration) render,
+  // then portal after mount. Without the `mounted` gate the client would render
+  // the portal immediately while the server rendered null — a hydration
+  // mismatch (the portal wrapper appears client-only). Deferring to after mount
+  // keeps the first client render identical to the server. SSR-safe for every
+  // Portal consumer (Toast, Modal, Dropdown, Tooltip, Popover, …).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || typeof document === "undefined") return null;
 
   const target = container ?? document.body;
 
