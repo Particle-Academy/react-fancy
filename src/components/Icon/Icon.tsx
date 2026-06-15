@@ -1,6 +1,6 @@
-import { forwardRef } from "react";
+import { forwardRef, useSyncExternalStore } from "react";
 import { cn } from "../../utils/cn";
-import { resolveIcon } from "./icon-config";
+import { resolveIcon, subscribeIconResolution, getIconResolutionVersion } from "./icon-config";
 import type { IconProps } from "./Icon.types";
 
 const sizeClasses: Record<NonNullable<IconProps["size"]>, string> = {
@@ -21,6 +21,15 @@ const sizePixels: Record<NonNullable<IconProps["size"]>, number> = {
 
 export const Icon = forwardRef<HTMLSpanElement, IconProps>(
   ({ size = "md", className, children, name, iconSet, ...props }, ref) => {
+    // Re-render when the lazy lucide barrel lands, so `<Icon name>` auto-resolved
+    // from lucide appears once loaded. Registered icons resolve synchronously and
+    // never trigger the lazy load. SSR snapshot is the same getter (version 0).
+    useSyncExternalStore(
+      subscribeIconResolution,
+      getIconResolutionVersion,
+      getIconResolutionVersion,
+    );
+
     let content = children;
 
     if (name && !children) {

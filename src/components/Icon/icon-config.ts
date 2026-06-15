@@ -1,5 +1,4 @@
 import type { ComponentType } from "react";
-import * as LucideIcons from "lucide-react";
 import type { IconSet } from "./icon-config.types";
 
 type IconComponent = ComponentType<{ className?: string; size?: number }>;
@@ -15,13 +14,59 @@ function kebabToPascal(str: string): string {
 }
 
 /**
+ * Lazy lucide barrel. The auto-fallback (`<Icon name="…" />` resolving ANY
+ * lucide icon by kebab name) needs the whole namespace because names are
+ * dynamic — un-tree-shakeable. Importing it eagerly forced all ~5400 icons
+ * into react-fancy's main bundle for every consumer (~548KB). Instead we
+ * dynamic-import it on first auto-resolve, so the barrel becomes a lazy chunk
+ * loaded ONLY by apps that actually use `<Icon name>` with an unregistered
+ * icon — never on the critical path. Consumers wanting sync resolution +
+ * tree-shaking should `registerIcons({ ...named imports })` (those win and
+ * never trigger the lazy load).
+ */
+let lucideModule: Record<string, IconComponent | undefined> | null = null;
+let lucidePromise: Promise<unknown> | null = null;
+let lucideVersion = 0;
+const lucideListeners = new Set<() => void>();
+
+function ensureLucideLoaded(): void {
+  if (lucideModule || lucidePromise) return;
+  lucidePromise = import("lucide-react")
+    .then((mod) => {
+      lucideModule = mod as unknown as Record<string, IconComponent | undefined>;
+      lucideVersion++;
+      for (const listener of lucideListeners) listener();
+    })
+    .catch(() => {
+      // Leave lucidePromise set so we don't hammer a failed import.
+    });
+}
+
+/** Subscribe to the lazy lucide load so `<Icon>` can re-render once it lands. */
+export function subscribeIconResolution(listener: () => void): () => void {
+  lucideListeners.add(listener);
+  return () => lucideListeners.delete(listener);
+}
+
+/** Snapshot for useSyncExternalStore — bumps when the lucide barrel loads. */
+export function getIconResolutionVersion(): number {
+  return lucideVersion;
+}
+
+/**
  * Fallback resolver: look up any lucide-react icon by its kebab-case name
- * without requiring the consumer to call `registerIcons()` first. Overrides
- * registered via `registerIcons()` still win.
+ * without requiring the consumer to call `registerIcons()` first. Returns null
+ * until the lazy barrel has loaded (the first call kicks off the import; `<Icon>`
+ * re-renders via `subscribeIconResolution` when it's ready). Overrides
+ * registered via `registerIcons()` still win and resolve synchronously.
  */
 function resolveFromLucide(name: string): IconComponent | null {
+  if (!lucideModule) {
+    ensureLucideLoaded();
+    return null;
+  }
   const pascal = kebabToPascal(name);
-  const icon = (LucideIcons as unknown as Record<string, IconComponent | undefined>)[pascal];
+  const icon = lucideModule[pascal];
   return typeof icon === "function" || (icon && typeof icon === "object") ? (icon as IconComponent) : null;
 }
 
