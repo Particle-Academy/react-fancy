@@ -117,6 +117,37 @@ export function useFloatingPosition(
     if (enabled) update();
   });
 
+  // …but the per-commit effect ISN'T enough when the floating element mounts
+  // through a <Portal> whose own mount gate (SSR-safe; renders nothing until its
+  // useEffect runs) attaches the node WITHOUT re-rendering this hook's component.
+  // Then no commit happens here, the measurement never runs, and the popover
+  // stays parked at its off-screen sentinel until an unrelated scroll/resize
+  // fires `update()` — the "menu only appears after I scroll" bug. Poll with rAF
+  // until the node is actually in the DOM, measure it, then keep it observed for
+  // size changes (async content / lazily-loaded icons).
+  useEffect(() => {
+    if (!enabled) return;
+    let raf = 0;
+    let ro: ResizeObserver | null = null;
+    const tick = () => {
+      const el = floatingRef.current;
+      if (el) {
+        update();
+        if (typeof ResizeObserver !== "undefined") {
+          ro = new ResizeObserver(() => update());
+          ro.observe(el);
+        }
+      } else {
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      ro?.disconnect();
+    };
+  }, [enabled, update, floatingRef]);
+
   // Park off-screen when closed so the next open re-measures from scratch.
   useEffect(() => {
     if (!enabled) {
