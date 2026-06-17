@@ -2,6 +2,8 @@ import { useId } from "react";
 import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { Field } from "../Field";
+import { useFieldMode } from "../mode/FieldMode.context";
+import { DisplayValue } from "../mode/DisplayValue";
 import { dirtyRingClasses, resolveOption } from "../inputs.utils";
 import type { CheckboxGroupProps } from "./CheckboxGroup.types";
 
@@ -20,8 +22,10 @@ export function CheckboxGroup<V = string>({
   defaultValue = [],
   onValueChange,
   orientation = "vertical",
+  mode,
 }: CheckboxGroupProps<V>) {
   const groupId = useId();
+  const resolvedMode = useFieldMode(mode);
   const [value, setValue] = useControllableState(
     controlledValue,
     defaultValue,
@@ -43,7 +47,15 @@ export function CheckboxGroup<V = string>({
     xl: "h-6 w-6",
   }[size];
 
-  const content = (
+  const content = resolvedMode === "view" ? (
+    <DisplayValue size={size}>
+      {list
+        .map(resolveOption)
+        .filter((o) => value.includes(o.value))
+        .map((o) => o.label)
+        .join(", ")}
+    </DisplayValue>
+  ) : (
     <div
       data-react-fancy-checkbox-group=""
       className={cn(

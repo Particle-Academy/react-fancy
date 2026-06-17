@@ -8,6 +8,8 @@ import {
   inputBaseClasses,
   inputSizeClasses,
 } from "../inputs.utils";
+import { useFieldMode } from "../mode/FieldMode.context";
+import { DisplayValue } from "../mode/DisplayValue";
 import type { TextareaProps } from "./Textarea.types";
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -29,6 +31,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       suffix,
       prefixPosition: _prefixPosition,
       suffixPosition: _suffixPosition,
+      mode,
       onValueChange,
       onChange,
       value,
@@ -40,6 +43,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const autoId = useId();
     const textareaId = id ?? autoId;
     const internalRef = useRef<HTMLTextAreaElement | null>(null);
+    const resolvedMode = useFieldMode(mode);
 
     useEffect(() => {
       const el = internalRef.current;
@@ -51,7 +55,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       el.style.height = `${Math.min(Math.max(el.scrollHeight, minHeight), maxHeight)}px`;
     }, [autoResize, minRows, maxRows, value, defaultValue]);
 
-    const textarea = (
+    const textarea = resolvedMode === "view" ? (
+      <DisplayValue size={size} className="whitespace-pre-wrap">
+        {(value ?? defaultValue) as string | undefined}
+      </DisplayValue>
+    ) : (
       <InputWrapper
         prefix={prefix}
         suffix={suffix}

@@ -2,6 +2,8 @@ import { forwardRef, useId } from "react";
 import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { Field } from "../Field";
+import { useFieldMode } from "../mode/FieldMode.context";
+import { DisplayValue } from "../mode/DisplayValue";
 import {
   dirtyClasses,
   errorClasses,
@@ -9,6 +11,26 @@ import {
   inputSizeClasses,
 } from "../inputs.utils";
 import type { DatePickerProps } from "./DatePicker.types";
+
+/** Locale-format an ISO date / datetime-local string; fall back to the raw value. */
+function formatDateValue(iso: string, includeTime?: boolean): string {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return includeTime
+    ? date.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : date.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+}
 
 export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
   (props, ref) => {
@@ -89,6 +111,8 @@ const SingleDatePicker = forwardRef<
       name,
       min,
       max,
+      includeTime,
+      mode,
       inputType,
       inputClasses,
       ...rest
@@ -100,13 +124,18 @@ const SingleDatePicker = forwardRef<
       defaultValue?: string;
       onValueChange?: (v: string) => void;
     };
+    const resolvedMode = useFieldMode(mode);
     const [value, setValue] = useControllableState(
       singleProps.value,
       singleProps.defaultValue ?? "",
       singleProps.onValueChange,
     );
 
-    const input = (
+    const input = resolvedMode === "view" ? (
+      <DisplayValue size={size} className={className}>
+        {formatDateValue(value, includeTime)}
+      </DisplayValue>
+    ) : (
       <input
         data-react-fancy-date-picker=""
         ref={ref}
@@ -161,6 +190,8 @@ const RangeDatePicker = forwardRef<
       name,
       min,
       max,
+      includeTime,
+      mode,
       inputType,
       inputClasses,
       ...rest
@@ -172,13 +203,20 @@ const RangeDatePicker = forwardRef<
       defaultValue?: [string, string];
       onValueChange?: (v: [string, string]) => void;
     };
+    const resolvedMode = useFieldMode(mode);
     const [value, setValue] = useControllableState(
       rangeProps.value,
       rangeProps.defaultValue ?? ["", ""] as [string, string],
       rangeProps.onValueChange,
     );
 
-    const input = (
+    const input = resolvedMode === "view" ? (
+      <DisplayValue size={size} className={className}>
+        {value[0] || value[1]
+          ? `${formatDateValue(value[0], includeTime)} – ${formatDateValue(value[1], includeTime)}`
+          : ""}
+      </DisplayValue>
+    ) : (
       <div data-react-fancy-date-picker="" className={cn("flex items-center gap-2", className)}>
         <input
           ref={ref}

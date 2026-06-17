@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useId, useRef } from "react";
 import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
+import { useFieldMode } from "../mode/FieldMode.context";
 import { dirtyRingClasses } from "../inputs.utils";
 import type { CheckboxProps } from "./Checkbox.types";
 
@@ -21,12 +22,14 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       defaultChecked = false,
       onCheckedChange,
       indeterminate,
+      mode,
     },
     ref,
   ) => {
     const autoId = useId();
     const checkboxId = id ?? autoId;
     const internalRef = useRef<HTMLInputElement | null>(null);
+    const resolvedMode = useFieldMode(mode);
     const [checked, setChecked] = useControllableState(
       controlledChecked,
       defaultChecked,
@@ -48,8 +51,23 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       xl: "h-6 w-6",
     }[size];
 
+    const glyph = indeterminate ? "—" : checked ? "✓" : "✕";
+
     return (
       <div data-react-fancy-checkbox="" className={cn("flex items-start gap-2", className)}>
+        {resolvedMode === "view" ? (
+          <span
+            data-react-fancy-display=""
+            data-mode="view"
+            className={cn(
+              "flex shrink-0 items-center justify-center text-zinc-700 dark:text-zinc-200",
+              sizeClasses,
+            )}
+            aria-hidden="true"
+          >
+            {glyph}
+          </span>
+        ) : (
         <div className="relative flex items-center">
           <input
             ref={(node) => {
@@ -75,6 +93,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             )}
           />
         </div>
+        )}
         {(label || description) && (
           <div className="flex flex-col">
             {label && (

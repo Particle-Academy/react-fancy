@@ -2,6 +2,8 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { Field } from "../Field";
+import { useFieldMode } from "../mode/FieldMode.context";
+import { DisplayValue } from "../mode/DisplayValue";
 import { resolveOption } from "../inputs.utils";
 import type { Size } from "../../../utils/types";
 import type { MultiSwitchProps } from "./MultiSwitch.types";
@@ -30,9 +32,11 @@ export function MultiSwitch<V = string>({
   defaultValue,
   onValueChange,
   linear,
+  mode,
 }: MultiSwitchProps<V>) {
   const resolvedOptions = list.map(resolveOption);
   const fallback = defaultValue ?? resolvedOptions[0]?.value;
+  const resolvedMode = useFieldMode(mode);
   const [value, setValue] = useControllableState(controlledValue, fallback as V, onValueChange);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -62,7 +66,11 @@ export function MultiSwitch<V = string>({
     updateIndicator();
   }, [updateIndicator]);
 
-  const control = (
+  const control = resolvedMode === "view" ? (
+    <DisplayValue size={size}>
+      {resolvedOptions.find((o) => o.value === value)?.label}
+    </DisplayValue>
+  ) : (
     <div
       ref={containerRef}
       data-react-fancy-multi-switch=""

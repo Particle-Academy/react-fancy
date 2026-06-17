@@ -280,6 +280,40 @@
   }
 }
 
+/* Avatar glow — a looping halo ring (box-shadow only, no reflow). Color comes
+   from the --fancy-glow custom property set on the element. */
+@keyframes fancy-avatar-glow {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--fancy-glow, #a855f7) 55%, transparent);
+    opacity: 0.9;
+  }
+  70% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--fancy-glow, #a855f7) 0%, transparent);
+    opacity: 0.5;
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--fancy-glow, #a855f7) 0%, transparent);
+    opacity: 0.9;
+  }
+}
+
+.fancy-avatar-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--fancy-glow, #a855f7) 70%, transparent),
+    0 0 10px 0 color-mix(in srgb, var(--fancy-glow, #a855f7) 45%, transparent);
+  animation: fancy-avatar-glow 1.6s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fancy-avatar-glow {
+    animation: none;
+  }
+}
+
 @keyframes fancy-slide-out-right {
   from {
     transform: translateX(0);

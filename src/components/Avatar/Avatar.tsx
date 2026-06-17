@@ -1,6 +1,12 @@
-import { forwardRef } from "react";
+import { forwardRef, type CSSProperties } from "react";
 import { cn } from "../../utils/cn";
 import type { AvatarProps } from "./Avatar.types";
+
+const glowColors = {
+  on: "#a855f7", // violet — neutral
+  xp: "#22c55e", // green
+  achievement: "#f59e0b", // amber
+} as const;
 
 type AvatarSize = NonNullable<AvatarProps["size"]>;
 type AvatarStatus = NonNullable<AvatarProps["status"]>;
@@ -44,10 +50,12 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
       fallback,
       size = "md",
       status,
+      glow,
       className,
     },
     ref,
   ) => {
+    const glowKey = glow === true ? "on" : glow || null;
     return (
       <div
         ref={ref}
@@ -59,6 +67,14 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
           className,
         )}
       >
+        {glowKey && (
+          <span
+            aria-hidden
+            data-react-fancy-avatar-glow={glowKey}
+            className="fancy-avatar-glow"
+            style={{ "--fancy-glow": glowColors[glowKey] } as CSSProperties}
+          />
+        )}
         {src ? (
           <img
             src={src}

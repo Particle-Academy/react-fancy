@@ -2,6 +2,7 @@ import { forwardRef, useCallback } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
+import { useFieldMode } from "../inputs/mode/FieldMode.context";
 import type { TimePickerProps } from "./TimePicker.types";
 
 function pad(n: number): string {
@@ -23,6 +24,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
       minuteStep = 1,
       disabled = false,
       className,
+      mode,
     },
     ref,
   ) {
@@ -31,10 +33,31 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
       defaultValue,
       onChange,
     );
+    const resolvedMode = useFieldMode(mode);
 
     const { hours: h24, minutes } = parseTime(value);
     const isPM = h24 >= 12;
     const displayHour = format === "12h" ? (h24 % 12 || 12) : h24;
+
+    if (resolvedMode === "view") {
+      const formatted =
+        format === "12h"
+          ? `${pad(displayHour)}:${pad(minutes)} ${isPM ? "PM" : "AM"}`
+          : `${pad(displayHour)}:${pad(minutes)}`;
+      return (
+        <div
+          data-react-fancy-time-picker=""
+          data-mode="view"
+          ref={ref}
+          className={cn(
+            "text-sm font-medium tabular-nums text-zinc-900 dark:text-zinc-100",
+            className,
+          )}
+        >
+          {formatted}
+        </div>
+      );
+    }
 
     const updateTime = useCallback(
       (hours: number, mins: number) => {

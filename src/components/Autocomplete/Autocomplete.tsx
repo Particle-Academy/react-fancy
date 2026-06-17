@@ -5,6 +5,7 @@ import { useControllableState } from "../../hooks/use-controllable-state";
 import { useFloatingPosition } from "../../hooks/use-floating-position";
 import { useOutsideClick } from "../../hooks/use-outside-click";
 import { useEscapeKey } from "../../hooks/use-escape-key";
+import { useFieldMode } from "../inputs/mode/FieldMode.context";
 import type { AutocompleteProps } from "./Autocomplete.types";
 
 export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
@@ -20,6 +21,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
       emptyMessage = "No results found.",
       disabled = false,
       className,
+      mode,
     },
     ref,
   ) {
@@ -28,6 +30,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
       defaultValue,
       onChange,
     );
+    const resolvedMode = useFieldMode(mode);
     const [query, setQuery] = useState(value);
     const [open, setOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(-1);
@@ -89,6 +92,24 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
         if (item && !item.disabled) select(item.value);
       }
     };
+
+    if (resolvedMode === "view") {
+      const matched = options.find((o) => o.value === value);
+      return (
+        <div
+          data-react-fancy-autocomplete=""
+          data-mode="view"
+          ref={wrapperRef}
+          className={cn(
+            "text-sm text-zinc-900 dark:text-zinc-100",
+            !value && "text-zinc-400 dark:text-zinc-500",
+            className,
+          )}
+        >
+          {matched?.label ?? value ?? "—"}
+        </div>
+      );
+    }
 
     return (
       <div data-react-fancy-autocomplete="" ref={wrapperRef} className={cn("relative", className)}>

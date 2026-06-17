@@ -1,6 +1,7 @@
 import { forwardRef, useId } from "react";
 import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
+import { useFieldMode } from "../mode/FieldMode.context";
 import { dirtyRingClasses } from "../inputs.utils";
 import type { SwitchProps } from "./Switch.types";
 import { switchTrack } from "./Switch.colors";
@@ -22,11 +23,13 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
       defaultChecked = false,
       onCheckedChange,
       color = "blue",
+      mode,
     },
     ref,
   ) => {
     const autoId = useId();
     const switchId = id ?? autoId;
+    const resolvedMode = useFieldMode(mode);
     const [checked, setChecked] = useControllableState(
       controlledChecked,
       defaultChecked,
@@ -59,6 +62,15 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
 
     return (
       <div data-react-fancy-switch="" className={cn("flex items-start gap-2", className)}>
+        {resolvedMode === "view" ? (
+          <span
+            data-react-fancy-display=""
+            data-mode="view"
+            className="text-sm font-medium text-zinc-700 dark:text-zinc-200"
+          >
+            {checked ? "On" : "Off"}
+          </span>
+        ) : (
         <button
           ref={ref}
           id={switchId}
@@ -83,6 +95,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
             )}
           />
         </button>
+        )}
         {name && (
           <input type="hidden" name={name} value={checked ? "1" : "0"} />
         )}

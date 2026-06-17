@@ -8,6 +8,8 @@ import {
   inputBaseClasses,
   inputSizeClasses,
 } from "../inputs.utils";
+import { useFieldMode } from "../mode/FieldMode.context";
+import { DisplayValue } from "../mode/DisplayValue";
 import type { InputProps } from "./Input.types";
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -29,6 +31,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       suffix,
       prefixPosition,
       suffixPosition,
+      mode,
       onValueChange,
       onChange,
       ...props
@@ -37,8 +40,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   ) => {
     const autoId = useId();
     const inputId = id ?? autoId;
+    const resolvedMode = useFieldMode(mode);
 
-    const input = (
+    const input = resolvedMode === "view" ? (
+      <DisplayValue size={size} leading={leading ?? prefix} trailing={trailing ?? suffix}>
+        {type === "password" ? (props.value ? "••••••" : "") : (props.value as string | undefined)}
+      </DisplayValue>
+    ) : (
       <InputWrapper
         prefix={prefix}
         suffix={suffix}

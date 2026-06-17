@@ -1,3 +1,5 @@
+import type { FieldMode } from "../inputs/inputs.types";
+
 export interface ColorPickerProps {
   value?: string;
   defaultValue?: string;
@@ -7,4 +9,6 @@ export interface ColorPickerProps {
   variant?: "outline" | "filled";
   disabled?: boolean;
   className?: string;
+  /** `"edit"` (default) renders the control; `"view"` renders the value as text. */
+  mode?: FieldMode;
 }

@@ -13,6 +13,8 @@ import {
   inputSizeClasses,
   resolveOption,
 } from "../inputs.utils";
+import { useFieldMode } from "../mode/FieldMode.context";
+import { DisplayValue } from "../mode/DisplayValue";
 import type { InputOption, InputOptionGroup } from "../inputs.types";
 import type { SelectProps } from "./Select.types";
 
@@ -67,6 +69,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
       suffix,
       prefixPosition,
       suffixPosition,
+      mode,
       onValueChange,
       onChange,
       value,
@@ -77,6 +80,34 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
   ) => {
     const autoId = useId();
     const selectId = id ?? autoId;
+    const resolvedMode = useFieldMode(mode);
+
+    if (resolvedMode === "view") {
+      const current = (value ?? defaultValue) as string | undefined;
+      const opt = flattenOptions(list)
+        .map((o) => resolveOption(o))
+        .find((o) => o.value === current);
+      const display = (
+        <DisplayValue size={size} leading={prefix} trailing={suffix}>
+          {opt?.label ?? current}
+        </DisplayValue>
+      );
+      if (label || error || description) {
+        return (
+          <Field
+            label={label}
+            description={description}
+            error={error}
+            required={required}
+            htmlFor={selectId}
+            size={size}
+          >
+            {display}
+          </Field>
+        );
+      }
+      return display;
+    }
 
     // When a placeholder is provided but no value/defaultValue, default to ""
     // so the disabled placeholder <option> is the initial selection instead of
@@ -184,6 +215,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
       createLabel = "Create",
       selectedSuffix = "selected",
       indicator = "check",
+      mode,
       value: controlledSingleValue,
       defaultValue: defaultSingleValue,
     },
@@ -191,6 +223,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
   ) => {
     const autoId = useId();
     const selectId = id ?? autoId;
+    const resolvedMode = useFieldMode(mode);
 
     // Creatable implies a text input, which is also the search input.
     const textInputEnabled = searchable || creatable;
@@ -361,6 +394,35 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
         }
       }
     };
+
+    // ── View mode ──────────────────────────────────────────
+    if (resolvedMode === "view") {
+      const labels = multiple
+        ? currentMulti.map(
+            (v) => resolvedOptions.find((o) => o.value === v)?.label ?? v,
+          )
+        : currentSingle
+          ? [resolvedOptions.find((o) => o.value === currentSingle)?.label ?? currentSingle]
+          : [];
+      const display = (
+        <DisplayValue size={size}>{labels.join(", ")}</DisplayValue>
+      );
+      if (label || error || description) {
+        return (
+          <Field
+            label={label}
+            description={description}
+            error={error}
+            required={required}
+            htmlFor={selectId}
+            size={size}
+          >
+            {display}
+          </Field>
+        );
+      }
+      return display;
+    }
 
     // ── Render ─────────────────────────────────────────────
     const trigger = (

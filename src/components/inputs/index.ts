@@ -31,4 +31,7 @@ export type { MultiSwitchProps } from "./MultiSwitch";
 export { DatePicker } from "./DatePicker";
 export type { DatePickerProps, DatePickerSingleProps, DatePickerRangeProps } from "./DatePicker";
 
-export type { InputBaseProps, InputOption, InputOptionGroup, AffixPosition, InputAffixProps } from "./inputs.types";
+export type { FieldMode, InputBaseProps, InputOption, InputOptionGroup, AffixPosition, InputAffixProps } from "./inputs.types";
+
+// Display-mode form binding: <Form mode>/<FormProvider mode> + useFieldMode + DisplayValue.
+export * from "./mode";

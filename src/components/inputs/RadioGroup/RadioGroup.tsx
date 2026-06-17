@@ -2,6 +2,8 @@ import { useId } from "react";
 import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { Field } from "../Field";
+import { useFieldMode } from "../mode/FieldMode.context";
+import { DisplayValue } from "../mode/DisplayValue";
 import { dirtyRingClasses, resolveOption } from "../inputs.utils";
 import type { RadioGroupProps } from "./RadioGroup.types";
 
@@ -20,9 +22,11 @@ export function RadioGroup<V = string>({
   defaultValue,
   onValueChange,
   orientation = "vertical",
+  mode,
 }: RadioGroupProps<V>) {
   const groupId = useId();
   const radioName = name ?? groupId;
+  const resolvedMode = useFieldMode(mode);
   const [value, setValue] = useControllableState(
     controlledValue,
     defaultValue as V,
@@ -37,7 +41,11 @@ export function RadioGroup<V = string>({
     xl: "h-6 w-6",
   }[size];
 
-  const content = (
+  const content = resolvedMode === "view" ? (
+    <DisplayValue size={size}>
+      {list.map(resolveOption).find((o) => o.value === value)?.label}
+    </DisplayValue>
+  ) : (
     <div
       data-react-fancy-radio-group=""
       role="radiogroup"

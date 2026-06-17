@@ -1,6 +1,7 @@
 import { forwardRef, useCallback, useRef } from "react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
+import { useFieldMode } from "../inputs/mode/FieldMode.context";
 import type { OtpInputProps } from "./OtpInput.types";
 
 export const OtpInput = forwardRef<HTMLDivElement, OtpInputProps>(
@@ -12,6 +13,7 @@ export const OtpInput = forwardRef<HTMLDivElement, OtpInputProps>(
       disabled = false,
       autoFocus = false,
       className,
+      mode,
     },
     ref,
   ) {
@@ -20,6 +22,7 @@ export const OtpInput = forwardRef<HTMLDivElement, OtpInputProps>(
       "",
       onChange,
     );
+    const resolvedMode = useFieldMode(mode);
     const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
     const focusInput = useCallback(
@@ -79,6 +82,22 @@ export const OtpInput = forwardRef<HTMLDivElement, OtpInputProps>(
       },
       [length, setValue, focusInput],
     );
+
+    if (resolvedMode === "view") {
+      return (
+        <div
+          data-react-fancy-otp-input=""
+          data-mode="view"
+          ref={ref}
+          className={cn(
+            "font-mono text-lg tracking-[0.4em] text-zinc-900 dark:text-zinc-100",
+            className,
+          )}
+        >
+          {value || "—"}
+        </div>
+      );
+    }
 
     return (
       <div data-react-fancy-otp-input="" ref={ref} className={cn("flex gap-2", className)}>

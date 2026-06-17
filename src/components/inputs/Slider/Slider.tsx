@@ -2,6 +2,8 @@ import { forwardRef, useId } from "react";
 import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { Field } from "../Field";
+import { useFieldMode } from "../mode/FieldMode.context";
+import { DisplayValue } from "../mode/DisplayValue";
 import { dirtyRingClasses } from "../inputs.utils";
 import type { SliderProps } from "./Slider.types";
 
@@ -71,18 +73,24 @@ const SingleSlider = forwardRef<HTMLInputElement, SliderProps & { range?: false 
       marks,
       prefix,
       suffix,
+      mode,
       ...rest
     },
     ref,
   ) => {
     const singleProps = rest as { value?: number; defaultValue?: number; onValueChange?: (v: number) => void };
+    const resolvedMode = useFieldMode(mode);
     const [value, setValue] = useControllableState(
       singleProps.value,
       singleProps.defaultValue ?? min,
       singleProps.onValueChange,
     );
 
-    const slider = (
+    const slider = resolvedMode === "view" ? (
+      <DisplayValue size={size} className={className}>
+        {`${prefix ?? ""}${value}${suffix ?? ""}`}
+      </DisplayValue>
+    ) : (
       <div data-react-fancy-slider="" className={cn("flex flex-col gap-1", className)}>
         <div className="flex items-center gap-3">
           <input
@@ -152,11 +160,13 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
       marks,
       prefix,
       suffix,
+      mode,
       ...rest
     },
     ref,
   ) => {
     const rangeProps = rest as { value?: [number, number]; defaultValue?: [number, number]; onValueChange?: (v: [number, number]) => void };
+    const resolvedMode = useFieldMode(mode);
     const [value, setValue] = useControllableState(
       rangeProps.value,
       rangeProps.defaultValue ?? [min, max] as [number, number],
@@ -174,7 +184,11 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
     const leftPercent = ((value[0] - min) / (max - min)) * 100;
     const rightPercent = ((value[1] - min) / (max - min)) * 100;
 
-    const slider = (
+    const slider = resolvedMode === "view" ? (
+      <DisplayValue size={size} className={className}>
+        {`${prefix ?? ""}${value[0]}${suffix ?? ""}–${prefix ?? ""}${value[1]}${suffix ?? ""}`}
+      </DisplayValue>
+    ) : (
       <div data-react-fancy-slider="" className={cn("flex flex-col gap-1", className)}>
         <div className="flex items-center gap-3">
           <div className="relative w-full">

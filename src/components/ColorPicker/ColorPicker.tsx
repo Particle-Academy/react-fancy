@@ -1,6 +1,7 @@
 import { forwardRef, useId, useRef } from "react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
+import { useFieldMode } from "../inputs/mode/FieldMode.context";
 import type { ColorPickerProps } from "./ColorPicker.types";
 
 const DEFAULT_COLOR = "#3b82f6";
@@ -28,6 +29,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
       variant = "outline",
       disabled = false,
       className,
+      mode,
     },
     ref,
   ) => {
@@ -36,6 +38,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
       defaultValue,
       onChange,
     );
+    const resolvedMode = useFieldMode(mode);
 
     const inputRef = useRef<HTMLInputElement>(null);
     const datalistId = useId();
@@ -49,6 +52,36 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
         inputRef.current?.click();
       }
     };
+
+    if (resolvedMode === "view") {
+      return (
+        <div
+          ref={ref}
+          data-react-fancy-color-picker=""
+          data-mode="view"
+          className={cn("inline-flex items-center gap-2", className)}
+        >
+          <span
+            className={cn(
+              "shrink-0 rounded-full",
+              SWATCH_SIZES[size],
+              variant === "outline" && "ring-1 ring-zinc-300 dark:ring-zinc-600",
+            )}
+            style={{ backgroundColor: color }}
+            aria-label={`Color: ${color}`}
+          />
+          <span
+            className={cn(
+              "select-all font-mono uppercase",
+              TEXT_SIZES[size],
+              "text-zinc-700 dark:text-zinc-300",
+            )}
+          >
+            {color.toUpperCase()}
+          </span>
+        </div>
+      );
+    }
 
     return (
       <div

@@ -1,3 +1,5 @@
+import type { FieldMode } from "../inputs/inputs.types";
+
 export interface TimePickerProps {
   value?: string;
   defaultValue?: string;
@@ -6,4 +8,6 @@ export interface TimePickerProps {
   minuteStep?: number;
   disabled?: boolean;
   className?: string;
+  /** `"edit"` (default) renders the spinners; `"view"` renders the time as text. */
+  mode?: FieldMode;
 }

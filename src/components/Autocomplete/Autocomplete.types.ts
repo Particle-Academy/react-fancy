@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { FieldMode } from "../inputs/inputs.types";
 
 export interface AutocompleteOption {
   value: string;
@@ -17,4 +18,6 @@ export interface AutocompleteProps {
   emptyMessage?: ReactNode;
   disabled?: boolean;
   className?: string;
+  /** `"edit"` (default) renders the control; `"view"` renders the value as text. */
+  mode?: FieldMode;
 }
