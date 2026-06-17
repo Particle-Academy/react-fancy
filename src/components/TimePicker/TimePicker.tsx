@@ -3,6 +3,7 @@ import { ChevronUp, ChevronDown } from "lucide-react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import { useFieldMode } from "../inputs/mode/FieldMode.context";
+import { useInlineEdit } from "../inputs/mode/useInlineEdit";
 import type { TimePickerProps } from "./TimePicker.types";
 
 function pad(n: number): string {
@@ -34,12 +35,13 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
       onChange,
     );
     const resolvedMode = useFieldMode(mode);
+    const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
 
     const { hours: h24, minutes } = parseTime(value);
     const isPM = h24 >= 12;
     const displayHour = format === "12h" ? (h24 % 12 || 12) : h24;
 
-    if (resolvedMode === "view") {
+    if (!showControl) {
       const formatted =
         format === "12h"
           ? `${pad(displayHour)}:${pad(minutes)} ${isPM ? "PM" : "AM"}`
@@ -49,8 +51,24 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
           data-react-fancy-time-picker=""
           data-mode="view"
           ref={ref}
+          role={interactive ? "button" : undefined}
+          tabIndex={interactive ? 0 : undefined}
+          title={interactive ? "Click to edit" : undefined}
+          onClick={interactive ? enterEdit : undefined}
+          onKeyDown={
+            interactive
+              ? (e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    enterEdit();
+                  }
+                }
+              : undefined
+          }
           className={cn(
             "text-sm font-medium tabular-nums text-zinc-900 dark:text-zinc-100",
+            interactive &&
+              "cursor-pointer rounded-md outline-none transition-colors hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:hover:bg-zinc-800",
             className,
           )}
         >
@@ -95,6 +113,9 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
       <div
         data-react-fancy-time-picker=""
         ref={ref}
+        onBlur={(e) => {
+          if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
+        }}
         className={cn(
           "inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white p-2 dark:border-zinc-700 dark:bg-zinc-900",
           disabled && "opacity-50",
@@ -103,7 +124,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
       >
         {/* Hour column */}
         <div className="flex flex-col items-center">
-          <button type="button" onClick={() => changeHour(1)} disabled={disabled} className={spinBtnClass} aria-label="Increase hour">
+          <button type="button" autoFocus={interactive} onClick={() => changeHour(1)} disabled={disabled} className={spinBtnClass} aria-label="Increase hour">
             <ChevronUp size={14} />
           </button>
           <div className={displayClass}>{pad(displayHour)}</div>

@@ -2,6 +2,7 @@ import { forwardRef, useId } from "react";
 import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { useFieldMode } from "../mode/FieldMode.context";
+import { useInlineEdit } from "../mode/useInlineEdit";
 import { dirtyRingClasses } from "../inputs.utils";
 import type { SwitchProps } from "./Switch.types";
 import { switchTrack } from "./Switch.colors";
@@ -30,6 +31,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
     const autoId = useId();
     const switchId = id ?? autoId;
     const resolvedMode = useFieldMode(mode);
+    const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
     const [checked, setChecked] = useControllableState(
       controlledChecked,
       defaultChecked,
@@ -62,11 +64,29 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
 
     return (
       <div data-react-fancy-switch="" className={cn("flex items-start gap-2", className)}>
-        {resolvedMode === "view" ? (
+        {!showControl ? (
           <span
             data-react-fancy-display=""
             data-mode="view"
-            className="text-sm font-medium text-zinc-700 dark:text-zinc-200"
+            role={interactive ? "button" : undefined}
+            tabIndex={interactive ? 0 : undefined}
+            title={interactive ? "Click to edit" : undefined}
+            onClick={interactive ? enterEdit : undefined}
+            onKeyDown={
+              interactive
+                ? (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      enterEdit();
+                    }
+                  }
+                : undefined
+            }
+            className={cn(
+              "text-sm font-medium text-zinc-700 dark:text-zinc-200",
+              interactive &&
+                "cursor-pointer rounded-md outline-none transition-colors hover:text-zinc-900 focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:hover:text-white",
+            )}
           >
             {checked ? "On" : "Off"}
           </span>
@@ -78,6 +98,10 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           role="switch"
           aria-checked={checked}
           disabled={disabled}
+          autoFocus={interactive}
+          onBlur={() => {
+            if (interactive) exitEdit();
+          }}
           onClick={() => setChecked(!checked)}
           className={cn(
             "relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",

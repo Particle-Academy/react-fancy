@@ -4,6 +4,7 @@ import { useControllableState } from "../../../hooks/use-controllable-state";
 import { Field } from "../Field";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { DisplayValue } from "../mode/DisplayValue";
+import { useInlineEdit } from "../mode/useInlineEdit";
 import { dirtyRingClasses, resolveOption } from "../inputs.utils";
 import type { RadioGroupProps } from "./RadioGroup.types";
 
@@ -27,6 +28,7 @@ export function RadioGroup<V = string>({
   const groupId = useId();
   const radioName = name ?? groupId;
   const resolvedMode = useFieldMode(mode);
+  const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
   const [value, setValue] = useControllableState(
     controlledValue,
     defaultValue as V,
@@ -41,14 +43,19 @@ export function RadioGroup<V = string>({
     xl: "h-6 w-6",
   }[size];
 
-  const content = resolvedMode === "view" ? (
-    <DisplayValue size={size}>
+  const selectedIndex = list.map(resolveOption).findIndex((o) => o.value === value);
+
+  const content = !showControl ? (
+    <DisplayValue size={size} interactive={interactive} onActivate={enterEdit}>
       {list.map(resolveOption).find((o) => o.value === value)?.label}
     </DisplayValue>
   ) : (
     <div
       data-react-fancy-radio-group=""
       role="radiogroup"
+      onBlur={(e) => {
+        if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
+      }}
       className={cn(
         "flex gap-3",
         orientation === "vertical" ? "flex-col" : "flex-row flex-wrap",
@@ -59,6 +66,9 @@ export function RadioGroup<V = string>({
         const resolved = resolveOption(option);
         const optionId = `${groupId}-${index}`;
         const isSelected = value === resolved.value;
+        // Focus the selected radio on entering edit (or the first if none).
+        const shouldAutoFocus =
+          interactive && (selectedIndex === -1 ? index === 0 : isSelected);
 
         return (
           <div key={optionId} className="flex items-start gap-2">
@@ -69,6 +79,7 @@ export function RadioGroup<V = string>({
               value={String(resolved.value)}
               checked={isSelected}
               disabled={disabled || resolved.disabled}
+              autoFocus={shouldAutoFocus}
               onChange={() => setValue(resolved.value)}
               className={cn(
                 sizeClasses,

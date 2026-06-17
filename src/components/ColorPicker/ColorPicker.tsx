@@ -2,6 +2,7 @@ import { forwardRef, useId, useRef } from "react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import { useFieldMode } from "../inputs/mode/FieldMode.context";
+import { useInlineEdit } from "../inputs/mode/useInlineEdit";
 import type { ColorPickerProps } from "./ColorPicker.types";
 
 const DEFAULT_COLOR = "#3b82f6";
@@ -39,6 +40,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
       onChange,
     );
     const resolvedMode = useFieldMode(mode);
+    const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
 
     const inputRef = useRef<HTMLInputElement>(null);
     const datalistId = useId();
@@ -53,13 +55,32 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
       }
     };
 
-    if (resolvedMode === "view") {
+    if (!showControl) {
       return (
         <div
           ref={ref}
           data-react-fancy-color-picker=""
           data-mode="view"
-          className={cn("inline-flex items-center gap-2", className)}
+          role={interactive ? "button" : undefined}
+          tabIndex={interactive ? 0 : undefined}
+          title={interactive ? "Click to edit" : undefined}
+          onClick={interactive ? enterEdit : undefined}
+          onKeyDown={
+            interactive
+              ? (e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    enterEdit();
+                  }
+                }
+              : undefined
+          }
+          className={cn(
+            "inline-flex items-center gap-2",
+            interactive &&
+              "cursor-pointer rounded-md outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-blue-500/40",
+            className,
+          )}
         >
           <span
             className={cn(
@@ -88,10 +109,14 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
         ref={ref}
         data-react-fancy-color-picker=""
         className={cn("inline-flex items-center gap-2", className)}
+        onBlur={(e) => {
+          if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
+        }}
       >
         <button
           type="button"
           disabled={disabled}
+          autoFocus={interactive}
           onClick={handleSwatchClick}
           className={cn(
             "relative shrink-0 rounded-full transition-shadow",

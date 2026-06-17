@@ -6,6 +6,7 @@ import { useFloatingPosition } from "../../hooks/use-floating-position";
 import { useOutsideClick } from "../../hooks/use-outside-click";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import { useFieldMode } from "../inputs/mode/FieldMode.context";
+import { useInlineEdit } from "../inputs/mode/useInlineEdit";
 import type { AutocompleteProps } from "./Autocomplete.types";
 
 export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
@@ -31,6 +32,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
       onChange,
     );
     const resolvedMode = useFieldMode(mode);
+    const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
     const [query, setQuery] = useState(value);
     const [open, setOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(-1);
@@ -93,16 +95,32 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
       }
     };
 
-    if (resolvedMode === "view") {
+    if (!showControl) {
       const matched = options.find((o) => o.value === value);
       return (
         <div
           data-react-fancy-autocomplete=""
           data-mode="view"
           ref={wrapperRef}
+          role={interactive ? "button" : undefined}
+          tabIndex={interactive ? 0 : undefined}
+          title={interactive ? "Click to edit" : undefined}
+          onClick={interactive ? enterEdit : undefined}
+          onKeyDown={
+            interactive
+              ? (e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    enterEdit();
+                  }
+                }
+              : undefined
+          }
           className={cn(
             "text-sm text-zinc-900 dark:text-zinc-100",
             !value && "text-zinc-400 dark:text-zinc-500",
+            interactive &&
+              "cursor-pointer rounded-md outline-none transition-colors hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:hover:bg-zinc-800",
             className,
           )}
         >
@@ -112,7 +130,17 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
     }
 
     return (
-      <div data-react-fancy-autocomplete="" ref={wrapperRef} className={cn("relative", className)}>
+      <div
+        data-react-fancy-autocomplete=""
+        ref={wrapperRef}
+        className={cn("relative", className)}
+        onBlur={(e) => {
+          // Options live in a Portal; only exit when closed and focus left.
+          if (interactive && !open && !e.currentTarget.contains(e.relatedTarget as Node)) {
+            exitEdit();
+          }
+        }}
+      >
         <input
           ref={(node) => {
             (anchorRef as React.MutableRefObject<HTMLInputElement | null>).current = node;
@@ -130,6 +158,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
+          autoFocus={interactive}
           role="combobox"
           aria-expanded={open}
           aria-autocomplete="list"

@@ -4,6 +4,7 @@ import { useControllableState } from "../../../hooks/use-controllable-state";
 import { Field } from "../Field";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { DisplayValue } from "../mode/DisplayValue";
+import { useInlineEdit } from "../mode/useInlineEdit";
 import { dirtyRingClasses } from "../inputs.utils";
 import type { SliderProps } from "./Slider.types";
 
@@ -80,14 +81,20 @@ const SingleSlider = forwardRef<HTMLInputElement, SliderProps & { range?: false 
   ) => {
     const singleProps = rest as { value?: number; defaultValue?: number; onValueChange?: (v: number) => void };
     const resolvedMode = useFieldMode(mode);
+    const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
     const [value, setValue] = useControllableState(
       singleProps.value,
       singleProps.defaultValue ?? min,
       singleProps.onValueChange,
     );
 
-    const slider = resolvedMode === "view" ? (
-      <DisplayValue size={size} className={className}>
+    const slider = !showControl ? (
+      <DisplayValue
+        size={size}
+        className={className}
+        interactive={interactive}
+        onActivate={enterEdit}
+      >
         {`${prefix ?? ""}${value}${suffix ?? ""}`}
       </DisplayValue>
     ) : (
@@ -103,6 +110,10 @@ const SingleSlider = forwardRef<HTMLInputElement, SliderProps & { range?: false 
             step={step}
             value={value}
             disabled={disabled}
+            autoFocus={interactive}
+            onBlur={() => {
+              if (interactive) exitEdit();
+            }}
             onChange={(e) => setValue(Number(e.target.value))}
             className={cn(
               "w-full cursor-pointer accent-blue-600 disabled:cursor-not-allowed disabled:opacity-50",
@@ -167,6 +178,7 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
   ) => {
     const rangeProps = rest as { value?: [number, number]; defaultValue?: [number, number]; onValueChange?: (v: [number, number]) => void };
     const resolvedMode = useFieldMode(mode);
+    const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
     const [value, setValue] = useControllableState(
       rangeProps.value,
       rangeProps.defaultValue ?? [min, max] as [number, number],
@@ -184,12 +196,23 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
     const leftPercent = ((value[0] - min) / (max - min)) * 100;
     const rightPercent = ((value[1] - min) / (max - min)) * 100;
 
-    const slider = resolvedMode === "view" ? (
-      <DisplayValue size={size} className={className}>
+    const slider = !showControl ? (
+      <DisplayValue
+        size={size}
+        className={className}
+        interactive={interactive}
+        onActivate={enterEdit}
+      >
         {`${prefix ?? ""}${value[0]}${suffix ?? ""}–${prefix ?? ""}${value[1]}${suffix ?? ""}`}
       </DisplayValue>
     ) : (
-      <div data-react-fancy-slider="" className={cn("flex flex-col gap-1", className)}>
+      <div
+        data-react-fancy-slider=""
+        className={cn("flex flex-col gap-1", className)}
+        onBlur={(e) => {
+          if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
+        }}
+      >
         <div className="flex items-center gap-3">
           <div className="relative w-full">
             <div className="pointer-events-none absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-zinc-200 dark:bg-zinc-700" />
@@ -205,6 +228,7 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
               step={step}
               value={value[0]}
               disabled={disabled}
+              autoFocus={interactive}
               onChange={(e) => handleMin(Number(e.target.value))}
               className={cn(
                 "pointer-events-none absolute w-full cursor-pointer appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:shadow",

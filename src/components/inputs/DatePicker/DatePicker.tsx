@@ -4,6 +4,7 @@ import { useControllableState } from "../../../hooks/use-controllable-state";
 import { Field } from "../Field";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { DisplayValue } from "../mode/DisplayValue";
+import { useInlineEdit } from "../mode/useInlineEdit";
 import {
   dirtyClasses,
   errorClasses,
@@ -125,14 +126,20 @@ const SingleDatePicker = forwardRef<
       onValueChange?: (v: string) => void;
     };
     const resolvedMode = useFieldMode(mode);
+    const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
     const [value, setValue] = useControllableState(
       singleProps.value,
       singleProps.defaultValue ?? "",
       singleProps.onValueChange,
     );
 
-    const input = resolvedMode === "view" ? (
-      <DisplayValue size={size} className={className}>
+    const input = !showControl ? (
+      <DisplayValue
+        size={size}
+        className={className}
+        interactive={interactive}
+        onActivate={enterEdit}
+      >
         {formatDateValue(value, includeTime)}
       </DisplayValue>
     ) : (
@@ -149,6 +156,10 @@ const SingleDatePicker = forwardRef<
         required={required}
         onChange={(e) => setValue(e.target.value)}
         className={cn(inputClasses, className)}
+        autoFocus={interactive}
+        onBlur={() => {
+          if (interactive) exitEdit();
+        }}
       />
     );
 
@@ -204,20 +215,32 @@ const RangeDatePicker = forwardRef<
       onValueChange?: (v: [string, string]) => void;
     };
     const resolvedMode = useFieldMode(mode);
+    const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
     const [value, setValue] = useControllableState(
       rangeProps.value,
       rangeProps.defaultValue ?? ["", ""] as [string, string],
       rangeProps.onValueChange,
     );
 
-    const input = resolvedMode === "view" ? (
-      <DisplayValue size={size} className={className}>
+    const input = !showControl ? (
+      <DisplayValue
+        size={size}
+        className={className}
+        interactive={interactive}
+        onActivate={enterEdit}
+      >
         {value[0] || value[1]
           ? `${formatDateValue(value[0], includeTime)} – ${formatDateValue(value[1], includeTime)}`
           : ""}
       </DisplayValue>
     ) : (
-      <div data-react-fancy-date-picker="" className={cn("flex items-center gap-2", className)}>
+      <div
+        data-react-fancy-date-picker=""
+        className={cn("flex items-center gap-2", className)}
+        onBlur={(e) => {
+          if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
+        }}
+      >
         <input
           ref={ref}
           id={id}
@@ -230,6 +253,7 @@ const RangeDatePicker = forwardRef<
           required={required}
           onChange={(e) => setValue([e.target.value, value[1]])}
           className={inputClasses}
+          autoFocus={interactive}
         />
         <span className="text-sm text-zinc-500 dark:text-zinc-400">to</span>
         <input

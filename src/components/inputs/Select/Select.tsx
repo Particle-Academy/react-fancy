@@ -15,6 +15,7 @@ import {
 } from "../inputs.utils";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { DisplayValue } from "../mode/DisplayValue";
+import { useInlineEdit } from "../mode/useInlineEdit";
 import type { InputOption, InputOptionGroup } from "../inputs.types";
 import type { SelectProps } from "./Select.types";
 
@@ -81,14 +82,21 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
     const autoId = useId();
     const selectId = id ?? autoId;
     const resolvedMode = useFieldMode(mode);
+    const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
 
-    if (resolvedMode === "view") {
+    if (!showControl) {
       const current = (value ?? defaultValue) as string | undefined;
       const opt = flattenOptions(list)
         .map((o) => resolveOption(o))
         .find((o) => o.value === current);
       const display = (
-        <DisplayValue size={size} leading={prefix} trailing={suffix}>
+        <DisplayValue
+          size={size}
+          leading={prefix}
+          trailing={suffix}
+          interactive={interactive}
+          onActivate={enterEdit}
+        >
           {opt?.label ?? current}
         </DisplayValue>
       );
@@ -146,6 +154,11 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
           }}
           {...props}
           {...(isControlled ? { value } : { defaultValue: resolvedDefault })}
+          autoFocus={interactive || props.autoFocus}
+          onBlur={(e) => {
+            props.onBlur?.(e);
+            if (interactive) exitEdit();
+          }}
         >
           {placeholder && (
             <option value="" disabled>
@@ -224,6 +237,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
     const autoId = useId();
     const selectId = id ?? autoId;
     const resolvedMode = useFieldMode(mode);
+    const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
 
     // Creatable implies a text input, which is also the search input.
     const textInputEnabled = searchable || creatable;
@@ -396,7 +410,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
     };
 
     // ── View mode ──────────────────────────────────────────
-    if (resolvedMode === "view") {
+    if (!showControl) {
       const labels = multiple
         ? currentMulti.map(
             (v) => resolvedOptions.find((o) => o.value === v)?.label ?? v,
@@ -405,7 +419,9 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
           ? [resolvedOptions.find((o) => o.value === currentSingle)?.label ?? currentSingle]
           : [];
       const display = (
-        <DisplayValue size={size}>{labels.join(", ")}</DisplayValue>
+        <DisplayValue size={size} interactive={interactive} onActivate={enterEdit}>
+          {labels.join(", ")}
+        </DisplayValue>
       );
       if (label || error || description) {
         return (
@@ -431,6 +447,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
         type="button"
         id={selectId}
         disabled={disabled}
+        autoFocus={interactive}
         onClick={() => setOpen((o) => !o)}
         onKeyDown={handleKeyDown}
         role="combobox"
@@ -572,7 +589,16 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
     );
 
     const content = (
-      <div className="relative">
+      <div
+        className="relative"
+        onBlur={(e) => {
+          // The popover is portaled (focus moves out of this wrapper), so only
+          // exit edit when the dropdown is closed and focus has truly left.
+          if (interactive && !open && !e.currentTarget.contains(e.relatedTarget as Node)) {
+            exitEdit();
+          }
+        }}
+      >
         {trigger}
         {dropdown}
       </div>

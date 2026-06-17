@@ -4,6 +4,7 @@ import { useControllableState } from "../../../hooks/use-controllable-state";
 import { Field } from "../Field";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { DisplayValue } from "../mode/DisplayValue";
+import { useInlineEdit } from "../mode/useInlineEdit";
 import { dirtyRingClasses, resolveOption } from "../inputs.utils";
 import type { CheckboxGroupProps } from "./CheckboxGroup.types";
 
@@ -26,6 +27,7 @@ export function CheckboxGroup<V = string>({
 }: CheckboxGroupProps<V>) {
   const groupId = useId();
   const resolvedMode = useFieldMode(mode);
+  const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
   const [value, setValue] = useControllableState(
     controlledValue,
     defaultValue,
@@ -47,8 +49,8 @@ export function CheckboxGroup<V = string>({
     xl: "h-6 w-6",
   }[size];
 
-  const content = resolvedMode === "view" ? (
-    <DisplayValue size={size}>
+  const content = !showControl ? (
+    <DisplayValue size={size} interactive={interactive} onActivate={enterEdit}>
       {list
         .map(resolveOption)
         .filter((o) => value.includes(o.value))
@@ -58,6 +60,9 @@ export function CheckboxGroup<V = string>({
   ) : (
     <div
       data-react-fancy-checkbox-group=""
+      onBlur={(e) => {
+        if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
+      }}
       className={cn(
         "flex gap-3",
         orientation === "vertical" ? "flex-col" : "flex-row flex-wrap",
@@ -78,6 +83,7 @@ export function CheckboxGroup<V = string>({
               value={String(resolved.value)}
               checked={isChecked}
               disabled={disabled || resolved.disabled}
+              autoFocus={interactive && index === 0}
               onChange={() => handleToggle(resolved.value)}
               className={cn(
                 sizeClasses,

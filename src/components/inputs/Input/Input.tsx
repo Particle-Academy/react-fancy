@@ -10,6 +10,7 @@ import {
 } from "../inputs.utils";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { DisplayValue } from "../mode/DisplayValue";
+import { useInlineEdit } from "../mode/useInlineEdit";
 import type { InputProps } from "./Input.types";
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -41,9 +42,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const autoId = useId();
     const inputId = id ?? autoId;
     const resolvedMode = useFieldMode(mode);
+    const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
 
-    const input = resolvedMode === "view" ? (
-      <DisplayValue size={size} leading={leading ?? prefix} trailing={trailing ?? suffix}>
+    const input = !showControl ? (
+      <DisplayValue
+        size={size}
+        interactive={interactive}
+        onActivate={enterEdit}
+        leading={leading ?? prefix}
+        trailing={trailing ?? suffix}
+      >
         {type === "password" ? (props.value ? "••••••" : "") : (props.value as string | undefined)}
       </DisplayValue>
     ) : (
@@ -81,6 +89,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               onValueChange?.(e.target.value);
             }}
             {...props}
+            // Inline click-to-edit: focus on entering edit, return to the display
+            // (and run the host's onBlur) when focus leaves.
+            autoFocus={interactive || props.autoFocus}
+            onBlur={(e) => {
+              props.onBlur?.(e);
+              if (interactive) exitEdit();
+            }}
           />
           {trailing && (
             <span className="pointer-events-none absolute right-3 text-zinc-400 dark:text-zinc-500">

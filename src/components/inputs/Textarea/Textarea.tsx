@@ -10,6 +10,7 @@ import {
 } from "../inputs.utils";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { DisplayValue } from "../mode/DisplayValue";
+import { useInlineEdit } from "../mode/useInlineEdit";
 import type { TextareaProps } from "./Textarea.types";
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -44,6 +45,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const textareaId = id ?? autoId;
     const internalRef = useRef<HTMLTextAreaElement | null>(null);
     const resolvedMode = useFieldMode(mode);
+    const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
 
     useEffect(() => {
       const el = internalRef.current;
@@ -55,8 +57,13 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       el.style.height = `${Math.min(Math.max(el.scrollHeight, minHeight), maxHeight)}px`;
     }, [autoResize, minRows, maxRows, value, defaultValue]);
 
-    const textarea = resolvedMode === "view" ? (
-      <DisplayValue size={size} className="whitespace-pre-wrap">
+    const textarea = !showControl ? (
+      <DisplayValue
+        size={size}
+        className="whitespace-pre-wrap"
+        interactive={interactive}
+        onActivate={enterEdit}
+      >
         {(value ?? defaultValue) as string | undefined}
       </DisplayValue>
     ) : (
@@ -97,6 +104,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             onValueChange?.(e.target.value);
           }}
           {...props}
+          autoFocus={interactive || props.autoFocus}
+          onBlur={(e) => {
+            props.onBlur?.(e);
+            if (interactive) exitEdit();
+          }}
         />
       </InputWrapper>
     );
