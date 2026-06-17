@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
 import type { ButtonColor, Size } from "../../utils/types";
 
 export interface ButtonProps
@@ -45,6 +45,12 @@ export interface ButtonProps
   disabled?: boolean;
   /** Render as anchor tag */
   href?: string;
+  /** Anchor `target` — only applies in `href` (anchor) mode. */
+  target?: AnchorHTMLAttributes<HTMLAnchorElement>["target"];
+  /** Anchor `rel` — only applies in `href` (anchor) mode. */
+  rel?: AnchorHTMLAttributes<HTMLAnchorElement>["rel"];
+  /** Anchor `download` — only applies in `href` (anchor) mode. */
+  download?: AnchorHTMLAttributes<HTMLAnchorElement>["download"];
   /**
    * Collapse to icon-only when squeezed — injects the minimal Tailwind classes
    * (`sr-only sm:not-sr-only`) onto the label so it stays screen-reader

@@ -1,4 +1,4 @@
-import { forwardRef, type ReactNode } from "react";
+import { forwardRef, type AnchorHTMLAttributes, type ForwardedRef, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
 import { sanitizeHref } from "../../utils/sanitize";
 import { resolve } from "../../data/emoji-utils";
@@ -453,7 +453,16 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // -----------------------------------------------------------------------
     const safeHref = sanitizeHref(href);
     const buttonEl = safeHref && !disabled ? (
-      <a href={safeHref} className={classes} data-react-fancy-button="" data-react-fancy-action="">
+      // Anchor mode forwards the same rest props as the <button> branch so
+      // onClick / target / rel / ref / ARIA / data-* reach the <a> (issue #7).
+      <a
+        ref={ref as ForwardedRef<HTMLAnchorElement>}
+        href={safeHref}
+        className={classes}
+        data-react-fancy-button=""
+        data-react-fancy-action=""
+        {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)}
+      >
         {content}
       </a>
     ) : (
