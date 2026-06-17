@@ -6,6 +6,29 @@ type IconComponent = ComponentType<{ className?: string; size?: number }>;
 const registry = new Map<string, IconSet>();
 let defaultSetName = "lucide";
 
+/**
+ * Addendum layer — icon sets consulted across EVERY lookup, after the active
+ * base set but before the lucide auto-fallback, regardless of `defaultSet`.
+ * This is how a brand-icon pack (e.g. `@particle-academy/fancy-brand-icons`)
+ * layers in: `<Icon name="github" />` resolves the brand mark on top of Lucide
+ * (or any swapped base) without a `set=` query. Base set still wins; addenda
+ * supplement. Empty by default ⇒ behavior unchanged.
+ */
+const addenda: IconSet[] = [];
+
+/** Register an icon set as an addendum (supplements every base set). */
+export function registerIconAddendum(set: IconSet): void {
+  if (!addenda.includes(set)) addenda.push(set);
+}
+
+function resolveFromAddenda(name: string): IconComponent | null {
+  for (const set of addenda) {
+    const hit = set.resolve(name);
+    if (hit) return hit as IconComponent;
+  }
+  return null;
+}
+
 function kebabToPascal(str: string): string {
   return str
     .split("-")
@@ -122,6 +145,10 @@ export function resolveIcon(
   const set = registry.get(resolvedSet);
   const registered = set ? set.resolve(name) : null;
   if (registered) return registered;
+  // Addenda fill gaps after the base set, before the lucide auto-fallback — so a
+  // brand pack's `github` wins over lucide's auto-resolved one.
+  const fromAddenda = resolveFromAddenda(name);
+  if (fromAddenda) return fromAddenda;
   if (resolvedSet === "lucide") return resolveFromLucide(name);
   return null;
 }
