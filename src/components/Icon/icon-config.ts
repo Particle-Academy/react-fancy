@@ -84,6 +84,15 @@ export function getIconResolutionVersion(): number {
  * registered via `registerIcons()` still win and resolve synchronously.
  */
 function resolveFromLucide(name: string): IconComponent | null {
+  // SSR-deterministic: never resolve the lazily-imported lucide barrel on the
+  // server. A long-running SSR process (e.g. Inertia's node SSR daemon) loads
+  // the barrel after its first request, then renders auto-fallback lucide icons
+  // that a fresh client (barrel not yet loaded) does NOT have at hydration →
+  // React #418 ("server HTML didn't match"). Returning null on the server makes
+  // the server render match the client's FIRST render; the icon then appears
+  // once the client loads the barrel (via subscribeIconResolution). Registered
+  // icons + addenda (brand packs) still resolve synchronously on both sides.
+  if (typeof window === "undefined") return null;
   if (!lucideModule) {
     ensureLucideLoaded();
     return null;
