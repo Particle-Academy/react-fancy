@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { RenderExtension } from "../ContentRenderer/extensions";
+import type { FieldMode } from "../inputs/inputs.types";
 
 export interface EditorAction {
   icon: ReactNode;
@@ -31,6 +32,14 @@ export interface EditorProps {
   outputFormat?: "html" | "markdown";
   lineSpacing?: number;
   placeholder?: string;
+  /**
+   * View/edit mode — like the react-fancy inputs. Resolution: this prop →
+   * nearest `<Form>` / `<FormProvider>` context → `"edit"`. In `"view"` mode the
+   * editor renders its value read-only through `<ContentRenderer>` (matching
+   * `outputFormat` — markdown/html) instead of the editable toolbar + content.
+   * @default "edit"
+   */
+  mode?: FieldMode;
   /** Per-instance render extensions. Merged with any globally-registered extensions. */
   extensions?: RenderExtension[];
   /**

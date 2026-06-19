@@ -9,6 +9,8 @@ import { EditorToolbarSeparator } from "./EditorToolbarSeparator";
 import { EditorContent } from "./EditorContent";
 import { htmlToMarkdown, detectFormat } from "./editor.utils";
 import { mergeExtensions } from "../ContentRenderer/extensions";
+import { ContentRenderer } from "../ContentRenderer/ContentRenderer";
+import { useFieldMode } from "../inputs/mode/FieldMode.context";
 import type { EditorProps } from "./Editor.types";
 
 function toHtml(value: string, outputFormat: "html" | "markdown", unsafe: boolean): string {
@@ -32,17 +34,24 @@ function EditorRoot({
   outputFormat = "html",
   lineSpacing = 1.6,
   placeholder,
+  mode: modeProp,
   extensions: instanceExtensions,
   unsafe = false,
 }: EditorProps) {
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const [, setValue] = useControllableState(controlledValue, defaultValue, onChange);
+  const [value, setValue] = useControllableState(controlledValue, defaultValue, onChange);
+  // View/edit mode — same resolution as the inputs: prop → <Form> context → "edit".
+  const mode = useFieldMode(modeProp);
+  const isView = mode === "view";
 
   const initialHtml = useMemo(
-    () => toHtml(controlledValue ?? defaultValue, outputFormat, unsafe),
-    // Only compute once on mount — don't re-run when value changes from user input
+    () => toHtml(value, outputFormat, unsafe),
+    // Seed the contentEditable from the LIVE value when (re)entering edit mode.
+    // EditorContent reads this once on mount, and it only mounts in edit mode —
+    // so this captures the current value on view→edit, not a stale mount snapshot,
+    // and does NOT re-run on every keystroke.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [isView, outputFormat, unsafe],
   );
 
   const extensions = useMemo(
@@ -113,10 +122,36 @@ function EditorRoot({
     _onInput: handleInput,
   };
 
+  // View mode — render the value read-only through ContentRenderer, matching the
+  // editor's own format (markdown/html), instead of the editable toolbar+content
+  // tree. Driven by `mode` / a `<Form mode="view">`, exactly like the inputs.
+  if (isView) {
+    return (
+      <div
+        data-react-fancy-editor=""
+        data-mode="view"
+        className={cn(
+          "overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900",
+          className,
+        )}
+      >
+        <ContentRenderer
+          value={value}
+          format={outputFormat}
+          lineSpacing={lineSpacing}
+          extensions={instanceExtensions}
+          unsafe={unsafe}
+          className="px-4 py-3"
+        />
+      </div>
+    );
+  }
+
   return (
     <EditorContext.Provider value={contextValue}>
       <div
         data-react-fancy-editor=""
+        data-mode="edit"
         className={cn(
           "overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900",
           className,
