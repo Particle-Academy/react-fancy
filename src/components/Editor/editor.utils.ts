@@ -102,13 +102,14 @@ export function htmlToMarkdown(html: string): string {
     return STANDARD_HTML_TAGS.has(tagName.toLowerCase()) ? "" : match;
   });
 
-  // Decode common HTML entities
-  md = md.replace(/&amp;/g, "&");
+  // Decode common HTML entities. Decode &amp; LAST so we never double-unescape:
+  // e.g. "&amp;lt;" must decode to the literal "&lt;", not to "<".
   md = md.replace(/&lt;/g, "<");
   md = md.replace(/&gt;/g, ">");
   md = md.replace(/&quot;/g, '"');
   md = md.replace(/&#39;/g, "'");
   md = md.replace(/&nbsp;/g, " ");
+  md = md.replace(/&amp;/g, "&");
 
   // Clean up extra whitespace
   md = md.replace(/\n{3,}/g, "\n\n");
