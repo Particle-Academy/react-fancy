@@ -124,6 +124,30 @@
   background-color: #3f3f46; /* zinc-700 */
 }
 
+/* ─── Media viewer — transparency checkerboard ───────────────────────────────
+   Backdrop for <ImageViewer> / <MediaViewer> so transparent images read clearly.
+   Light + dark variants; the dark rule is wrapped in :where() (zero specificity)
+   so it ships out of the box without the consumer @sourcing react-fancy. */
+.fancy-checkerboard {
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(45deg, #e5e7eb 25%, transparent 25%),
+    linear-gradient(-45deg, #e5e7eb 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e5e7eb 75%),
+    linear-gradient(-45deg, transparent 75%, #e5e7eb 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+:where(.dark) .fancy-checkerboard {
+  background-color: #18181b; /* zinc-900 */
+  background-image:
+    linear-gradient(45deg, #27272a 25%, transparent 25%),
+    linear-gradient(-45deg, #27272a 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #27272a 75%),
+    linear-gradient(-45deg, transparent 75%, #27272a 75%);
+}
+
 @keyframes fancy-fade-in {
   from {
     opacity: 0;

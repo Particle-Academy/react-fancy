@@ -385,6 +385,8 @@ export type {
 // Utilities
 export { cn } from "./utils/cn";
 export { sanitizeHtml, sanitizeHref } from "./utils/sanitize";
+export { resolveMediaType } from "./utils/media-type";
+export type { MediaKind, ResolveMediaTypeInput } from "./utils/media-type";
 export type { Size, Color, Variant, ButtonColor, ActionColor, Placement } from "./utils/types";
 
 // Hooks
@@ -447,3 +449,20 @@ export type {
 
 export { MagicWand } from "./components/MagicWand";
 export type { MagicWandProps, MagicWandAction, MagicWandSelection, MagicWandAppearance } from "./components/MagicWand";
+
+// Media viewers — standalone image / video / audio / PDF viewers, plus a
+// type-resolving <MediaViewer> that picks the right one from a mime/src.
+export { MediaViewer } from "./components/MediaViewer";
+export type { MediaViewerProps } from "./components/MediaViewer";
+
+export { ImageViewer } from "./components/ImageViewer";
+export type { ImageViewerProps, ImageViewerViewport } from "./components/ImageViewer";
+
+export { VideoViewer } from "./components/VideoViewer";
+export type { VideoViewerProps } from "./components/VideoViewer";
+
+export { AudioViewer } from "./components/AudioViewer";
+export type { AudioViewerProps } from "./components/AudioViewer";
+
+export { PdfViewer } from "./components/PdfViewer";
+export type { PdfViewerProps } from "./components/PdfViewer";

@@ -166,6 +166,18 @@ npx vite build                      # Build demo app (verifies imports work)
 | Diagram | Entity-relationship diagram with draggable nodes and relation lines | [docs](docs/Diagram.md) |
 | ContentRenderer | Markdown/HTML content renderer | [docs](docs/ContentRenderer.md) |
 
+### Media Viewers
+
+Standalone, read-only viewers for displaying media files — drop one in anywhere, or use `<MediaViewer>` to pick the right one from a `mime`/`src` when you don't know the type ahead of time (e.g. showing a file from a tree). SVG renders through `ImageViewer`.
+
+| Component | Description | Docs |
+|-----------|-------------|------|
+| MediaViewer | Picks image/video/audio/PDF from `mime` (or `src`) + download fallback | [docs](docs/MediaViewer.md) |
+| ImageViewer | Fit-to-container image with zoom/pan and transparency checkerboard | [docs](docs/ImageViewer.md) |
+| VideoViewer | Native video controls, poster, fit | [docs](docs/VideoViewer.md) |
+| AudioViewer | Themed card around the native audio player | [docs](docs/AudioViewer.md) |
+| PdfViewer | Inline PDF via `<object>`/`<iframe>` with download fallback | [docs](docs/PdfViewer.md) |
+
 ### Human+ Primitives
 
 Components for surfaces where humans and AI agents trade control fluidly. Each promoted from the [`dreaming`](https://github.com/Particle-Academy/pa-ux-sandbox/tree/dreaming) sandbox after the API stabilized.
@@ -191,6 +203,7 @@ Components for surfaces where humans and AI agents trade control fluidly. Each p
 |--------|-------------|------|
 | Portal | `createPortal` wrapper with automatic dark mode propagation | [docs](docs/Portal.md) |
 | `cn()` | `clsx` + `tailwind-merge` for conditional class composition | [docs](docs/utilities.md) |
+| `resolveMediaType()` | Resolve `image`/`video`/`audio`/`pdf`/`unknown` from a `mime` and/or `src` | [docs](docs/MediaViewer.md) |
 | Hooks | useControllableState, useFloatingPosition, useOutsideClick, useEscapeKey, useFocusTrap, useAnimation, useId, usePanZoom | [docs](docs/hooks.md) |
 
 ## Customization
