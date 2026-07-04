@@ -13,12 +13,23 @@ import { ContentRenderer } from "../ContentRenderer/ContentRenderer";
 import { useFieldMode } from "../inputs/mode/FieldMode.context";
 import type { EditorProps } from "./Editor.types";
 
-function toHtml(value: string, outputFormat: "html" | "markdown", unsafe: boolean): string {
+function toHtml(
+  value: string,
+  outputFormat: "html" | "markdown",
+  unsafe: boolean,
+  valueFormat: "markdown" | "html" | "auto" = "auto",
+): string {
   if (!value) return "";
   const raw = (() => {
-    if (outputFormat === "html") return value;
-    // Markdown value — convert to HTML for contentEditable
-    const format = detectFormat(value);
+    // An explicit valueFormat is authoritative — the sniff misclassifies
+    // markdown that merely MENTIONS HTML-ish snippets (`<code>`, `<table`),
+    // collapsing it into an innerHTML wall of text (#10).
+    const format =
+      valueFormat !== "auto"
+        ? valueFormat
+        : outputFormat === "html"
+          ? "html"
+          : detectFormat(value);
     if (format === "html") return value;
     return (marked.parse(value, { async: false }) as string).trim();
   })();
@@ -32,6 +43,7 @@ function EditorRoot({
   defaultValue = "",
   onChange,
   outputFormat = "html",
+  valueFormat = "auto",
   lineSpacing = 1.6,
   placeholder,
   mode: modeProp,
@@ -45,13 +57,13 @@ function EditorRoot({
   const isView = mode === "view";
 
   const initialHtml = useMemo(
-    () => toHtml(value, outputFormat, unsafe),
+    () => toHtml(value, outputFormat, unsafe, valueFormat),
     // Seed the contentEditable from the LIVE value when (re)entering edit mode.
     // EditorContent reads this once on mount, and it only mounts in edit mode —
     // so this captures the current value on view→edit, not a stale mount snapshot,
     // and does NOT re-run on every keystroke.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isView, outputFormat, unsafe],
+    [isView, outputFormat, unsafe, valueFormat],
   );
 
   const extensions = useMemo(
@@ -137,7 +149,7 @@ function EditorRoot({
       >
         <ContentRenderer
           value={value}
-          format={outputFormat}
+          format={valueFormat !== "auto" ? valueFormat : outputFormat}
           lineSpacing={lineSpacing}
           extensions={instanceExtensions}
           unsafe={unsafe}

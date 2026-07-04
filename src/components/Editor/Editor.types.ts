@@ -30,6 +30,17 @@ export interface EditorProps {
   defaultValue?: string;
   onChange?: (value: string) => void;
   outputFormat?: "html" | "markdown";
+  /**
+   * The format of the INCOMING `value` / `defaultValue`. Default `"auto"`
+   * keeps the historical sniff (`detectFormat`) — but real-world markdown that
+   * merely mentions HTML-ish snippets (`<code>`, `<table`, …) flips the sniff
+   * to html and renders as a wall of text. Callers with a KNOWN format
+   * (file-typed content, values previously emitted with
+   * `outputFormat="markdown"`) should declare it; explicit values bypass the
+   * sniff entirely — in edit mode AND view mode.
+   * @default "auto"
+   */
+  valueFormat?: "markdown" | "html" | "auto";
   lineSpacing?: number;
   placeholder?: string;
   /**
