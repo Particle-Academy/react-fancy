@@ -1,4 +1,4 @@
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ElementType } from "react";
 import type { ButtonColor, Size } from "../../utils/types";
 
 export interface ButtonProps
@@ -45,6 +45,14 @@ export interface ButtonProps
   disabled?: boolean;
   /** Render as anchor tag */
   href?: string;
+  /**
+   * Anchor-mode element override — the component to render INSTEAD of the
+   * plain `<a>` when `href` is set, e.g. a router's `<Link>` (Inertia, React
+   * Router, Next) so the button navigates client-side. Receives `href`,
+   * `className`, and the forwarded rest props. Ignored without `href` or when
+   * `disabled` (the plain `<button>` renders as always).
+   */
+  as?: ElementType;
   /** Anchor `target` — only applies in `href` (anchor) mode. */
   target?: AnchorHTMLAttributes<HTMLAnchorElement>["target"];
   /** Anchor `rel` — only applies in `href` (anchor) mode. */

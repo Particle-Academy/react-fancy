@@ -1,4 +1,4 @@
-import { forwardRef, type AnchorHTMLAttributes, type ForwardedRef, type ReactNode } from "react";
+import { forwardRef, type AnchorHTMLAttributes, type ElementType, type ForwardedRef, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
 import { sanitizeHref } from "../../utils/sanitize";
 import { resolve } from "../../data/emoji-utils";
@@ -248,6 +248,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       loading = false,
       disabled,
       href,
+      as: As,
       responsive,
       labelClassName,
       ...props
@@ -452,10 +453,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // Build the button element
     // -----------------------------------------------------------------------
     const safeHref = sanitizeHref(href);
+    // Anchor mode renders `as` when provided (e.g. a router's <Link> for
+    // client-side navigation — Inertia, React Router, Next). Previously `as`
+    // fell through ...props onto the <a> where React silently DROPS a
+    // function-valued unknown attribute — so `<Button as={Link}>` looked fine
+    // but did a full page load. `as` only applies in anchor mode; without an
+    // href (or when disabled) the plain <button> renders as always.
+    const Anchor = (As ?? "a") as ElementType;
     const buttonEl = safeHref && !disabled ? (
       // Anchor mode forwards the same rest props as the <button> branch so
       // onClick / target / rel / ref / ARIA / data-* reach the <a> (issue #7).
-      <a
+      <Anchor
         ref={ref as ForwardedRef<HTMLAnchorElement>}
         href={safeHref}
         className={classes}
@@ -464,7 +472,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)}
       >
         {content}
-      </a>
+      </Anchor>
     ) : (
       <button
         ref={ref}
