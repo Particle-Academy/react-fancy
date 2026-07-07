@@ -88,6 +88,9 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-timeline]` | Timeline |
 | `[data-react-fancy-timeline-item]` | Timeline.Item |
 | `[data-react-fancy-timeline-block]` | Timeline.Block |
+| `[data-react-fancy-marquee]` | Marquee |
+| `[data-react-fancy-marquee-track]` | Marquee track (animated) |
+| `[data-react-fancy-marquee-item]` | Marquee item |
 
 #### Actions & Inputs
 

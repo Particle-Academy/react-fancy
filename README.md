@@ -130,6 +130,7 @@ npx vite build                      # Build demo app (verifies imports work)
 | Card | Container with Header, Body, Footer compound slots | [docs](docs/Card.md) |
 | Callout | Alert/info box with icon, color, and dismissible support | [docs](docs/Callout.md) |
 | Timeline | Stacked, alternating, and horizontal timeline with data-driven or compound API | [docs](docs/Timeline.md) |
+| Marquee | Auto-scrolling ticker strip with seamless wrap, px/s speed, fade edges, reduced-motion gate | [docs](docs/Marquee.md) |
 
 ### Overlay & Floating
 

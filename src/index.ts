@@ -155,6 +155,9 @@ export type { TimelineProps, TimelineItemProps, TimelineBlockProps, TimelineEven
 export { TimeGrid } from "./components/TimeGrid";
 export type { TimeGridProps, TimeGridTone } from "./components/TimeGrid";
 
+export { Marquee } from "./components/Marquee";
+export type { MarqueeProps, MarqueeDirection } from "./components/Marquee";
+
 // Phase 3: Overlay & Floating Components
 export { Tooltip } from "./components/Tooltip";
 export type { TooltipProps } from "./components/Tooltip";

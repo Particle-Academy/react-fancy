@@ -362,3 +362,82 @@
 .fancy-slide-out-right {
   animation: fancy-slide-out-right 0.2s ease-in forwards;
 }
+
+/* ─── Marquee ────────────────────────────────────────────────────────────────
+   Edge-to-edge auto-scrolling strip. The track holds two identical copies of
+   the content; translateX(-50%) over one loop shifts exactly one copy, so the
+   wrap is seamless. Duration/gap/fade arrive as custom properties set by the
+   component. No animation under prefers-reduced-motion.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+[data-react-fancy-marquee] {
+  overflow: hidden;
+  width: 100%;
+}
+
+.fancy-marquee--fade {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black var(--fancy-marquee-fade, 48px),
+    black calc(100% - var(--fancy-marquee-fade, 48px)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black var(--fancy-marquee-fade, 48px),
+    black calc(100% - var(--fancy-marquee-fade, 48px)),
+    transparent
+  );
+}
+
+.fancy-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: fancy-marquee var(--fancy-marquee-duration, 40s) linear infinite;
+  will-change: transform;
+}
+
+[data-react-fancy-marquee][data-direction="right"] .fancy-marquee__track {
+  animation-direction: reverse;
+}
+
+.fancy-marquee--pause-hover:hover .fancy-marquee__track,
+[data-react-fancy-marquee][data-paused] .fancy-marquee__track {
+  animation-play-state: paused;
+}
+
+.fancy-marquee__group {
+  display: flex;
+  flex: none;
+}
+
+.fancy-marquee__unit {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--fancy-marquee-gap, 40px);
+  padding-inline-end: var(--fancy-marquee-gap, 40px);
+  white-space: nowrap;
+}
+
+.fancy-marquee__item,
+.fancy-marquee__separator {
+  flex: none;
+}
+
+@keyframes fancy-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fancy-marquee__track {
+    animation: none;
+  }
+}
