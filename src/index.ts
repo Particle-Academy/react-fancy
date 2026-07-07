@@ -1,8 +1,12 @@
 // Components
+export { Button } from "./components/Button";
+export type { ButtonProps } from "./components/Button";
 // `Button` is the canonical name; `Action` is the original name, kept as a
 // deprecated alias for backward compatibility (removed in a future major).
-export { Button, Action } from "./components/Button";
-export type { ButtonProps, ActionProps } from "./components/Button";
+/** @deprecated Renamed to Button — use Button. */
+export { Action } from "./components/Button";
+/** @deprecated Renamed to ButtonProps — use ButtonProps. */
+export type { ActionProps } from "./components/Button";
 
 export {
   AccordionPanel,
@@ -390,7 +394,9 @@ export { cn } from "./utils/cn";
 export { sanitizeHtml, sanitizeHref } from "./utils/sanitize";
 export { resolveMediaType } from "./utils/media-type";
 export type { MediaKind, ResolveMediaTypeInput } from "./utils/media-type";
-export type { Size, Color, Variant, ButtonColor, ActionColor, Placement } from "./utils/types";
+export type { Size, Color, Variant, ButtonColor, Placement } from "./utils/types";
+/** @deprecated Renamed to ButtonColor — use ButtonColor. */
+export type { ActionColor } from "./utils/types";
 
 // Hooks
 export {

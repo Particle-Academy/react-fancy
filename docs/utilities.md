@@ -55,12 +55,13 @@ type Color =
 type Variant = "solid" | "outline" | "ghost" | "soft";
 ```
 
-### ActionColor
+### ButtonColor
+
+Standalone color accepted by `Button` and friends — an alias of `Color` (the
+full palette above). `ActionColor` remains as a deprecated alias.
 
 ```ts
-type ActionColor =
-  | "blue" | "emerald" | "amber" | "red" | "violet"
-  | "indigo" | "sky" | "rose" | "orange" | "zinc";
+type ButtonColor = Color;
 ```
 
 ### Placement

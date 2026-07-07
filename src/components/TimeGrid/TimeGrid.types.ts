@@ -1,7 +1,7 @@
 /**
- * Subset of palette colors the TimeGrid offers for the "cell-on" tone.
- * Mirrors react-fancy's `ActionColor` choice — small enough to keep the
- * compiled CSS tight, broad enough to cover most use cases.
+ * Subset of palette colors the TimeGrid offers for the "cell-on" tone —
+ * small enough to keep the compiled CSS tight, broad enough to cover most
+ * use cases.
  */
 export type TimeGridTone =
   | "violet"

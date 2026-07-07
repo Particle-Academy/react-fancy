@@ -96,8 +96,8 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 
 | Selector | Component |
 |----------|-----------|
-| `[data-react-fancy-action]` | Action (button) |
-| `[data-react-fancy-action-group]` | Action.Group |
+| `[data-react-fancy-action]` | Button (formerly `Action` — the attribute name is a stable handle and keeps the original spelling) |
+| `[data-react-fancy-action-group]` | Button external-icon wrapper |
 | `[data-react-fancy-field]` | Field (form field wrapper) |
 | `[data-react-fancy-input]` | Input |
 | `[data-react-fancy-input-wrapper]` | Input wrapper div |

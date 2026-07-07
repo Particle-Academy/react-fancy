@@ -232,9 +232,9 @@ Dark mode works via Tailwind's `dark:` class strategy. The library's `Portal` co
 ```
 src/
 ├── components/           # One directory per component
-│   ├── Action/
-│   │   ├── Action.tsx           # Component implementation
-│   │   ├── Action.types.ts      # Props interface
+│   ├── Button/
+│   │   ├── Button.tsx           # Component implementation
+│   │   ├── Button.types.ts      # Props interface
 │   │   └── index.ts             # Re-exports
 │   ├── Modal/
 │   │   ├── Modal.tsx            # Root + Object.assign compound
@@ -257,7 +257,7 @@ src/
 
 - `Size` — `"xs" | "sm" | "md" | "lg" | "xl"`
 - `Color` — Full Tailwind color palette (17 colors)
-- `ButtonColor` — Subset of 10 standalone colors used by `Button` and friends (legacy alias: `ActionColor`)
+- `ButtonColor` — Standalone colors used by `Button` and friends; alias of `Color` (full palette). Deprecated legacy alias: `ActionColor`
 - `Variant` — `"solid" | "outline" | "ghost" | "soft"`
 - `Placement` — `"top" | "bottom" | "left" | "right"` + start/end variants
 

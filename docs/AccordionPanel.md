@@ -22,22 +22,22 @@ import { AccordionPanel } from "@particle-academy/react-fancy";
 ```tsx
 <AccordionPanel orientation="horizontal" defaultValue={["wishlist"]}>
   <AccordionPanel.Section id="home" pinned>
-    <Action icon="home" />
+    <Button icon="home" />
   </AccordionPanel.Section>
 
   <AccordionPanel.Section id="wishlist">
     <AccordionPanel.Trigger />
     <AccordionPanel.Content>
-      <Action icon="list">Wishlist</Action>
-      <Action icon="mail">Feedback</Action>
-      <Action icon="file-text">Plans</Action>
+      <Button icon="list">Wishlist</Button>
+      <Button icon="mail">Feedback</Button>
+      <Button icon="file-text">Plans</Button>
     </AccordionPanel.Content>
   </AccordionPanel.Section>
 
   <AccordionPanel.Section id="board">
     <AccordionPanel.Trigger />
     <AccordionPanel.Content>
-      <Action icon="grid">Board</Action>
+      <Button icon="grid">Board</Button>
     </AccordionPanel.Content>
   </AccordionPanel.Section>
 </AccordionPanel>
@@ -55,7 +55,7 @@ When closed, the Trigger renders as a standalone chevron button. When open, the 
     {({ open }) => (open ? "Collapse" : "Expand")}
   </AccordionPanel.Trigger>
   <AccordionPanel.Content>
-    <Action>Releases</Action>
+    <Button>Releases</Button>
   </AccordionPanel.Content>
 </AccordionPanel.Section>
 ```
