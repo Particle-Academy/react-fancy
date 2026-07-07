@@ -154,6 +154,7 @@ npx vite build                      # Build demo app (verifies imports work)
 | Navbar | Responsive navigation bar with hamburger collapse | [docs](docs/Navbar.md) |
 | Pagination | Page navigation with prev/next and ellipsis | [docs](docs/Pagination.md) |
 | TreeNav | Hierarchical file/folder tree with expand/collapse, selection, and extension-based icons | [docs](docs/TreeNav.md) |
+| FileBrowser | Remote-capable file/folder browser + directory picker — lazy async provider and/or streamed snapshot tree, breadcrumb + editable path, sorting, name filter | [docs](docs/FileBrowser.md) |
 
 ### Rich Content
 

@@ -389,6 +389,26 @@ export type {
   DropPosition,
 } from "./components/TreeNav";
 
+export { FileBrowser, useFileBrowser } from "./components/FileBrowser";
+export type {
+  FileEntry,
+  FileKind,
+  FileSnapshotNode,
+  FileBrowserProvider,
+  FileSelectMode,
+  FileSort,
+  FileSortField,
+  FileSortDirection,
+  FileLoadStatus,
+  FileBrowserProps,
+  FileBrowserRow,
+  FileBrowserContextValue,
+  FileBrowserPathBarProps,
+  FileBrowserToolbarProps,
+  FileBrowserTreeProps,
+  FileBrowserNodeProps,
+} from "./components/FileBrowser";
+
 // Utilities
 export { cn } from "./utils/cn";
 export { sanitizeHtml, sanitizeHref } from "./utils/sanitize";
