@@ -26,7 +26,9 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Trusted Publishing (OIDC) requires npm 11.5.1+; bundled npm in
-      # the runner is 10.x. Use npx to fetch a fresh npm just for publish.
+      # Trusted Publishing (OIDC) requires npm 11.5.1+; bundled npm in the
+      # runner is 10.x. Pin a known-good npm rather than npm@latest: 12.0.0
+      # (the current latest) ships a broken --provenance path that fails with
+      # "Cannot find module 'sigstore'". 11.18.0 is the last stable 11.x.
       - name: Publish
-        run: npx -y npm@latest publish --provenance --access public
+        run: npx -y npm@11.18.0 publish --provenance --access public
