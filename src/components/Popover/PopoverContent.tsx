@@ -7,7 +7,7 @@ import { useOutsideClick } from "../../hooks/use-outside-click";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import type { PopoverContentProps } from "./Popover.types";
 
-export function PopoverContent({ children, className }: PopoverContentProps) {
+export function PopoverContent({ children, className, style, ...rest }: PopoverContentProps) {
   const { open, setOpen, anchorRef, floatingRef, placement, offset, hover, onHoverEnter, onHoverLeave } = usePopover();
   const outsideRef = useRef<HTMLDivElement>(null);
 
@@ -29,6 +29,7 @@ export function PopoverContent({ children, className }: PopoverContentProps) {
   return (
     <Portal>
       <div
+        {...rest}
         ref={(node) => {
           outsideRef.current = node;
           (floatingRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
@@ -39,7 +40,7 @@ export function PopoverContent({ children, className }: PopoverContentProps) {
           positioned ? "fancy-scale-in" : "invisible",
           className,
         )}
-        style={{ left: position.x, top: position.y }}
+        style={{ ...style, left: position.x, top: position.y }}
         onMouseEnter={hover ? onHoverEnter : undefined}
         onMouseLeave={hover ? onHoverLeave : undefined}
       >
