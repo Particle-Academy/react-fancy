@@ -162,7 +162,7 @@ npx vite build                      # Build demo app (verifies imports work)
 |-----------|-------------|------|
 | Composer | Chat-style message input composing textarea + actions | [docs](docs/Composer.md) |
 | Chart | SVG-based Bar, Line, Area, Pie, Donut, and Sparkline charts | [docs](docs/Chart.md) |
-| Editor | Toolbar chrome wrapper for contentEditable | [docs](docs/Editor.md) |
+| Editor | Toolbar chrome wrapper for contentEditable, with a Source toggle to edit raw HTML/Markdown | [docs](docs/Editor.md) |
 | Kanban | Drag-and-drop board with columns and cards | [docs](docs/Kanban.md) |
 | Canvas | Interactive node canvas with pan, zoom, and connections | [docs](docs/Canvas.md) |
 | Diagram | Entity-relationship diagram with draggable nodes and relation lines | [docs](docs/Diagram.md) |

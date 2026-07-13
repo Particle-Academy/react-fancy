@@ -320,6 +320,7 @@ export type {
   EditorProps,
   EditorToolbarProps,
   EditorContentProps,
+  EditorSourceToggleProps,
   EditorAction,
   EditorContextValue,
 } from "./components/Editor";

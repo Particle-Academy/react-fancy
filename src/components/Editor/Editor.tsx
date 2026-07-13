@@ -6,6 +6,7 @@ import { useControllableState } from "../../hooks";
 import { EditorContext } from "./Editor.context";
 import { EditorToolbar } from "./EditorToolbar";
 import { EditorToolbarSeparator } from "./EditorToolbarSeparator";
+import { EditorSourceToggle } from "./EditorSourceToggle";
 import { EditorContent } from "./EditorContent";
 import { htmlToMarkdown, detectFormat } from "./editor.utils";
 import { mergeExtensions } from "../ContentRenderer/extensions";
@@ -49,21 +50,30 @@ function EditorRoot({
   mode: modeProp,
   extensions: instanceExtensions,
   unsafe = false,
+  showSource: showSourceProp,
+  defaultShowSource = false,
+  onShowSourceChange,
 }: EditorProps) {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [value, setValue] = useControllableState(controlledValue, defaultValue, onChange);
+  const [showSource, setShowSource] = useControllableState(
+    showSourceProp,
+    defaultShowSource,
+    onShowSourceChange,
+  );
   // View/edit mode — same resolution as the inputs: prop → <Form> context → "edit".
   const mode = useFieldMode(modeProp);
   const isView = mode === "view";
 
   const initialHtml = useMemo(
     () => toHtml(value, outputFormat, unsafe, valueFormat),
-    // Seed the contentEditable from the LIVE value when (re)entering edit mode.
-    // EditorContent reads this once on mount, and it only mounts in edit mode —
-    // so this captures the current value on view→edit, not a stale mount snapshot,
-    // and does NOT re-run on every keystroke.
+    // Seed the contentEditable from the LIVE value when (re)entering edit mode —
+    // and when returning from the raw-source view, which may have rewritten the
+    // value out from under the rich-text surface. EditorContent re-seeds when
+    // this recomputes; it does NOT re-run on every keystroke (`value` is not a
+    // dep, so typing in the rich-text surface never re-seeds it).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isView, outputFormat, unsafe, valueFormat],
+    [isView, outputFormat, unsafe, valueFormat, showSource],
   );
 
   const extensions = useMemo(
@@ -106,6 +116,15 @@ function EditorRoot({
     [handleInput],
   );
 
+  // The source textarea edits `value` directly — it is already the canonical
+  // source in `outputFormat` (html or markdown), so no conversion round-trip.
+  const handleSourceInput = useCallback(
+    (next: string) => {
+      setValue(next);
+    },
+    [setValue],
+  );
+
   const wrapSelection = useCallback(
     (before: string, after: string) => {
       const sel = window.getSelection();
@@ -130,8 +149,12 @@ function EditorRoot({
     lineSpacing,
     placeholder,
     extensions,
+    showSource,
+    setShowSource,
     _initialHtml: initialHtml,
     _onInput: handleInput,
+    _sourceValue: value,
+    _onSourceInput: handleSourceInput,
   };
 
   // View mode — render the value read-only through ContentRenderer, matching the
@@ -182,4 +205,5 @@ const ToolbarWithSeparator = Object.assign(EditorToolbar, {
 export const Editor = Object.assign(EditorRoot, {
   Toolbar: ToolbarWithSeparator,
   Content: EditorContent,
+  SourceToggle: EditorSourceToggle,
 });

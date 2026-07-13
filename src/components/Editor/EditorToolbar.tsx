@@ -1,5 +1,6 @@
 import { cn } from "../../utils/cn";
 import { useEditor } from "./Editor.context";
+import { EditorSourceToggle } from "./EditorSourceToggle";
 import type { EditorToolbarProps } from "./Editor.types";
 
 const DEFAULT_ACTIONS = [
@@ -14,8 +15,9 @@ export function EditorToolbar({
   onAction,
   children,
   className,
+  showSourceToggle = true,
 }: EditorToolbarProps) {
-  const { exec } = useEditor();
+  const { exec, showSource } = useEditor();
 
   return (
     <div
@@ -25,29 +27,36 @@ export function EditorToolbar({
         className,
       )}
     >
-      {children ??
-        actions.map((action) => (
-          <button
-            key={`${action.command}-${action.commandArg ?? ""}`}
-            type="button"
-            onClick={() => {
-              if (onAction) {
-                onAction(action.command);
-              } else {
-                exec(action.command, action.commandArg);
-              }
-            }}
-            title={action.label}
-            className={cn(
-              "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm transition-colors",
-              action.active
-                ? "bg-zinc-200 dark:bg-zinc-700"
-                : "hover:bg-zinc-100 dark:hover:bg-zinc-800",
-            )}
-          >
-            {action.icon}
-          </button>
-        ))}
+      {children ?? (
+        <>
+          {actions.map((action) => (
+            <button
+              key={`${action.command}-${action.commandArg ?? ""}`}
+              type="button"
+              // Rich-text commands don't apply to the raw-source textarea.
+              disabled={showSource}
+              onClick={() => {
+                if (onAction) {
+                  onAction(action.command);
+                } else {
+                  exec(action.command, action.commandArg);
+                }
+              }}
+              title={action.label}
+              className={cn(
+                "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm transition-colors",
+                action.active
+                  ? "bg-zinc-200 dark:bg-zinc-700"
+                  : "hover:bg-zinc-100 dark:hover:bg-zinc-800",
+                showSource && "cursor-not-allowed opacity-40 hover:bg-transparent",
+              )}
+            >
+              {action.icon}
+            </button>
+          ))}
+          {showSourceToggle && <EditorSourceToggle className="ml-auto" />}
+        </>
+      )}
     </div>
   );
 }

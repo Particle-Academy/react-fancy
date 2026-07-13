@@ -5,5 +5,6 @@ export type {
   EditorProps,
   EditorToolbarProps,
   EditorContentProps,
+  EditorSourceToggleProps,
   EditorAction,
 } from "./Editor.types";

@@ -12,10 +12,18 @@ export interface EditorContextValue {
   placeholder?: string;
   /** Merged render extensions (global + instance). */
   extensions: RenderExtension[];
+  /** Whether the raw-source view (textarea) is showing instead of the rich-text surface. */
+  showSource: boolean;
+  /** Toggle/set the raw-source view. */
+  setShowSource: (showSource: boolean) => void;
   /** Initial HTML content to load into the editor on mount */
   _initialHtml: string;
   /** @internal Called by EditorContent on input events */
   _onInput: () => void;
+  /** @internal Raw source value (`value` in `outputFormat`), for the source textarea. */
+  _sourceValue: string;
+  /** @internal Commit an edit made directly in the source textarea. */
+  _onSourceInput: (value: string) => void;
 }
 
 export const EditorContext = createContext<EditorContextValue | null>(null);
