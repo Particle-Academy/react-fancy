@@ -36,6 +36,7 @@ function TreeNavRoot({
   defaultExpandAll = false,
   indentSize = 16,
   showIcons = true,
+  dragCursor = "none",
   className,
 }: TreeNavProps) {
   const [internalExpanded, setInternalExpanded] = useState<string[]>(() => {
@@ -82,10 +83,10 @@ function TreeNavRoot({
   const ctx = useMemo(
     () => ({
       selectedId, onSelect, onNodeContextMenu, expandedIds, toggle, indentSize, showIcons,
-      draggable, dragState, setDragState, onNodeMove, acceptExternalDrops, onExternalDrop, nodes, expandNode,
+      draggable, dragCursor, dragState, setDragState, onNodeMove, acceptExternalDrops, onExternalDrop, nodes, expandNode,
     }),
     [selectedId, onSelect, onNodeContextMenu, expandedIds, toggle, indentSize, showIcons,
-     draggable, dragState, onNodeMove, acceptExternalDrops, onExternalDrop, nodes, expandNode],
+     draggable, dragCursor, dragState, onNodeMove, acceptExternalDrops, onExternalDrop, nodes, expandNode],
   );
 
   const dropEnabled = draggable || acceptExternalDrops;

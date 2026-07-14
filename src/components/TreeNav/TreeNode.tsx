@@ -115,7 +115,7 @@ function computeDropPosition(
 export function TreeNode({ node, depth }: TreeNodeProps) {
   const {
     selectedId, onSelect, onNodeContextMenu, expandedIds, toggle, indentSize, showIcons,
-    draggable, dragState, setDragState, onNodeMove, acceptExternalDrops, onExternalDrop, nodes, expandNode,
+    draggable, dragCursor, dragState, setDragState, onNodeMove, acceptExternalDrops, onExternalDrop, nodes, expandNode,
   } = useTreeNav();
 
   const isFolder = node.type === "folder" || (node.children && node.children.length > 0);
@@ -283,7 +283,13 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
             : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
           node.disabled && "pointer-events-none opacity-40",
           isDragging && "opacity-50",
-          canDrag && "cursor-grab active:cursor-grabbing",
+          // Grab affordance. By default (`dragCursor="none"`) the row keeps its
+          // normal click cursor on hover — no open-hand "move me" cursor before
+          // any drag — and only shows the closed-hand `grabbing` cursor while a
+          // drag is actually underway (mousedown/drag). `dragCursor="grab"` opts
+          // back into the always-on grab cursor for whole-row drag handles (#14).
+          canDrag &&
+            (dragCursor === "grab" ? "cursor-grab active:cursor-grabbing" : "active:cursor-grabbing"),
           isDropTarget && dropPosition === "inside" && "bg-blue-500/10 ring-1 ring-blue-500/30 ring-inset",
         )}
         style={{ paddingLeft }}

@@ -60,6 +60,17 @@ export interface TreeNavProps {
   indentSize?: number;
   /** Show file/folder icons (default: true) */
   showIcons?: boolean;
+  /**
+   * Cursor shown on hover over a draggable node.
+   * - `"none"` (default): the normal clickable cursor — no move affordance on
+   *   mere hover. A closed-hand `grabbing` cursor still appears while a drag is
+   *   actually happening. This suits click-to-select/open trees (file/nav
+   *   trees), where an always-on grab cursor wrongly implies move-first intent.
+   * - `"grab"`: show the open-hand `grab` cursor on hover. Opt in when the whole
+   *   row is genuinely a drag handle and reordering is the primary interaction.
+   * @default "none"
+   */
+  dragCursor?: "grab" | "none";
   /** Custom className */
   className?: string;
 }
@@ -73,6 +84,7 @@ export interface TreeNavContextValue {
   indentSize: number;
   showIcons: boolean;
   draggable: boolean;
+  dragCursor: "grab" | "none";
   dragState: DragState;
   setDragState: (state: DragState) => void;
   onNodeMove?: (sourceId: string, targetId: string, position: DropPosition) => void;
