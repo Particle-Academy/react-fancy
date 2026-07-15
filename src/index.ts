@@ -325,6 +325,9 @@ export type {
   EditorContextValue,
 } from "./components/Editor";
 
+export { CodeView } from "./components/CodeView";
+export type { CodeViewProps } from "./components/CodeView";
+
 export { ContentRenderer, registerExtension, registerExtensions } from "./components/ContentRenderer";
 export type {
   ContentRendererProps,

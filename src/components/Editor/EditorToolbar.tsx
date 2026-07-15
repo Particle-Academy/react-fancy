@@ -23,7 +23,7 @@ export function EditorToolbar({
     <div
       data-react-fancy-editor-toolbar=""
       className={cn(
-        "flex items-center gap-0.5 border-b border-zinc-200 px-2 py-1.5 dark:border-zinc-700",
+        "flex shrink-0 items-center gap-0.5 border-b border-zinc-200 px-2 py-1.5 dark:border-zinc-700",
         className,
       )}
     >

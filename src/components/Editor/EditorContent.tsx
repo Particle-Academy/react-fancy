@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { cn } from "../../utils/cn";
+import { CodeView } from "../CodeView";
 import { useEditor } from "./Editor.context";
 import { proseClasses, extensionEditorClasses } from "./editor.utils";
 import type { EditorContentProps } from "./Editor.types";
@@ -44,24 +45,20 @@ export function EditorContent({ className, maxHeight, sourceClassName }: EditorC
   );
 
   if (showSource) {
+    // Raw-source view — a syntax-highlighted code surface (HTML highlighted;
+    // markdown/plain un-highlighted), built on the shared fancy-file-commons
+    // primitives. It's a DIRECT child of the flex-column editor root (no
+    // wrapper — a nested flex box collapses the fill), so `flex-auto` makes it
+    // fill the editor body when height-constrained and grow with content
+    // (≥ minHeight) when not. `maxHeight` caps + scrolls.
     return (
-      <textarea
-        data-react-fancy-editor-source=""
+      <CodeView
         value={_sourceValue}
-        onChange={(e) => _onSourceInput(e.target.value)}
-        spellCheck={false}
+        onChange={_onSourceInput}
+        language={outputFormat === "html" ? "html" : "plaintext"}
         placeholder={placeholder}
-        aria-label={`${outputFormat === "markdown" ? "Markdown" : "HTML"} source`}
-        style={{
-          maxHeight: maxHeight ? `${maxHeight}px` : undefined,
-        }}
-        className={cn(
-          "block min-h-[120px] w-full resize-y px-4 py-3 font-mono text-xs leading-relaxed outline-none",
-          "bg-zinc-50 text-zinc-800 focus:outline-none dark:bg-zinc-900 dark:text-zinc-200",
-          "placeholder:text-zinc-400",
-          maxHeight && "overflow-y-auto",
-          sourceClassName,
-        )}
+        maxHeight={maxHeight}
+        className={cn("min-h-0 flex-auto", sourceClassName)}
       />
     );
   }
@@ -79,9 +76,8 @@ export function EditorContent({ className, maxHeight, sourceClassName }: EditorC
         maxHeight: maxHeight ? `${maxHeight}px` : undefined,
       }}
       className={cn(
-        "min-h-[120px] px-4 py-3 text-sm outline-none",
+        "min-h-[120px] flex-auto overflow-y-auto px-4 py-3 text-sm outline-none",
         "focus:outline-none",
-        maxHeight && "overflow-y-auto",
         proseClasses,
         extClasses,
         "empty:before:content-[attr(data-placeholder)] empty:before:text-zinc-400 empty:before:pointer-events-none",

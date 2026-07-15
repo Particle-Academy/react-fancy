@@ -188,7 +188,7 @@ function EditorRoot({
         data-react-fancy-editor=""
         data-mode="edit"
         className={cn(
-          "overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900",
+          "flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900",
           className,
         )}
       >

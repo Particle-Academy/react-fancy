@@ -90,11 +90,13 @@ A toolbar button that reveals the raw HTML/Markdown behind the editor. It is app
 ## Source View
 
 The default toolbar includes a **Source** toggle (`</>`) on the right. Clicking it
-swaps the rich-text surface for a `<textarea>` showing the raw markup — HTML when
-`outputFormat="html"`, Markdown when `outputFormat="markdown"`. Edits made in the
-textarea flow straight to `value`; toggling back re-renders the rich-text surface
-from the edited source. Formatting buttons in the default toolbar are disabled
-while source view is open.
+swaps the rich-text surface for a syntax-highlighted [`CodeView`](./CodeView.md)
+showing the raw markup — HTML (highlighted) when `outputFormat="html"`, Markdown
+(plain) when `outputFormat="markdown"`. The source view **fills the editor's
+height** (give the `Editor` a height, e.g. `className="h-full"` inside a sized
+box), and grows with content otherwise. Edits flow straight to `value`; toggling
+back re-renders the rich-text surface from the edited source. Formatting buttons
+in the default toolbar are disabled while source view is open.
 
 ```tsx
 // Source toggle is on by default — nothing to wire up.
