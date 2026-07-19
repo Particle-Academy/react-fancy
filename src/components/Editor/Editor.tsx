@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { marked } from "marked";
 import { cn } from "../../utils/cn";
 import { sanitizeHtml } from "../../utils/sanitize";
@@ -65,15 +65,30 @@ function EditorRoot({
   const mode = useFieldMode(modeProp);
   const isView = mode === "view";
 
+  // The value this editor last emitted through `onChange`. An incoming `value`
+  // equal to it is our own keystroke echoing back; anything else came from
+  // OUTSIDE — an async load, a host reset, a form repopulating.
+  const lastEmitted = useRef<string | null>(null);
+
+  // Bumped only on an external `value` change, so the seed memo below recomputes
+  // for those and stays put while the user types. Without this, `value` was
+  // excluded from the deps to avoid re-seeding on keystrokes, which also meant a
+  // value arriving after mount was silently dropped and the editor stayed blank
+  // forever (#15).
+  const [externalSeed, setExternalSeed] = useState(0);
+  useEffect(() => {
+    if (value !== lastEmitted.current) setExternalSeed((n) => n + 1);
+  }, [value]);
+
   const initialHtml = useMemo(
     () => toHtml(value, outputFormat, unsafe, valueFormat),
     // Seed the contentEditable from the LIVE value when (re)entering edit mode —
     // and when returning from the raw-source view, which may have rewritten the
-    // value out from under the rich-text surface. EditorContent re-seeds when
-    // this recomputes; it does NOT re-run on every keystroke (`value` is not a
-    // dep, so typing in the rich-text surface never re-seeds it).
+    // value out from under the rich-text surface. `value` itself stays out of
+    // the deps so typing never re-seeds (which would fight the caret);
+    // `externalSeed` covers the externally-driven case instead.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isView, outputFormat, unsafe, valueFormat, showSource],
+    [isView, outputFormat, unsafe, valueFormat, showSource, externalSeed],
   );
 
   const extensions = useMemo(
@@ -91,7 +106,11 @@ function EditorRoot({
   const handleInput = useCallback(() => {
     const el = contentRef.current;
     if (!el) return;
-    setValue(getOutputValue(el.innerHTML));
+    const next = getOutputValue(el.innerHTML);
+    // Record what we emitted BEFORE publishing it, so the value coming back in
+    // is recognised as our own and does not trigger a re-seed mid-keystroke.
+    lastEmitted.current = next;
+    setValue(next);
   }, [setValue, getOutputValue]);
 
   const exec = useCallback(
@@ -120,6 +139,9 @@ function EditorRoot({
   // source in `outputFormat` (html or markdown), so no conversion round-trip.
   const handleSourceInput = useCallback(
     (next: string) => {
+      // Also an internal emission — record it so typing in the source view is
+      // not mistaken for an external change on every keystroke.
+      lastEmitted.current = next;
       setValue(next);
     },
     [setValue],
