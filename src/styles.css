@@ -363,6 +363,79 @@
   animation: fancy-slide-out-right 0.2s ease-in forwards;
 }
 
+/* Vertical drawer edges. The horizontal pair above predates Drawer (it was
+   built for MobileMenu.Flyout, which only ever opened left/right); these
+   complete the set so `side="top"`/`side="bottom"` animate rather than pop. */
+
+@keyframes fancy-slide-in-top {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fancy-slide-out-top {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes fancy-slide-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fancy-slide-out-bottom {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+.fancy-slide-in-top {
+  animation: fancy-slide-in-top 0.25s ease-out;
+}
+
+.fancy-slide-out-top {
+  animation: fancy-slide-out-top 0.2s ease-in forwards;
+}
+
+.fancy-slide-in-bottom {
+  animation: fancy-slide-in-bottom 0.25s ease-out;
+}
+
+.fancy-slide-out-bottom {
+  animation: fancy-slide-out-bottom 0.2s ease-in forwards;
+}
+
+/* Reduced motion collapses the travel — but must NOT use `animation: none`.
+   `useAnimation` unmounts on `animationend`, so removing the animation removes
+   the event, and a closed drawer would stay in the DOM forever. A ~0 duration
+   still fires it. */
+@media (prefers-reduced-motion: reduce) {
+  .fancy-slide-in-left,
+  .fancy-slide-out-left,
+  .fancy-slide-in-right,
+  .fancy-slide-out-right,
+  .fancy-slide-in-top,
+  .fancy-slide-out-top,
+  .fancy-slide-in-bottom,
+  .fancy-slide-out-bottom {
+    animation-duration: 0.01ms;
+  }
+}
+
 /* ─── Marquee ────────────────────────────────────────────────────────────────
    Edge-to-edge auto-scrolling strip. The track holds two identical copies of
    the content; translateX(-50%) over one loop shifts exactly one copy, so the

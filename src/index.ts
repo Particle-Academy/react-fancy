@@ -203,6 +203,19 @@ export type {
   ModalContextValue,
 } from "./components/Modal";
 
+export { Drawer, useDrawer } from "./components/Drawer";
+export type {
+  DrawerProps,
+  DrawerHeaderProps,
+  DrawerBodyProps,
+  DrawerFooterProps,
+  DrawerContainerProps,
+  DrawerContextValue,
+  DrawerSide,
+  DrawerSize,
+  DrawerAttach,
+} from "./components/Drawer";
+
 export { Toast, useToast } from "./components/Toast";
 export type {
   ToastData,
