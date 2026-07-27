@@ -5,6 +5,7 @@ export function BreadcrumbsItem({
   children,
   href,
   active = false,
+  onClick,
   className,
 }: BreadcrumbsItemProps) {
   const baseClass = cn(
@@ -20,6 +21,25 @@ export function BreadcrumbsItem({
       <a data-react-fancy-breadcrumbs-item="" href={href} className={baseClass}>
         {children}
       </a>
+    );
+  }
+
+  // A crumb that navigates through a callback rather than a URL. Controlled
+  // components own their navigation and have no href to give — a repository
+  // browser walking directories, a wizard stepping back — and until this
+  // existed the only way to make such a crumb clickable was to nest a button
+  // inside the span below, which is interactive content inside a non-
+  // interactive element.
+  if (onClick && !active) {
+    return (
+      <button
+        type="button"
+        data-react-fancy-breadcrumbs-item=""
+        onClick={onClick}
+        className={cn(baseClass, "cursor-pointer border-0 bg-transparent p-0")}
+      >
+        {children}
+      </button>
     );
   }
 

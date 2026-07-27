@@ -11,6 +11,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.17.0] - 2026-07-27
+
+### Added
+
+- **`<Breadcrumbs.Item onClick>`** — a crumb that navigates by callback instead
+  of by URL.
+
+  The item only ever supported `href`, so a **controlled** component that owns
+  its own navigation had no address to link to: a repository browser walking
+  directories, a wizard stepping back, any surface whose "location" lives in
+  React state rather than the URL bar. The only way to make such a crumb
+  clickable was to nest a `<button>` inside the rendered `<span>`, which puts
+  interactive content inside a non-interactive element.
+
+  Renders the crumb as a `<button>`. `href` still wins if both are given — a
+  link is right-clickable, middle-clickable and copyable and a button is none of
+  those, so silently downgrading one to the other would be the wrong way to
+  resolve the ambiguity. Ignored on the `active` crumb, which is where you
+  already are.
+
+  **Nothing to do.** Purely additive; every existing crumb renders exactly as
+  before.
+
 ## [4.16.0] - 2026-07-20
 
 ### Added
