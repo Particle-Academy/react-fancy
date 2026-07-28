@@ -41,6 +41,40 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
     const isPM = h24 >= 12;
     const displayHour = format === "12h" ? (h24 % 12 || 12) : h24;
 
+    // These four MUST stay above the view-mode early return below.
+    //
+    // They used to sit after it, which meant view mode ran three hooks and edit
+    // mode ran seven. Clicking "Click to edit" flipped `showControl` and React
+    // hit a different hook count on the very next render — the classic
+    // desync, which surfaces as a crash from inside React naming none of this
+    // code. Nothing caught it because no test ever crossed the boundary.
+    const updateTime = useCallback(
+      (hours: number, mins: number) => {
+        setValue(`${pad(hours)}:${pad(mins)}`);
+      },
+      [setValue],
+    );
+
+    const changeHour = useCallback(
+      (delta: number) => {
+        const newHour = (h24 + delta + 24) % 24;
+        updateTime(newHour, minutes);
+      },
+      [h24, minutes, updateTime],
+    );
+
+    const changeMinute = useCallback(
+      (delta: number) => {
+        const newMin = (minutes + delta + 60) % 60;
+        updateTime(h24, newMin);
+      },
+      [h24, minutes, updateTime],
+    );
+
+    const toggleAmPm = useCallback(() => {
+      updateTime((h24 + 12) % 24, minutes);
+    }, [h24, minutes, updateTime]);
+
     if (!showControl) {
       const formatted =
         format === "12h"
@@ -76,33 +110,6 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
         </div>
       );
     }
-
-    const updateTime = useCallback(
-      (hours: number, mins: number) => {
-        setValue(`${pad(hours)}:${pad(mins)}`);
-      },
-      [setValue],
-    );
-
-    const changeHour = useCallback(
-      (delta: number) => {
-        const newHour = (h24 + delta + 24) % 24;
-        updateTime(newHour, minutes);
-      },
-      [h24, minutes, updateTime],
-    );
-
-    const changeMinute = useCallback(
-      (delta: number) => {
-        const newMin = (minutes + delta + 60) % 60;
-        updateTime(h24, newMin);
-      },
-      [h24, minutes, updateTime],
-    );
-
-    const toggleAmPm = useCallback(() => {
-      updateTime((h24 + 12) % 24, minutes);
-    }, [h24, minutes, updateTime]);
 
     const spinBtnClass =
       "flex h-7 w-full items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 disabled:opacity-50";

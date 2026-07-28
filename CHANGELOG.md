@@ -11,6 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`TimePicker` crashed the first time you clicked "Click to edit".** Four
+  `useCallback`s sat below the `mode="view"` early return, so view mode ran three
+  hooks and edit mode ran seven. React compares hook counts between renders, so
+  the transition threw `Rendered more hooks than during the previous render` from
+  inside React — an error naming none of this component, with the field gone from
+  the page.
+
+  **If you use `<TimePicker mode="view">`, this was reproducible on every first
+  click.** `mode="edit"` (the default) was never affected, which is why it
+  survived: the whole existing suite rendered one mode and stopped, and the bug
+  lives exclusively in the transition.
+
+  A regression test now mounts in view mode and clicks. It fails against the
+  previous release, which is the only reason to trust it.
+
 ### Changed
 
 - Widened the `@particle-academy/fancy-file-commons` requirement from `^0.2.0` to
