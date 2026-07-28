@@ -62,7 +62,7 @@
     "tailwindcss": "^4.0.0"
   },
   "dependencies": {
-    "@particle-academy/fancy-file-commons": "^0.2.0",
+    "@particle-academy/fancy-file-commons": ">=0.2 <2.0",
     "clsx": "^2.1.0",
     "lucide-react": "^0.511.0",
     "marked": "^15.0.0",
