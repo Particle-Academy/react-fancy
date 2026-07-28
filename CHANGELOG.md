@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.17.1] — 2026-07-28
+
 ### Fixed
 
 - **`TimePicker` crashed the first time you clicked "Click to edit".** Four
