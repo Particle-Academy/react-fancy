@@ -11,6 +11,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Navigation primitives accept `as`, so a router `<Link>` can render in their
+  place.** `Navbar.Item`, `Sidebar.Item`, `Menu.Item`, `MobileMenu.Item` and
+  `Breadcrumbs.Item` all hardcoded a plain `<a href>` — a **full page load** in
+  every client-routed app, from the app's own nav chrome. The only workaround
+  was nesting a router `<Link>` inside the item, which is an anchor inside an
+  anchor: invalid HTML, and the same nested-anchor shape behind a past SSR
+  hydration bug.
+
+  `as` is the seam `Button` already had, and it is router-agnostic on purpose —
+  one prop covers Inertia, TanStack Router, React Router and Next rather than a
+  package per router. **No action needed:** the default is still `"a"`, so an
+  item given only `href` renders exactly what it rendered before.
+
+  ```tsx
+  // href-based routers (Inertia, Next)
+  <Navbar.Item as={Link} href="/dashboard">Dashboard</Navbar.Item>
+
+  // to-based routers (TanStack Router, React Router) — router props pass through
+  <Navbar.Item as={Link} to="/dashboard">Dashboard</Navbar.Item>
+  ```
+
+  Link mode engages on `href` **or** `as`, because a `to`-based router passes no
+  `href` and would otherwise fall through to the non-interactive branch — an item
+  that renders correctly and navigates nowhere. `href` is only forwarded when
+  actually set, so it cannot overwrite the one a router derives for itself.
+
+  Unrecognized props now reach the rendered element, which is what carries `to`,
+  `params`, `preload` and `search` through to a router's Link.
+
+### Fixed
+
+- **`onClick` was silently dropped on any item with an `href`.** `Sidebar.Item`,
+  `Menu.Item` and `MobileMenu.Item` swapped the whole prop set in link mode, so
+  an item that navigates *and* closes a drawer — the common mobile case — never
+  ran its handler, with no error to notice. It now fires alongside navigation.
+
 ## [4.17.1] — 2026-07-28
 
 ### Fixed

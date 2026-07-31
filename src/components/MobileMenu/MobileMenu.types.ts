@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { NavigableProps } from "../../utils/types";
 
 export type MobileMenuVariant = "flyout" | "bottom-bar";
 export type MobileMenuSide = "left" | "right";
@@ -23,9 +24,8 @@ export interface MobileMenuBottomBarProps {
   className?: string;
 }
 
-export interface MobileMenuItemProps {
+export interface MobileMenuItemProps extends NavigableProps {
   children: ReactNode;
-  href?: string;
   icon?: ReactNode;
   active?: boolean;
   disabled?: boolean;

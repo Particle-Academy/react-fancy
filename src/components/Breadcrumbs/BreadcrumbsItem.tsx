@@ -1,12 +1,15 @@
+import type { ElementType } from "react";
 import { cn } from "../../utils/cn";
 import type { BreadcrumbsItemProps } from "./Breadcrumbs.types";
 
 export function BreadcrumbsItem({
   children,
   href,
+  as: As,
   active = false,
   onClick,
   className,
+  ...rest
 }: BreadcrumbsItemProps) {
   const baseClass = cn(
     "text-sm",
@@ -16,11 +19,21 @@ export function BreadcrumbsItem({
     className,
   );
 
-  if (href && !active) {
+  // The CURRENT crumb stays a <span> even with `as`: it is the page you are on,
+  // so a link to it is a link to nowhere, and `aria-current="page"` is the point.
+  if ((href || As) && !active) {
+    const Link = (As ?? "a") as ElementType;
+
     return (
-      <a data-react-fancy-breadcrumbs-item="" href={href} className={baseClass}>
+      <Link
+        data-react-fancy-breadcrumbs-item=""
+        {...(href ? { href } : {})}
+        onClick={onClick}
+        className={baseClass}
+        {...rest}
+      >
         {children}
-      </a>
+      </Link>
     );
   }
 
@@ -37,6 +50,7 @@ export function BreadcrumbsItem({
         data-react-fancy-breadcrumbs-item=""
         onClick={onClick}
         className={cn(baseClass, "cursor-pointer border-0 bg-transparent p-0")}
+        {...rest}
       >
         {children}
       </button>
@@ -44,7 +58,7 @@ export function BreadcrumbsItem({
   }
 
   return (
-    <span data-react-fancy-breadcrumbs-item="" className={baseClass} aria-current={active ? "page" : undefined}>
+    <span data-react-fancy-breadcrumbs-item="" className={baseClass} aria-current={active ? "page" : undefined} {...rest}>
       {children}
     </span>
   );
