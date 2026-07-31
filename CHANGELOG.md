@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.18.0] - 2026-07-31
+
 ### Added
 
 - **Navigation primitives accept `as`, so a router `<Link>` can render in their
