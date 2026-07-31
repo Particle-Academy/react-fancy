@@ -1,3 +1,4 @@
+import type { ElementType } from "react";
 import { cn } from "../../utils/cn";
 import { useMobileMenu } from "./MobileMenu.context";
 import type { MobileMenuItemProps } from "./MobileMenu.types";
@@ -5,23 +6,32 @@ import type { MobileMenuItemProps } from "./MobileMenu.types";
 export function MobileMenuItem({
   children,
   href,
+  as: As,
   icon,
   active = false,
   disabled = false,
   badge,
   onClick,
   className,
+  ...rest
 }: MobileMenuItemProps) {
   const { variant } = useMobileMenu();
   const isBottomBar = variant === "bottom-bar";
 
-  const Tag = href ? "a" : "button";
-  const tagProps = href ? { href } : { type: "button" as const, onClick };
+  // See NavigableProps: link mode engages on `href` OR `as`. Keeping `onClick`
+  // in link mode matters most here — a mobile item usually has to close the menu
+  // as well as navigate, and it was silently dropped.
+  const isLink = Boolean(href || As);
+  const Tag = isLink ? ((As ?? "a") as ElementType) : "button";
+  const tagProps = isLink
+    ? { ...(href ? { href } : {}), onClick }
+    : { type: "button" as const, onClick };
 
   if (isBottomBar) {
     return (
       <Tag
         {...tagProps}
+        {...rest}
         data-react-fancy-mobile-menu-item=""
         data-active={active || undefined}
         aria-current={active ? "page" : undefined}
@@ -47,6 +57,7 @@ export function MobileMenuItem({
   return (
     <Tag
       {...tagProps}
+      {...rest}
       data-react-fancy-mobile-menu-item=""
       data-active={active || undefined}
       aria-current={active ? "page" : undefined}

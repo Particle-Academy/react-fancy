@@ -1,3 +1,4 @@
+import type { ElementType } from "react";
 import { cn } from "../../utils/cn";
 import { useMenu } from "./Menu.context";
 import type { MenuItemProps } from "./Menu.types";
@@ -5,22 +6,30 @@ import type { MenuItemProps } from "./Menu.types";
 export function MenuItem({
   children,
   href,
+  as: As,
   icon,
   active = false,
   disabled = false,
   badge,
   onClick,
   className,
+  ...rest
 }: MenuItemProps) {
   const { orientation } = useMenu();
   const isVertical = orientation === "vertical";
 
-  const Tag = href ? "a" : "button";
-  const tagProps = href ? { href } : { type: "button" as const, onClick };
+  // See NavigableProps: link mode engages on `href` OR `as`, and `onClick`
+  // survives into it rather than being dropped.
+  const isLink = Boolean(href || As);
+  const Tag = isLink ? ((As ?? "a") as ElementType) : "button";
+  const tagProps = isLink
+    ? { ...(href ? { href } : {}), onClick }
+    : { type: "button" as const, onClick };
 
   return (
     <Tag
       {...tagProps}
+      {...rest}
       data-react-fancy-menu-item=""
       data-active={active || undefined}
       aria-current={active ? "page" : undefined}

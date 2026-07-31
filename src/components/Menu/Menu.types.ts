@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { NavigableProps } from "../../utils/types";
 
 export type MenuOrientation = "horizontal" | "vertical";
 
@@ -8,9 +9,8 @@ export interface MenuProps {
   className?: string;
 }
 
-export interface MenuItemProps {
+export interface MenuItemProps extends NavigableProps {
   children: ReactNode;
-  href?: string;
   icon?: ReactNode;
   active?: boolean;
   disabled?: boolean;

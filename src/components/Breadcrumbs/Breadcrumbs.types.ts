@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { NavigableProps } from "../../utils/types";
 
 export interface BreadcrumbsProps {
   children: ReactNode;
@@ -7,9 +8,8 @@ export interface BreadcrumbsProps {
   className?: string;
 }
 
-export interface BreadcrumbsItemProps {
+export interface BreadcrumbsItemProps extends NavigableProps {
   children: ReactNode;
-  href?: string;
   active?: boolean;
   /**
    * Navigate by callback instead of by URL, for a crumb with no href.

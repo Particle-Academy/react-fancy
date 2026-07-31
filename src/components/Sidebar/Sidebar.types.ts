@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { NavigableProps } from "../../utils/types";
 
 export type SidebarCollapseMode = "icons" | "letters";
 
@@ -17,9 +18,8 @@ export interface SidebarProps {
   className?: string;
 }
 
-export interface SidebarItemProps {
+export interface SidebarItemProps extends NavigableProps {
   children: ReactNode;
-  href?: string;
   icon?: ReactNode;
   active?: boolean;
   disabled?: boolean;

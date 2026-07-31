@@ -1,3 +1,4 @@
+import type { ElementType } from "react";
 import { cn } from "../../utils/cn";
 import { useSidebar } from "./Sidebar.context";
 import type { SidebarItemProps } from "./Sidebar.types";
@@ -11,17 +12,26 @@ function getLetters(children: React.ReactNode): string {
 export function SidebarItem({
   children,
   href,
+  as: As,
   icon,
   active = false,
   disabled = false,
   badge,
   onClick,
   className,
+  ...rest
 }: SidebarItemProps) {
   const { collapsed, collapseMode } = useSidebar();
 
-  const Tag = href ? "a" : "button";
-  const tagProps = href ? { href } : { type: "button" as const, onClick };
+  // Link mode engages on `href` OR `as` — a `to`-based router (TanStack Router,
+  // React Router) passes no href, and would otherwise render a <button> that
+  // navigates nowhere. `onClick` now rides along in link mode instead of being
+  // dropped: an item that both navigates and closes a drawer is the common case.
+  const isLink = Boolean(href || As);
+  const Tag = isLink ? ((As ?? "a") as ElementType) : "button";
+  const tagProps = isLink
+    ? { ...(href ? { href } : {}), onClick }
+    : { type: "button" as const, onClick };
 
   const showIconOnly = collapsed && collapseMode === "icons" && icon;
   const showLetters = collapsed && (collapseMode === "letters" || (collapseMode === "icons" && !icon));
@@ -31,6 +41,7 @@ export function SidebarItem({
   return (
     <Tag
       {...tagProps}
+      {...rest}
       data-react-fancy-sidebar-item=""
       data-active={active || undefined}
       aria-current={active ? "page" : undefined}

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { NavigableProps } from "../../utils/types";
 
 export interface NavbarContextValue {
   mobileOpen: boolean;
@@ -20,9 +21,8 @@ export interface NavbarItemsProps {
   className?: string;
 }
 
-export interface NavbarItemProps {
+export interface NavbarItemProps extends NavigableProps {
   children: ReactNode;
-  href?: string;
   active?: boolean;
   className?: string;
 }
