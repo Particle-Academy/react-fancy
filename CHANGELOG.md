@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **README: component demos now point at the showcase package pages.** The
+  "Demo Pages" section still sent readers (and agents) to
+  `resources/js/react-demos/pages/`, a tree that was removed from the showcase.
+  Every component's live demo is a page at
+  `https://ui.particle.academy/packages/react-fancy/<component>`, sourced from
+  one file per component in `Particle-Academy/pa-ux-sandbox` under
+  `resources/js/Pages/Packages/ComponentDocs/`. Docs only — no code change.
+
 ## [4.18.0] - 2026-07-31
 
 ### Added

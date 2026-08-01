@@ -265,7 +265,16 @@ src/
 
 ## Demo Pages
 
-Component demos live in the monorepo at `resources/js/react-demos/pages/`. Each component has a `ComponentNameDemo.tsx` that exercises all props and states using the `DemoSection` wrapper component.
+Every component has a live demo page on the showcase site, at
+`https://ui.particle.academy/packages/react-fancy/<component>` — e.g.
+[`/packages/react-fancy/button`](https://ui.particle.academy/packages/react-fancy/button).
+Each one exercises the component's props and states, with the source for every
+example shown inline.
+
+Those pages are the demos: one file per component in the showcase repo
+([`Particle-Academy/pa-ux-sandbox`](https://github.com/Particle-Academy/pa-ux-sandbox))
+at `resources/js/Pages/Packages/ComponentDocs/<ComponentName>.tsx`. The older
+`resources/js/react-demos/pages/` tree they replaced no longer exists.
 
 ---
 
@@ -318,7 +327,7 @@ Purely visual primitives (labels, dividers, layout shells) only owe the first bu
 - tsup handles the build — ESM, CJS, and `.d.ts` generation.
 - `react`, `react-dom`, and `lucide-react` are external dependencies, never bundled.
 - After any change, verify with `pnpm --filter @particle-academy/react-fancy build` before considering the work done.
-- When updating a component, update its demo page in `resources/js/react-demos/pages/` to cover all new features.
+- When updating a component, update its demo page in the showcase repo — `resources/js/Pages/Packages/ComponentDocs/<ComponentName>.tsx` in [`Particle-Academy/pa-ux-sandbox`](https://github.com/Particle-Academy/pa-ux-sandbox) — to cover all new features. That page is what `/packages/react-fancy/<component>` renders.
 
 ---
 
