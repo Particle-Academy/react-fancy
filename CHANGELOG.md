@@ -11,6 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 4.19.1 — 2026-08-02
+
+### Fixed
+
+- **`Sidebar.Item` labels were clipped mid-word instead of ellipsing.** Two
+  causes stacked. A `<button>` sizes to FIT-CONTENT rather than to its parent,
+  so a label longer than the sidebar made the item wider than the sidebar and an
+  ancestor clipped the overflow. And the label span carried `truncate` without
+  `min-w-0`, so even under width pressure a flex item defaults to
+  `min-width: auto` — its min-content width — and refuses to shrink. Fixed with
+  `w-full` on the item and `min-w-0` on the label; either alone is insufficient.
+
+  Only visible with labels longer than the sidebar is wide, which is why short
+  nav labels never surfaced it.
+
 ## 4.19.0 — 2026-08-02
 
 ### Added

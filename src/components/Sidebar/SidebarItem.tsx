@@ -48,7 +48,13 @@ export function SidebarItem({
       aria-disabled={disabled || undefined}
       title={collapsed ? title : undefined}
       className={cn(
-        "flex items-center rounded-md text-sm font-medium transition-colors",
+        // `w-full` matters when the Tag is a <button>: form controls size to
+        // FIT-CONTENT, not to their parent, so a long label made the item wider
+        // than the sidebar and an ancestor clipped the overflow — which reads as
+        // a label cut off mid-word rather than an ellipsis. Without this,
+        // `min-w-0` on the label below can never engage, because the item is
+        // never under width pressure in the first place.
+        "flex w-full items-center rounded-md text-sm font-medium transition-colors",
         "outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
         collapsed ? "justify-center px-2 py-2" : "gap-2 px-3 py-2",
         active
@@ -67,7 +73,18 @@ export function SidebarItem({
       {!collapsed && (
         <>
           {icon && <span className="flex h-5 w-5 shrink-0 items-center justify-center">{icon}</span>}
-          <span className="flex-1 truncate text-left">{children}</span>
+          {/*
+            `min-w-0` is load-bearing, not tidiness. A flex item defaults to
+            `min-width: auto`, which resolves to its MIN-CONTENT width — so with
+            `truncate` alone the span refuses to shrink below the full label,
+            and the item grows wider than the sidebar instead of ellipsing.
+            The overflow then gets clipped by an ancestor, which looks like a
+            mid-word cut rather than a truncation.
+
+            Only shows up with labels longer than the sidebar is wide, which is
+            why it survived: short nav labels never trigger it.
+          */}
+          <span className="min-w-0 flex-1 truncate text-left">{children}</span>
           {badge && <span className="shrink-0">{badge}</span>}
         </>
       )}
