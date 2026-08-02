@@ -11,6 +11,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 4.19.0 — 2026-08-02
+
+### Added
+
+- **A brand colour scheme — `brand`, `primary-*` and `secondary-*`.** Packages
+  across the suite were already writing `bg-brand`, `text-primary-600` and
+  `border-secondary-200` against tokens **nothing defined**. Tailwind generated
+  no such utility, the class resolved to nothing, and the component rendered
+  with correct markup and no colour — and no error anywhere. This turns those
+  class names into a contract instead of a hope.
+
+  - `brand` — one accent; the thing a consumer rebrands first.
+  - `primary-50…950` — the accent as a full scale.
+  - `secondary-50…950` — the **neutral** scale for surfaces, borders and text.
+
+  **`secondary-*` inverts with the theme.** `text-secondary-900` means
+  "strongest foreground", not "nearly black", so it stays readable on a dark
+  surface. That distinction is the defect it was written to prevent: mixing a
+  literal background (`bg-white`) with a semantic foreground
+  (`text-secondary-900`) is what rendered white-on-white in a dark host and made
+  `@particle-academy/classroom` unusable on the showcase.
+
+  **What you must DO: nothing.** Purely additive — no existing utility changes
+  meaning. Override any token in your own `@theme` and yours wins, because the
+  utilities read the variable rather than baking a value in:
+
+  ```css
+  @theme { --color-brand: var(--color-emerald-600); }
+  ```
+
+  Requires `@import "@particle-academy/react-fancy/styles.css"` in your Tailwind
+  entry, which is already the documented setup.
+
 ### Changed
 
 - **README: component demos now point at the showcase package pages.** The

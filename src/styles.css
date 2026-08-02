@@ -1,5 +1,77 @@
 /* @particle-academy/react-fancy — base styles + animations */
 
+/* ─── Brand colour scheme ────────────────────────────────────────────────────
+   Three token families every Fancy package can rely on, so a component never
+   has to invent a palette or hardcode a literal:
+
+     brand         one accent — the thing a consumer rebrands first
+     primary-*     the accent as a full 50→950 scale
+     secondary-*   the NEUTRAL scale for surfaces, borders and body text
+
+   Why this exists: packages were already writing `bg-brand`, `text-primary-600`
+   and `border-secondary-200` against tokens nothing defined. Tailwind generated
+   no such utility, the class silently resolved to nothing, and the component
+   rendered unstyled — correct markup, no colour, no error. Defining them here
+   turns those classes into a contract instead of a hope.
+
+   SECONDARY INVERTS WITH THE THEME. `text-secondary-900` means "strongest
+   foreground", not "nearly black" — so it stays readable on a dark surface.
+   That distinction is the whole point: mixing a literal background (`bg-white`)
+   with a semantic foreground (`text-secondary-900`) is what produced
+   white-on-white in a dark host.
+
+   OVERRIDE IT. Redefine any of these in your own `@theme` (or on `:root`) and
+   yours wins — nothing here is `!important`, and the utilities read the variable
+   rather than baking a value in:
+
+     @theme { --color-brand: var(--color-emerald-600); }
+   ──────────────────────────────────────────────────────────────────────────── */
+@theme {
+  --color-brand: var(--color-violet-600);
+
+  --color-primary-50: var(--color-violet-50);
+  --color-primary-100: var(--color-violet-100);
+  --color-primary-200: var(--color-violet-200);
+  --color-primary-300: var(--color-violet-300);
+  --color-primary-400: var(--color-violet-400);
+  --color-primary-500: var(--color-violet-500);
+  --color-primary-600: var(--color-violet-600);
+  --color-primary-700: var(--color-violet-700);
+  --color-primary-800: var(--color-violet-800);
+  --color-primary-900: var(--color-violet-900);
+  --color-primary-950: var(--color-violet-950);
+
+  /* Light-theme defaults: 50 = faintest surface, 900/950 = strongest text. */
+  --color-secondary-50: var(--color-zinc-50);
+  --color-secondary-100: var(--color-zinc-100);
+  --color-secondary-200: var(--color-zinc-200);
+  --color-secondary-300: var(--color-zinc-300);
+  --color-secondary-400: var(--color-zinc-400);
+  --color-secondary-500: var(--color-zinc-500);
+  --color-secondary-600: var(--color-zinc-600);
+  --color-secondary-700: var(--color-zinc-700);
+  --color-secondary-800: var(--color-zinc-800);
+  --color-secondary-900: var(--color-zinc-900);
+  --color-secondary-950: var(--color-zinc-950);
+}
+
+/* Dark: the neutral scale flips, so "900" still means strongest foreground and
+   "50" still means faintest surface. Wrapped in :where() for zero specificity,
+   matching the rest of this file — any consumer override beats it. */
+:where(.dark) {
+  --color-secondary-50: var(--color-zinc-950);
+  --color-secondary-100: var(--color-zinc-900);
+  --color-secondary-200: var(--color-zinc-800);
+  --color-secondary-300: var(--color-zinc-700);
+  --color-secondary-400: var(--color-zinc-600);
+  --color-secondary-500: var(--color-zinc-500);
+  --color-secondary-600: var(--color-zinc-400);
+  --color-secondary-700: var(--color-zinc-300);
+  --color-secondary-800: var(--color-zinc-200);
+  --color-secondary-900: var(--color-zinc-100);
+  --color-secondary-950: var(--color-zinc-50);
+}
+
 /* ─── Input & Field defaults ─────────────────────────────────────────────────
    Better UX out of the box: spacing between stacked fields, smooth transitions,
    and polished dark-mode defaults. All overridable via data-attribute selectors.
