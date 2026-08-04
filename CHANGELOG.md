@@ -11,6 +11,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 5.0.0 — 2026-08-04
+
+The kit 0.5 platform floors. **This release changes only what the package
+requires — no component API changed, nothing was removed, and nothing was
+renamed.** If you are already on React 19 and Node 22, upgrading is a version
+bump and nothing else.
+
+### Changed
+
+- **BREAKING — React 18 is no longer supported.** `peerDependencies.react` and
+  `react-dom` move from `^18.0.0 || ^19.0.0` to `^19.0.0`.
+
+  **What you must do:** if you are on React 19, nothing. If you are on React 18,
+  stay on `react-fancy@4` — it continues to receive fixes on the 0.4 kit line —
+  or upgrade your app to React 19 first, then take this release.
+
+  React 18 support was a claim nothing tested. Every build and every test in
+  this package has always run against 19 (`devDependencies.react` was `^19.0.0`),
+  so the 18 half of that range was never executed. An untested compatibility
+  claim is worse than an absent one, because it reads as support.
+
+- **BREAKING — Node 22 is now declared as the floor.** `engines.node` is
+  `>=22`, where the package previously declared nothing at all.
+
+  **What you must do:** on Node 22 or newer, nothing. Note that npm only
+  *warns* on an `engines` mismatch, but **pnpm fails the install**, so this
+  surfaces differently depending on your package manager. Node 18 is
+  end-of-life and 20 is maintenance-only.
+
+  Declaring nothing was not the same as supporting old Node — it meant a
+  consumer on 18 installed cleanly and discovered the problem at runtime.
+
+- `devDependencies` for `react`, `react-dom`, `@types/react` and
+  `@types/react-dom` pinned to `^19.2.0`, so the tested version is stated
+  rather than inherited.
+
+### Why this is a major
+
+This package is past 1.0, so a breaking change takes a major. Most of the suite
+is pre-1.0 and lands the same floors in a minor — that difference is semver, not
+a difference in how much changed.
+
+**Peer ranges in consuming packages:** most first-party packages declare
+`@particle-academy/react-fancy` as an open range (`>=3`, `>=4`) and resolve 5.x
+without any change. A few pinned an upper bound and need widening before they
+can take this; those are released alongside.
+
 ## 4.19.1 — 2026-08-02
 
 ### Fixed
