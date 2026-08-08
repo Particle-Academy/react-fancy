@@ -11,6 +11,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 5.1.0 — 2026-08-07
+
+### Added
+
+- **`reveal` on `Input`** — a show/hide toggle for `type="password"`, which the
+  component did not have. Consumers were hand-rolling an eye-icon button beside
+  the field to get it.
+
+  ```tsx
+  <Input type="password" reveal />
+  ```
+
+  Optional `revealed` / `onRevealedChange` make the state controllable, and
+  `revealLabel` / `hideLabel` replace the default accessible labels.
+
+  Details that are easy to get wrong when hand-rolling it, and are handled here:
+
+  - The toggle is `type="button"`. The HTML default is `submit`, so a reveal
+    inside a login form submits the form on every click.
+  - It is `tabIndex={-1}`. The path through a login form is field → submit, and
+    a reveal in between is a stop most people do not want. It stays reachable by
+    click and to screen readers, which carry `aria-pressed` and `aria-controls`.
+  - Only the RENDERED type changes. The declared `type` stays `"password"`, so
+    `mode="view"` still masks the value rather than printing it.
+  - `reveal` on a non-password input is ignored — a reveal on a visible field is
+    a button that does nothing.
+  - It replaces `trailing` rather than stacking on it; both occupy the same
+    corner, and rendering both looks like a bug.
+
+  The icons are inline SVG rather than `<Icon>`, so a password field does not
+  depend on an icon set being registered.
+
+
 ## 5.0.0 — 2026-08-04
 
 The kit 0.5 platform floors. **This release changes only what the package

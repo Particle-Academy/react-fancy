@@ -1,7 +1,7 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "5.0.0",
-  "description": "React UI component library for Human+ UX \u2014 controlled, agent-bridgeable primitives",
+  "version": "5.1.0",
+  "description": "React UI component library for Human+ UX — controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Particle-Academy/react-fancy.git"
