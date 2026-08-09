@@ -11,6 +11,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.5.0] — 2026-08-09
+
+### Added
+
+- **`<Kbd>`** — a keyboard key cap. `<Kbd>K</Kbd>`, or a chord with
+  `<Kbd keys={["Cmd", "K"]} />`.
+
+  Twenty `<kbd>` elements across this suite's own showcase carried **six**
+  different className recipes for the same thing: rounded, bordered, mono,
+  small, with a dark-mode counterpart. None disagreed on intent — they
+  disagreed on which greys.
+
+  Two details it puts in one place. `min-w`, because without it a `K` cap is
+  visibly narrower than an `Esc` beside it and a row of single letters reads as
+  ragged rather than as keys. And `not-italic`, because several UA stylesheets
+  italicise `<kbd>` — every hand-rolled copy that happened to set a mono font
+  hid that by accident, and the one that did not, did not.
+
+  A chord renders as one `<kbd>` containing per-key caps, with the separator
+  `aria-hidden`, so a screen reader announces "Cmd + K" as the single shortcut
+  it is rather than as two unrelated keys.
+
+  **What you must do:** nothing. Additive.
+
+
 ## [5.4.0] — 2026-08-09
 
 ### Added

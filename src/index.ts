@@ -134,6 +134,8 @@ export { Brand, BrandMark } from "./components/Brand";
 export type { BrandProps, BrandMarkProps } from "./components/Brand";
 export { Eyebrow } from "./components/Eyebrow";
 export type { EyebrowProps } from "./components/Eyebrow";
+export { Kbd } from "./components/Kbd";
+export type { KbdProps } from "./components/Kbd";
 
 export { Profile } from "./components/Profile";
 export type { ProfileProps } from "./components/Profile";
