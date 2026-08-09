@@ -11,6 +11,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.14.0] — 2026-08-09
+
+### Added
+
+- **`StatList`** — the mono figure stack (`70 packages / 261 components / MIT
+  licensed`). Story #170, task 224.
+
+  ```tsx
+  <StatList items={[{ value: 70, label: "packages" }]} />
+  ```
+
+  The Inspiration index and `/packages` each hand-rolled this from tokens. That
+  is the gallery working as intended — it stress-tests the kit and what it
+  hand-rolls is the gap list — but the list only pays off when the gap comes
+  back here, otherwise every surface keeps a copy and they drift.
+
+  Takes `items` as **data rather than children**, because what those surfaces
+  repeat is a shape, not a layout — and a data prop is what an agent can emit,
+  which children are not. Each row carries a `data-stat` handle so a figure can
+  be addressed rather than counted.
+
 ## [5.13.1] — 2026-08-09
 
 ### Fixed

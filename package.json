@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "5.13.1",
+  "version": "5.14.0",
   "description": "React UI component library for Human+ UX \u2014 controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
@@ -23,17 +23,6 @@
         "default": "./dist/index.cjs"
       }
     },
-    "./icons": {
-      "import": {
-        "types": "./dist/icons.d.ts",
-        "default": "./dist/icons.js"
-      },
-      "require": {
-        "types": "./dist/icons.d.cts",
-        "default": "./dist/icons.cjs"
-      }
-    },
-    "./styles.css": "./dist/styles.css",
     "./accordion": {
       "import": {
         "types": "./dist/accordion.d.ts",
@@ -394,6 +383,16 @@
         "default": "./dist/icon.cjs"
       }
     },
+    "./icons": {
+      "import": {
+        "types": "./dist/icons.d.ts",
+        "default": "./dist/icons.js"
+      },
+      "require": {
+        "types": "./dist/icons.d.cts",
+        "default": "./dist/icons.cjs"
+      }
+    },
     "./image-viewer": {
       "import": {
         "types": "./dist/image-viewer.d.ts",
@@ -744,6 +743,16 @@
         "default": "./dist/stat.cjs"
       }
     },
+    "./stat-list": {
+      "import": {
+        "types": "./dist/stat-list.d.ts",
+        "default": "./dist/stat-list.js"
+      },
+      "require": {
+        "types": "./dist/stat-list.d.cts",
+        "default": "./dist/stat-list.cjs"
+      }
+    },
     "./sticky-note": {
       "import": {
         "types": "./dist/sticky-note.d.ts",
@@ -754,6 +763,7 @@
         "default": "./dist/sticky-note.cjs"
       }
     },
+    "./styles.css": "./dist/styles.css",
     "./switch": {
       "import": {
         "types": "./dist/switch.d.ts",
