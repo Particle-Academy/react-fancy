@@ -28,7 +28,21 @@ export type PromptMention = {
   name: string;
   kind: "agent" | "file" | "person" | string;
 };
-export type PromptAttachment = { id: string; name: string; bytes: number };
+export type PromptAttachment = {
+  id: string;
+  name: string;
+  bytes: number;
+  /**
+   * The file the user actually attached.
+   *
+   * Optional because an attachment restored from a server has no File — but for
+   * anything the user dropped or picked it is always present. Without it a host
+   * can render a chip and nothing else: no POST, no FormData, no send-to-model.
+   */
+  file?: File;
+  /** MIME type. Hosts branch on this to decide whether a file can be sent as-is. */
+  type?: string;
+};
 
 export interface PromptInputProps {
   /** Token budget for the meter. */
@@ -84,6 +98,7 @@ export function PromptInput({
     cursor: number;
   }>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
   const colors = mentionColor ?? DEFAULT_MENTION_COLOR;
@@ -213,18 +228,33 @@ export function PromptInput({
     }
   };
 
-  const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(false);
-    const files = Array.from(e.dataTransfer.files);
+  /**
+   * Build attachments from a FileList, KEEPING the File.
+   *
+   * Shared by the drop handler and the picker so the two cannot drift — the
+   * picker being a second, subtly different copy of this is exactly how one of
+   * them would end up dropping the File again.
+   */
+  const attach = (list: FileList | File[] | null) => {
+    const files = Array.from(list ?? []);
+    if (files.length === 0) return;
+
     setAttachments((cur) => [
       ...cur,
       ...files.map((f) => ({
-        id: `${f.name}-${Date.now()}-${Math.random()}`,
+        id: crypto.randomUUID(),
         name: f.name,
         bytes: f.size,
+        file: f,
+        type: f.type,
       })),
     ]);
+  };
+
+  const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(false);
+    attach(e.dataTransfer.files);
   };
 
   return (
@@ -354,13 +384,27 @@ export function PromptInput({
             variant="ghost"
             size="sm"
             className="shrink-0"
-            onClick={() => {
-              /* host can wire its own file picker; default no-op */
-            }}
+            onClick={() => fileRef.current?.click()}
           >
             📎 attach
           </Button>
         </Tooltip>
+        {/*
+          The button above shipped with a no-op onClick and a tooltip reading
+          "Drop files here, or click" — an affordance that lied. Drop-only also
+          meant keyboard and touch users could not attach at all.
+        */}
+        <input
+          ref={fileRef}
+          type="file"
+          multiple
+          className="hidden"
+          onChange={(e) => {
+            attach(e.target.files);
+            // Let the same file be picked twice in a row.
+            e.target.value = "";
+          }}
+        />
         <div className="ml-2 flex min-w-0 items-center gap-1.5 overflow-hidden">
           <div className="h-1.5 w-24 shrink overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
             <div

@@ -11,6 +11,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.10.0] — 2026-08-09
+
+### Fixed
+
+- **`PromptInput` discarded the `File` on drop, so attachments could not be
+  uploaded.** (#16) Only `{ id, name, bytes }` survived, so a host could render
+  the chip and do nothing else with it — no POST, no `FormData`, no
+  send-to-model.
+
+  `PromptAttachment` now also carries:
+
+  ```ts
+  file?: File;   // what the user actually attached
+  type?: string; // MIME, for hosts that branch on it
+  ```
+
+  Additive — existing code reading `name`/`bytes` is unaffected. They are
+  optional because an attachment restored from a server has no `File`, but
+  anything the user dropped or picked always has one.
+
+  This is the expensive shape of bug: the UI looked finished — chips rendered,
+  sizes correct — so it was only discovered when someone wired the upload up and
+  found nothing to send. There was no escape hatch either, since attachments are
+  internal state with no `value`/`onChange` and no ref.
+
+- **The `📎 attach` button did nothing.** It shipped with a no-op `onClick` and a
+  tooltip reading "Drop files here, or click" — an affordance that lied. It now
+  opens a real file picker, which also means **keyboard and touch users can
+  attach at all**, where before drop was the only route.
+
+### Changed
+
+- Attachment ids now use `crypto.randomUUID()` instead of
+  `` `${name}-${Date.now()}-${Math.random()}` ``. Tidier, not a bug fix — the old
+  scheme did produce distinct ids, and there is a test asserting it still does.
+
 ## [5.9.0] — 2026-08-09
 
 ### Fixed
