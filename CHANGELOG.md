@@ -11,6 +11,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.3.0] — 2026-08-09
+
+### Added
+
+- **`<Card.Media>`** — the fixed-ratio thumbnail region at the top of a card,
+  with slots pinned to its corners (`topLeft` / `topRight` / `bottomLeft` /
+  `bottomRight`), an `src`, a `ratio` or fixed `height`, and a `background`.
+
+  ```tsx
+  <Card interactive>
+    <Card.Media src={thumb} background={swatch} height={122}
+                topLeft={<Chip>{num}</Chip>} topRight={<Chip>{mode}</Chip>} />
+    <Card.Body>…</Card.Body>
+  </Card>
+  ```
+
+  Four surfaces had each rebuilt exactly this from tokens, and one of them was
+  already wrapping `Card` and hand-rolling only this region — which is why it is
+  `Card.Media` and not a separate `<MediaCard>`. What was being asked for was
+  never a different card; it was a card with a picture in it.
+
+  `background` is not decoration. It shows through while the image loads and
+  stays visible if the image never arrives, so a missing thumbnail degrades to
+  the intended colour rather than to a hole.
+
+- **`<Card interactive>`** — the hover lift, border/shadow response, and corner
+  clipping a grid tile or link card wants. Clipping is part of `interactive`
+  rather than always-on, because clipping unconditionally would cut off
+  popovers and dropdowns that legitimately overflow a static card.
+
+  **What you must do:** nothing. Both are additive, and a `Card` written before
+  this release renders identically — pinned by a test.
+
+
 ## [5.2.0] — 2026-08-09
 
 ### Added

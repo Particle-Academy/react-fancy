@@ -3,6 +3,7 @@ import { cn } from "../../utils/cn";
 import { CardHeader } from "./CardHeader";
 import { CardBody } from "./CardBody";
 import { CardFooter } from "./CardFooter";
+import { CardMedia } from "./CardMedia";
 import type { CardProps } from "./Card.types";
 
 const variantClasses: Record<NonNullable<CardProps["variant"]>, string> = {
@@ -23,6 +24,7 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
     {
       variant = "outlined",
       padding = "md",
+      interactive = false,
       className,
       children,
       ...props
@@ -36,6 +38,11 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
         className={cn(
           "rounded-lg bg-white dark:bg-zinc-900",
           variantClasses[variant],
+          // `overflow-hidden` is part of `interactive` rather than always-on:
+          // clipping unconditionally would cut off popovers and dropdowns that
+          // legitimately overflow a static card.
+          interactive &&
+            "overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg hover:border-zinc-300 dark:hover:border-zinc-600",
           paddingClasses[padding],
           className,
         )}
@@ -50,6 +57,7 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
 CardRoot.displayName = "Card";
 
 export const Card = Object.assign(CardRoot, {
+  Media: CardMedia,
   Header: CardHeader,
   Body: CardBody,
   Footer: CardFooter,
