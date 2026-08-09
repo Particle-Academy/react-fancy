@@ -24,7 +24,9 @@ const VARIANT_ICON_COLORS = {
 } as const;
 
 export function ToastItem({ data, onDismiss }: ToastItemProps) {
-  const { id, title, description, variant = "default", duration = 5000 } = data;
+  const { id, title, description, variant = "default", action } = data;
+  // An action toast does not expire by default.
+  const duration = data.duration ?? (action ? 0 : 5000);
 
   useEffect(() => {
     if (duration <= 0) return;
@@ -36,6 +38,11 @@ export function ToastItem({ data, onDismiss }: ToastItemProps) {
     <div
       data-react-fancy-toast-item=""
       role="alert"
+      // Scoped to the toast rather than the document: a global Escape handler
+      // would fight whatever modal or drawer is already listening.
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onDismiss(id);
+      }}
       className={cn(
         "fancy-toast-in pointer-events-auto w-80 rounded-xl border p-4 shadow-lg",
         VARIANT_STYLES[variant],
@@ -56,6 +63,20 @@ export function ToastItem({ data, onDismiss }: ToastItemProps) {
             </p>
           )}
         </div>
+        {action && (
+          <button
+            type="button"
+            onClick={() => {
+              action.onClick();
+              // The offer is consumed; leaving it up invites undoing an
+              // already-undone action.
+              onDismiss(id);
+            }}
+            className="shrink-0 self-center rounded-md px-2 py-1 text-xs font-medium text-zinc-700 underline-offset-2 transition-colors hover:bg-zinc-100 hover:underline dark:text-zinc-200 dark:hover:bg-zinc-800"
+          >
+            {action.label}
+          </button>
+        )}
         <button
           type="button"
           onClick={() => onDismiss(id)}

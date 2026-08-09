@@ -11,6 +11,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.12.0] — 2026-08-09
+
+### Added
+
+- **`Toast` takes an `action`, so undo can be a button instead of a countdown.** (#18)
+
+  ```tsx
+  toast({
+    title: "Moved to Claimed",
+    action: { label: "Undo", onClick: () => move(id, previousStage) },
+  })
+  ```
+
+  A timeout-based undo makes the safety of an action depend on how fast someone
+  reads, which is worst for exactly the people who need undo most. Without a slot
+  a consumer either dropped undo or rebuilt the toast — and a rebuilt one does not
+  join the provider's stack, so it overlaps the real ones.
+
+  Three behaviours are baked in rather than left to callers:
+
+  - **A toast with an action does not auto-dismiss.** Expiring the offer is the
+    same bug as making undo a timeout. Pass an explicit `duration` to opt back in.
+  - Clicking the action runs it and then dismisses — leaving it up invites undoing
+    an already-undone action.
+  - **`Escape` dismisses**, scoped to the toast rather than the document, so it
+    does not fight whatever modal or drawer is already listening.
+
+  The action renders as a real `<button>`, so it is reachable by Tab from wherever
+  focus already is. `ToastAction` is exported.
+
+  **What you must do:** nothing. Toasts without an action keep the 5000ms default,
+  and there is a test asserting it.
+
 ## [5.11.0] — 2026-08-09
 
 ### Added

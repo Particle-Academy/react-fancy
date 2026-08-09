@@ -7,12 +7,32 @@ export type ToastPosition =
   | "bottom-right"
   | "bottom-left";
 
+/** A single control offered inside a toast — typically "Undo". */
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 export interface ToastData {
   id: string;
   title: string;
   description?: string;
   variant?: ToastVariant;
+  /**
+   * Auto-dismiss delay in ms. `0` (or less) never dismisses.
+   *
+   * Defaults to 5000 — but to 0 when `action` is set, because expiring the
+   * offer is the same bug as making undo a timeout. Pass a number to opt back in.
+   */
   duration?: number;
+  /**
+   * An action the toast offers, rendered as a real button.
+   *
+   * Undo has to be a control rather than a countdown: a timeout makes the safety
+   * of an action depend on how fast someone reads, which is worst for exactly
+   * the people who need undo most.
+   */
+  action?: ToastAction;
 }
 
 export interface ToastContextValue {

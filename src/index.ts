@@ -228,6 +228,7 @@ export type {
 
 export { Toast, useToast } from "./components/Toast";
 export type {
+  ToastAction,
   ToastData,
   ToastVariant,
   ToastPosition,
