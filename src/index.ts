@@ -130,8 +130,10 @@ export type { SkeletonProps } from "./components/Skeleton";
 export { Progress } from "./components/Progress";
 export type { ProgressProps } from "./components/Progress";
 
-export { Brand } from "./components/Brand";
-export type { BrandProps } from "./components/Brand";
+export { Brand, BrandMark } from "./components/Brand";
+export type { BrandProps, BrandMarkProps } from "./components/Brand";
+export { Eyebrow } from "./components/Eyebrow";
+export type { EyebrowProps } from "./components/Eyebrow";
 
 export { Profile } from "./components/Profile";
 export type { ProfileProps } from "./components/Profile";

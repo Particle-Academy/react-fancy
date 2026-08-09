@@ -1,2 +1,3 @@
 export { Brand } from "./Brand";
-export type { BrandProps } from "./Brand.types";
+export { BrandMark } from "./BrandMark";
+export type { BrandProps, BrandMarkProps } from "./Brand.types";

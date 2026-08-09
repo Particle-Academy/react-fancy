@@ -11,6 +11,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.4.0] — 2026-08-09
+
+### Added
+
+- **`<Brand.Mark>`** — the square logo tile: a glyph centred in a rounded
+  coloured square, at `sm`/`md`/`lg` or an exact pixel size.
+
+  `Brand` has always taken its mark as a caller-supplied `logo` node, which is
+  exactly why four surfaces each rebuilt the same square inline — fixed size,
+  rounded, grid-centred, bold, and `shrink-0` so a flex row never squashes it.
+  That last one is the detail every hand-rolled copy had to remember.
+
+  **It ships no brand colour, deliberately.** The default is a neutral zinc
+  tile and the fill is `className`'s job. A component library inventing your
+  brand gradient would be wrong and would be the first thing every consumer
+  overrode — and each duplicated copy already pulled its gradient from a token
+  class and hand-rolled only the box, so the box is all this owns.
+
+  Decorative by default (`aria-hidden`), which lifts when you pass an
+  `aria-label`: a mark beside the brand name is redundant to a screen reader, a
+  mark standing alone is not.
+
+- **`<Eyebrow>`** — the mono running head that opens a section:
+  `<Eyebrow num="01" label="Selected work" aside="…" rule />`.
+
+  Thirty-six gallery surfaces carry a version of this. What they share is the
+  arrangement — a numbered marker, a label, an optional trailing aside, an
+  optional hairline — while every one restyles the type, so this owns the
+  structure and the uppercase-mono default and gets out of `className`'s way.
+
+  The aside uses `ml-auto` rather than the row using `justify-between`: with
+  `justify-between` a single-item eyebrow drifts, and half of them have only
+  one item.
+
+  **What you must do:** nothing. Both are additive; `Brand` and every existing
+  component render unchanged.
+
+
 ## [5.3.0] — 2026-08-09
 
 ### Added

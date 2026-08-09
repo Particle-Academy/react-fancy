@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
 import { cn } from "../../utils/cn";
+import { BrandMark } from "./BrandMark";
 import type { BrandProps } from "./Brand.types";
 
 const gapClasses: Record<NonNullable<BrandProps["size"]>, string> = {
@@ -20,7 +21,7 @@ const taglineClasses: Record<NonNullable<BrandProps["size"]>, string> = {
   lg: "text-base",
 };
 
-export const Brand = forwardRef<HTMLDivElement, BrandProps>(
+const BrandRoot = forwardRef<HTMLDivElement, BrandProps>(
   ({ logo, name, tagline, size = "md", className }, ref) => {
     return (
       <div
@@ -58,4 +59,6 @@ export const Brand = forwardRef<HTMLDivElement, BrandProps>(
   },
 );
 
-Brand.displayName = "Brand";
+BrandRoot.displayName = "Brand";
+
+export const Brand = Object.assign(BrandRoot, { Mark: BrandMark });
