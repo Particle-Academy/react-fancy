@@ -11,6 +11,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.13.0] — 2026-08-09
+
+### Added
+
+- **Per-component subpath exports.** (#21)
+
+  ```tsx
+  import { Badge } from "@particle-academy/react-fancy/badge";
+  ```
+
+  84 subpaths, one per component. **`.` stays the barrel**, so every existing
+  import keeps working unchanged — this adds entry points, it does not move any.
+
+### Fixed
+
+- **A consumer importing one component no longer pays for all of them.**
+
+  `dist/index.js` was ~660 kB exporting ~140 names, and tree-shaking could not
+  rescue it from outside: the bundle carried hundreds of top-level initialiser
+  calls, which a bundler must keep and which transitively retain most of the
+  graph. The reporter's smallest route shipped ~931 kB of kit to render a form
+  with four inputs.
+
+  Measured by bundling a consumer that imports **only `Badge`**, minified,
+  React external:
+
+  | | bytes |
+  |---|---|
+  | published 5.12.0 | **1,133,438** |
+  | 5.13.0 | **33,255** |
+
+  The build now emits one entry per component with `splitting: true`, so shared
+  code lands in chunks instead of being copied into each entry — without that,
+  per-component entries would trade one large download for many duplicated ones,
+  which is worse for anyone importing several.
+
+  Note the **barrel itself got the same benefit**: the measurement above is
+  identical whether you import from `.` or from `/badge`. Splitting is what made
+  the graph reachable to a bundler; the subpaths make it explicit and guaranteed
+  rather than dependent on your bundler's tree-shaking.
+
+  **What you must do:** nothing. Switch to subpaths if you like the explicitness,
+  but the barrel is no longer the reason your bundle is large.
+
+### Changed
+
+- `npm run build` runs tsup under `--max-old-space-size=8192`. Generating types
+  for 84 entries exceeds Node's default heap and the build OOMs without it.
+
 ## [5.12.0] — 2026-08-09
 
 ### Added
