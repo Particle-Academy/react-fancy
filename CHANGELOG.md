@@ -11,6 +11,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.15.0] — 2026-08-09
+
+### Added
+
+- **`Container`, `Section` and `Grid`** — the layout primitives the kit did not
+  have. Story #170, task 228, which the report calls "the highest-leverage gap
+  found so far".
+
+  ```tsx
+  <Container as="main">
+    <Section divider><Grid cols={3}>…</Grid></Section>
+  </Container>
+  ```
+
+  All twenty Swiss-family gallery styles hand-rolled the same three things: a
+  page container with a max width, section rhythm, and a modular grid.
+
+  The obvious objection is that Tailwind already has `max-w-*`, `py-*` and
+  `grid-cols-*`. What got repeated twenty times was not the utilities though —
+  it was the **decisions**: how wide the page reads, how much air between
+  sections, when the grid collapses. Twenty copies of a decision drift. These own
+  the decision and leave the styling replaceable, the same split `Eyebrow` makes.
+
+  Three details worth knowing:
+
+  - `Container` and `Section` take `as`, because a container is often a `<main>`
+    and forcing a `<div>` makes you wrap it.
+  - `Grid` sets its column count through a **custom property and inline
+    `grid-template-columns`**, not a `grid-cols-N` class. N is a prop, and
+    Tailwind cannot generate a class it never sees in source — that is precisely
+    what each hand-rolled copy worked around differently.
+  - `Grid` collapses responsively by default, with `responsive={false}` for grids
+    that are genuinely fixed and look broken when they collapse.
+
 ## [5.14.0] — 2026-08-09
 
 ### Added

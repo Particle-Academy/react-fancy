@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "5.14.0",
+  "version": "5.15.0",
   "description": "React UI component library for Human+ UX \u2014 controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
@@ -233,6 +233,16 @@
         "default": "./dist/composer.cjs"
       }
     },
+    "./container": {
+      "import": {
+        "types": "./dist/container.d.ts",
+        "default": "./dist/container.js"
+      },
+      "require": {
+        "types": "./dist/container.d.cts",
+        "default": "./dist/container.cjs"
+      }
+    },
     "./content-renderer": {
       "import": {
         "types": "./dist/content-renderer.d.ts",
@@ -361,6 +371,16 @@
       "require": {
         "types": "./dist/file-upload.d.cts",
         "default": "./dist/file-upload.cjs"
+      }
+    },
+    "./grid": {
+      "import": {
+        "types": "./dist/grid.d.ts",
+        "default": "./dist/grid.js"
+      },
+      "require": {
+        "types": "./dist/grid.d.cts",
+        "default": "./dist/grid.cjs"
       }
     },
     "./heading": {
@@ -681,6 +701,16 @@
       "require": {
         "types": "./dist/reason-tag.d.cts",
         "default": "./dist/reason-tag.cjs"
+      }
+    },
+    "./section": {
+      "import": {
+        "types": "./dist/section.d.ts",
+        "default": "./dist/section.js"
+      },
+      "require": {
+        "types": "./dist/section.d.cts",
+        "default": "./dist/section.cjs"
       }
     },
     "./select": {
