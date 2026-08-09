@@ -53,7 +53,8 @@
   --color-secondary-800: var(--color-zinc-800);
   --color-secondary-900: var(--color-zinc-900);
   --color-secondary-950: var(--color-zinc-950);
-}
+}@layer base {
+
 
 /* Dark: the neutral scale flips, so "900" still means strongest foreground and
    "50" still means faintest surface. Wrapped in :where() for zero specificity,
@@ -219,6 +220,8 @@
     linear-gradient(45deg, transparent 75%, #27272a 75%),
     linear-gradient(-45deg, transparent 75%, #27272a 75%);
 }
+}
+
 
 @keyframes fancy-fade-in {
   from {
@@ -247,7 +250,8 @@
   to {
     transform: translateX(0);
   }
-}
+}@layer base {
+
 
 .fancy-fade-in {
   animation: fancy-fade-in 0.2s ease-out;
@@ -260,6 +264,8 @@
 .fancy-slide-right {
   animation: fancy-slide-right 0.3s ease-out;
 }
+}
+
 
 /* Overlay / floating animations */
 
@@ -321,7 +327,8 @@
   to {
     grid-template-rows: 0fr;
   }
-}
+}@layer base {
+
 
 .fancy-scale-in {
   animation: fancy-scale-in 0.15s ease-out;
@@ -346,6 +353,8 @@
 .fancy-collapse-close {
   animation: fancy-collapse-close 0.15s ease-in forwards;
 }
+}
+
 
 /* Mobile flyout slide animations */
 
@@ -391,7 +400,8 @@
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--fancy-glow, #a855f7) 0%, transparent);
     opacity: 0.9;
   }
-}
+}@layer base {
+
 
 .fancy-avatar-glow {
   position: absolute;
@@ -409,6 +419,8 @@
     animation: none;
   }
 }
+}
+
 
 @keyframes fancy-slide-out-right {
   from {
@@ -417,7 +429,8 @@
   to {
     transform: translateX(100%);
   }
-}
+}@layer base {
+
 
 .fancy-slide-in-left {
   animation: fancy-slide-in-left 0.25s ease-out;
@@ -434,6 +447,8 @@
 .fancy-slide-out-right {
   animation: fancy-slide-out-right 0.2s ease-in forwards;
 }
+}
+
 
 /* Vertical drawer edges. The horizontal pair above predates Drawer (it was
    built for MobileMenu.Flyout, which only ever opened left/right); these
@@ -473,7 +488,8 @@
   to {
     transform: translateY(100%);
   }
-}
+}@layer base {
+
 
 .fancy-slide-in-top {
   animation: fancy-slide-in-top 0.25s ease-out;
@@ -571,6 +587,8 @@
 .fancy-marquee__separator {
   flex: none;
 }
+}
+
 
 @keyframes fancy-marquee {
   from {
@@ -579,10 +597,13 @@
   to {
     transform: translateX(-50%);
   }
-}
+}@layer base {
+
 
 @media (prefers-reduced-motion: reduce) {
   .fancy-marquee__track {
     animation: none;
   }
 }
+}
+

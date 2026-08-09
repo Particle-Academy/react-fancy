@@ -11,6 +11,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.9.0] — 2026-08-09
+
+### Fixed
+
+- **Base styles are now in `@layer base`, so a Tailwind utility passed through
+  `className` finally wins.** (#20)
+
+  ```tsx
+  <Badge className="bg-[#4338CA] text-white">Epic</Badge>  // was silently ignored
+  ```
+
+  In the CSS cascade an **unlayered** normal declaration outranks every layered
+  one, whatever the specificity — and Tailwind v4 puts utilities in
+  `@layer utilities`. The kit shipped its base looks unlayered, so `className`
+  utilities could never win. It failed silently and backwards: the class is in
+  the DOM, DevTools shows it, nothing warns, and the consumer doing the
+  documented thing got a worse result than one reaching for `!important`.
+
+  Note this was **not** solved by the existing `:where()` wrappers. Those drop
+  specificity to zero, and a comment in `styles.css` claimed a generated utility
+  would therefore win. It would not — specificity is only compared *within* a
+  layer. Measured in a browser before and after: the overlay dark-mode rule beat
+  a `@layer utilities` background before this change and loses to it now.
+
+  **`base`, not a private layer name.** A `@layer fancy-base` orders by first
+  declaration, so whether utilities won would depend on whether you imported this
+  file before or after Tailwind. `base` always precedes `components` and
+  `utilities`, so it is order-independent and needs nothing from you.
+
+  `@theme` stays unlayered — wrapping it stops Tailwind registering the tokens at
+  all, which would turn `bg-brand` and `text-primary-600` back into classes that
+  resolve to nothing.
+
+  **What you must do:** check any place you worked around this. Overrides that
+  were previously ignored now apply, so a `className` you left in believing it
+  did nothing will start taking effect. If you moved tones into your own
+  unlayered stylesheet (the documented workaround), that still wins — unlayered
+  beats layered — so nothing breaks until you choose to move it back.
+
 ## [5.8.0] — 2026-08-09
 
 ### Fixed
