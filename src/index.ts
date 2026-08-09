@@ -136,6 +136,10 @@ export { Eyebrow } from "./components/Eyebrow";
 export type { EyebrowProps } from "./components/Eyebrow";
 export { Kbd } from "./components/Kbd";
 export type { KbdProps } from "./components/Kbd";
+export { IndexList } from "./components/IndexList";
+export type { IndexListProps, IndexListItem } from "./components/IndexList";
+export { Stat, StatBand } from "./components/Stat";
+export type { StatProps, StatBandProps } from "./components/Stat";
 
 export { Profile } from "./components/Profile";
 export type { ProfileProps } from "./components/Profile";

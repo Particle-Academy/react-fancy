@@ -11,6 +11,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.6.0] — 2026-08-09
+
+### Added
+
+- **`<Stat>` / `<Stat.Band>`** — a big display figure with a caption, and the
+  row it sits in.
+
+  Twenty-seven gallery styles build this, and **five of seventeen forgot
+  `tabular-nums`**. That is not cosmetic: in a proportional face a `1` is
+  narrower than a `0`, so a row meant to read as a band comes out visibly
+  ragged — from one property nobody thinks to look for. It is the default here,
+  at every size.
+
+- **`<IndexList>`** — the flush-left numbered index: `num · title · meta ·
+  trailing value`, each row optionally a single click target. Thirteen styles
+  build it; the sandbox uses a stretched-link treatment in twenty-four places.
+
+  **Exactly one anchor per row, by construction.** The row is `relative` and the
+  title's `<a>` carries `after:inset-0`, so the anchor's own pseudo-element
+  covers the row. Wrapping the row in an `<a>` instead produces nested anchors
+  — issue #418 — which the browser silently restructures, so the server HTML and
+  the client tree disagree and hydration fails. A test asserts the invariant.
+
+  The link text stays the title rather than becoming an `aria-label` on an
+  invisible overlay, so the accessible name is what you would say out loud.
+  `linkAs` takes your router's link component (Inertia, `next/link`) to keep
+  client-side navigation.
+
+  **What you must do:** nothing. Both additive.
+
+
 ## [5.5.0] — 2026-08-09
 
 ### Added
