@@ -1,7 +1,8 @@
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import type { Size } from "../../../utils/types";
 
-export interface FieldProps {
+export interface FieldProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   label?: string;
   description?: string;
   error?: string;

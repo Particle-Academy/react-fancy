@@ -1,4 +1,4 @@
-import type { ReactNode, TdHTMLAttributes } from "react";
+import type { HTMLAttributes, ReactNode, TdHTMLAttributes } from "react";
 
 export interface TableColumn<T = any> {
   key: string;
@@ -34,7 +34,8 @@ export interface TableBodyProps {
   className?: string;
 }
 
-export interface TableRowProps {
+export interface TableRowProps
+  extends Omit<HTMLAttributes<HTMLTableRowElement>, "onClick"> {
   children: ReactNode;
   className?: string;
   onClick?: () => void;

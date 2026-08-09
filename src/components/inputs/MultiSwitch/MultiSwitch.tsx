@@ -34,6 +34,7 @@ export function MultiSwitch<V = string>({
   onValueChange,
   linear,
   mode,
+  ...rest
 }: MultiSwitchProps<V>) {
   const resolvedOptions = list.map(resolveOption);
   const fallback = defaultValue ?? resolvedOptions[0]?.value;
@@ -75,6 +76,7 @@ export function MultiSwitch<V = string>({
   ) : (
     <div
       ref={containerRef}
+      {...rest}
       data-react-fancy-multi-switch=""
       role="radiogroup"
       id={id}

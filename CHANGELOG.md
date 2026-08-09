@@ -11,6 +11,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.8.0] — 2026-08-09
+
+### Fixed
+
+- **`data-*` and `aria-*` props now reach the DOM** on `Switch`, `Checkbox`,
+  `CheckboxGroup`, `RadioGroup`, `MultiSwitch`, `Field` and `Table.Row`. They
+  named every prop they used and had no `...rest`, so anything unrecognised was
+  silently dropped. (#22, #19)
+
+  ```tsx
+  <Switch data-pw-set="digits" … />
+  document.querySelectorAll('[data-pw-set]')  // was [] — nothing, anywhere
+  ```
+
+  Nothing reported it: React discards unknown props on a component silently,
+  TypeScript does not check hyphenated prop names at all, and the component
+  renders perfectly. It only shows up when something tries to **address** the
+  control — the agent-driving case the component contract exists to protect:
+
+  > Each interactive element has a stable identity (`id`, `data-*`, or a
+  > selector prop). Agents never guess DOM.
+
+  The two reported were `Switch` and `Table.Row`; auditing the family in one pass
+  found three more, so all of them are fixed and asserted together.
+
+  **Where the handle lands:** the component's own outermost element, which exists
+  in every mode. `Switch` renders a `<span>` instead of its `<button>` in view
+  mode, and the group components are only wrapped in `<Field>` when a label is
+  present — so attaching to the control or the wrapper would have moved the
+  handle around depending on unrelated props.
+
+  The spread comes **before** the component's own attributes, so a passed prop
+  cannot clobber the internal marker, `className` or the handlers.
+
+  **What you must do:** nothing. This only adds props that previously vanished.
+  If you worked around it with `id`, that still works — `id` was always honoured.
+
 ## [5.7.0] — 2026-08-09
 
 ### Added

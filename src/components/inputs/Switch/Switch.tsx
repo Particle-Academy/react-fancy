@@ -25,6 +25,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
       onCheckedChange,
       color = "blue",
       mode,
+      ...rest
     },
     ref,
   ) => {
@@ -63,7 +64,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
     }[size];
 
     return (
-      <div data-react-fancy-switch="" className={cn("flex items-start gap-2", className)}>
+      <div {...rest} data-react-fancy-switch="" className={cn("flex items-start gap-2", className)}>
         {!showControl ? (
           <span
             data-react-fancy-display=""

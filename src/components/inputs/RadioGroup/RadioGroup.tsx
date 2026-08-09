@@ -24,6 +24,7 @@ export function RadioGroup<V = string>({
   onValueChange,
   orientation = "vertical",
   mode,
+  ...rest
 }: RadioGroupProps<V>) {
   const groupId = useId();
   const radioName = name ?? groupId;
@@ -51,6 +52,7 @@ export function RadioGroup<V = string>({
     </DisplayValue>
   ) : (
     <div
+      {...rest}
       data-react-fancy-radio-group=""
       role="radiogroup"
       onBlur={(e) => {

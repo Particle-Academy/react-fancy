@@ -24,6 +24,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       onCheckedChange,
       indeterminate,
       mode,
+      ...rest
     },
     ref,
   ) => {
@@ -56,7 +57,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     const glyph = indeterminate ? "—" : checked ? "✓" : "✕";
 
     return (
-      <div data-react-fancy-checkbox="" className={cn("flex items-start gap-2", className)}>
+      <div {...rest} data-react-fancy-checkbox="" className={cn("flex items-start gap-2", className)}>
         {!showControl ? (
           <span
             data-react-fancy-display=""

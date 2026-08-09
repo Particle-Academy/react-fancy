@@ -11,6 +11,7 @@ export function TableRow({
   expanded: controlledExpanded,
   defaultExpanded = false,
   onExpandedChange,
+  ...rest
 }: TableRowProps) {
   const [expanded, setExpanded] = useControllableState(
     controlledExpanded,
@@ -51,6 +52,7 @@ export function TableRow({
   return (
     <>
       <tr
+        {...rest}
         data-react-fancy-table-row=""
         className={cn(
           "transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50",

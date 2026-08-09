@@ -24,6 +24,7 @@ export function CheckboxGroup<V = string>({
   onValueChange,
   orientation = "vertical",
   mode,
+  ...rest
 }: CheckboxGroupProps<V>) {
   const groupId = useId();
   const resolvedMode = useFieldMode(mode);
@@ -59,6 +60,7 @@ export function CheckboxGroup<V = string>({
     </DisplayValue>
   ) : (
     <div
+      {...rest}
       data-react-fancy-checkbox-group=""
       onBlur={(e) => {
         if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();

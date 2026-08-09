@@ -11,9 +11,10 @@ export function Field({
   size = "md",
   children,
   className,
+  ...rest
 }: FieldProps) {
   return (
-    <div data-react-fancy-field="" className={cn("flex flex-col gap-2", className)}>
+    <div {...rest} data-react-fancy-field="" className={cn("flex flex-col gap-2", className)}>
       {label && (
         <label
           htmlFor={htmlFor}
