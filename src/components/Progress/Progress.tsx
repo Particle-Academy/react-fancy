@@ -3,19 +3,23 @@ import { cn } from "../../utils/cn";
 import type { ProgressProps } from "./Progress.types";
 import { progressFill, progressStroke, progressText } from "./Progress.colors";
 
-const barHeightClasses: Record<NonNullable<ProgressProps["size"]>, string> = {
+type NamedSize = "sm" | "md" | "lg";
+
+const barHeightClasses: Record<NamedSize, string> = {
   sm: "h-1.5",
   md: "h-2.5",
   lg: "h-4",
 };
 
-const circularSizeMap: Record<NonNullable<ProgressProps["size"]>, number> = {
+const circularSizeMap: Record<NamedSize, number> = {
   sm: 32,
   md: 48,
   lg: 64,
 };
 
-const textSizeClasses: Record<NonNullable<ProgressProps["size"]>, string> = {
+const namedStrokeWidth: Record<NamedSize, number> = { sm: 3, md: 4, lg: 5 };
+
+const textSizeClasses: Record<NamedSize, string> = {
   sm: "text-[8px]",
   md: "text-[10px]",
   lg: "text-xs",
@@ -28,6 +32,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       max = 100,
       variant = "bar",
       size = "md",
+      strokeWidth: strokeWidthProp,
       color = "blue",
       indeterminate = false,
       showValue = false,
@@ -35,11 +40,21 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
     },
     ref,
   ) => {
+    // Class lookups need a named key; a pixel size sizes the ring itself and
+    // leaves the type/bar scales on their default.
+    const named: NamedSize = typeof size === "number" ? "md" : size;
+
     const percentage = Math.min(100, Math.max(0, (value / max) * 100));
 
     if (variant === "circular") {
-      const diameter = circularSizeMap[size];
-      const strokeWidth = size === "sm" ? 3 : size === "md" ? 4 : 5;
+      const pixelSize = typeof size === "number" ? size : null;
+      const diameter = pixelSize ?? circularSizeMap[named];
+      // Scale with the circle when not told otherwise: a 5px stroke on a 152px
+      // ring reads as a hairline, so a fixed default makes large sizes look
+      // broken out of the box. The named scale keeps its exact old values.
+      const strokeWidth =
+        strokeWidthProp ??
+        (pixelSize === null ? namedStrokeWidth[named] : Math.max(3, Math.round(diameter * 0.075)));
       const radius = (diameter - strokeWidth) / 2;
       const circumference = 2 * Math.PI * radius;
       const offset = indeterminate ? circumference * 0.75 : circumference - (percentage / 100) * circumference;
@@ -52,12 +67,23 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
           aria-valuemin={0}
           aria-valuemax={max}
           data-react-fancy-progress=""
-          className={cn("relative inline-flex items-center justify-center", className)}
-          style={{ width: diameter, height: diameter }}
+          // The named diameters live in styles.css keyed off this, so they work
+          // without the consumer's Tailwind generating anything — and, being
+          // layered, a className utility still beats them.
+          data-size={pixelSize === null ? named : undefined}
+          className={cn(
+            "relative inline-flex items-center justify-center",
+            className,
+          )}
+          style={pixelSize === null ? undefined : { width: pixelSize, height: pixelSize }}
         >
           <svg
-            width={diameter}
-            height={diameter}
+            // viewBox + 100% so the geometry follows the box instead of being
+            // baked in: the ring now scales with whatever sizes the wrapper,
+            // including a `className` override of the named scale.
+            viewBox={`0 0 ${diameter} ${diameter}`}
+            width="100%"
+            height="100%"
             className={cn(indeterminate && "animate-spin")}
           >
             <circle
@@ -86,7 +112,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
               className={cn(
                 "absolute font-medium",
                 progressText[color],
-                textSizeClasses[size],
+                textSizeClasses[named],
               )}
             >
               {Math.round(percentage)}%
@@ -109,7 +135,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
         <div
           className={cn(
             "w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700",
-            barHeightClasses[size],
+            barHeightClasses[named],
           )}
         >
           <div

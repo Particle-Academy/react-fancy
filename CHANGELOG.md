@@ -11,6 +11,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.11.0] — 2026-08-09
+
+### Added
+
+- **`Progress` circular accepts a pixel `size` and an explicit `strokeWidth`.** (#17)
+
+  ```tsx
+  <Progress variant="circular" value={62} size={152} strokeWidth={11} />
+  ```
+
+  `size` topped out at `lg` (64px) and was written as an **inline style**, with
+  the radius, circumference and dash maths computed in JS from that number. So a
+  larger ring was impossible rather than awkward: inline styles beat any
+  stylesheet rule short of `!important`, and winning that fight would still have
+  left the geometry wrong. The reporter built a local ring instead, duplicating
+  the circumference maths.
+
+  When no `strokeWidth` is given, a pixel size derives one from the diameter — a
+  5px stroke on a 152px ring reads as a hairline. The named scale keeps its exact
+  previous values.
+
+### Changed
+
+- The circular SVG now uses a `viewBox` with `width="100%" height="100%"`, so the
+  ring follows whatever sizes its box instead of having its dimensions baked in.
+
+- **Named diameters moved from inline styles to shipped CSS**, keyed off
+  `[data-react-fancy-progress][data-size="…"]`, so `className` can override them.
+
+  Deliberately not Tailwind classes on the element: a consumer who has not
+  `@source`d this package gets no generated utilities, and the ring would render
+  with **no size at all**. Shipping them as real CSS works regardless — and
+  because 5.9.0 put the stylesheet in `@layer base`, a utility still wins.
+
+  **What you must do:** nothing, unless you were relying on the inline style to
+  beat your own CSS. Named sizes render at the same diameters as before, and
+  there is a test asserting that.
+
 ## [5.10.0] — 2026-08-09
 
 ### Fixed

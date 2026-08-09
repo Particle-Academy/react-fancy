@@ -53,7 +53,22 @@
   --color-secondary-800: var(--color-zinc-800);
   --color-secondary-900: var(--color-zinc-900);
   --color-secondary-950: var(--color-zinc-950);
-}@layer base {
+}
+
+@layer base {
+
+/* ─── Progress (circular) — named diameters ──────────────────────────────────
+   These ship as real CSS rather than Tailwind classes on the element, because a
+   consumer who has not @sourced this package gets no generated utilities and
+   the ring would render with NO SIZE at all. They were inline styles before,
+   which always worked but could not be overridden by className (issue #17).
+
+   Being inside @layer base, a className utility now beats them — which is the
+   whole point, and the reason #20 had to land first. */
+[data-react-fancy-progress][data-size="sm"] { width: 2rem; height: 2rem; }
+[data-react-fancy-progress][data-size="md"] { width: 3rem; height: 3rem; }
+[data-react-fancy-progress][data-size="lg"] { width: 4rem; height: 4rem; }
+
 
 
 /* Dark: the neutral scale flips, so "900" still means strongest foreground and
@@ -250,7 +265,9 @@
   to {
     transform: translateX(0);
   }
-}@layer base {
+}
+
+@layer base {
 
 
 .fancy-fade-in {
@@ -327,7 +344,9 @@
   to {
     grid-template-rows: 0fr;
   }
-}@layer base {
+}
+
+@layer base {
 
 
 .fancy-scale-in {
@@ -400,7 +419,9 @@
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--fancy-glow, #a855f7) 0%, transparent);
     opacity: 0.9;
   }
-}@layer base {
+}
+
+@layer base {
 
 
 .fancy-avatar-glow {
@@ -429,7 +450,9 @@
   to {
     transform: translateX(100%);
   }
-}@layer base {
+}
+
+@layer base {
 
 
 .fancy-slide-in-left {
@@ -488,7 +511,9 @@
   to {
     transform: translateY(100%);
   }
-}@layer base {
+}
+
+@layer base {
 
 
 .fancy-slide-in-top {
@@ -597,7 +622,9 @@
   to {
     transform: translateX(-50%);
   }
-}@layer base {
+}
+
+@layer base {
 
 
 @media (prefers-reduced-motion: reduce) {
