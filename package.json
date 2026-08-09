@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "5.13.0",
+  "version": "5.13.1",
   "description": "React UI component library for Human+ UX \u2014 controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
@@ -882,10 +882,10 @@
   ],
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/tsup/dist/cli-default.js",
-    "dev": "tsup --watch",
+    "dev": "node --max-old-space-size=8192 ./node_modules/tsup/dist/cli-default.js --watch",
     "lint": "tsc --noEmit && eslint .",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run test && npm run lint && tsup",
+    "prepublishOnly": "npm run test && npm run lint && npm run build",
     "test": "vitest run",
     "test:watch": "vitest"
   },

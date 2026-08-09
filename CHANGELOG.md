@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.13.1] — 2026-08-09
+
+### Fixed
+
+- **5.13.0 never reached npm.** Its publish died with
+  `ERR_WORKER_OUT_OF_MEMORY`: 5.13.0 raised the heap in `scripts.build`, but
+  `prepublishOnly` invoked `tsup` directly and went straight past it, so the
+  release path OOMed while CI was green.
+
+  Every script now builds one way, through `npm run build`. Two routes to the
+  same build is the actual defect — fixing only the one I happened to be looking
+  at is what shipped a tag that could not publish.
+
 ## [5.13.0] — 2026-08-09
 
 ### Added
