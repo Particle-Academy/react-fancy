@@ -11,6 +11,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.0] — 2026-08-09
+
+### Added
+
+- **`<Heading>` reaches display scale.** The `size` scale gains `3xl`–`7xl`,
+  mapping to `text-5xl` through `text-9xl`, with tighter tracking at those steps
+  (`tracking-tight` at 3xl–4xl, `tracking-tighter` above).
+
+  It stopped at `2xl` before, which is why a hero wanting "typography at maximum
+  volume" had to hand-roll its own `<h1>` — a primitive that exists but cannot
+  reach the size a design needs is a primitive that gets bypassed.
+
+  **What you must do:** nothing. Purely additive; every existing size renders
+  exactly as before, pinned by a test.
+
+  **Note the ramp is semantic, not literal.** These names are steps on a scale,
+  not Tailwind class names: `xl` has meant `text-2xl` and `2xl` has meant
+  `text-4xl` since this component shipped, and the new steps continue that
+  offset. Re-basing so `4xl` meant `text-4xl` would have silently shrunk every
+  heading already using `2xl`, so the offset stays and is now documented on the
+  prop.
+
+  Tracking is applied to the display steps ONLY — spacing tuned for
+  body-adjacent headings reads loose once type is big, and that difference was
+  most of why a hand-rolled `<h1>` looked better than the component did.
+
+
 ## 5.1.0 — 2026-08-07
 
 ### Added
