@@ -138,6 +138,8 @@ export { Kbd } from "./components/Kbd";
 export type { KbdProps } from "./components/Kbd";
 export { IndexList } from "./components/IndexList";
 export type { IndexListProps, IndexListItem } from "./components/IndexList";
+export { PullQuote } from "./components/PullQuote";
+export type { PullQuoteProps } from "./components/PullQuote";
 export { Stat, StatBand } from "./components/Stat";
 export type { StatProps, StatBandProps } from "./components/Stat";
 

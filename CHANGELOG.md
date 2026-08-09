@@ -11,6 +11,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.7.0] — 2026-08-09
+
+### Added
+
+- **`<PullQuote>`** — the oversized line lifted out of body copy, with optional
+  attribution and a rule-bracketed treatment.
+
+  Twelve gallery styles build one, but the reason this is a component rather
+  than a class is the same reason `<Kbd>` renders a real `<kbd>`: of the eight
+  quote elements in those styles, **one** was a `<blockquote>` — five were `<p>`
+  and two were `<div>` — and **none** used `<cite>`. They all look right and
+  none of them says what it is.
+
+  `citeUrl` maps to `<blockquote cite>`, which is the attribute's actual job
+  (the source URL) and is routinely confused with the visible `<cite>` element
+  (the speaker or work). Separate props so the two cannot collapse into one
+  another.
+
+  **What you must do:** nothing. Additive.
+
+
 ## [5.6.1] — 2026-08-09
 
 ### Fixed
