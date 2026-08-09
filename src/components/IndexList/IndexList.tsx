@@ -34,12 +34,12 @@ export const IndexList = forwardRef<HTMLOListElement, IndexListProps>(
             className="relative flex items-baseline gap-4 border-b border-zinc-200 py-3 last:border-b-0 dark:border-zinc-800"
           >
             {item.num != null && (
-              <span className="shrink-0 font-mono text-xs tabular-nums text-zinc-400 dark:text-zinc-500">
+              <span data-react-fancy-index-num="" className="shrink-0 font-mono text-xs tabular-nums text-zinc-400 dark:text-zinc-500">
                 {item.num}
               </span>
             )}
 
-            <span className="min-w-0 flex-1 truncate font-medium text-zinc-900 dark:text-zinc-100">
+            <span data-react-fancy-index-title="" className="min-w-0 flex-1 truncate font-medium text-zinc-900 dark:text-zinc-100">
               {item.href ? (
                 <Link
                   href={item.href}
@@ -53,11 +53,11 @@ export const IndexList = forwardRef<HTMLOListElement, IndexListProps>(
             </span>
 
             {item.meta != null && (
-              <span className="shrink-0 truncate text-sm text-zinc-500 dark:text-zinc-400">{item.meta}</span>
+              <span data-react-fancy-index-meta="" className="shrink-0 truncate text-sm text-zinc-500 dark:text-zinc-400">{item.meta}</span>
             )}
 
             {item.value != null && (
-              <span className="ml-auto shrink-0 font-mono text-xs tabular-nums text-zinc-500 dark:text-zinc-400">
+              <span data-react-fancy-index-value="" className="ml-auto shrink-0 font-mono text-xs tabular-nums text-zinc-500 dark:text-zinc-400">
                 {item.value}
               </span>
             )}

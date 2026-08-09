@@ -102,3 +102,17 @@ describe("Stat.Band", () => {
     expect(Object.keys(Stat)).toContain("Band");
   });
 });
+
+describe("restyling hooks", () => {
+  it("exposes a stable handle on every part", () => {
+    // The component contract asks for stable identity on the parts, and it is
+    // what makes a primitive restylable: the gallery styles target
+    // `.swiss-figure__num`, so without a hook per part they could only replace
+    // the component, not restyle it — which is how twenty-seven copies happened.
+    const { host, unmount } = mount(<Stat value="2016" label="Founded" className="swiss-figure" />);
+
+    expect(host.querySelector("[data-react-fancy-stat-value]")?.textContent).toBe("2016");
+    expect(host.querySelector("[data-react-fancy-stat-label]")?.textContent).toBe("Founded");
+    unmount();
+  });
+});

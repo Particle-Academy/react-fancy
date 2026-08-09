@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.6.1] — 2026-08-09
+
+### Fixed
+
+- **`<Stat>` and `<IndexList>` now carry a stable handle on each PART** —
+  `data-react-fancy-stat-value` / `-stat-label`, and `-index-num` / `-index-title`
+  / `-index-meta` / `-index-value`.
+
+  Shipped in 5.6.0 with a handle on the root only, which made them unrestylable
+  in practice: a consumer styling `.swiss-figure__num` had no selector for the
+  figure inside the component, so adopting it meant losing the design. Being
+  unrestylable is how twenty-seven separate copies of a figure band happened in
+  the first place, so a primitive that cannot be restyled does not solve the
+  problem it was built for.
+
+  **What you must do:** nothing. Attributes only.
+
+
 ## [5.6.0] — 2026-08-09
 
 ### Added

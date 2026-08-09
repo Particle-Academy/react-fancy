@@ -105,3 +105,16 @@ describe("IndexList", () => {
     unmount();
   });
 });
+
+describe("restyling hooks", () => {
+  it("exposes a stable handle on every column", () => {
+    const { host, unmount } = mount(<IndexList items={ITEMS} />);
+    const row = host.querySelector("[data-react-fancy-index-row]") as HTMLElement;
+
+    expect(row.querySelector("[data-react-fancy-index-num]")?.textContent).toBe("01");
+    expect(row.querySelector("[data-react-fancy-index-title]")?.textContent).toBe("Meridian");
+    expect(row.querySelector("[data-react-fancy-index-meta]")?.textContent).toBe("Brand system");
+    expect(row.querySelector("[data-react-fancy-index-value]")?.textContent).toBe("2024");
+    unmount();
+  });
+});
