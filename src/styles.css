@@ -93,10 +93,22 @@
    and polished dark-mode defaults. All overridable via data-attribute selectors.
    ──────────────────────────────────────────────────────────────────────────── */
 
-/* Field spacing — adjacent fields get vertical breathing room */
-[data-react-fancy-field] + [data-react-fancy-field] {
-  margin-top: 1rem;
-}
+/* Field spacing is the CONTAINER's job, not the field's.
+   ────────────────────────────────────────────────────────────────────────────
+   This used to be:
+
+     [data-react-fancy-field] + [data-react-fancy-field] { margin-top: 1rem; }
+
+   An adjacent-sibling selector cannot know which way its parent lays children
+   out. Stacked vertically it read as spacing; inside a `grid-cols-2` row it
+   pushed the right-hand cell 16px down, and `items-start` could not fix it
+   because a margin is not alignment. The only escape was wrapping every field
+   in a plain <div> so each became an only-child.
+
+   Space fields with the container instead — `space-y-4`, or `gap-4` on a flex
+   or grid parent. A container knows its own axis; a sibling selector never
+   can. See CHANGELOG 5.17.0 for the migration.
+   ──────────────────────────────────────────────────────────────────────────── */
 
 /* Smooth transitions on all text inputs, selects, and textareas */
 [data-react-fancy-input] input,

@@ -11,6 +11,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.17.0] — 2026-08-10
+
+### Changed
+
+- **BREAKING — `Field` no longer spaces itself. Its container does.** The
+  stylesheet shipped an adjacent-sibling rule:
+
+  ```css
+  [data-react-fancy-field] + [data-react-fancy-field] { margin-top: 1rem; }
+  ```
+
+  A sibling selector has no idea which way its parent lays children out.
+  Stacked vertically that read as spacing; inside a `grid-cols-2` row it pushed
+  the right-hand cell 16px down — and `items-start` could not fix it, because a
+  margin is not alignment:
+
+  ```jsx
+  <div className="grid grid-cols-2 gap-4 items-start">
+    <Field label="Class">…</Field>
+    <Field label="Type">…</Field>   {/* ← sat 16px lower */}
+  </div>
+  ```
+
+  The only escape was wrapping every `Field` in a plain `<div>` so each became
+  an only-child. Needing a wrapper per field to put a component in a grid is
+  the tell that the spacing was in the wrong place.
+
+  **What you must do:** add spacing to the containers that stack fields —
+  `space-y-4` on the wrapper, or `gap-4` if it is already flex or grid. One
+  class per form, not per field:
+
+  ```diff
+  - <div>
+  + <div className="space-y-4">
+      <Field label="Name">…</Field>
+      <Field label="Email">…</Field>
+    </div>
+  ```
+
+  **How to find them:** anywhere two or more `Field`s share a parent that sets
+  no `gap` or `space-y-*`. If your form already sat inside a flex/grid parent
+  with a `gap`, or holds a single `Field`, nothing changes. Grid and flex-row
+  layouts are *fixed* by this — they need no edit and stop being misaligned.
+
+  Why a breaking change rather than an opt-out attribute: an opt-out leaves the
+  default wrong and makes every future grid layout pay for it, and the amount
+  of consumer code silently relying on a component to space its own siblings
+  only grows. `gap` exists for this.
+
+  Reported by a consuming app, with the correct diagnosis and the correct root
+  fix. Reproduced in a real browser against the shipped CSS before changing
+  anything, and the showcase's own 54 stacked call sites were migrated in the
+  same change.
+
 ## [5.16.0] — 2026-08-10
 
 ### Added
