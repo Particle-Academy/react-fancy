@@ -1,7 +1,7 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "5.15.0",
-  "description": "React UI component library for Human+ UX \u2014 controlled, agent-bridgeable primitives",
+  "version": "5.16.0",
+  "description": "React UI component library for Human+ UX — controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Particle-Academy/react-fancy.git"
@@ -461,6 +461,16 @@
       "require": {
         "types": "./dist/inputs.d.cts",
         "default": "./dist/inputs.cjs"
+      }
+    },
+    "./json-editor": {
+      "import": {
+        "types": "./dist/json-editor.d.ts",
+        "default": "./dist/json-editor.js"
+      },
+      "require": {
+        "types": "./dist/json-editor.d.cts",
+        "default": "./dist/json-editor.cjs"
       }
     },
     "./kanban": {

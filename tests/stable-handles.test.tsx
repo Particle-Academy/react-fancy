@@ -8,6 +8,7 @@ import { CheckboxGroup } from "../src/components/inputs/CheckboxGroup/CheckboxGr
 import { MultiSwitch } from "../src/components/inputs/MultiSwitch/MultiSwitch";
 import { RadioGroup } from "../src/components/inputs/RadioGroup/RadioGroup";
 import { Switch } from "../src/components/inputs/Switch/Switch";
+import { ColorPicker } from "../src/components/ColorPicker/ColorPicker";
 import { Table } from "../src/components/Table/Table";
 import { TableRow } from "../src/components/Table/TableRow";
 import { TableCell } from "../src/components/Table/TableCell";
@@ -101,6 +102,18 @@ describe("data-* handles reach the DOM", () => {
         />,
       ),
     ).toBe(true);
+  });
+
+  it("ColorPicker, in BOTH modes", () => {
+    // Missed by the 5.8.0 sweep, and found by building `JsonEditor` on top of
+    // it: a `color`-typed field could not carry the handle its row needed, so
+    // the handle had to hang off a wrapper element instead.
+    //
+    // Both modes are asserted because this component swaps its root: `view`
+    // renders a different `<div>` from `edit`, and a spread added to only one
+    // of them makes the handle appear and disappear with an unrelated prop.
+    expect(reaches(<ColorPicker data-handle="cp" value="#3b82f6" />)).toBe(true);
+    expect(reaches(<ColorPicker data-handle="cp" value="#3b82f6" mode="view" />)).toBe(true);
   });
 
   it("Table.Row", () => {

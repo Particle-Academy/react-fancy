@@ -11,7 +11,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.16.0] — 2026-08-10
+
+### Added
+
+- **`JsonEditor`** — a key/value editor for arbitrary JSON, nested to any depth,
+  where a `keyMap` imposes a data type on chosen paths and that type drives both
+  how a value is displayed and which input edits it.
+
+  ```tsx
+  <JsonEditor
+    value={config}
+    onChange={setConfig}
+    keyMap='{"user.age":"number","tags.*":"string","role":{"type":"enum","options":["admin","member"]}}'
+  />
+  ```
+
+  **`keyMap` is a JSON string, not an object**, and an already-parsed object is
+  deliberately not accepted. A string survives an MCP tool call, a config
+  column, a `data-*` attribute or a form field intact; a live object does not.
+  It is parsed once per distinct string, which a test asserts with a
+  call-counting spy rather than by inspection.
+
+  Paths are **dotted patterns with `*` as a single-segment wildcard** —
+  `orders.*.total` — chosen over a nested mirror because a mirror is ambiguous
+  the moment a key needs both a type and typed children, and needs a magic
+  `$type` escape to disambiguate. Specificity is literal-segment count, ties
+  broken by last-declared. A literal dot escapes as `\.`.
+
+  Types: `string`, `text`, `number`, `integer`, `boolean`, `date`, `datetime`,
+  `enum`, `secret`, `url`, `email`, `color`, `json`, `object`, `array`. With no
+  rule the type is inferred from the value.
+
+  **A value that contradicts its declared type is never coerced and never
+  dropped.** It keeps its real value, renders through the raw text editor — the
+  only control that can both hold and repair `"thirty-six"` in a `number` field
+  — and the row reports `data-conflict="true"`. Typing reaches the same state:
+  numeric fields commit on blur rather than per keystroke (a controlled number
+  input eats the `.` in `1.5`), and unparseable text is stored verbatim as a
+  string so the conflict is visible instead of silently becoming `0`.
+
+  Two failure modes are kept distinct, because collapsing them is how a typing
+  feature quietly stops typing things. An unusable `keyMap` **string** yields no
+  rules, sets `data-keymap-error`, and says plainly that values are untyped — it
+  never throws and never silently renders an untyped editor. A single malformed
+  **rule** is dropped and reported while the rest of the map stays in force, so
+  one typo cannot disable forty rules.
+
+  Human+: controlled `value` + `onChange(next, edit)` with no private copy;
+  stable `data-react-fancy-json-editor-*` handles carrying `data-path`, plus a
+  `role="tree"` DOM so an agent addresses `[data-path="orders.2.total"]` in one
+  selector; `pendingMode` for staged accept/reject; `onActivity` on every
+  commit. `applyJsonEdit`, `parseKeyMap` and `findJsonConflicts` are exported
+  pure and non-mutating — the surface a bridge needs.
+
+  62 tests. Built from the kit's own `Input`, `Textarea`, `Select`, `Switch`,
+  `DatePicker`, `ColorPicker`, `Button`, `Badge`, `Callout` and `useInlineEdit`
+  — which is what gives `mode="view"` click-to-edit for free.
+
 ### Fixed
+
+- **`data-*`, `aria-*` and `id` now reach the DOM on `ColorPicker`.** It had no
+  `...rest`, so a handle put on it was dropped — the same defect swept out of
+  `Switch`, `Checkbox` and friends in 5.8.0 (#22), which this component was not
+  part of. Found by building `JsonEditor` on top of it: a `color`-typed field
+  could not carry the handle its own row needed.
+
+  Both roots are covered. The component renders a different element in `view`
+  mode than in `edit` mode, so a spread on only one of them would make the
+  handle appear and disappear with an unrelated prop.
 
 - **`Table.Column` now announces its sort state with `aria-sort`.** The column
   already computed whether it was the sort key and in which direction, and spent

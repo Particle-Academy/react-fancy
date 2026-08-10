@@ -531,3 +531,48 @@ export type { AudioViewerProps } from "./components/AudioViewer";
 
 export { PdfViewer } from "./components/PdfViewer";
 export type { PdfViewerProps } from "./components/PdfViewer";
+
+// JSON editing — a key/value surface over nested JSON, typed by a `keyMap`
+// string. The helpers ship alongside the component because they are the seam an
+// MCP bridge uses: `parseKeyMap` to validate a map before handing it over,
+// `findJsonConflicts` to ask what is wrong, `applyJsonEdit` to replay the exact
+// op a human (or another agent) performed.
+//
+// NOTE for whoever cuts the next release: this component has no
+// `src/components/JsonEditor/index.ts` yet, and it needs one — but adding it
+// makes `tests/subpath-exports.test.ts` require a matching `"./json-editor"`
+// entry in package.json's `exports`. Add BOTH in the same change, or the
+// component ships importable only through this barrel.
+export { JsonEditor } from "./components/JsonEditor/JsonEditor";
+export {
+  parseKeyMap,
+  resolveKeyRule,
+  findJsonConflicts,
+  inferType,
+  typeMatches,
+} from "./components/JsonEditor/JsonEditor.keymap";
+export {
+  applyJsonEdit,
+  describeEdit,
+  parsePath,
+  pathToString,
+  getAtPath,
+} from "./components/JsonEditor/JsonEditor.paths";
+export { JSON_FIELD_TYPES } from "./components/JsonEditor/JsonEditor.types";
+export type {
+  JsonEditorProps,
+  JsonEditorEdit,
+  JsonEditorPendingEdit,
+  JsonEditorActivity,
+  JsonEditorIssue,
+  JsonEditorNode,
+  JsonFieldType,
+  JsonKeyRule,
+  JsonKeyMapEntry,
+  ParsedKeyMap,
+  JsonValue,
+  JsonObject,
+  JsonArray,
+  JsonPrimitive,
+  JsonPath,
+} from "./components/JsonEditor/JsonEditor.types";

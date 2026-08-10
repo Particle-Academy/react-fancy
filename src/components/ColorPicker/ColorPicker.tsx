@@ -31,6 +31,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
       disabled = false,
       className,
       mode,
+      ...rest
     },
     ref,
   ) => {
@@ -58,6 +59,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
     if (!showControl) {
       return (
         <div
+          {...rest}
           ref={ref}
           data-react-fancy-color-picker=""
           data-mode="view"
@@ -106,6 +108,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
 
     return (
       <div
+        {...rest}
         ref={ref}
         data-react-fancy-color-picker=""
         className={cn("inline-flex items-center gap-2", className)}
