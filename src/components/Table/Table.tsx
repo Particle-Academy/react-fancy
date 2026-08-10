@@ -13,7 +13,7 @@ import { TableTray } from "./TableTray";
 import { TableRowTray } from "./TableRowTray";
 import type { TableProps, TableContextValue } from "./Table.types";
 
-function TableRoot({ children, className }: TableProps) {
+function TableRoot({ children, className, ...rest }: TableProps) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [page, setPage] = useState(0);
@@ -48,7 +48,11 @@ function TableRoot({ children, className }: TableProps) {
 
   return (
     <TableContext.Provider value={ctx}>
-      <div data-react-fancy-table="" className={cn("overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700", className)}>
+      <div
+        {...rest}
+        data-react-fancy-table=""
+        className={cn("overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700", className)}
+      >
         {splitTableChildren(children)}
       </div>
     </TableContext.Provider>

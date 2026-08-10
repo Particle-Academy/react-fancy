@@ -11,6 +11,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`Table.Column` now announces its sort state with `aria-sort`.** The column
+  already computed whether it was the sort key and in which direction, and spent
+  both entirely on rendering a ▲/▼ glyph. Nothing reached assistive technology,
+  so a sortable table sounded exactly like a static one and activating a header
+  produced no feedback at all.
+
+  ```html
+  <!-- before -->  <th class="…">Name ▲</th>
+  <!-- after  -->  <th class="…" aria-sort="ascending">Name ▲</th>
+  ```
+
+  A sortable column that is not the current key is now `aria-sort="none"`, which
+  is deliberately not the same as omitting the attribute — it says "this sorts,
+  but is not sorted right now". A **non**-sortable header still gets nothing,
+  because claiming otherwise invites someone to activate an inert control. The
+  arrow glyph is now `aria-hidden`, so it is no longer read out as stray text
+  next to the real state.
+
+  **What you must do:** nothing, unless you have CSS or tests keyed on the
+  absence of the attribute — a selector like `th:not([aria-sort])` will stop
+  matching sortable headers. Passing `aria-sort` yourself overrides the computed
+  value, which is what a server-sorted table needs.
+
+- **`data-*` and `aria-*` props now reach the DOM on `Table`, `Table.Head`,
+  `Table.Body` and `Table.Column`.** They named every prop they used and had no
+  `...rest`, so anything unrecognised was dropped — the same defect fixed for
+  `Table.Row` in 5.8.0 and `Table.Cell` in #5. (#19)
+
+  Those two were fixed because they were the two reported. Auditing the rest of
+  the family in one pass — which is what the 5.8.0 entry said it had done for
+  the *form* controls — found the four above still carrying it. `Table.Column`
+  was the one that mattered: it is a `<th>`, so it is where `scope` and
+  `aria-sort` belong.
+
+  As elsewhere, the spread comes **before** the component's own attributes, so a
+  passed prop cannot clobber the internal `data-react-fancy-*` marker,
+  `className`, or the sort handler.
+
+- **`Table.Column` no longer discards a caller's `onClick`** on a sortable
+  column. It set its own handler unconditionally, so passing one was accepted
+  and silently ignored. Both now run, the caller's first.
+
 ## [5.15.0] — 2026-08-09
 
 ### Added

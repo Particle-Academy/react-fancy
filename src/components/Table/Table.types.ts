@@ -1,4 +1,9 @@
-import type { HTMLAttributes, ReactNode, TdHTMLAttributes } from "react";
+import type {
+  HTMLAttributes,
+  ReactNode,
+  TdHTMLAttributes,
+  ThHTMLAttributes,
+} from "react";
 
 export interface TableColumn<T = any> {
   key: string;
@@ -19,17 +24,17 @@ export interface TableContextValue {
   setSearchQuery: (query: string) => void;
 }
 
-export interface TableProps {
+export interface TableProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   className?: string;
 }
 
-export interface TableHeadProps {
+export interface TableHeadProps extends HTMLAttributes<HTMLTableSectionElement> {
   children: ReactNode;
   className?: string;
 }
 
-export interface TableBodyProps {
+export interface TableBodyProps extends HTMLAttributes<HTMLTableSectionElement> {
   children: ReactNode;
   className?: string;
 }
@@ -61,7 +66,16 @@ export interface TableCellProps extends TdHTMLAttributes<HTMLTableCellElement> {
   header?: boolean;
 }
 
-export interface TableColumnProps {
+/**
+ * Extends the native `<th>` attributes so `scope`, `colSpan`, `data-*` and
+ * `aria-*` reach the header cell instead of being dropped.
+ *
+ * `aria-sort` is the one worth calling out: it is emitted automatically from
+ * the column's own sort state, and passing it explicitly overrides that — which
+ * is what a server-sorted table needs, since it knows its state and the
+ * component does not.
+ */
+export interface TableColumnProps extends ThHTMLAttributes<HTMLTableCellElement> {
   label: string;
   sortKey?: string;
   className?: string;
