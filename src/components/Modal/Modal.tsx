@@ -10,12 +10,33 @@ import { useEscapeKey } from "../../hooks/use-escape-key";
 import { useAnimation } from "../../hooks/use-animation";
 import type { ModalProps } from "./Modal.types";
 
+/**
+ * Every size is capped against the VIEWPORT, not just the width.
+ *
+ * Only `full` used to carry a max-height. The other four were width-constrained
+ * and vertically unbounded, so a modal with long content simply grew past the
+ * bottom of the screen and the rest became unreachable — no scrollbar, because
+ * there was no overflow to scroll: the box got taller instead.
+ *
+ * `ModalBody` already had `flex-1 overflow-y-auto` and the panel already had
+ * `overflow-hidden`. The scrolling machinery was complete and inert, waiting on
+ * the one constraint that makes it engage.
+ *
+ * `dvh` over `vh` deliberately: on mobile browsers `100vh` is the tallest the
+ * viewport ever gets, ignoring the address bar, so a `vh`-capped modal still
+ * runs under the chrome on exactly the devices with least room. `dvh` tracks
+ * the visible height. The `vh` fallback is listed first for any engine that
+ * does not know `dvh` yet — an unknown unit drops the declaration, so ordering
+ * is what keeps the old behaviour rather than none.
+ */
+const VIEWPORT_CAP = "max-h-[calc(100vh-2rem)] max-h-[calc(100dvh-2rem)]";
+
 const SIZE_MAP = {
-  sm: "max-w-sm",
-  md: "max-w-lg",
-  lg: "max-w-2xl",
-  xl: "max-w-4xl",
-  full: "max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)]",
+  sm: `max-w-sm ${VIEWPORT_CAP}`,
+  md: `max-w-lg ${VIEWPORT_CAP}`,
+  lg: `max-w-2xl ${VIEWPORT_CAP}`,
+  xl: `max-w-4xl ${VIEWPORT_CAP}`,
+  full: `max-w-[calc(100vw-2rem)] ${VIEWPORT_CAP}`,
 } as const;
 
 function ModalRoot({

@@ -11,6 +11,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.17.1] — 2026-08-11
+
+### Fixed
+
+- **A `Modal` could grow taller than the screen, and its content became
+  unreachable.** Only `size="full"` carried a max-height. `sm`, `md`, `lg` and
+  `xl` — including the `md` default — were width-constrained and vertically
+  unbounded, so a long modal simply extended past the bottom of the viewport.
+
+  No scrollbar appeared, because there was nothing to scroll: the box got
+  taller instead of overflowing. `ModalBody` has always had
+  `flex-1 overflow-y-auto` and the panel has always had `overflow-hidden` — the
+  entire scrolling mechanism was present and inert, waiting on the one
+  constraint that makes it engage.
+
+  Every size is now capped at `calc(100dvh - 2rem)`, with a `100vh` fallback
+  listed first for engines that do not know `dvh`. `dvh` rather than `vh`
+  deliberately: on mobile `100vh` is the tallest the viewport ever gets, so a
+  `vh` cap still runs under the browser chrome on exactly the devices with the
+  least room.
+
+  `ModalBody` also gains **`min-h-0`**, which is load-bearing rather than
+  tidying. A flex child defaults to `min-height: auto` and refuses to shrink
+  below its content, so without it the body would push the panel through its
+  own new max-height and the scrollbar still would not appear.
+
+  **What you must do:** nothing. A modal that fit before is unchanged; one that
+  did not now scrolls internally. If you had worked around this with your own
+  `max-h-*` and `overflow` on `Modal` or `Modal.Body`, those still win — they
+  are on the same elements and later in the class string — so nothing breaks,
+  but you can now delete them.
+
+
 ## [5.17.0] — 2026-08-10
 
 ### Changed
