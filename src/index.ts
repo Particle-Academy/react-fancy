@@ -425,7 +425,7 @@ export type {
   DropPosition,
 } from "./components/TreeNav";
 
-export { FileBrowser, useFileBrowser } from "./components/FileBrowser";
+export { FileBrowser, FileBrowserNewFolder, useFileBrowser, validateFolderName } from "./components/FileBrowser";
 export type {
   FileEntry,
   FileKind,

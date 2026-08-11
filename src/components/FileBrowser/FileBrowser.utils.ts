@@ -128,3 +128,34 @@ export function formatFileSize(bytes: number): string {
   const rounded = value >= 100 ? Math.round(value) : Math.round(value * 10) / 10;
   return `${rounded} ${units[unit]}`;
 }
+
+/**
+ * Why a proposed folder name cannot be used, or `null` if it can.
+ *
+ * Only checks what the BROWSER can know: that the name is a name rather than a
+ * path, and that nothing in this directory already answers to it. Case
+ * sensitivity, reserved device names and length limits depend on a filesystem
+ * this component cannot see, so they stay the host's to enforce — and the host
+ * rejecting a create is a supported outcome, surfaced on the form.
+ *
+ * A collision counts against FILES too. `mkdir` fails the same way either way,
+ * and "there is already an index.ts here" is the useful message.
+ */
+export function validateFolderName(
+  raw: string,
+  siblings: ReadonlyArray<{ name: string }>,
+): string | null {
+  const name = raw.trim();
+
+  if (name === "") return "Enter a name.";
+  // `/` and `\` make it a path, not a name; `.`/`..` are traversal. Forwarding
+  // either would make the host decide what an escape attempt means.
+  if (name.includes("/") || name.includes("\\")) return "A name cannot contain / or \.";
+  if (name === "." || name === "..") return "That name is reserved.";
+
+  if (siblings.some((entry) => entry.name === name)) {
+    return `“${name}” already exists here.`;
+  }
+
+  return null;
+}

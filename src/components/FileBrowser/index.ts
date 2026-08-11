@@ -18,3 +18,5 @@ export type {
   FileBrowserTreeProps,
   FileBrowserNodeProps,
 } from "./FileBrowser.types";
+export { FileBrowserNewFolder } from "./FileBrowserNewFolder";
+export { validateFolderName } from "./FileBrowser.utils";

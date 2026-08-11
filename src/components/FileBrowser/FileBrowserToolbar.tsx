@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUp, Search, X } from "lucide-react";
 import { cn } from "../../utils/cn";
 import { useFileBrowser } from "./FileBrowser.context";
+import { FileBrowserNewFolder } from "./FileBrowserNewFolder";
 import type { FileBrowserToolbarProps, FileSortField } from "./FileBrowser.types";
 
 const SORT_FIELDS: { field: FileSortField; label: string }[] = [
@@ -89,6 +90,7 @@ export function FileBrowserToolbar({ filterPlaceholder = "Filter", className }: 
           );
         })}
       </div>
+      <FileBrowserNewFolder />
     </div>
   );
 }

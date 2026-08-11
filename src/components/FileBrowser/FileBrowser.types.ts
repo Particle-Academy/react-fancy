@@ -108,6 +108,17 @@ export interface FileBrowserProps {
   onFilterChange?: (filter: string) => void;
   /** Called when a provider load rejects; the failed folder shows an inline error with a retry. */
   onError?: (path: string, error: unknown) => void;
+  /**
+   * Create a folder. **Supplying this is the opt-in** — the toolbar renders a
+   * "New folder" button only when it is present, so a visible button and a
+   * working one cannot disagree.
+   *
+   * Receives the directory currently being viewed and the trimmed name, both
+   * already validated against what is in that directory. Reject the promise to
+   * surface a message on the form; in provider mode a resolved promise reloads
+   * the directory so the folder appears.
+   */
+  onCreateFolder?: (input: { parentPath: string; name: string }) => void | Promise<void>;
   /** Indent per nesting level in px (default `16`). */
   indentSize?: number;
   /** Show file/folder icons (default `true`). */
@@ -174,6 +185,8 @@ export interface FileBrowserContextValue {
   // Presentation
   indentSize: number;
   showIcons: boolean;
+  /** Present only when the host opted in. See {@link FileBrowserProps.onCreateFolder}. */
+  onCreateFolder?: (input: { parentPath: string; name: string }) => void | Promise<void>;
 }
 
 export interface FileBrowserPathBarProps {

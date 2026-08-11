@@ -11,6 +11,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.18.0] - 2026-08-11
+
+### Added
+
+- **`FileBrowser` can create folders, if the app opts in.** Supply
+  `onCreateFolder` and the toolbar grows a "New folder" button; leave it off and
+  nothing renders. The handler IS the opt-in — a separate `showNewFolder` flag
+  would let the two disagree, and a visible button wired to nothing is the
+  failure this shape rules out.
+
+  ```tsx
+  <FileBrowser
+      provider={{ loadChildren }}
+      onCreateFolder={async ({ parentPath, name }) => {
+          await api.mkdir(`${parentPath}/${name}`);
+      }}
+  />
+  ```
+
+  An inline input, not `window.prompt`: a prompt blocks the event loop, cannot
+  be themed, is unusable on mobile, and has no handle an agent could target.
+
+  The browser validates before your handler is called — empty names, a name
+  already taken in that directory (files count), path separators, `.` and `..`.
+  It knows what is in the folder and you would have to round-trip to find out.
+  It does NOT guess at case-sensitivity, reserved device names or length limits;
+  those depend on a filesystem it cannot see, so **rejecting the promise is a
+  supported outcome** and the message lands on the form.
+
+  In provider mode a resolved promise reloads that directory so the folder
+  appears. A rejected one does not — reloading after a failure hides it behind
+  an unchanged listing.
+
+  Handles for agents and tests: `data-react-fancy-file-browser-new-folder`,
+  `-new-folder-input`, `-new-folder-submit`, `-new-folder-cancel`,
+  `-new-folder-error`.
+
+- **`FileBrowser.NewFolder`** is exported separately, for hosts composing their
+  own toolbar out of the parts.
+
+- **`validateFolderName(name, siblings)`** — the same rule the component uses,
+  exported so a host can pre-flight a name it is about to submit programmatically.
+
+
 ## [5.17.1] — 2026-08-11
 
 ### Fixed

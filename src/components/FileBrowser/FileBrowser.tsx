@@ -115,6 +115,7 @@ function FileBrowserRoot({
   defaultFilter,
   onFilterChange,
   onError,
+  onCreateFolder,
   indentSize = 16,
   showIcons = true,
   className,
@@ -397,13 +398,14 @@ function FileBrowserRoot({
       registerRow,
       indentSize,
       showIcons,
+      onCreateFolder,
     }),
     [
       entriesFor, visibleChildrenFor, statusFor, errorFor, loadPath, provider,
       currentPath, navigate, expanded, toggleExpanded, select, multiple,
       selectedPaths, isSelected, isSelectable, selectEntry, sortState,
       setSortState, filterState, setFilterState, visibleRows, focusedPath,
-      tabFocusPath, focusRow, registerRow, indentSize, showIcons,
+      tabFocusPath, focusRow, registerRow, indentSize, showIcons, onCreateFolder,
     ],
   );
 
