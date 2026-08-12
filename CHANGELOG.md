@@ -11,6 +11,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.20.0] - 2026-08-11
+
+### Added
+
+- **`preload` on `AudioViewer` and `VideoViewer`**, defaulting to `"metadata"`.
+
+  Both wrapped a media element and forwarded `controls`, `autoPlay` and `loop`
+  but not `preload`, so the browser decided — and Chrome decides `"auto"` for
+  `<audio>`. Rendering the component downloaded the entire file. Measured on the
+  Fancy showcase: one audio tile on the package grid transferred **995 KB**
+  before anyone pressed play.
+
+  `"metadata"` is enough for duration and the scrubber, which is all a viewer
+  needs before someone decides to listen. Pass `"none"` for a thumbnail that
+  should cost nothing, or `"auto"` to restore the eager behaviour.
+
+  **What to do:** nothing, unless you were relying on the file being fully
+  buffered by the time a user pressed play — in that case pass `preload="auto"`
+  explicitly. The expensive option is now the one you opt into.
+
+
 ## [5.19.0] - 2026-08-11
 
 ### Added

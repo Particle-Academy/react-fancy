@@ -18,6 +18,7 @@ export const VideoViewer = forwardRef<HTMLDivElement, VideoViewerProps>(
       controls = true,
       autoPlay = false,
       loop = false,
+      preload = "metadata",
       muted = false,
       fit = "contain",
       onError,
@@ -46,6 +47,7 @@ export const VideoViewer = forwardRef<HTMLDivElement, VideoViewerProps>(
         ) : (
           <video
             src={src}
+            preload={preload}
             poster={poster}
             controls={controls}
             autoPlay={autoPlay}

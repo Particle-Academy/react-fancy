@@ -18,6 +18,7 @@ export const AudioViewer = forwardRef<HTMLDivElement, AudioViewerProps>(
       controls = true,
       autoPlay = false,
       loop = false,
+      preload = "metadata",
       onError,
       className,
       style,
@@ -48,6 +49,7 @@ export const AudioViewer = forwardRef<HTMLDivElement, AudioViewerProps>(
         ) : (
           <audio
             src={src}
+            preload={preload}
             controls={controls}
             autoPlay={autoPlay}
             loop={loop}
