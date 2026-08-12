@@ -4,6 +4,20 @@ import type { NavigableProps } from "../../utils/types";
 export type SidebarCollapseMode = "icons" | "letters";
 
 export interface SidebarProps {
+  /**
+   * Render without the app-shell chrome — no right border, no background, and
+   * full width instead of the fixed `w-60`.
+   *
+   * For a sidebar living inside a container that already owns its surface: a
+   * card, a panel, a drawer. The defaults are right for the standalone rail and
+   * wrong here, and neutralising them from outside takes four `!important`
+   * utilities that every host has to rediscover and that rot when the base
+   * classes change.
+   *
+   * Chrome only — collapsing still works, and a collapsed rail keeps its fixed
+   * narrow width.
+   */
+  embedded?: boolean;
   children: ReactNode;
   collapsed?: boolean;
   defaultCollapsed?: boolean;

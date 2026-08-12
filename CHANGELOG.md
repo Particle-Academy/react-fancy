@@ -11,6 +11,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.19.0] - 2026-08-11
+
+### Added
+
+- **`Sidebar` takes an `embedded` prop** — no right border, no background, and
+  full width instead of the fixed `w-60`, for a sidebar living inside a
+  container that already owns its surface.
+
+  The defaults are right for the standalone app rail and actively wrong inside
+  a card: a 240px rail in a 300px panel draws its right border 240px in, which
+  reads as a stray vertical line slicing the panel rather than an edge, and the
+  opaque background sits as a lighter block over the card behind it. Both were
+  visible on the Fancy UI Curriculum's lesson list.
+
+  Chrome only — collapsing still works, and a collapsed rail keeps its fixed
+  narrow width.
+
+  Not a `className` fix: neutralising `border-r`, `bg-white`,
+  `dark:bg-zinc-900` and `w-60` from outside takes four `!important` utilities
+  that every embedding host has to rediscover, and that rot the moment the base
+  classes change.
+
+
 ## [5.18.0] - 2026-08-11
 
 ### Added
