@@ -11,6 +11,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.21.0] - 2026-08-18
+
+### Added
+
+- **Light / dark / system theming, in the kit rather than in every app.** This
+  package already owned the dark contract -- `styles.css` redefines the whole
+  `--color-secondary-*` scale under `:where(.dark)` -- but nothing here decided
+  when `.dark` was on, so every consumer hand-rolled that half. Every hand-rolled
+  copy we have looked at had the same two holes:
+
+  - **No live listener.** The OS preference was read once at boot, so changing
+    the system theme with the page open did nothing. That is a default, not a
+    system mode.
+  - **No way back.** Choosing light or dark wrote to storage forever, leaving
+    "follow my system" unreachable after a single click.
+
+  Both come from storing `"system"` as a third value. Here it is instead the
+  *absence* of a stored choice, which makes following the OS the natural
+  resting state.
+
+  ```ts
+  import { initTheme, useTheme } from "@particle-academy/react-fancy";
+
+  initTheme();                                   // once, as early as possible
+
+  const { preference, resolved, setPreference } = useTheme();
+  ```
+
+  `initTheme()` applies the theme and starts following the OS, returning a
+  disposer. `useTheme()` re-renders on change -- including when the OS flips
+  underneath a `system` preference. Also exported: `getThemePreference`,
+  `setThemePreference`, `resolveTheme`, `subscribeTheme`, `THEME_STORAGE_KEY`.
+
+  **Nothing to do on upgrade** -- this is additive, and nothing here applies a
+  theme unless you call `initTheme()`. If you already hand-roll this, the
+  storage key defaults to `fancy-ui.theme`, which is the one the showcase used,
+  so adopting it keeps a returning visitor's saved choice rather than resetting
+  it. Pass `initTheme({ storageKey })` if yours differs.
+
+  Every export is SSR-safe, and `useTheme` renders `system` / `light` on the
+  server and syncs in an effect -- reading the real theme during render is the
+  hydration mismatch this project has already chased down more than once.
+
 ## [5.20.0] - 2026-08-11
 
 ### Added

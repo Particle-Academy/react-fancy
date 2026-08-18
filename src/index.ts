@@ -576,3 +576,15 @@ export type {
   JsonPrimitive,
   JsonPath,
 } from "./components/JsonEditor/JsonEditor.types";
+
+export {
+  initTheme,
+  getThemePreference,
+  setThemePreference,
+  resolveTheme,
+  subscribeTheme,
+  THEME_STORAGE_KEY,
+} from "./theme";
+export type { ThemePreference, ResolvedTheme } from "./theme";
+export { useTheme } from "./hooks/use-theme";
+export type { UseThemeResult } from "./hooks/use-theme";

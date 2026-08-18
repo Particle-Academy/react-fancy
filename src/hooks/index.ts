@@ -9,3 +9,5 @@ export { usePanZoom } from "./use-pan-zoom";
 export type { ViewportState } from "./use-pan-zoom";
 export { useNodeRegistry } from "./use-node-registry";
 export type { NodeRect } from "./use-node-registry";
+export { useTheme } from "./use-theme";
+export type { UseThemeResult } from "./use-theme";
