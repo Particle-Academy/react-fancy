@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "5.21.0",
+  "version": "5.22.0",
   "description": "React UI component library for Human+ UX — controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
@@ -953,7 +953,6 @@
   },
   "dependencies": {
     "@particle-academy/fancy-file-commons": ">=0.2 <2.0",
-    "clsx": "^2.1.0",
     "lucide-react": "^0.511.0",
     "marked": "^15.0.0",
     "tailwind-merge": "^3.0.0"

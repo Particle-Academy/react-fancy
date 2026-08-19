@@ -11,6 +11,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.22.0] - 2026-08-19
+
+### Changed
+
+- **`clsx` is no longer a dependency.** It was a *runtime* dependency, so it
+  shipped to every consumer of this package, and its last commit was **801 days**
+  old. Under the suite's rule that third-party code must be both approved and
+  actively maintained, it fails — and it is roughly twenty lines of logic that
+  owning costs less than carrying.
+
+  `cn()` behaves identically. Its contract was pinned by tests written against
+  `clsx` *before* the swap, and those same tests pass unchanged after it:
+  falsy values dropped (including `0` and `""`), truthy numbers kept, arrays
+  flattened recursively, object keys taken when truthy.
+
+  `tailwind-merge` deliberately stays. Deciding which of two conflicting
+  Tailwind utilities wins requires modelling the whole utility space, which is
+  emphatically not twenty lines, and it is actively maintained.
+
+  **Nothing to do on upgrade.** `ClassValue` is now exported from this package
+  rather than re-exported from `clsx`; if you imported the type from `clsx`
+  yourself, that is still your own dependency and unaffected.
+
+
 ## [5.21.0] - 2026-08-18
 
 ### Added
