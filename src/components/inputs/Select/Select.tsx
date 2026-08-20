@@ -59,6 +59,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
       dirty,
       error,
       label,
+      labelHidden,
       description,
       required,
       disabled,
@@ -104,6 +105,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
         return (
           <Field
             label={label}
+            labelHidden={labelHidden}
             description={description}
             error={error}
             required={required}
@@ -184,6 +186,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
       return (
         <Field
           label={label}
+          labelHidden={labelHidden}
           description={description}
           error={error}
           required={required}
@@ -210,6 +213,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
       dirty,
       error,
       label,
+      labelHidden,
       description,
       required,
       disabled,
@@ -427,6 +431,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
         return (
           <Field
             label={label}
+            labelHidden={labelHidden}
             description={description}
             error={error}
             required={required}
@@ -608,6 +613,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
       return (
         <Field
           label={label}
+          labelHidden={labelHidden}
           description={description}
           error={error}
           required={required}

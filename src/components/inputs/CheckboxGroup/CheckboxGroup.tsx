@@ -13,6 +13,7 @@ export function CheckboxGroup<V = string>({
   dirty,
   error,
   label,
+  labelHidden,
   description,
   required,
   disabled,
@@ -121,6 +122,7 @@ export function CheckboxGroup<V = string>({
     return (
       <Field
         label={label}
+        labelHidden={labelHidden}
         description={description}
         error={error}
         required={required}

@@ -13,6 +13,7 @@ export function RadioGroup<V = string>({
   dirty,
   error,
   label,
+  labelHidden,
   description,
   required,
   disabled,
@@ -28,6 +29,9 @@ export function RadioGroup<V = string>({
 }: RadioGroupProps<V>) {
   const groupId = useId();
   const radioName = name ?? groupId;
+  // Same reason as MultiSwitch: a `<label>` cannot name a div[role="radiogroup"].
+  // This one did not even pass `htmlFor`, so its label named nothing at all.
+  const labelId = label ? `${groupId}-label` : undefined;
   const resolvedMode = useFieldMode(mode);
   const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
   const [value, setValue] = useControllableState(
@@ -55,6 +59,7 @@ export function RadioGroup<V = string>({
       {...rest}
       data-react-fancy-radio-group=""
       role="radiogroup"
+      aria-labelledby={labelId}
       onBlur={(e) => {
         if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
       }}
@@ -117,6 +122,8 @@ export function RadioGroup<V = string>({
     return (
       <Field
         label={label}
+        labelHidden={labelHidden}
+        labelId={labelId}
         description={description}
         error={error}
         required={required}

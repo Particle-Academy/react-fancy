@@ -11,6 +11,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.23.0] - 2026-08-20
+
+All three of these were found by one consumer — the showcase's `/packages`
+rebuild — and filed as #23, #24 and #25.
+
+### Fixed
+
+- **`<Grid cols>` now does something while `responsive` is on.** It did not.
+  The responsive track template was a fixed
+  `repeat(auto-fit, minmax(min(100%, 16rem), 1fr))` with no reference to the
+  column count, so a grid asked for 2 and a grid asked for 5 laid out
+  identically, and the only way to get a real count was `responsive={false}` —
+  which then had no breakpoints at all. `cols` is now a CEILING: at most that
+  many, fewer as the grid narrows.
+
+  **This will change how existing grids look, so check the ones you have.** Any
+  `<Grid>` wider than `cols × 16rem` was rendering MORE columns than it asked
+  for and will now cap correctly — that is the fix, but it is a visible change
+  and it is the reason this entry leads. Grids at or below that width are
+  unaffected. If you actually wanted "as many as fit", say so explicitly with a
+  high `cols`.
+
+  `--fancy-grid-cols` is now genuinely load-bearing. The doc comment has always
+  advertised it as the single place to override column behaviour in CSS; it was
+  set by the component and read by nothing, so overriding it did nothing. A
+  companion `--fancy-grid-gap` is published for the same reason — the cap has to
+  know the gutter, or N tracks plus N-1 gaps overflow the row and `auto-fit`
+  quietly drops to N-1.
+
+  The existing test named *"lays out the requested columns"* passed throughout,
+  because it asserted only that the property was **set**. Two tests now pin that
+  the template **reads** it.
+
+- **`MultiSwitch` accepts the DOM attributes it already forwards.** It spreads
+  its rest props onto the container, so `style`, `data-*` and `aria-*` all
+  worked at runtime — while `MultiSwitchProps` extended `InputBaseProps` alone
+  and the compiler rejected every one of them. Implemented and unreachable.
+  `MultiSwitchProps` now also extends `HTMLAttributes<HTMLDivElement>` (minus
+  `onChange`, which would offer a handler that never fires — this control
+  reports through `onValueChange`).
+
+  **Nothing to do on upgrade.** Purely a widening: props you could already pass
+  still typecheck.
+
+- **A labelled `MultiSwitch` or `RadioGroup` is now actually named.** `<Field>`
+  renders `<label for=…>`, and a `<label>` only names *labelable* elements —
+  input, select, textarea, button. Both of these controls are
+  `div[role="radiogroup"]`, which is not one, so the label sat beside an unnamed
+  group and looked like it had done its job. (`RadioGroup` passed no `htmlFor`
+  at all, so its label named nothing whatsoever.) Both now point
+  `aria-labelledby` at the rendered label.
+
+  **Nothing to do on upgrade** — unless you added your own `aria-label` to work
+  around this, in which case yours still wins and you can now drop it.
+
+### Added
+
+- **`labelHidden` on every `Field`-wrapped input** — `Input`, `Textarea`,
+  `Select`, `DatePicker`, `Slider`, `CheckboxGroup`, `RadioGroup`,
+  `MultiSwitch`. Keeps the label in the accessibility tree and out of the
+  layout.
+
+  For a control whose options already say what it does — a filter toolbar's
+  segmented switches — where a visible label is noise but an unnamed control is
+  a bug. Before this the choices were an unnamed control or a label the design
+  does not have, and the silent one is the one that ships.
+
+  It is `labelHidden` and not `hideLabel` because `Input` has used `hideLabel`
+  since the reveal toggle shipped, for that toggle's accessible label ("Hide
+  password"). Different concept, and renaming a 5.x prop to free the name would
+  be breaking for the sake of a nicer word.
+
+
 ## [5.22.0] - 2026-08-19
 
 ### Changed

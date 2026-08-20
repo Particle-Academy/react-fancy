@@ -20,6 +20,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       dirty,
       error,
       label,
+      labelHidden,
       description,
       required,
       disabled,
@@ -117,6 +118,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       return (
         <Field
           label={label}
+          labelHidden={labelHidden}
           description={description}
           error={error}
           required={required}

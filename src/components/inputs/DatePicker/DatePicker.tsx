@@ -40,6 +40,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       dirty,
       error,
       label,
+      labelHidden,
       description,
       required,
       disabled,
@@ -104,6 +105,7 @@ const SingleDatePicker = forwardRef<
       size = "md",
       error,
       label,
+      labelHidden,
       description,
       required,
       disabled,
@@ -167,6 +169,7 @@ const SingleDatePicker = forwardRef<
       return (
         <Field
           label={label}
+          labelHidden={labelHidden}
           description={description}
           error={error}
           required={required}
@@ -193,6 +196,7 @@ const RangeDatePicker = forwardRef<
       size = "md",
       error,
       label,
+      labelHidden,
       description,
       required,
       disabled,
@@ -273,6 +277,7 @@ const RangeDatePicker = forwardRef<
       return (
         <Field
           label={label}
+          labelHidden={labelHidden}
           description={description}
           error={error}
           required={required}

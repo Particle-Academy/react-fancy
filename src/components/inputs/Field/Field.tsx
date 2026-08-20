@@ -4,6 +4,8 @@ import type { FieldProps } from "./Field.types";
 
 export function Field({
   label,
+  labelHidden,
+  labelId,
   description,
   error,
   required,
@@ -18,9 +20,12 @@ export function Field({
       {label && (
         <label
           htmlFor={htmlFor}
+          id={labelId}
           className={cn(
             "font-medium text-zinc-700 dark:text-zinc-100",
             labelSizeClasses[size],
+            // Out of the layout, still in the accessibility tree.
+            labelHidden && "sr-only",
           )}
         >
           {label}

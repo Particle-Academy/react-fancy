@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useId } from "react";
 import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { Field } from "../Field";
@@ -22,6 +22,7 @@ export function MultiSwitch<V = string>({
   dirty,
   error,
   label,
+  labelHidden,
   description,
   required,
   disabled,
@@ -36,6 +37,11 @@ export function MultiSwitch<V = string>({
   mode,
   ...rest
 }: MultiSwitchProps<V>) {
+  const reactId = useId();
+  // A `<label for>` cannot name a div[role="radiogroup"], so the group points at
+  // the label instead. Needs an id the label and the group both agree on.
+  const labelId = label ? `${id ?? reactId}-label` : undefined;
+
   const resolvedOptions = list.map(resolveOption);
   const fallback = defaultValue ?? resolvedOptions[0]?.value;
   const resolvedMode = useFieldMode(mode);
@@ -80,6 +86,7 @@ export function MultiSwitch<V = string>({
       data-react-fancy-multi-switch=""
       role="radiogroup"
       id={id}
+      aria-labelledby={labelId}
       onBlur={(e) => {
         if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
       }}
@@ -135,7 +142,16 @@ export function MultiSwitch<V = string>({
 
   if (label || error || description) {
     return (
-      <Field label={label} description={description} error={error} required={required} htmlFor={id} size={size}>
+      <Field
+        label={label}
+        labelHidden={labelHidden}
+        labelId={labelId}
+        description={description}
+        error={error}
+        required={required}
+        htmlFor={id}
+        size={size}
+      >
         {control}
       </Field>
     );

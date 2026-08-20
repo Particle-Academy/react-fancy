@@ -15,6 +15,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
       dirty,
       error,
       label,
+      labelHidden,
       description,
       required,
       disabled,
@@ -61,6 +62,7 @@ const SingleSlider = forwardRef<HTMLInputElement, SliderProps & { range?: false 
       dirty,
       error,
       label,
+      labelHidden,
       description,
       required,
       disabled,
@@ -139,7 +141,7 @@ const SingleSlider = forwardRef<HTMLInputElement, SliderProps & { range?: false 
 
     if (label || error || description) {
       return (
-        <Field label={label} description={description} error={error} required={required} htmlFor={id} size={size}>
+        <Field label={label} labelHidden={labelHidden} description={description} error={error} required={required} htmlFor={id} size={size}>
           {slider}
         </Field>
       );
@@ -158,6 +160,7 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
       dirty,
       error,
       label,
+      labelHidden,
       description,
       required,
       disabled,
@@ -259,7 +262,7 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
 
     if (label || error || description) {
       return (
-        <Field label={label} description={description} error={error} required={required} htmlFor={id} size={size}>
+        <Field label={label} labelHidden={labelHidden} description={description} error={error} required={required} htmlFor={id} size={size}>
           {slider}
         </Field>
       );

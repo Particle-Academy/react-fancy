@@ -24,6 +24,15 @@ export interface InputBaseProps {
   dirty?: boolean;
   error?: string;
   label?: string;
+  /**
+   * Keep the label for assistive tech, but do not draw it.
+   *
+   * For a control whose options already say what it does — a filter toolbar's
+   * segmented switches, say — where a visible label is noise but an unnamed
+   * control is a bug. Without this the only choices were an unnamed control or
+   * a label the design does not have, and the silent one is the one that ships.
+   */
+  labelHidden?: boolean;
   description?: string;
   required?: boolean;
   disabled?: boolean;

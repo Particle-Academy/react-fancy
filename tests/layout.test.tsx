@@ -92,6 +92,64 @@ describe("Grid", () => {
     unmount();
   });
 
+  it("honours cols in responsive mode — the column count is not decorative", () => {
+    // The test above this one asserted only that `--fancy-grid-cols` was SET,
+    // and passed for months while the responsive template ignored it entirely
+    // (`repeat(auto-fit, minmax(min(100%, 16rem), 1fr))`). A grid asked for 2
+    // and a grid asked for 5 laid out identically.
+    //
+    // Note what is NOT asserted: that the two produce different template
+    // STRINGS. They deliberately do not — the template is one expression and
+    // the count rides in the custom property it reads. So the invariant is the
+    // pair: the property carries the request, and the template consumes it.
+    // Either half alone is satisfiable by the broken version.
+    for (const cols of [2, 5]) {
+      const { host, unmount } = mount(<Grid cols={cols}>x</Grid>);
+      const el = host.querySelector("[data-react-fancy-grid]") as HTMLElement;
+
+      expect(el.style.getPropertyValue("--fancy-grid-cols")).toBe(String(cols));
+      expect(el.style.gridTemplateColumns).toContain("var(--fancy-grid-cols)");
+
+      unmount();
+    }
+  });
+
+  it("reads the custom property it publishes", () => {
+    // `--fancy-grid-cols` is documented as the single place a design overrides
+    // the column behaviour in CSS. That promise is only true if the component's
+    // own template reads it — otherwise the property is set, never consumed, and
+    // overriding it does nothing at all.
+    for (const responsive of [true, false]) {
+      const { host, unmount } = mount(
+        <Grid cols={3} responsive={responsive}>
+          x
+        </Grid>,
+      );
+      const el = host.querySelector("[data-react-fancy-grid]") as HTMLElement;
+
+      expect(el.style.gridTemplateColumns).toContain("var(--fancy-grid-cols)");
+
+      unmount();
+    }
+  });
+
+  it("caps the track count rather than filling to a fixed minimum", () => {
+    // The responsive template must still COLLAPSE (auto-fit) while never
+    // exceeding `cols` — "3 columns at most, fewer when narrow". A plain
+    // auto-fit at a fixed 16rem floor gives however many happen to fit, which
+    // at a wide viewport is more than asked for.
+    const { host, unmount } = mount(<Grid cols={3}>x</Grid>);
+    const template = (host.querySelector("[data-react-fancy-grid]") as HTMLElement).style
+      .gridTemplateColumns;
+
+    expect(template).toContain("auto-fit");
+    // The cap arithmetic has to know the gutter, or N tracks plus N-1 gaps
+    // overflow the row and auto-fit quietly drops to N-1.
+    expect(template).toContain("var(--fancy-grid-gap)");
+
+    unmount();
+  });
+
   it("goes single-column on small screens by default", () => {
     // The thing every hand-rolled copy got slightly differently. Expressed as a
     // custom property so a design can override the breakpoint behaviour in CSS

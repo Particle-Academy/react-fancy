@@ -22,6 +22,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       dirty,
       error,
       label,
+      labelHidden,
       description,
       required,
       disabled,
@@ -149,6 +150,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       return (
         <Field
           label={label}
+          labelHidden={labelHidden}
           description={description}
           error={error}
           required={required}
