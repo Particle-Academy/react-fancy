@@ -11,6 +11,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.23.1] - 2026-08-20
+
+### Fixed
+
+- **`<Grid>` now applies its own gutter, because 5.23.0's column cap could be
+  wrong by exactly one column.** That release drew the gutter with a Tailwind
+  `gap-*` class and hard-coded the matching length beside it for the cap
+  arithmetic. Those are two values for one thing, and in the showcase they
+  disagreed by 2px — the class resolved to 14px in context while the arithmetic
+  assumed 12px. That was enough: N tracks plus N-1 gaps overflowed the row, and
+  `auto-fit` responded by fitting N-1. A grid asked for 3 rendered 2, with both
+  numbers individually defensible and nothing to see in the markup.
+
+  The gutter now comes from `--fancy-grid-gap`, the same property the cap
+  divides by, so the spacing in effect and the spacing in the maths cannot
+  disagree.
+
+  **If you override a `<Grid>`'s gutter with a `gap-*` class, that stops
+  working** — the grid sets `gap` itself now, and an inline style beats a class.
+  Set `--fancy-grid-gap` instead, which moves the gutter AND keeps the column
+  cap correct:
+
+  ```tsx
+  <Grid cols={3} style={{ "--fancy-grid-gap": "2rem" } as CSSProperties}>
+  ```
+
+  The `gap` prop (`"sm" | "md" | "lg"`) is unchanged and is still the normal way
+  to ask for a gutter.
+
+  Found by the browser, not the suite: jsdom cannot compute grid layout, so the
+  tests could confirm the template referenced the property but never that the
+  resulting column count was right.
+
+
 ## [5.23.0] - 2026-08-20
 
 All three of these were found by one consumer — the showcase's `/packages`

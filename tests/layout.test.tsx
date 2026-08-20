@@ -133,6 +133,22 @@ describe("Grid", () => {
     }
   });
 
+  it("owns its gutter, so the cap divides by the gap actually in effect", () => {
+    // 5.23.0 drew the gutter with a Tailwind `gap-*` class and hard-coded the
+    // matching length for the arithmetic. In the showcase those disagreed by
+    // 2px — enough that N tracks plus N-1 gaps overflowed the row and auto-fit
+    // dropped to N-1. A 3-up grid rendered 2-up with both values individually
+    // defensible. The component now applies the gutter itself, from the same
+    // property the cap divides by, so they cannot disagree.
+    const { host, unmount } = mount(<Grid cols={3}>x</Grid>);
+    const el = host.querySelector("[data-react-fancy-grid]") as HTMLElement;
+
+    expect(el.style.gap).toContain("var(--fancy-grid-gap)");
+    expect(el.className).not.toMatch(/gap-\d/);
+
+    unmount();
+  });
+
   it("caps the track count rather than filling to a fixed minimum", () => {
     // The responsive template must still COLLAPSE (auto-fit) while never
     // exceeding `cols` — "3 columns at most, fewer when narrow". A plain
