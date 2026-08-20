@@ -11,6 +11,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.24.0] - 2026-08-20
+
+Both from putting `<Progress>` on the showcase's player level meter, filed as
+#26 and #27. They are one shape — the component decided everything and the
+caller could not reach past the outer wrapper — and they failed differently.
+
+### Added
+
+- **`trackClassName` and `fillClassName` on `<Progress>`** (#27). `className`
+  reached only the outermost of three nested elements, so the track
+  (`bg-zinc-200`) and the fill were unreachable, and `color` takes a single
+  palette name — a gradient was not expressible at all. The showcase shipped a
+  solid colour in place of its brand gradient rather than reach in with
+  `className="[&>div>div]:…"`, which hard-codes this component's DOM shape into
+  a consumer and breaks silently, still rendering but unstyled, the first time a
+  wrapper is added.
+
+  Named for the ROLE, not the element, so one vocabulary covers both variants:
+  on `variant="circular"` they land on the ring's background and value circles.
+
+  ```tsx
+  <Progress value={xp} max={next} fillClassName="bg-[linear-gradient(90deg,#7dd3fc,#818cf8_55%,#c4b5fd)]" />
+  ```
+
+### Fixed
+
+- **`<Progress>` can be named, and can say what its number means** (#26). It
+  announced as *"progress bar, 42%"* — 42% of what was not recoverable from the
+  control. `ProgressProps` was a closed interface and the component had **no
+  rest spread**, so `aria-label`, `aria-labelledby` and `aria-valuetext` had no
+  route in at either the type or the runtime level. Unlike #24 this needed both.
+
+  `ProgressProps` now extends `HTMLAttributes<HTMLDivElement>` (minus `color`,
+  which here is a palette name rather than the legacy HTML attribute) and the
+  rest props are spread onto the `progressbar` element in both variants. That
+  brings `aria-valuetext` with it, which is the right answer for a meter whose
+  scale is not a percentage:
+
+  ```tsx
+  <Progress
+    value={1240} max={2500}
+    aria-labelledby="level-heading"
+    aria-valuetext="1,240 of 2,500 XP to Level 6"
+  />
+  ```
+
+  **Nothing to do on upgrade** — additive, and a bar with no ARIA props renders
+  exactly as before.
+
+  Not done, and deliberately left open on #27: the custom-property route
+  (`--fancy-progress-fill` and friends) for consumers who theme centrally rather
+  than per-call-site. That is a kit-wide decision about how components expose
+  theming hooks, and #23 is the reason not to add one casually — a property that
+  is set but never read is worse than none, because the doc comment then
+  promises a hook that does nothing.
+
+
 ## [5.23.1] - 2026-08-20
 
 ### Fixed

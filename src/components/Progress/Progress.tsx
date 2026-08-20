@@ -37,6 +37,9 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       indeterminate = false,
       showValue = false,
       className,
+      trackClassName,
+      fillClassName,
+      ...rest
     },
     ref,
   ) => {
@@ -62,6 +65,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       return (
         <div
           ref={ref}
+          {...rest}
           role="progressbar"
           aria-valuenow={indeterminate ? undefined : value}
           aria-valuemin={0}
@@ -92,7 +96,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
               r={radius}
               fill="none"
               strokeWidth={strokeWidth}
-              className="stroke-zinc-200 dark:stroke-zinc-700"
+              className={cn("stroke-zinc-200 dark:stroke-zinc-700", trackClassName)}
             />
             <circle
               cx={diameter / 2}
@@ -103,7 +107,11 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
               strokeLinecap="round"
               strokeDasharray={circumference}
               strokeDashoffset={offset}
-              className={cn(progressStroke[color], "transition-[stroke-dashoffset] duration-300")}
+              className={cn(
+                progressStroke[color],
+                "transition-[stroke-dashoffset] duration-300",
+                fillClassName,
+              )}
               style={{ transform: "rotate(-90deg)", transformOrigin: "center" }}
             />
           </svg>
@@ -125,6 +133,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
     return (
       <div
         ref={ref}
+        {...rest}
         role="progressbar"
         aria-valuenow={indeterminate ? undefined : value}
         aria-valuemin={0}
@@ -136,6 +145,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
           className={cn(
             "w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700",
             barHeightClasses[named],
+            trackClassName,
           )}
         >
           <div
@@ -143,6 +153,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
               "h-full rounded-full transition-[width] duration-300",
               progressFill[color],
               indeterminate && "animate-pulse w-full",
+              fillClassName,
             )}
             style={indeterminate ? undefined : { width: `${percentage}%` }}
           />
