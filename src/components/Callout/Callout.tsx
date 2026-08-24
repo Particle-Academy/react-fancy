@@ -13,6 +13,7 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(
       dismissible = false,
       onDismiss,
       className,
+      ...props
     },
     ref,
   ) => {
@@ -26,6 +27,7 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(
           calloutContainer[color],
           className,
         )}
+        {...props}
       >
         {icon && (
           <span className={cn("mt-0.5 shrink-0", calloutIcon[color])}>

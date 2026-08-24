@@ -11,6 +11,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.26.0] - 2026-08-23
+
+### Fixed
+
+- **`<Callout>` forwards its rest props** (#28). It destructured its six named
+  props and spread nothing, so everything else was accepted and discarded:
+
+  ```tsx
+  // Compiled. Rendered. The attribute was nowhere in the DOM.
+  <Callout data-my-handle="x" color="red">…</Callout>
+  ```
+
+  **TypeScript could not catch this.** A hyphenated JSX attribute is always
+  allowed and never checked against a component's props type, so `data-*` on a
+  Callout typechecked and vanished — accepted silently and dropped silently,
+  with no signal at compile time or run time. It also made Callout the odd one
+  out: `Badge`, `Button`, `Table.Cell`, `Table.Row` and `Table.Column` all
+  already spread rest.
+
+  Found building `fancy-trading-ui`, where **four** agent handles were dead for
+  this reason — each with a passing test, because the tests asserted on
+  rendered text rather than on the handle.
+
+  `CalloutProps` now extends `HTMLAttributes<HTMLDivElement>`, and the spread
+  sits last, so `id`, `aria-*`, event handlers and `role` all reach the element.
+  `role="alert"` remains the default and is now overridable — a static
+  informational callout no longer has to announce itself assertively.
+
+  **What you must do: nothing.** This only adds props that were previously
+  discarded. If you worked around it by moving a handle onto a wrapping
+  element, that still works; you can now move it back.
+
+
 ## [5.25.0] - 2026-08-23
 
 ### Fixed
