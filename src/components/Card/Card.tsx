@@ -12,11 +12,22 @@ const variantClasses: Record<NonNullable<CardProps["variant"]>, string> = {
   flat: "bg-zinc-50 dark:bg-zinc-800/50",
 };
 
+/**
+ * Padding is applied to the card's DIRECT CHILDREN rather than the card
+ * itself, so a full-bleed child (`Card.Media`) can opt out with `!px-0`
+ * without having to undo a padding that is already baked into the frame.
+ *
+ * The selector is `&>*`, not `&>div`. It was `&>div` until 5.24.0, which meant
+ * the tag a caller happened to choose silently decided whether that child was
+ * padded: `<Card><div>a</div><p>b</p></Card>` inset the div and left the
+ * paragraph hard against the border. Nothing in the caller's code hinted at
+ * the rule, and the result read as a bug in the card.
+ */
 const paddingClasses: Record<NonNullable<CardProps["padding"]>, string> = {
   none: "",
-  sm: "[&>div]:px-3 [&>div]:py-2",
-  md: "[&>div]:px-4 [&>div]:py-3",
-  lg: "[&>div]:px-6 [&>div]:py-4",
+  sm: "[&>*]:px-3 [&>*]:py-2",
+  md: "[&>*]:px-4 [&>*]:py-3",
+  lg: "[&>*]:px-6 [&>*]:py-4",
 };
 
 const CardRoot = forwardRef<HTMLDivElement, CardProps>(

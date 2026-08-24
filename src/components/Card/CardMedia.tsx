@@ -45,8 +45,8 @@ export const CardMedia = forwardRef<HTMLDivElement, CardMediaProps>(
         data-react-fancy-card-media=""
         className={cn(
           "relative overflow-hidden rounded-t-lg",
-          // Card's `padding` prop pads EVERY direct div child
-          // (`[&>div]:px-4 …`), which would inset the media and break the
+          // Card's `padding` prop pads EVERY direct child
+          // (`[&>*]:px-4 …`), which would inset the media and break the
           // flush-to-the-edge look every caller wants. `!` wins regardless of
           // stylesheet order, which plain `p-0` would not.
           "!px-0 !py-0",

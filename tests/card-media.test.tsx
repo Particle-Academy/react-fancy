@@ -99,7 +99,7 @@ describe("Card.Media", () => {
   });
 
   it("escapes the parent's child padding", () => {
-    // Card's `padding` prop pads every direct div child (`[&>div]:px-4 …`),
+    // Card's `padding` prop pads every direct child (`[&>*]:px-4 …`),
     // which would inset the media and break the flush-to-the-edge look every
     // caller wants. Plain `p-0` would depend on stylesheet order.
     const { host, unmount } = mount(

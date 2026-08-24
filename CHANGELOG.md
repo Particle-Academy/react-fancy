@@ -11,6 +11,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.25.0] - 2026-08-23
+
+### Fixed
+
+- **`<Card>` padding now reaches every direct child, not only `<div>`
+  children.** `padding` compiled to `[&>div]:px-4`, so the TAG a caller
+  happened to choose silently decided whether that child was padded. A card
+  mixing element types came out half-padded:
+
+  ```tsx
+  <Card>
+    <div>Backend & headless</div>   {/* inset 16px */}
+    <p>PHP / Node packages…</p>     {/* flush against the border */}
+  </Card>
+  ```
+
+  Nothing in the caller's code hinted at the rule, so the result read as a bug
+  in the card rather than in the markup — it was found on the showcase's
+  `/packages` page, where a description paragraph and a footer link sat hard
+  against the border while the header and thumbnail strip beside them were
+  correctly inset.
+
+  **What you must do: nothing, unless you were compensating for this.** Any
+  non-`<div>` direct child of a `Card` now picks up the card's padding. If you
+  had added your own `padding-inline` to such a child to work around the gap,
+  remove it or you will get the inset twice. If you genuinely want a
+  full-bleed child, use the same escape hatch `Card.Media` uses — `!px-0
+  !py-0` — which keeps working and is now reachable from any tag.
+
+
 ## [5.24.0] - 2026-08-20
 
 Both from putting `<Progress>` on the showcase's player level meter, filed as
