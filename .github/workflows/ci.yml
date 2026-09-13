@@ -51,5 +51,10 @@ jobs:
       - name: Type-check
         run: npm run lint
 
+      # The suite has to run somewhere a push can see it. Without this step the
+      # CI tick went green on lint + build alone, whatever the tests said.
+      - name: Test
+        run: npm test
+
       - name: Build
         run: npm run build
