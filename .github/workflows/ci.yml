@@ -39,8 +39,14 @@ jobs:
         with:
           node-version: "22"
 
+      # npm 11.18.0, not the runner's bundled npm 10.9.8. No lockfile is tracked
+      # here, so every run resolves the tree from scratch, and npm 10's arborist
+      # crashes resolving vitest 4.1.11's peer set:
+      #   npm error Cannot read properties of null (reading 'edgesOut')
+      # 11.18.0 is the version publish.yml already pins. Never get past it with
+      # --legacy-peer-deps: that silently drops peers instead of resolving them.
       - name: Install
-        run: npm install --no-audit --no-fund
+        run: npx -y npm@11.18.0 install --no-audit --no-fund
 
       - name: Type-check
         run: npm run lint

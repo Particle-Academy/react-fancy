@@ -80,8 +80,12 @@ jobs:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
 
+      # The same npm the Publish step and CI use. The runner's npm 10.9.8 crashes
+      # resolving vitest 4.1.11's peer set with no lockfile ("Cannot read
+      # properties of null (reading 'edgesOut')"), which would fail the release
+      # at install, before anything is built.
       - name: Install
-        run: npm install
+        run: npx -y npm@11.18.0 install
 
       - name: Build
         run: npm run build
