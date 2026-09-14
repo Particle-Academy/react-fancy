@@ -104,6 +104,94 @@ describe("PromptInput keeps the File", () => {
   });
 });
 
+/**
+ * jsdom has no ClipboardEvent or DataTransfer either. `text` is what
+ * `getData("text/plain")` answers, which is how a real clipboard tells a text
+ * paste from an image one.
+ */
+function paste(host: HTMLElement, files: File[], text = "") {
+  const ta = host.querySelector("textarea") as HTMLTextAreaElement;
+  const ev = new Event("paste", { bubbles: true, cancelable: true });
+  Object.defineProperty(ev, "clipboardData", {
+    value: {
+      files,
+      types: [...(text ? ["text/plain"] : []), ...(files.length ? ["Files"] : [])],
+      getData: (type: string) => (type === "text/plain" ? text : ""),
+    },
+    writable: false,
+  });
+  act(() => {
+    ta.dispatchEvent(ev);
+  });
+  return ev;
+}
+
+function submitVia(host: HTMLElement) {
+  const ta = host.querySelector("textarea") as HTMLTextAreaElement;
+  act(() => {
+    ta.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", ctrlKey: true, bubbles: true }));
+  });
+}
+
+/**
+ * Pasting a screenshot is how most people share an image with a chat.
+ *
+ * The composer took drops and the picker but had no paste handler at all, so a
+ * pasted screenshot did nothing — no chip, no error. A host that replaced its
+ * own paste-capable textarea with PromptInput lost the feature without noticing.
+ */
+describe("PromptInput attaches pasted images", () => {
+  it("attaches a pasted screenshot with the File intact", () => {
+    let got: PromptAttachment[] = [];
+    const { host, unmount } = mount(
+      <PromptInput budgetTokens={1000} onSubmit={(_t, a) => (got = a)} />,
+    );
+
+    const shot = file("image.png", "image/png", 5120);
+    const ev = paste(host, [shot]);
+
+    expect(host.textContent).toContain("image.png");
+    // Nothing for the browser to insert, and nothing half-inserted either.
+    expect(ev.defaultPrevented).toBe(true);
+
+    submitVia(host);
+
+    expect(got).toHaveLength(1);
+    expect(got[0]!.file).toBe(shot);
+    expect(got[0]!.type).toBe("image/png");
+
+    unmount();
+  });
+
+  it("leaves an ordinary text paste alone", () => {
+    const { host, unmount } = mount(<PromptInput budgetTokens={1000} onSubmit={() => {}} />);
+
+    const ev = paste(host, [], "hello");
+
+    // The browser inserts the text; the component must not swallow it.
+    expect(ev.defaultPrevented).toBe(false);
+    // No chip. (Not a search for the paperclip: the attach button has one.)
+    expect(host.querySelector('[aria-label="Remove attachment"]')).toBeNull();
+
+    unmount();
+  });
+
+  it("treats text copied with an image rendition as text", () => {
+    // Word, Excel and most editors put a picture of the selection on the
+    // clipboard beside the text. Attaching it would turn every paste of a
+    // sentence into a screenshot of that sentence.
+    const { host, unmount } = mount(<PromptInput budgetTokens={1000} onSubmit={() => {}} />);
+
+    const rendition = file("image.png", "image/png", 900);
+    const ev = paste(host, [rendition], "Quarterly revenue rose 12%");
+
+    expect(ev.defaultPrevented).toBe(false);
+    expect(host.querySelector('[aria-label="Remove attachment"]')).toBeNull();
+
+    unmount();
+  });
+});
+
 describe("PromptInput can be attached to without a mouse", () => {
   it("exposes a real file input", () => {
     // Drop-only means keyboard and touch users cannot attach at all — an

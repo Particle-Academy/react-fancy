@@ -9,7 +9,8 @@ import { Tooltip } from "../Tooltip";
  *   • slash-command picker (`/` triggers a filtered command palette,
  *     ↑/↓ navigate, Enter inserts)
  *   • mention picker (`@` triggers, filtered against `mentions`)
- *   • drop-to-attach (drag files anywhere on the surface) + chip bar
+ *   • drop-to-attach (drag files anywhere on the surface), paste-to-attach
+ *     (a pasted screenshot becomes an attachment) + chip bar
  *   • submit on ⌘/Ctrl+Enter (plain Enter inserts a newline)
  *   • live token-budget meter (green → amber → red as headroom drops)
  *
@@ -257,6 +258,29 @@ export function PromptInput({
     attach(e.dataTransfer.files);
   };
 
+  /**
+   * Paste a screenshot, get an attachment.
+   *
+   * There was no paste handler at all, so a pasted image did nothing — no chip,
+   * no error — and a host that had swapped its own paste-capable textarea for
+   * this component lost the feature without noticing.
+   *
+   * Files attach only when the clipboard carries NO plain text. Word, Excel and
+   * most editors put a picture of the selection beside the text; attaching that
+   * would turn every pasted sentence into a screenshot of the sentence. A pure
+   * image paste has nothing for the browser to insert, so the default is
+   * prevented only then, and a text paste is never touched.
+   */
+  const onPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const data = e.clipboardData;
+    const files = Array.from(data?.files ?? []);
+
+    if (files.length === 0 || (data?.getData("text/plain") ?? "") !== "") return;
+
+    e.preventDefault();
+    attach(files);
+  };
+
   return (
     <div
       onDragOver={(e) => {
@@ -306,6 +330,7 @@ export function PromptInput({
           value={text}
           onChange={(e) => updateText(e.target.value, e.target.selectionStart)}
           onKeyDown={onKeyDown}
+          onPaste={onPaste}
           placeholder={placeholder}
           spellCheck={false}
           className="block w-full resize-none bg-transparent px-3 py-2.5 text-[14px] leading-relaxed outline-none placeholder:text-zinc-400"

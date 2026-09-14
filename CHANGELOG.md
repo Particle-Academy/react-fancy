@@ -11,6 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.27.0] - 2026-09-14
+
+### Added
+
+- **`<PromptInput>` attaches a pasted image.** Pasting a screenshot into the
+  composer now adds it as an attachment, with the `File` and its MIME type, just
+  like a drop or the picker. There was no paste handler at all, so a pasted image
+  did nothing: no chip and no error. A host that swapped its own paste-capable
+  textarea for `PromptInput` (flabs did) lost the feature without noticing.
+
+  Files attach only when the clipboard carries no plain text. Word, Excel and
+  most editors put a picture of the selection beside the text, and attaching
+  that would turn every pasted sentence into a screenshot of the sentence. A text
+  paste is left entirely to the browser.
+
+  **What you must do:** nothing. If your host already handled `paste` on an
+  element wrapping `PromptInput`, an image paste now attaches here as well, so
+  remove your handler or you will get the image twice.
+
 ## [5.26.0] - 2026-08-23
 
 ### Fixed
