@@ -1,6 +1,7 @@
 import { forwardRef, useId } from "react";
 import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
+import { useAdornmentWidth } from "../../../hooks/use-adornment-width";
 import { Field } from "../Field";
 import { InputWrapper } from "../InputWrapper";
 import {
@@ -51,6 +52,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const resolvedMode = useFieldMode(mode);
     const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
 
+    // Measured, not assumed: `leading`/`trailing` take arbitrary content, and a
+    // fixed padding can only ever be right for one width. See
+    // `useAdornmentWidth` for what went wrong with the fixed version.
+    const [leadingRef, leadingWidth] = useAdornmentWidth();
+    const [trailingRef, trailingWidth] = useAdornmentWidth();
+
     // Only meaningful on a password field: a reveal on an already-visible input
     // is a button that does nothing.
     const canReveal = reveal === true && type === "password";
@@ -80,7 +87,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       >
         <div data-react-fancy-input="" className="relative flex items-center">
           {leading && (
-            <span className="pointer-events-none absolute left-3 text-zinc-400 dark:text-zinc-500">
+            <span
+              ref={leadingRef}
+              className="pointer-events-none absolute left-3 text-zinc-400 dark:text-zinc-500"
+            >
               {leading}
             </span>
           )}
@@ -96,10 +106,21 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               dirtyClasses(dirty),
               errorClasses(error),
               "w-full",
-              leading && "pl-9",
-              (trailing || canReveal) && "pr-9",
+              // The fixed classes are the PRE-MEASURE fallback only. Once the
+              // adornment is measured, the inline style below overrides them
+              // with its real width -- a fixed 36px is correct for one icon and
+              // wrong for anything wider, which is how `https://` came to
+              // render on top of the value.
+              leading && !leadingWidth && "pl-9",
+              (trailing || canReveal) && !trailingWidth && "pr-9",
               className,
             )}
+            style={{
+              // 12px clears `left-3`/`right-3`; 8px is the gap to the text.
+              ...(leadingWidth ? { paddingLeft: leadingWidth + 20 } : null),
+              ...(trailingWidth ? { paddingRight: trailingWidth + 20 } : null),
+              ...props.style,
+            }}
             onChange={(e) => {
               onChange?.(e);
               onValueChange?.(e.target.value);
@@ -137,7 +158,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             </button>
           ) : (
             trailing && (
-              <span className="pointer-events-none absolute right-3 text-zinc-400 dark:text-zinc-500">
+              <span
+                ref={trailingRef}
+                className="pointer-events-none absolute right-3 text-zinc-400 dark:text-zinc-500"
+              >
                 {trailing}
               </span>
             )

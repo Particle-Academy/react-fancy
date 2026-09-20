@@ -11,6 +11,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.27.1] - 2026-09-20
+
+### Fixed
+
+- **A wide `leading` / `trailing` no longer renders on top of the value.**
+  These adornments are absolutely positioned over the input, so they take no
+  space in flow and the input is padded by hand to keep text clear of them. That
+  padding was a fixed `pl-9` / `pr-9` — 36px, sized for a single icon — while the
+  adornment sits at `left-3` (12px), leaving 24px of room.
+
+  `leading="https://"` is roughly 50px, so the protocol and the value drew on top
+  of one another. Reported on the live showcase.
+
+  The width is now **measured** rather than assumed, because these props accept
+  arbitrary content — a currency code, a unit, a protocol, a short label — and no
+  fixed padding can be right for all of it. A `ResizeObserver` re-measures when a
+  webfont swaps in or the adornment's content changes.
+
+  **What to do:** nothing. The fixed padding remains the pre-measure fallback, so
+  server-rendered and first-paint output is unchanged, and an icon-sized
+  adornment lands on the same 36px it always did.
+
 ## [5.27.0] - 2026-09-14
 
 ### Added
