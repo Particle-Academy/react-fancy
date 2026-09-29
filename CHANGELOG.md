@@ -11,6 +11,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.28.1] - 2026-09-28
+
+### Fixed
+
+- **`contentEditableAdapter.replaceRange` flattened the element, so `InputTag`
+  could only ever insert ONE tag into a contenteditable that renders anything.**
+  Reported in #29 by a consumer whose entire surface is a contenteditable: the
+  first pill vanished on the second insert, and the characters around the insert
+  were eaten, because `start` / `end` index the visible text while the host's
+  `insert()` returns a marker of a different length — so the slice drifted by
+  the difference every time.
+
+  The cause was `el.textContent = next`, which destroys every element child.
+  `caretIndex()` and `setCaret()` already node-walked correctly; `replaceRange`
+  was the one place reaching for `textContent` as BOTH reader and writer, and
+  reading a flattened string is fine while writing one back is what threw the
+  elements away.
+
+  It now resolves both indices through the same walk `setCaret` uses (extracted
+  as a shared `locate`) and edits through a `Range` — `deleteContents()` +
+  `insertNode()` — so nodes outside the range survive by construction, and the
+  caret anchors on the node just written rather than on an offset that has
+  moved.
+
+  **What you must do: nothing.** A plain-text contenteditable behaves exactly as
+  before; this only adds behaviour where element children exist, which is the
+  case that used to lose them. If you wrote your own adapter to work around
+  this, you can delete it.
+
 ## [5.28.0] - 2026-09-28
 
 ### Fixed

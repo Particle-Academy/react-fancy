@@ -135,29 +135,42 @@ export function contentEditableAdapter(
     range.setEnd(sel.focusNode!, sel.focusOffset);
     return range.toString().length;
   }
+  /**
+   * Resolve an index into the element's visible text to a position inside the
+   * text node that actually holds it. Returns null when the index is past the
+   * end, or when there is no text node at all (an empty editable).
+   *
+   * This is the single walk that `setCaret` and `replaceRange` share. They used
+   * to disagree: `setCaret` walked, `replaceRange` went through `textContent`.
+   */
+  function locate(
+    el: HTMLElement,
+    index: number,
+  ): { node: Text; offset: number } | null {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let remaining = index;
+    let node = walker.nextNode() as Text | null;
+    while (node) {
+      const len = node.textContent?.length ?? 0;
+      if (remaining <= len) return { node, offset: remaining };
+      remaining -= len;
+      node = walker.nextNode() as Text | null;
+    }
+    return null;
+  }
   function setCaret(el: HTMLElement, index: number): void {
     const sel = window.getSelection();
     if (!sel) return;
-    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-    let remaining = index;
-    let node: Node | null = walker.nextNode();
-    while (node) {
-      const len = (node.textContent ?? "").length;
-      if (remaining <= len) {
-        const range = document.createRange();
-        range.setStart(node, remaining);
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
-        return;
-      }
-      remaining -= len;
-      node = walker.nextNode();
-    }
-    // Past end: place at end.
+    const at = locate(el, index);
     const range = document.createRange();
-    range.selectNodeContents(el);
-    range.collapse(false);
+    if (at) {
+      range.setStart(at.node, at.offset);
+      range.collapse(true);
+    } else {
+      // Past end (or nothing to walk): place at end.
+      range.selectNodeContents(el);
+      range.collapse(false);
+    }
     sel.removeAllRanges();
     sel.addRange(range);
   }
@@ -188,10 +201,37 @@ export function contentEditableAdapter(
     replaceRange(start, end, replacement) {
       const el = ref.current;
       if (!el) return;
-      const current = el.textContent ?? "";
-      const next = current.slice(0, start) + replacement + current.slice(end);
-      el.textContent = next;
-      setCaret(el, start + replacement.length);
+
+      // Edit through a Range rather than rewriting `textContent`. Assigning
+      // `textContent` destroys EVERY element child, so a host that renders a
+      // resolved tag as a pill could only ever insert one: the next insert
+      // flattened the first away. A Range touches nothing outside itself.
+      const from = locate(el, start);
+      const to = locate(el, end);
+      const inserted = document.createTextNode(replacement);
+
+      if (from && to) {
+        const range = document.createRange();
+        range.setStart(from.node, from.offset);
+        range.setEnd(to.node, to.offset);
+        range.deleteContents();
+        range.insertNode(inserted);
+      } else {
+        // Past the end, or an empty editable with no text node to address.
+        el.append(inserted);
+      }
+
+      // Anchor the caret on the node just written instead of re-deriving an
+      // index: the text offsets have moved, and the node has not.
+      const sel = window.getSelection();
+      if (sel) {
+        const after = document.createRange();
+        after.setStart(inserted, inserted.length);
+        after.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(after);
+      }
+
       el.dispatchEvent(new Event("input", { bubbles: true }));
       el.focus();
     },
