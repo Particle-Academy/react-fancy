@@ -11,6 +11,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.29.1] - 2026-09-29
+
+### Fixed
+
+- **Documented how to theme `color="brand"` per mode, in the file a consumer
+  actually receives.** 5.29.0 explained the three brand variables in a comment
+  in `src/styles.css` — and the build emits `@theme` without comments, so none
+  of it reached anyone who installed the package. The guidance now lives in
+  `README.md`, which ships.
+
+  The part worth having: **`--color-brand` and `--color-brand-contrast` are a
+  pair and must turn over together.** Repointing one for dark mode is the
+  obvious move and it fails QUIETLY — the surface goes pale while the label
+  stays white on top of it, and on `ghost` / `outline`, where brand is the
+  label rather than the surface, a brand that stayed dark puts dark text on a
+  near-black background. Nothing errors; it is simply unreadable.
+
+  ```css
+  .dark {
+    --color-brand: #BFD7EA;
+    --color-brand-contrast: #003057;
+  }
+  ```
+
+  `--color-brand-hover` usually needs no per-mode value.
+
+  Reported by the consumer who drove #30, from five ghost buttons that made it
+  real rather than theoretical. No code changed.
+
 ## [5.29.0] - 2026-09-29
 
 ### Added

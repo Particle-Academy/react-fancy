@@ -39,6 +39,21 @@
          --color-brand-hover: #D4A017;      need not be a shade of brand
        }
 
+     PER MODE, SWAP THE PAIR. `--color-brand` and `--color-brand-contrast` only
+     mean anything together. Repointing one alone fails QUIETLY -- the button
+     still renders, it is just unreadable (a pale surface still carrying white
+     text; or, on ghost/outline where brand is the LABEL, dark text on a dark
+     background):
+
+       .dark { --color-brand: #BFD7EA; --color-brand-contrast: #003057; }
+
+     `--color-brand-hover` usually needs no per-mode value: an accent chosen to
+     stand against the brand tends to stand against it in both modes.
+
+     NOTE: this comment does not survive the build -- `@theme` is emitted
+     without it. The consumer-facing copy is in README.md, and that is the one
+     to keep correct.
+
      Defaults keep the kit's violet so nothing changes for a host that never
      sets them. Soft/outline/ghost variants derive their tints with opacity
      modifiers (`bg-brand/10`), which is what lets three variables cover four

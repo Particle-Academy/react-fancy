@@ -221,6 +221,60 @@ All components render a `data-react-fancy-*` attribute on their root element (e.
 document.querySelectorAll("[data-react-fancy-dropdown-item]");
 ```
 
+## Your brand colour
+
+Every component that takes a `color` accepts `"brand"` — your colour, not one of
+Tailwind's hues:
+
+```jsx
+<Button color="brand">Save</Button>
+<Badge color="brand">New</Badge>
+```
+
+It resolves through three CSS variables you set once:
+
+```css
+:root {
+  --color-brand: #003057;           /* the brand colour itself */
+  --color-brand-contrast: #ffffff;  /* text + icons ON that colour */
+  --color-brand-hover: #D4A017;     /* need NOT be a shade of brand */
+}
+```
+
+Three rather than one because a generated hover assumes "same hue, darker", and
+a brand palette need not work that way — a navy whose hover is gold cannot be
+derived from navy by any amount of arithmetic. You state it.
+
+The tinted variants (`outline`, `ghost`, `soft`) derive from the same three with
+opacity, so you never need to supply a 50–950 scale.
+
+### Dark mode: swap the PAIR
+
+`--color-brand` and `--color-brand-contrast` only make sense together. Repointing
+one without the other is the obvious wrong move, and it **fails quietly** — the
+button still renders, it is just unreadable:
+
+```css
+/* WRONG — the surface goes pale, the label stays white on top of it */
+.dark { --color-brand: #BFD7EA; }
+
+/* RIGHT — the pair turns over together */
+.dark {
+  --color-brand: #BFD7EA;
+  --color-brand-contrast: #003057;
+}
+```
+
+The same swap fixes ghost and outline buttons, where the brand colour is the
+LABEL rather than the surface: a dark-mode brand that stayed navy would put navy
+text on a near-black background.
+
+`--color-brand-hover` often needs no per-mode value. An accent chosen to stand
+against the brand usually stands against it in both modes.
+
+Reported by a consumer running a three-colour palette; the wrong version above
+is the one they hit first.
+
 ## Dark Mode
 
 Dark mode works via Tailwind's `dark:` class strategy. The library's `Portal` component automatically detects the `dark` class (or `data-theme="dark"`) on `<html>` and propagates it into portaled content (modals, dropdowns, tooltips, toasts, etc.).
