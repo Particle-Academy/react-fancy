@@ -8,7 +8,7 @@ export function FileUploadDropzone({
   children,
   className,
 }: FileUploadDropzoneProps) {
-  const { addFiles, disabled } = useFileUpload();
+  const { addFiles, disabled, accept, multiple } = useFileUpload();
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -50,7 +50,8 @@ export function FileUploadDropzone({
         type="file"
         className="hidden"
         onChange={(e) => e.target.files && addFiles(e.target.files)}
-        multiple
+        accept={accept}
+        multiple={multiple}
         disabled={disabled}
       />
       {children ?? (

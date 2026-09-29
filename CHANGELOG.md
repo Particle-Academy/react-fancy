@@ -11,6 +11,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.28.0] - 2026-09-28
+
+### Fixed
+
+- **`FileUpload`'s `accept` and `multiple` props were wired to nothing.** Both
+  were declared on `FileUploadProps`, so they were real props to anyone reading
+  the types or asking an agent to compose the component. Neither was
+  destructured in the root, neither reached the hidden `<input>`, and neither was
+  consulted when files were added. `accept="image/*"` filtered nothing in the
+  browse dialog and accepted any dropped file; `multiple={false}` sat beside an
+  input that hard-coded `multiple`.
+
+  **`accept` is now enforced on BOTH paths, and the drop path is the one that
+  matters.** A browser enforces `accept` in the file picker only — a
+  drag-and-drop never opens a picker, so forwarding the attribute alone would
+  still have let a `.exe` dropped onto an image-only zone through. A new
+  `matchesAccept` implements the HTML `accept` grammar (extensions, exact MIME
+  types, `type/*` wildcards, case-insensitive) and filters dropped files with it.
+  Extension rules match the file NAME, because a dropped file frequently reports
+  an empty `File.type` — that is the common case, not an edge one.
+
+  **What a consumer must do: check whether you pass `accept` to `FileUpload`.**
+  If you do, files that previously got through will now be refused — which is
+  what you asked for, but it is a real behaviour change rather than a no-op, and
+  it is why this is a minor rather than a patch. If you were relying on the prop
+  being ignored, remove it. If you pass neither prop, nothing changes: an absent
+  `accept` constrains nothing and `multiple` still defaults to `true`.
+
+  `multiple={false}` now sets the input attribute and caps the selection at one
+  file, applied exactly the way `maxFiles` is (first-wins, not replace-last) so
+  the two props cannot disagree about what a single-file upload means.
+
+  `FileUpload` had **no tests at all**; it now has eight, four of which fail
+  against 5.27.1.
+
 ## [5.27.1] - 2026-09-20
 
 ### Fixed

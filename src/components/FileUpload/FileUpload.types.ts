@@ -5,6 +5,9 @@ export interface FileUploadContextValue {
   addFiles: (files: FileList | File[]) => void;
   removeFile: (index: number) => void;
   disabled: boolean;
+  /** Mirrored onto the hidden input so the browse dialog filters too. */
+  accept?: string;
+  multiple: boolean;
 }
 
 export interface FileUploadProps {
