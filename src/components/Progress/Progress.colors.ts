@@ -5,6 +5,9 @@
 import type { Color } from "../../utils/types";
 
 export const progressFill: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "bg-brand",
   slate: "bg-slate-500 dark:bg-slate-400",
   gray: "bg-gray-500 dark:bg-gray-400",
   zinc: "bg-zinc-500 dark:bg-zinc-400",
@@ -30,6 +33,9 @@ export const progressFill: Record<Color, string> = {
 };
 
 export const progressStroke: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "stroke-brand",
   slate: "stroke-slate-500 dark:stroke-slate-400",
   gray: "stroke-gray-500 dark:stroke-gray-400",
   zinc: "stroke-zinc-500 dark:stroke-zinc-400",
@@ -55,6 +61,9 @@ export const progressStroke: Record<Color, string> = {
 };
 
 export const progressText: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "text-brand",
   slate: "text-slate-600 dark:text-slate-400",
   gray: "text-gray-600 dark:text-gray-400",
   zinc: "text-zinc-600 dark:text-zinc-400",

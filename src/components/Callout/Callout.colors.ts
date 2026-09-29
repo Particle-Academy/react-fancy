@@ -5,6 +5,9 @@
 import type { Color } from "../../utils/types";
 
 export const calloutContainer: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "border-brand bg-brand/5 text-brand",
   slate: "border-slate-500 bg-slate-50 text-slate-900 dark:border-slate-400 dark:bg-slate-950/50 dark:text-slate-100",
   gray: "border-gray-500 bg-gray-50 text-gray-900 dark:border-gray-400 dark:bg-gray-950/50 dark:text-gray-100",
   zinc: "border-zinc-500 bg-zinc-50 text-zinc-900 dark:border-zinc-400 dark:bg-zinc-950/50 dark:text-zinc-100",
@@ -30,6 +33,9 @@ export const calloutContainer: Record<Color, string> = {
 };
 
 export const calloutIcon: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "text-brand",
   slate: "text-slate-500 dark:text-slate-400",
   gray: "text-gray-500 dark:text-gray-400",
   zinc: "text-zinc-500 dark:text-zinc-400",

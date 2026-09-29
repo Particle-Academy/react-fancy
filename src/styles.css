@@ -27,7 +27,25 @@
      @theme { --color-brand: var(--color-emerald-600); }
    ──────────────────────────────────────────────────────────────────────────── */
 @theme {
+  /* THE HOST'S OWN COLOUR. `color="brand"` on any component resolves to these.
+     Three variables, not one: a generated hover assumes "same hue, darker",
+     and a brand palette need not work that way — a navy whose hover is gold
+     cannot be derived from navy. So the host states the hover instead of the
+     kit guessing it.
+
+       :root {
+         --color-brand: #003057;
+         --color-brand-contrast: #ffffff;   text/icon ON the brand colour
+         --color-brand-hover: #D4A017;      need not be a shade of brand
+       }
+
+     Defaults keep the kit's violet so nothing changes for a host that never
+     sets them. Soft/outline/ghost variants derive their tints with opacity
+     modifiers (`bg-brand/10`), which is what lets three variables cover four
+     variants without asking for a whole scale. */
   --color-brand: var(--color-violet-600);
+  --color-brand-contrast: var(--color-white);
+  --color-brand-hover: var(--color-violet-700);
 
   --color-primary-50: var(--color-violet-50);
   --color-primary-100: var(--color-violet-100);

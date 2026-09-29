@@ -11,6 +11,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.29.0] - 2026-09-29
+
+### Added
+
+- **`color="brand"` on every component that takes a colour** — `Button`,
+  `Badge`, `Callout`, `Progress`, `Switch` and `Timeline.Item`. Requested in
+  #30 by a consumer with 164 call sites reading `color="violet"` to mean "our
+  primary action"; their brand is navy, so every one of those was indigo-ish,
+  and `ButtonColor` was a closed union of the 22 Tailwind hue names with no
+  escape hatch.
+
+  `brand` is not a hue. It resolves through **three** CSS variables a host sets
+  once:
+
+  ```css
+  :root {
+    --color-brand: #003057;
+    --color-brand-contrast: #ffffff;  /* text/icons ON the brand colour */
+    --color-brand-hover: #D4A017;     /* need NOT be a shade of brand */
+  }
+  ```
+
+  **Three rather than one, and that is the whole design.** A generated hover
+  assumes "same hue, darker". A brand palette need not work that way — the
+  reporter's hover is gold on a navy brand, which no amount of arithmetic
+  recovers from navy. So the host states the hover instead of the kit guessing
+  it. The tinted variants (`outline`, `ghost`, `soft`) derive from the same
+  three via opacity modifiers, which is what lets three variables cover four
+  variants without asking anyone for a whole 50–950 scale.
+
+  Defaults keep the kit's violet, so a host that sets nothing sees no change.
+
+  `--color-brand` had existed in `styles.css` since before this release with
+  nothing in the kit reading it. That was not quite a dead token — Tailwind v4's
+  `@theme` generates `bg-brand` / `text-brand` utilities from it, so a host could
+  already paint its own markup. The gap was one-directional: nothing in the kit
+  could be pointed at it.
+
+### Changed
+
+- **`Color` (and therefore `ButtonColor`) gained the member `"brand"`.** Runtime
+  behaviour is purely additive and every existing hue is untouched.
+
+  **What you must do:** nothing, unless you wrote an exhaustive
+  `Record<Color, …>` or a `switch` over `Color` in your own code. Those will now
+  fail to compile with a missing `brand` case, which is the compiler correctly
+  telling you there is a colour you do not handle. Add the one entry. If you
+  would rather not, type your map against the hue names directly instead of
+  against our union.
+
+  `COLORS` also gained `"brand"`, since it is documented as every value of
+  `Color` and is what an exhaustive map is meant to be built from.
+
 ## [5.28.1] - 2026-09-28
 
 ### Fixed

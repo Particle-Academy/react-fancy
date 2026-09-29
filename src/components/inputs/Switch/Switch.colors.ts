@@ -5,6 +5,9 @@
 import type { Color } from "../../../utils/types";
 
 export const switchTrack: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "bg-brand",
   slate: "bg-slate-500",
   gray: "bg-gray-500",
   zinc: "bg-zinc-500",

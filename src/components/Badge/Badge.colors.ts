@@ -5,6 +5,9 @@
 import type { Color } from "../../utils/types";
 
 export const badgeSolid: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "bg-brand text-brand-contrast",
   slate: "bg-slate-600 text-white dark:bg-slate-500",
   gray: "bg-gray-600 text-white dark:bg-gray-500",
   zinc: "bg-zinc-600 text-white dark:bg-zinc-500",
@@ -30,6 +33,9 @@ export const badgeSolid: Record<Color, string> = {
 };
 
 export const badgeOutline: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "border border-brand/40 text-brand",
   slate: "border border-slate-300 text-slate-700 dark:border-slate-600 dark:text-slate-300",
   gray: "border border-gray-300 text-gray-700 dark:border-gray-600 dark:text-gray-300",
   zinc: "border border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-300",
@@ -55,6 +61,9 @@ export const badgeOutline: Record<Color, string> = {
 };
 
 export const badgeSoft: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "bg-brand/10 text-brand",
   slate: "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-300",
   gray: "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300",
   zinc: "bg-zinc-100 text-zinc-700 dark:bg-zinc-900/30 dark:text-zinc-300",
@@ -80,6 +89,9 @@ export const badgeSoft: Record<Color, string> = {
 };
 
 export const badgeDot: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "bg-brand",
   slate: "bg-slate-500",
   gray: "bg-gray-500",
   zinc: "bg-zinc-500",

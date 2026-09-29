@@ -5,6 +5,9 @@ import type { TimelineItemProps } from "./Timeline.types";
 import type { Color } from "../../utils/types";
 
 const dotColorClasses: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "bg-brand",
   slate: "bg-slate-400 dark:bg-slate-600", gray: "bg-gray-400 dark:bg-gray-600",
   zinc: "bg-zinc-300 dark:bg-zinc-600", neutral: "bg-neutral-400 dark:bg-neutral-600",
   stone: "bg-stone-400 dark:bg-stone-600",
@@ -17,6 +20,9 @@ const dotColorClasses: Record<Color, string> = {
 };
 
 const ringColorClasses: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "ring-brand/30",
   slate: "ring-slate-400/30", gray: "ring-gray-400/30",
   zinc: "ring-zinc-400/30 dark:ring-zinc-500/30", neutral: "ring-neutral-400/30",
   stone: "ring-stone-400/30",

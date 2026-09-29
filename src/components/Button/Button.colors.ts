@@ -5,6 +5,9 @@
 import type { Color } from "../../utils/types";
 
 export const buttonColorClasses: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "bg-brand text-brand-contrast border border-brand hover:bg-brand-hover",
   slate: "bg-slate-500 text-white border border-slate-600 hover:bg-slate-600 dark:bg-slate-600 dark:border-slate-500 dark:hover:bg-slate-500",
   gray: "bg-gray-500 text-white border border-gray-600 hover:bg-gray-600 dark:bg-gray-600 dark:border-gray-500 dark:hover:bg-gray-500",
   zinc: "bg-zinc-500 text-white border border-zinc-600 hover:bg-zinc-600 dark:bg-zinc-600 dark:border-zinc-500 dark:hover:bg-zinc-500",
@@ -30,6 +33,9 @@ export const buttonColorClasses: Record<Color, string> = {
 };
 
 export const buttonGhostClasses: Record<Color, string> = {
+  // The host's colour, from CSS variables -- no dark: variant, because a
+  // host that themes per mode scopes the variables themselves.
+  brand: "bg-transparent text-brand hover:bg-brand/10",
   slate: "bg-transparent text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-950/50",
   gray: "bg-transparent text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-950/50",
   zinc: "bg-transparent text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-950/50",

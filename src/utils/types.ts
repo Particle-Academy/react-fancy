@@ -43,10 +43,21 @@ export interface NavigableProps {
 
 /**
  * The full Tailwind v4 named color palette — every default hue, including all
- * five gray families. Components that accept a `color` should type it as this
- * so the whole palette is available.
+ * five gray families — plus `brand`, the host's own colour. Components that
+ * accept a `color` should type it as this so the whole palette is available.
+ *
+ * `brand` is not a hue. It resolves through three CSS variables the host sets
+ * once, rather than through a Tailwind scale:
+ *
+ *   `--color-brand`, `--color-brand-contrast`, `--color-brand-hover`
+ *
+ * Three rather than one because a generated hover assumes "same hue, darker",
+ * and a brand palette need not work that way — navy whose hover is gold cannot
+ * be derived from navy by any amount of arithmetic. The host states it.
  */
 export type Color =
+  // the host's own colour, resolved from CSS variables (see styles.css)
+  | "brand"
   // grays
   | "slate"
   | "gray"
@@ -74,6 +85,7 @@ export type Color =
 
 /** Every value of {@link Color}, for building exhaustive class maps. */
 export const COLORS = [
+  "brand",
   "slate", "gray", "zinc", "neutral", "stone",
   "red", "orange", "amber", "yellow", "lime", "green", "emerald", "teal",
   "cyan", "sky", "blue", "indigo", "violet", "purple", "fuchsia", "pink", "rose",
