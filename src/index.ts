@@ -160,6 +160,13 @@ export type {
   CardHeaderProps,
   CardBodyProps,
   CardFooterProps,
+  CardMediaProps,
+  CardBleedProps,
+  CardSectionProps,
+  CardSize,
+  CardPadding,
+  CardSections,
+  CardBleedEdges,
 } from "./components/Card";
 
 export { Callout } from "./components/Callout";

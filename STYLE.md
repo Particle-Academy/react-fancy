@@ -74,6 +74,11 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-card-header]` | Card.Header |
 | `[data-react-fancy-card-body]` | Card.Body |
 | `[data-react-fancy-card-footer]` | Card.Footer |
+| `[data-react-fancy-card-media]` | Card.Media |
+| `[data-react-fancy-card-bleed]` | Card.Bleed |
+| `[data-react-fancy-card-heading]` | the `heading` a card section rendered |
+| `[data-react-fancy-card-description]` | the `description` a card section rendered |
+| `[data-react-fancy-card-actions]` | the `actions` a card section rendered |
 | `[data-react-fancy-heading]` | Heading |
 | `[data-react-fancy-text]` | Text |
 | `[data-react-fancy-separator]` | Separator |

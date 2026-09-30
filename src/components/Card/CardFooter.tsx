@@ -1,23 +1,21 @@
 import { forwardRef } from "react";
-import { cn } from "../../utils/cn";
+import { CardSection } from "./CardSection";
 import type { CardFooterProps } from "./Card.types";
 
+/**
+ * A card's footer. Its rule sits on the TOP edge, and a lone `actions` block
+ * aligns to the end — matching `ModalFooter`, which has always done that while
+ * this component laid out nothing.
+ */
 export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
-  ({ className, children, ...props }, ref) => {
-    return (
-      <div
-        ref={ref}
-        data-react-fancy-card-footer=""
-        className={cn(
-          "border-t border-zinc-200 dark:border-zinc-700",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  },
+  (props, ref) => (
+    <CardSection
+      ref={ref}
+      edge="top"
+      handle="data-react-fancy-card-footer"
+      {...props}
+    />
+  ),
 );
 
 CardFooter.displayName = "CardFooter";

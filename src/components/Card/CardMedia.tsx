@@ -1,5 +1,7 @@
 import { forwardRef } from "react";
 import { cn } from "../../utils/cn";
+import { useCardContext } from "./Card.context";
+import { radiusTop } from "./Card.scales";
 import type { CardMediaProps } from "./Card.types";
 
 /**
@@ -39,12 +41,20 @@ export const CardMedia = forwardRef<HTMLDivElement, CardMediaProps>(
     },
     ref,
   ) => {
+    const cardSize = useCardContext()?.size ?? "md";
+
     return (
       <div
         ref={ref}
         data-react-fancy-card-media=""
         className={cn(
-          "relative overflow-hidden rounded-t-lg",
+          "relative overflow-hidden",
+          // Follows the CARD's radius step rather than hardcoding `rounded-t-lg`.
+          // It was fixed, so a `size="lg"` card put a `rounded-xl` frame around
+          // a `rounded-t-lg` image and left a visible sliver of card showing
+          // through each top corner. Defaults to `md` with no card above, which
+          // is the class it used to hardcode.
+          radiusTop[cardSize],
           // Card's `padding` prop pads EVERY direct child
           // (`[&>*]:px-4 …`), which would inset the media and break the
           // flush-to-the-edge look every caller wants. `!` wins regardless of

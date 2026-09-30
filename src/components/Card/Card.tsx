@@ -1,15 +1,25 @@
-import { forwardRef } from "react";
+import { forwardRef, useMemo } from "react";
 import { cn } from "../../utils/cn";
 import { CardHeader } from "./CardHeader";
 import { CardBody } from "./CardBody";
 import { CardFooter } from "./CardFooter";
 import { CardMedia } from "./CardMedia";
-import type { CardProps } from "./Card.types";
+import { CardBleed } from "./CardBleed";
+import { CardContext } from "./Card.context";
+import { paddingClasses, radiusClasses, sizePadding } from "./Card.scales";
+import type { CardContextValue, CardProps } from "./Card.types";
 
 const variantClasses: Record<NonNullable<CardProps["variant"]>, string> = {
   outlined: "border border-zinc-200 dark:border-zinc-700",
   elevated: "shadow-md border border-zinc-100 dark:border-zinc-800",
   flat: "bg-zinc-50 dark:bg-zinc-800/50",
+  // Tint steps between "no tint" and `flat`. They work the same way `flat`
+  // does: a later `bg-*` in the class string beats the base `bg-white`, because
+  // `cn` is tailwind-merge and resolves conflicting utilities last-wins. Class
+  // ORDER decides this, not CSS specificity — so these must stay after the base
+  // background in the `cn(...)` call below.
+  muted: "bg-zinc-100 dark:bg-zinc-800",
+  soft: "bg-zinc-50/70 dark:bg-zinc-800/40",
 };
 
 /**
@@ -22,19 +32,22 @@ const variantClasses: Record<NonNullable<CardProps["variant"]>, string> = {
  * padded: `<Card><div>a</div><p>b</p></Card>` inset the div and left the
  * paragraph hard against the border. Nothing in the caller's code hinted at
  * the rule, and the result read as a bug in the card.
+ *
+ * It is also why there is no `gap` to scale with `size`, which looks like an
+ * omission and is not: each direct child carries its own `py-*`, so two
+ * adjacent parts already have twice that between their content. Adding a row
+ * gap on the card would double a space that is already there.
  */
-const paddingClasses: Record<NonNullable<CardProps["padding"]>, string> = {
-  none: "",
-  sm: "[&>*]:px-3 [&>*]:py-2",
-  md: "[&>*]:px-4 [&>*]:py-3",
-  lg: "[&>*]:px-6 [&>*]:py-4",
-};
 
 const CardRoot = forwardRef<HTMLDivElement, CardProps>(
   (
     {
       variant = "outlined",
-      padding = "md",
+      size = "md",
+      padding,
+      sections = "divided",
+      dividerInset = false,
+      highlight = false,
       interactive = false,
       className,
       children,
@@ -42,25 +55,51 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
     },
     ref,
   ) => {
+    // `padding` stays authoritative over the step `size` implies. That order is
+    // what keeps `size` additive: a caller already passing `padding` sees no
+    // change, and `padding="none"` still means none.
+    const resolvedPadding = padding ?? sizePadding[size];
+
+    // The RESOLVED step goes into the context, not `size`. A part that has to
+    // meet the content's edge — an inset divider, a `Card.Bleed` — needs the
+    // distance the card actually applied, and `size` is only the default.
+    const context = useMemo<CardContextValue>(
+      () => ({ size, padding: resolvedPadding, sections, dividerInset }),
+      [size, resolvedPadding, sections, dividerInset],
+    );
+
     return (
-      <div
-        ref={ref}
-        data-react-fancy-card=""
-        className={cn(
-          "rounded-lg bg-white dark:bg-zinc-900",
-          variantClasses[variant],
-          // `overflow-hidden` is part of `interactive` rather than always-on:
-          // clipping unconditionally would cut off popovers and dropdowns that
-          // legitimately overflow a static card.
-          interactive &&
-            "overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg hover:border-zinc-300 dark:hover:border-zinc-600",
-          paddingClasses[padding],
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </div>
+      <CardContext.Provider value={context}>
+        <div
+          ref={ref}
+          data-react-fancy-card=""
+          className={cn(
+            "bg-white dark:bg-zinc-900",
+            radiusClasses[size],
+            variantClasses[variant],
+            // A pseudo-element rather than an inset box-shadow: `shadow-*` and
+            // `shadow-[inset...]` are the same tailwind-merge group, so an
+            // inset shadow here would have SILENTLY DELETED `elevated`'s
+            // `shadow-md`. Highlight and elevation have to be able to coexist.
+            // `dark:` carries a REAL colour. It was `dark:before:bg-transparent`,
+            // which made `highlight` a no-op in the mode that needs it most:
+            // a dark surface has no border contrast of its own, and a 10% white
+            // top edge is the whole reason Flux turns this on by default.
+            highlight &&
+              "relative before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-white/70 dark:before:bg-white/10",
+            // `overflow-hidden` is part of `interactive` rather than always-on:
+            // clipping unconditionally would cut off popovers and dropdowns that
+            // legitimately overflow a static card.
+            interactive &&
+              "overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg hover:border-zinc-300 dark:hover:border-zinc-600",
+            paddingClasses[resolvedPadding],
+            className,
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      </CardContext.Provider>
     );
   },
 );
@@ -72,4 +111,5 @@ export const Card = Object.assign(CardRoot, {
   Header: CardHeader,
   Body: CardBody,
   Footer: CardFooter,
+  Bleed: CardBleed,
 });

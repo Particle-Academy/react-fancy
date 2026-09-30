@@ -1,23 +1,20 @@
 import { forwardRef } from "react";
-import { cn } from "../../utils/cn";
+import { CardSection } from "./CardSection";
 import type { CardHeaderProps } from "./Card.types";
 
+/**
+ * A card's header. Also usable on its own, as a section heading above a card —
+ * see `CardSection`, which decides that from the absence of a `CardContext`.
+ */
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
-  ({ className, children, ...props }, ref) => {
-    return (
-      <div
-        ref={ref}
-        data-react-fancy-card-header=""
-        className={cn(
-          "border-b border-zinc-200 dark:border-zinc-700",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  },
+  (props, ref) => (
+    <CardSection
+      ref={ref}
+      edge="bottom"
+      handle="data-react-fancy-card-header"
+      {...props}
+    />
+  ),
 );
 
 CardHeader.displayName = "CardHeader";

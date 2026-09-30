@@ -11,6 +11,122 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.30.0] - 2026-09-30
+
+**Nothing here will stop your build.** Every prop below is new and optional,
+and every default was chosen so a `Card` written before this release renders
+byte-identically — `size` defaults to `md`, `sections` to `divided`,
+`highlight` to `false`. No API changed, nothing was renamed, nothing was
+removed. If you do not pass a new prop, there is nothing to do.
+
+`Card` was measured against Flux UI's card and this closes the feature gap.
+
+### Added
+
+- **`Card.Header` and `Card.Footer` compose from props.** `heading`,
+  `headingLevel`, `description` and `actions` lay a header out without a
+  wrapper from the caller. This suite's own showcase had two pages writing
+  `<div style={{ display: "flex", justifyContent: "space-between" }}>` INSIDE a
+  `Card.Header` — inline styles, in the app whose job is to demonstrate the
+  kit, across 136 headers, because nothing in the kit laid one out.
+
+  `children` still works and **wins**: pass it and the three props are ignored
+  rather than rendered alongside, so a caller who sets both gets one title
+  instead of two.
+
+- **`sections="divided" | "plain" | "banded"`** and **`dividerInset`** — how
+  header and footer are set apart: a hairline rule (today's behaviour and the
+  default), nothing at all, or a tinted band. `dividerInset` keeps the rules but
+  stops them at the content's edge.
+
+  `divided` is the default because it is what Card has always rendered.
+  Seamless is arguably the nicer default — Flux chose it — but defaulting to it
+  here would have silently restyled every card in every consumer.
+
+- **`size="xs" | "sm" | "md" | "lg"`** — scales padding and corner radius
+  together, and is inherited by `Card.Media` and `Card.Bleed`. `padding` stays
+  authoritative when you pass it, including `padding="none"`.
+
+- **`variant` gained `muted` and `soft`** — tint steps between `outlined` (no
+  tint) and `flat`. `flat` is NOT renamed to Flux's `filled`: the name is public
+  API and a rename buys nothing.
+
+- **`highlight`** — a 1px hairline just inside the top edge, white at 70% in
+  light mode and white at 10% in dark. Default `false`, deliberately unlike
+  Flux's `true`; turning a decorative hairline on by default would have changed
+  the look of every existing card.
+
+- **`Card.Bleed`** — runs content out to the card's edges (an image, a table, a
+  chart strip), with `edges="x" | "top" | "bottom" | "all"`.
+
+- **`Card.Header` and `Card.Footer` work standalone**, outside a `Card`, as a
+  section heading above one. They take their own `size` there, since there is
+  no card to inherit one from.
+
+- **`CardMediaProps`, `CardBleedProps`, `CardSectionProps`, `CardSize`,
+  `CardPadding`, `CardSections` and `CardBleedEdges` are exported** from the
+  package root. `CardMediaProps` had never been, so `Card.Media`'s props could
+  not be typed by a consumer wrapping it.
+
+- **`tests/card-tailwind.test.tsx`** renders every Card permutation, harvests
+  the class names it produced, and compiles them through the real Tailwind. A
+  class that is in the DOM and in no stylesheet now fails the build. See
+  *Fixed*, below, for why that check had to exist.
+
+### Changed
+
+- **`Card.Media`'s top radius follows the card's `size`** instead of hardcoding
+  `rounded-t-lg`. A `size="lg"` card previously put a `rounded-xl` frame around
+  a `rounded-t-lg` image and showed a sliver of card through each top corner.
+  Unchanged at `md`, which is the class it used to hardcode and the default.
+
+- **A standalone `Card.Header` / `Card.Footer` no longer draws a rule.** It
+  previously kept the `border-bottom` belonging to a card it was not inside.
+  This is the one visible change to existing markup, and only for a section
+  rendered outside a `Card` — which was a broken-looking state, not a style
+  anyone chose.
+
+### Fixed
+
+These were all found reviewing the additions above before release, so no
+released version carries them. They are recorded because each is a shape worth
+recognising.
+
+- **An inset divider and a `Card.Bleed` were measured from `size`, not from the
+  padding actually applied.** The two agree until someone passes `padding`, and
+  then they disagree by a whole step: `<Card size="md" padding="lg">` drew a
+  rule inset 1rem over content inset 1.5rem, and `<Card padding="none">` gave a
+  bleed a `-1rem` margin that carried it a centimetre PAST the card's edge and
+  hung the content outside the border. Both now read the resolved padding step
+  from context.
+
+- **A `Card.Bleed` inside a *standalone* header did nothing.** The section
+  published "am I inside a card" where the bleed needed "how much padding is
+  above me" — and a standalone header pads itself, so the answer was `false`
+  when the padding was real.
+
+- **`highlight` was a no-op in dark mode.** It carried
+  `dark:before:bg-transparent`, so the prop did nothing at all in the mode that
+  needs it most — a dark surface has no border contrast of its own, which is
+  why Flux turns its equivalent on by default.
+
+### Not copied from Flux, on purpose
+
+- **The `--flux-bleed-*` CSS-variable protocol.** Flux's padding sits on the
+  CARD, so a descendant has no way to know how far it must reach, and it needs
+  published custom properties to tell it — a public CSS API to version forever.
+  Ours sits on the card's direct CHILDREN, so the distance is always exactly one
+  padding step and `Card.Bleed` can look it up. Arithmetic instead of a contract.
+
+- **`body="inset"` / `body="flush"`.** A nested `<Card variant="soft">` already
+  composes an inset body, and `Card.Bleed` already composes a flush one. A prop
+  for it would be a second way to say the same thing.
+
+- **A `Card.Heading` / `Card.Subheading` pair.** `Heading` already ships an
+  11-step size ramp. Forking a card-local copy would give two answers to "how
+  big is a heading", and they would drift.
+
+
 ## [5.29.1] - 2026-09-29
 
 ### Fixed
