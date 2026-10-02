@@ -92,6 +92,27 @@ export interface UsePastePillsResult {
  * still closed carries the text.
  *
  * It owns no DOM. The host renders the pills.
+ *
+ * ---------------------------------------------------------------------------
+ * Who actually calls this (as of 5.32.0): `Composer`, and nothing else
+ * ---------------------------------------------------------------------------
+ *
+ * The estate that specified it **withdrew before adopting it**, hours after it
+ * shipped — their design moved the pill INTO the message as a `[paste:id|label]`
+ * marker in the same grammar as their other object tags, which makes the message
+ * itself the record of what is attached. A parallel `heldPastes` array would then be
+ * a second place answering "what am I sending?", and the two would disagree the
+ * moment someone backspaced a badge. Their reasoning was better than the spec.
+ *
+ * Recorded because a reader should not infer an extension point under active
+ * external use. It is kept rather than withdrawn for two reasons that are about
+ * cost, not optimism: it is published API on a 5.x package, so removing it needs a
+ * major; and `Composer` calls it, so it is exercised by that component's tests on
+ * every run and cannot rot unnoticed.
+ *
+ * **It gets no further surface without a real caller.** No extra options, no second
+ * hook. An API with one hypothetical consumer is how a package accumulates surface
+ * nobody uses.
  */
 export function usePastePills({
   threshold,
