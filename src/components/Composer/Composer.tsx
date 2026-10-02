@@ -157,7 +157,10 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   onClick={() => insertPaste(paste)}
                   disabled={disabled}
                   title="Insert this text into the message"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 py-1 pl-2.5 pr-1 text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                  // `pr-7` leaves room for the absolutely-positioned × that sits
+                  // over this button's right edge. With a smaller right padding the
+                  // × lands on top of the label.
+                  className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 py-1 pl-2.5 pr-7 text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
                 >
                   <span>
                     Pasted text · {withSeparators(paste.text.length)} characters
