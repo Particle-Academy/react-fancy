@@ -5,6 +5,27 @@ import { createRoot } from "react-dom/client";
 
 import { Composer } from "../src/components/Composer/Composer";
 
+/*
+ * `HeldPaste` imported from the PACKAGE BARREL on purpose, as a type-only import.
+ *
+ * `heldPastes` is a controllable prop, so a consumer owning that state needs the
+ * type to declare it — and a controllable prop whose type is unreachable is
+ * half-wired. It WAS missing when this feature was first written.
+ *
+ * **This line is not currently enforced, and I am saying so rather than implying
+ * otherwise.** `tsconfig.json` has `include: ["src"]`, so no test file here is
+ * type-checked by `npm run lint`; I wrote a comment claiming this made tsc fail,
+ * sabotage-tested it, and the sabotage passed. Types erase at runtime, so vitest
+ * cannot check it either, and a missing export only breaks the CONSUMER's build.
+ *
+ * It stays because it documents the contract and becomes a real guard the day tests
+ * are type-checked — but until then nothing here catches a dropped type export.
+ */
+import type { HeldPaste } from "../src/index";
+
+const HELD_PASTE_IS_EXPORTED: HeldPaste = { id: "x", text: "y" };
+void HELD_PASTE_IS_EXPORTED;
+
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 function mount(el: ReactElement) {

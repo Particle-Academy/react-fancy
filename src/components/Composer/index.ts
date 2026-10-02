@@ -1,2 +1,2 @@
 export { Composer } from "./Composer";
-export type { ComposerProps } from "./Composer.types";
+export type { ComposerProps, HeldPaste } from "./Composer.types";

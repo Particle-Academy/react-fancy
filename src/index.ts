@@ -335,7 +335,7 @@ export type {
 
 // Phase 6: Rich Content Components
 export { Composer } from "./components/Composer";
-export type { ComposerProps } from "./components/Composer";
+export type { ComposerProps, HeldPaste } from "./components/Composer";
 
 export { Chart } from "./components/Chart";
 export type {
