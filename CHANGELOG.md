@@ -11,6 +11,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.32.0] - 2026-10-02
+
+### Added
+
+- **`usePastePills` — the paste-holding logic without a surface.**
+
+  ```ts
+  const pills = usePastePills({ threshold: 500, heldPastes, onHeldPastesChange });
+
+  function onPaste(e) {
+    if (pills.handlePaste(e)) return;   // it took the paste and called preventDefault
+    // ...your own handling
+  }
+  ```
+
+  Returns `heldPastes`, `handlePaste(event) => boolean`, `expand(id) => string | undefined`
+  (removes it and hands back the text for you to insert), `remove(id)` and `clear()`.
+
+  **It owns no DOM** — you render the pills. And `handlePaste` is **composable**: it
+  returns `true` only if it took the paste, having called `preventDefault()` itself,
+  and otherwise declines *without touching the event*, so a host whose own handler
+  already intercepts paste can ask "did you want this?" rather than hand over.
+
+  `HeldPaste` carries `id` and `text` and deliberately **no `length`** — it would be
+  `text.length` and nothing else, and a derived value stored beside its source is a
+  value that can disagree with it.
+
+  Exists because the estate that specified 5.31.0's `Composer` feature then
+  established that they cannot use `Composer` at all: their chat input is a
+  contenteditable rendering inline `[deal:42|Acme]` badges, which a textarea cannot
+  do. **`Composer` is now this hook's first caller** — one implementation rather than
+  two, because two copies of a rule drift and the copy nobody reads is the one that
+  rots.
+
+  **What you must DO: nothing.** `Composer`'s behaviour is unchanged and its tests
+  are the proof — all 15 from 5.31.0 pass untouched across the refactor.
+
+### Fixed
+
+- **`useControllableState` silently lost an update when two functional updates
+  batched.** It resolved `setValue(fn)` against the **render closure's** value and
+  handed React a pre-computed result, so two calls before a re-render both computed
+  from the same stale value and **the first was dropped**:
+
+  ```
+  setItems(c => [...c, "a"]);
+  setItems(c => [...c, "b"]);   // -> ["b"], not ["a", "b"]
+  ```
+
+  Most stateful components in this library use this hook, so the blast radius was
+  everything — but it only surfaces when a caller updates twice in one batch, which
+  is why it survived. No error, no warning: just less state than you asked for.
+
+  Found by a `usePastePills` test that held two pastes inside one `act()` and got
+  one. Four of the five new regression tests fail against the previous
+  implementation.
+
+  **What you must DO: nothing**, and one thing you may notice: **the setter is now
+  stable across renders.** It used to change identity on every update, which
+  invalidated any consumer `useCallback`/`useEffect` depending on it. If you were
+  relying on that churn to re-run an effect, you were relying on a bug.
+
 ## [5.31.0] - 2026-10-02
 
 ### Added

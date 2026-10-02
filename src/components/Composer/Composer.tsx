@@ -1,7 +1,8 @@
 import { forwardRef, useCallback, useRef } from "react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
-import type { ComposerProps, HeldPaste } from "./Composer.types";
+import { usePastePills, type HeldPaste } from "../../hooks/use-paste-pills";
+import type { ComposerProps } from "./Composer.types";
 
 /** Characters of a held paste shown at each end of the hover preview. */
 const PREVIEW_CHARS = 20;
@@ -47,38 +48,31 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       defaultValue,
       onChange,
     );
-    const [heldPastes, setHeldPastes] = useControllableState<HeldPaste[]>(
-      controlledHeldPastes,
-      [],
-      onHeldPastesChange,
-    );
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const nextId = useRef(0);
-
     /*
-     * A large paste is held, not inserted.
+     * The holding logic lives in `usePastePills` and this is its first caller.
      *
-     * Requested by a consumer who had built and proven it against their own
-     * composer: paste a transcript and the input becomes a scrolling wall, so the
-     * message you were half way through writing is above the fold and the only way
-     * to see what you are about to send is to scroll your own input.
+     * It moved out in 5.32.0 because the estate that specified the feature cannot
+     * use this component at all — their chat input is a contenteditable rendering
+     * inline tag badges, which a textarea cannot do. One implementation rather than
+     * two: two copies of a rule drift, and the copy nobody reads is the one that
+     * rots. The rule that must not drift is the one below — a send with pills still
+     * closed carries the text.
      */
+    const pills = usePastePills({
+      threshold: pasteThreshold,
+      heldPastes: controlledHeldPastes,
+      onHeldPastesChange,
+    });
+    const heldPastes = pills.heldPastes;
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
     const handlePaste = useCallback(
       (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-        if (!pasteThreshold || pasteThreshold <= 0) return;
-
-        const text = e.clipboardData?.getData("text/plain") ?? "";
-
-        // Below the threshold, do NOTHING — not even look busy. This is the common
-        // case and the easiest thing to regress.
-        if (text.length < pasteThreshold) return;
-
-        e.preventDefault();
-        nextId.current += 1;
-        const id = `paste-${nextId.current}`;
-        setHeldPastes((current) => [...current, { id, text }]);
+        // Composable by design, so this reads as a question rather than a handover.
+        // Nothing else here wants the paste, so the answer is simply ignored.
+        pills.handlePaste(e);
       },
-      [pasteThreshold, setHeldPastes],
+      [pills],
     );
 
     /** Everything the person believes they are sending, in the order they built it. */
@@ -104,9 +98,9 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
        */
       onSubmit?.(composeOutgoing());
       setValue("");
-      setHeldPastes([]);
+      pills.clear();
       textareaRef.current?.focus();
-    }, [hasContent, disabled, onSubmit, composeOutgoing, setValue, setHeldPastes]);
+    }, [hasContent, disabled, onSubmit, composeOutgoing, setValue, pills]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
@@ -118,17 +112,16 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
     /** Click a pill: dump it into the input, APPENDED to what is already typed. */
     const insertPaste = useCallback(
       (paste: HeldPaste) => {
-        setValue((current) => (current ? `${current}\n\n${paste.text}` : paste.text));
-        setHeldPastes((current) => current.filter((p) => p.id !== paste.id));
+        // `expand` removes it and hands back the text; inserting is this
+        // component's job because the hook owns no DOM.
+        const text = pills.expand(paste.id);
+
+        if (text === undefined) return;
+
+        setValue((current) => (current ? `${current}\n\n${text}` : text));
         textareaRef.current?.focus();
       },
-      [setValue, setHeldPastes],
-    );
-
-    /** Discard without inserting. Without this the only way out is in-then-delete. */
-    const discardPaste = useCallback(
-      (id: string) => setHeldPastes((current) => current.filter((p) => p.id !== id)),
-      [setHeldPastes],
+      [pills, setValue],
     );
 
     return (
@@ -176,7 +169,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                 <button
                   type="button"
                   data-react-fancy-composer-paste-pill-remove={paste.id}
-                  onClick={() => discardPaste(paste.id)}
+                  onClick={() => pills.remove(paste.id)}
                   disabled={disabled}
                   aria-label="Discard this pasted text"
                   className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full px-1 text-xs text-zinc-400 transition-colors hover:text-zinc-700 dark:hover:text-zinc-100"

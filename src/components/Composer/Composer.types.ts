@@ -1,15 +1,16 @@
 import type { ReactNode } from "react";
 
-/**
- * A paste held beside the composer rather than inserted into it.
+/*
+ * `HeldPaste` now lives with `usePastePills`, re-exported here so the import path
+ * that 5.31.0 published keeps working.
  *
- * `text` is the whole thing. The pill shows a count and the two ends; nothing
- * truncates the content itself, because the point is to send it.
+ * It moved because the hook is the general primitive and the component is one of
+ * its callers — a hook depending on a component's types is the dependency the wrong
+ * way round.
  */
-export interface HeldPaste {
-  id: string;
-  text: string;
-}
+import type { HeldPaste } from "../../hooks/use-paste-pills";
+
+export type { HeldPaste };
 
 export interface ComposerProps {
   value?: string;
