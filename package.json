@@ -979,7 +979,9 @@
     "**/*.css"
   ],
   "overrides": {
-    "esbuild": "^0.28.1"
+    "esbuild": "^0.28.1",
+    "brace-expansion": "^5.0.12",
+    "undici": "^8.11.2"
   },
   "engines": {
     "node": ">=22"
