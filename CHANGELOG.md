@@ -11,6 +11,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.31.0] - 2026-10-02
+
+### Added
+
+- **`Composer` can hold a large paste beside the input as a pill instead of
+  inserting it.** Set `pasteThreshold={500}` (characters) to enable.
+
+  Paste a transcript into a composer and it becomes a scrolling wall: the message
+  you were half way through writing is above the fold, and the only way to see what
+  you are about to send is to scroll your own input.
+
+  - over the threshold, the paste is held and shown as `Pasted text · 2,036 characters`
+  - **hover** previews the first and last 20 characters, middle elided — the middle
+    is what made it unreadable, the ends are what tell you which paste this is when
+    there are several
+  - **click** inserts it, appended to what is already typed (people type the
+    question *before* pasting the thing it is about), and removes the pill
+  - **×** discards one without inserting it
+  - **a send with pills still closed CARRIES the text**, in arrival order, after
+    what was typed
+
+  That last point is the one worth knowing about. A pill reads as *"your paste is
+  attached"*, so a send that dropped it would mean asking a question about a
+  document without the document — with nobody able to tell, because the sender
+  believes it went and the receiver sees a question about nothing. `onSubmit`
+  receives everything; the pills clear.
+
+  Handles: `data-react-fancy-composer-paste-pill`, `-paste-pill-preview`,
+  `-paste-pill-remove`, `-paste-pills`.
+
+  Held pastes are controllable — `heldPastes` + `onHeldPastesChange` — per the
+  component contract, which forbids internal-only state for anything an agent might
+  need to read or write. Omit them and the component keeps its own.
+
+  **What you must DO: nothing.** `pasteThreshold` is **opt-in and has no default**,
+  so paste behaves exactly as it always has unless you ask for this. That is
+  deliberate rather than cautious: paste is a fundamental interaction and this
+  package is past 1.0, so a minor release must not quietly change what it does for
+  every consumer. Below the threshold nothing happens at all — no prevented event,
+  no pill, no ceremony for an address.
+
+  Specified by the MOIC estate, who had already built and proven it against their
+  own hand-rolled composer and sent the spec rather than a patch because they are
+  not on this component. The dangerous-state analysis above is theirs.
+
 ### Fixed
 
 - **`CHANGELOG.md` is now in the published tarball.** `files` did not whitelist it, so npm never shipped it: a consumer who followed a link to the changelog — from the README, from npm, or from an upgrade guide — found nothing. Nothing for you to do; the file simply arrives from this release on.
