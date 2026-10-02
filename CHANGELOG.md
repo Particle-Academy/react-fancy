@@ -41,6 +41,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Handles: `data-react-fancy-composer-paste-pill`, `-paste-pill-preview`,
   `-paste-pill-remove`, `-paste-pills`.
 
+  The pill carries an `aria-label` with the count and an `aria-describedby`
+  pointing at its preview, and the discard control is labelled — a bare `×` is
+  otherwise announced as "times", which is not an action. The pill deliberately has
+  no `title`: a native tooltip plus the hover preview renders two tooltips on one
+  hover, at different delays.
+
   Held pastes are controllable — `heldPastes` + `onHeldPastesChange` — per the
   component contract, which forbids internal-only state for anything an agent might
   need to read or write. Omit them and the component keeps its own.

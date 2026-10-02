@@ -299,6 +299,42 @@ describe("Composer - paste as pill", () => {
     unmount();
   });
 
+  it("links the pill to its preview, and does not stack two tooltips", () => {
+    // A native `title` plus the hover popover renders TWO tooltips on one hover at
+    // different delays. And the popover is useless to a screen reader unless it is
+    // linked rather than merely adjacent.
+    //
+    // Neither is visible to this suite as a LAYOUT problem — jsdom has no layout —
+    // so these assert the markup that decides it.
+    const { host, unmount } = mount(<Composer pasteThreshold={500} />);
+
+    paste(host, WALL);
+
+    const pill = pills(host)[0];
+    const preview = host.querySelector("[data-react-fancy-composer-paste-pill-preview]")!;
+
+    expect(pill.getAttribute("title")).toBeNull();
+    expect(pill.getAttribute("aria-label")).toContain("2,036");
+    expect(pill.getAttribute("aria-describedby")).toBe(preview.id);
+    expect(preview.id).not.toBe("");
+
+    unmount();
+  });
+
+  it("gives the discard control an accessible name", () => {
+    // It renders a bare "x". Without a label it is announced as "x", which is not
+    // an action.
+    const { host, unmount } = mount(<Composer pasteThreshold={500} />);
+
+    paste(host, WALL);
+
+    const remove = host.querySelector("[data-react-fancy-composer-paste-pill-remove]")!;
+
+    expect(remove.getAttribute("aria-label")).toBeTruthy();
+
+    unmount();
+  });
+
   it("reports held pastes to the host, so an agent can read them", () => {
     // The component contract: no internal-only state for anything an agent might
     // need to read or write.

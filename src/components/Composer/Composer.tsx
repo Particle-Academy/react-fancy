@@ -156,7 +156,13 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   data-react-fancy-composer-paste-pill={paste.id}
                   onClick={() => insertPaste(paste)}
                   disabled={disabled}
-                  title="Insert this text into the message"
+                  // No `title`. A native tooltip plus the hover preview below
+                  // renders TWO tooltips on the same hover, at different delays.
+                  // The label says what clicking does; the preview says what the
+                  // text is, and it is linked rather than merely adjacent so a
+                  // screen reader reaches it too.
+                  aria-label={`Insert this pasted text, ${withSeparators(paste.text.length)} characters`}
+                  aria-describedby={`${paste.id}-preview`}
                   // `pr-7` leaves room for the absolutely-positioned × that sits
                   // over this button's right edge. With a smaller right padding the
                   // × lands on top of the label.
@@ -179,6 +185,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                 </button>
 
                 <span
+                  id={`${paste.id}-preview`}
                   data-react-fancy-composer-paste-pill-preview={paste.id}
                   role="tooltip"
                   className="pointer-events-none absolute bottom-full left-0 z-10 mb-1 hidden max-w-xs whitespace-pre-wrap break-all rounded-md bg-zinc-900 px-2 py-1 text-xs text-white group-hover:block dark:bg-zinc-100 dark:text-zinc-900"
