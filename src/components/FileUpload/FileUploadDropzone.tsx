@@ -49,7 +49,15 @@ export function FileUploadDropzone({
         ref={inputRef}
         type="file"
         className="hidden"
-        onChange={(e) => e.target.files && addFiles(e.target.files)}
+        onChange={(e) => {
+          if (e.target.files) addFiles(e.target.files);
+
+          // Reset, or choosing the SAME file again fires no `change` event at
+          // all and the gesture is simply dead — "remove it, then re-add it"
+          // and "retry the import that just failed" both stop working. The
+          // component never sees those files to reject them; it is not asked.
+          e.target.value = "";
+        }}
         accept={accept}
         multiple={multiple}
         disabled={disabled}

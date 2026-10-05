@@ -11,6 +11,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.33.0] - 2026-10-04
+
+### Fixed
+
+- **`FileUpload` with `multiple={false}` could never change its file.** Choosing
+  a second file kept the first and discarded the new one in silence, so a
+  single-file field was write-once; the only way out was removing the file or
+  remounting the component. Reported by the YouGene estate, who were working
+  around it with a `key` remount.
+
+  **What changed, precisely:** `multiple={false}` now REPLACES. `maxFiles` is
+  unchanged and still refuses the overflow. The two used to share one rule — a
+  cap of one, first-wins — on the reasoning that they must not disagree about
+  what a single-file upload means. They are different statements and are now
+  allowed to differ: `maxFiles={n}` is a quota (drop five files into a
+  three-file field and you keep three, not the last three), while
+  `multiple={false}` is a field shape whose analogue is a radio group, where
+  choosing again moves the selection.
+
+  **Dropping several files at once onto a single-file field still keeps the
+  FIRST**, exactly as before. Only the across-gestures case changed. If you
+  depended on the old write-once behaviour — which we do not think anyone could
+  have wanted — pass `maxFiles={1}` instead of `multiple={false}`.
+
+- **`FileUpload` ignored the same file being chosen twice.** The hidden
+  `<input type="file">` was never reset, and an input still holding a path fires
+  no `change` event when the user picks that same path again. So "remove it,
+  then choose it again" and "retry the import that just failed" were dead
+  gestures — the component was never asked, so it never rejected anything. The
+  input is now cleared after each change.
+
+
 ## [5.32.0] - 2026-10-02
 
 ### Added
