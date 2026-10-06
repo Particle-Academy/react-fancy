@@ -12,14 +12,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Third-party dependency allowlist. Cheap, and failing here is cheap --
       # the same check gates the release, so a PR that adds an unapproved or
       # abandoned dependency finds out now rather than at tag time.
       # The allowlist is FETCHED, never vendored: one source, no copies to drift.
       - name: Fetch the third-party allowlist
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: Particle-Academy/.github
           path: .third-party-allowlist
@@ -35,7 +35,7 @@ jobs:
           # multi-line run: block is PowerShell and rm -rf is not a command.
           node -e "require('node:fs').rmSync('.third-party-allowlist',{recursive:true,force:true})"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
 
