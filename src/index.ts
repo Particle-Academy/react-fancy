@@ -461,6 +461,8 @@ export { cn } from "./utils/cn";
 export { sanitizeHtml, sanitizeHref } from "./utils/sanitize";
 export { resolveMediaType } from "./utils/media-type";
 export type { MediaKind, ResolveMediaTypeInput } from "./utils/media-type";
+export { detectPlatform, modifierKeyLabel, browserPlatformHints } from "./utils/platform";
+export type { FancyPlatform, PlatformHints } from "./utils/platform";
 export type { Size, Color, Variant, ButtonColor, Placement } from "./utils/types";
 /** @deprecated Renamed to ButtonColor — use ButtonColor. */
 export type { ActionColor } from "./utils/types";

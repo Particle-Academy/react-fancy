@@ -1,6 +1,21 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type HTMLAttributes,
+  type ReactNode,
+} from "react";
+import { cn } from "../../utils/cn";
 import { Button } from "../Button";
+import { Icon } from "../Icon";
 import { Tooltip } from "../Tooltip";
+import {
+  browserPlatformHints,
+  detectPlatform,
+  modifierKeyLabel,
+  type FancyPlatform,
+} from "../../utils/platform";
 
 /**
  * PromptInput — the chat composer every AI app rebuilds. Auto-growing
@@ -45,18 +60,47 @@ export type PromptAttachment = {
   type?: string;
 };
 
-export interface PromptInputProps {
+/**
+ * `...rest` reaches the root surface, so a consumer or a bridge can tag the
+ * composer with its own `data-*` handle. The component named every prop it
+ * used and had no rest spread, which means a `data-handle` put on it was
+ * DROPPED — silently, since React discards unknown props and the component
+ * still renders perfectly. That is issue #22 all over again, and the contract
+ * calls it out: "Each interactive element has a stable identity. Agents never
+ * guess DOM."
+ */
+export interface PromptInputProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "onSubmit" | "className"> {
+  /** Extra classes on the root surface. MERGED, never replaced. */
+  className?: string;
   /** Token budget for the meter. */
   budgetTokens: number;
   /** Slash-commands. Names must start with `/`. */
   commands?: PromptCmd[];
   /** @-mentions. */
   mentions?: PromptMention[];
-  /** Show the keyboard hint ("⌘ + Enter to send"). */
+  /** Show the keyboard hint ("Ctrl + Enter to send", "⌘ + Enter" on a Mac). */
   showHint?: boolean;
+  /**
+   * Which modifier the hint and the default placeholder NAME. Omit it and the
+   * component reads the platform after mount, which is the right answer for an
+   * ordinary web app.
+   *
+   * Pass it when the host knows better than `navigator` does — an Electron
+   * renderer forwarding `process.platform`, a remote session where the
+   * keyboard is not the one running the browser, or a test that needs the
+   * branch it is not sitting on. The pressed keys are unaffected either way:
+   * submit is `⌘/Ctrl+Enter` on every platform, so this only decides which
+   * true key gets named.
+   */
+  platform?: FancyPlatform;
   /** Called on ⌘/Ctrl+Enter or send button. */
   onSubmit: (text: string, attachments: PromptAttachment[]) => void;
-  /** Placeholder text. */
+  /**
+   * Placeholder text. Defaults to a hint naming the modifier THIS platform
+   * actually has, so leaving it unset is the better option — a hardcoded
+   * placeholder is the other place a `⌘` ends up in front of a Windows user.
+   */
   placeholder?: string;
   /** Rough estimator: chars-per-token. Defaults to 4. */
   charsPerToken?: number;
@@ -83,12 +127,15 @@ export function PromptInput({
   commands = [],
   mentions = [],
   showHint = true,
+  platform,
   onSubmit,
-  placeholder = "Ask anything. Type / for commands, @ for mentions. ⌘/Ctrl+Enter to send.",
+  placeholder,
   charsPerToken = 4,
   mentionColor,
   maxHeight = 280,
   aboveInput,
+  className,
+  ...rest
 }: PromptInputProps) {
   const [text, setText] = useState("");
   const [attachments, setAttachments] = useState<PromptAttachment[]>([]);
@@ -103,6 +150,27 @@ export function PromptInput({
   const [dragOver, setDragOver] = useState(false);
 
   const colors = mentionColor ?? DEFAULT_MENTION_COLOR;
+
+  /**
+   * Resolved AFTER mount, never during render.
+   *
+   * `navigator` read during render disagrees with the server's HTML and
+   * hydration patches it — so the fix for a wrong label would have introduced a
+   * hydration mismatch instead. The first paint names `Ctrl`, which is
+   * pressable on every platform including a Mac, and an Apple client swaps to
+   * `⌘` on the next tick. A prop, when given, wins outright and no detection
+   * runs at all.
+   */
+  const [detected, setDetected] = useState<FancyPlatform>("generic");
+  useEffect(() => {
+    if (platform) return;
+    setDetected(detectPlatform(browserPlatformHints()));
+  }, [platform]);
+  const modKey = modifierKeyLabel(platform ?? detected);
+
+  const resolvedPlaceholder =
+    placeholder ??
+    `Ask anything. Type / for commands, @ for mentions. ${modKey}+Enter to send.`;
 
   const tokens = useMemo(
     () => Math.ceil(text.length / Math.max(1, charsPerToken)),
@@ -283,17 +351,29 @@ export function PromptInput({
 
   return (
     <div
+      // Spread FIRST so an internal handler or data attribute cannot be
+      // clobbered from outside, and so a missing one fails loudly here rather
+      // than at a consumer's selector. `className` is merged below instead.
+      {...rest}
+      // The component had no root handle at all, so an agent reading the
+      // composer had to guess at classes. The drag state is on it too: a bridge
+      // that wants to know whether a drop is in flight should not have to infer
+      // it from Tailwind colours.
+      data-react-fancy-prompt-input=""
+      data-react-fancy-prompt-input-drag={dragOver ? "over" : "idle"}
       onDragOver={(e) => {
         e.preventDefault();
         setDragOver(true);
       }}
       onDragLeave={() => setDragOver(false)}
       onDrop={onDrop}
-      className={`relative rounded-md border transition ${
+      className={cn(
+        "relative rounded-md border bg-white transition dark:bg-zinc-900",
         dragOver
           ? "border-violet-400 bg-violet-50/50 dark:border-violet-600 dark:bg-violet-950/30"
-          : "border-zinc-200 dark:border-zinc-800"
-      } bg-white dark:bg-zinc-900`}
+          : "border-zinc-200 dark:border-zinc-800",
+        className,
+      )}
     >
       {aboveInput && (
         <div className="border-b border-zinc-200 dark:border-zinc-800">
@@ -307,7 +387,7 @@ export function PromptInput({
               key={a.id}
               className="inline-flex items-center gap-1.5 rounded-md bg-zinc-100 px-2 py-0.5 text-[11px] dark:bg-zinc-800"
             >
-              <span>📎</span>
+              <Icon name="paperclip" size="xs" className="text-zinc-400" />
               <span className="font-mono">{a.name}</span>
               <span className="text-zinc-400">{fmtSize(a.bytes)}</span>
               <button
@@ -331,7 +411,7 @@ export function PromptInput({
           onChange={(e) => updateText(e.target.value, e.target.selectionStart)}
           onKeyDown={onKeyDown}
           onPaste={onPaste}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           spellCheck={false}
           className="block w-full resize-none bg-transparent px-3 py-2.5 text-[14px] leading-relaxed outline-none placeholder:text-zinc-400"
           rows={3}
@@ -408,16 +488,24 @@ export function PromptInput({
           <Button
             variant="ghost"
             size="sm"
+            icon="paperclip"
             className="shrink-0"
             onClick={() => fileRef.current?.click()}
           >
-            📎 attach
+            attach
           </Button>
         </Tooltip>
         {/*
           The button above shipped with a no-op onClick and a tooltip reading
           "Drop files here, or click" — an affordance that lied. Drop-only also
           meant keyboard and touch users could not attach at all.
+
+          It then shipped with a literal paperclip EMOJI as its icon, which
+          needs a COLOUR
+          EMOJI FONT — not merely broad coverage — so a lean container renders a
+          tofu box where the affordance should be. `icon="paperclip"` draws an
+          SVG from the kit's own icon layer, which is the same reason the rest of
+          the suite does not hand-roll iconography.
         */}
         <input
           ref={fileRef}
@@ -443,9 +531,12 @@ export function PromptInput({
         </div>
         <div className="ml-auto flex shrink-0 items-center gap-2">
           {showHint && (
-            <span className="hidden text-[10px] text-zinc-500 sm:inline">
+            <span
+              className="hidden text-[10px] text-zinc-500 sm:inline"
+              data-react-fancy-prompt-input-hint={modKey === "⌘" ? "apple" : "generic"}
+            >
               <kbd className="rounded border border-zinc-300 bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                ⌘
+                {modKey}
               </kbd>{" "}
               +{" "}
               <kbd className="rounded border border-zinc-300 bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
@@ -454,8 +545,14 @@ export function PromptInput({
               to send
             </span>
           )}
-          <Button color="violet" size="sm" className="shrink-0" onClick={submit}>
-            send →
+          <Button
+            color="violet"
+            size="sm"
+            iconTrailing="arrow-right"
+            className="shrink-0"
+            onClick={submit}
+          >
+            send
           </Button>
         </div>
       </div>

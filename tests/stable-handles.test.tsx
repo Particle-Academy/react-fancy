@@ -9,6 +9,7 @@ import { MultiSwitch } from "../src/components/inputs/MultiSwitch/MultiSwitch";
 import { RadioGroup } from "../src/components/inputs/RadioGroup/RadioGroup";
 import { Switch } from "../src/components/inputs/Switch/Switch";
 import { ColorPicker } from "../src/components/ColorPicker/ColorPicker";
+import { PromptInput } from "../src/components/PromptInput/PromptInput";
 import { Table } from "../src/components/Table/Table";
 import { TableRow } from "../src/components/Table/TableRow";
 import { TableCell } from "../src/components/Table/TableCell";
@@ -155,5 +156,43 @@ describe("aria-* is forwarded too", () => {
         "[aria-describedby]",
       ),
     ).toBe(true);
+  });
+});
+
+/**
+ * Found while fixing a tofu glyph in the same component: PromptInput named every
+ * prop it used and had no rest spread either, so it belongs to the family above
+ * rather than being a separate story. It is the composer an agent is most likely
+ * to be asked to drive, which makes it the worst one to leave unaddressable.
+ */
+describe("PromptInput is addressable", () => {
+  it("forwards a data-* handle to the root surface", () => {
+    expect(reaches(<PromptInput budgetTokens={1000} onSubmit={() => {}} data-handle="p" />)).toBe(
+      true,
+    );
+  });
+
+  it("carries its own root handle even when the consumer adds none", () => {
+    expect(
+      reaches(
+        <PromptInput budgetTokens={1000} onSubmit={() => {}} />,
+        "[data-react-fancy-prompt-input]",
+      ),
+    ).toBe(true);
+  });
+
+  it("MERGES className instead of replacing the component's own", () => {
+    // The trap in adding a rest spread: `className` arriving through it would
+    // silently replace the surface's own classes, which is a worse bug than the
+    // one being fixed and looks like a styling mistake rather than a dropped prop.
+    const { host, unmount } = mount(
+      <PromptInput budgetTokens={1000} onSubmit={() => {}} className="ring-2" />,
+    );
+    const root = host.querySelector("[data-react-fancy-prompt-input]")!;
+
+    expect(root.className).toContain("ring-2");
+    expect(root.className).toContain("relative");
+
+    unmount();
   });
 });

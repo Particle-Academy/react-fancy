@@ -11,6 +11,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.35.0] - 2026-10-10
+
+### Fixed
+
+- **`PromptInput` told every Windows and Linux user to press a key they do not
+  have.** The keyboard hint was a hardcoded `⌘ + Enter to send`, and so was the
+  default placeholder. **Nothing to do** — the hint now names the modifier the
+  platform actually has, and the keys it accepts are unchanged (`⌘/Ctrl+Enter`
+  submits everywhere, as it always did).
+
+  It is worth more than one wrong glyph. A reader who cannot act on a hint
+  learns to ignore hints, which costs the credibility of every hint beside it.
+  In the lean Linux container where it was found, the glyph had no font behind
+  it either and rendered as a tofu box.
+
+  - New `platform?: "apple" | "generic"` prop. Omit it and the component reads
+    the platform after mount; pass it when the host knows better than
+    `navigator` — an Electron renderer forwarding `process.platform`, a remote
+    session where the keyboard is not the one running the browser, or a test
+    that needs the branch it is not sitting on.
+  - The platform is resolved AFTER mount, never during render, so this does not
+    introduce a hydration mismatch under SSR.
+  - `generic` is the fallback, and not arbitrarily: submit accepts
+    `metaKey || ctrlKey`, so `Ctrl` is a TRUE label on an Apple keyboard while
+    `⌘` is a false one everywhere else. The honest default is the pressable one.
+  - `detectPlatform(hints)` and `modifierKeyLabel(platform)` are exported for
+    any surface with a keyboard hint of its own. **Both take the platform as an
+    ARGUMENT** rather than reading a global, which is the only way a test can
+    cover the platform the developer is not sitting at.
+
+- **`PromptInput`'s attach control rendered as a tofu box in a lean container.**
+  Its icon was a literal paperclip emoji, and an emoji needs a dedicated COLOUR
+  EMOJI FONT — not merely a font with broad coverage — which a container image
+  has no reason to carry. **Nothing to do**: it now draws `icon="paperclip"`
+  from the kit's own icon layer, as the rest of the suite does. The attachment
+  chips had the same emoji and are fixed with it.
+
+  The `send` button's trailing `->` arrow became `iconTrailing="arrow-right"` in
+  the same pass — same class of risk, same primitive already in the kit.
+
+- **`PromptInput` dropped any `data-*` or `aria-*` handle put on it.** It named
+  every prop it used and had no rest spread, so a consumer's handle vanished
+  silently — the component contract's "agents never guess DOM" broken in the
+  one component an agent is most likely to be asked to drive. This is issue #22
+  recurring in a component that was not in that sweep. **Nothing to do**;
+  `className` now merges rather than replacing the surface's own classes, and
+  the root carries `data-react-fancy-prompt-input` whether or not a consumer
+  adds a handle.
+
+### Added
+
+- `data-react-fancy-prompt-input`, `-drag` (`over` / `idle`) and `-hint`
+  (`apple` / `generic`) on `PromptInput`, so a bridge reads the composer's drop
+  and platform state off the DOM instead of inferring it from Tailwind colours.
+
+### Notes
+
+- **A suite cannot see a font, which is why this needed a consumer to find it.**
+  Both glyph bugs passed every test here and would have passed forever: jsdom
+  has no fonts, so an emoji asserted in a DOM string is indistinguishable from
+  one a user can see. It took a screenshot of a real Electron window on Linux.
+  The new guard therefore does not test rendering — it tests the SOURCE for the
+  property that predicts the failure, that no component contains a character
+  above the Basic Multilingual Plane (the emoji dataset excepted). That line is
+  where "needs a font with good coverage" becomes "needs a second font dedicated
+  to emoji". BMP symbols are deliberately not covered: smaller risk, one
+  judgement call each, and a rule with false positives gets deleted.
+- Measured while here, because the same report asked: **no Fancy package
+  declares a `font-family` at all**, so none of our defaults can be hijacked by
+  a generic family resolving to whatever a machine's fontconfig puts first. The
+  showcase and the starter kit both lead their stack with a named face.
+- **This release shipped without a `lab:run`** — same dead Anthropic key as
+  5.34.0 (401 since before the previous release wave, `fancy-labs` #5). It went
+  out on a green package suite (498 tests) plus sabotage verification instead.
+- Each fix was verified by breaking it on purpose: hardcoding the glyph back
+  fails 2 tests, defaulting an unknown platform to Apple fails 5, letting free
+  text overturn an enumerated platform fails 1, putting an emoji into a
+  different component fails the source guard, restoring the emoji icon fails 5,
+  dropping the rest spread fails 1, and letting `className` replace instead of
+  merge fails 1.
+
 ## [5.34.0] - 2026-10-09
 
 ### Added

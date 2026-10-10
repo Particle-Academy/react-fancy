@@ -158,6 +158,9 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | Selector | Component |
 |----------|-----------|
 | `[data-react-fancy-composer]` | Composer |
+| `[data-react-fancy-prompt-input]` | PromptInput (the root surface) |
+| `[data-react-fancy-prompt-input-drag]` | PromptInput drop state (`over` / `idle`) |
+| `[data-react-fancy-prompt-input-hint]` | PromptInput keyboard hint (VALUE is the platform: `apple` / `generic`) |
 | `[data-react-fancy-editor]` | Editor |
 | `[data-react-fancy-editor-toolbar]` | Editor.Toolbar |
 | `[data-react-fancy-editor-content]` | Editor.Content |
