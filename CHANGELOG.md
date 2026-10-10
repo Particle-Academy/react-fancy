@@ -11,6 +11,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.34.0] - 2026-10-09
+
+### Added
+
+- **`VirtualList` — a windowed list for ledgers of tens of thousands of rows**,
+  with measured variable row heights, deep links by row id, and sticky-bottom
+  tail-following. **Nothing to do**: it is a new component, and no existing
+  export changed.
+
+  Built for an agent event stream, where all three matter at once — message
+  rows wrap while event rows do not, a link carries `?at=<rowId>` to the exact
+  row under discussion, and new rows keep arriving while the human reads older
+  ones. `fancy-term`'s scrollback, `CommitHistory` and long `Table` bodies want
+  the same thing.
+
+  Three decisions worth knowing before you reach for it:
+
+  - **Heights are measured, not predicted.** `estimateRowHeight` only seeds rows
+    that have never been on screen; a row's real height replaces it the moment
+    it renders. There is deliberately no `rowHeight(item)` callback — that is a
+    prediction about text wrapping, font loading and container width, and when
+    it is wrong the error accumulates down the list until rows draw in the wrong
+    place and `scrollToId` lands on a neighbour.
+  - **`followTail` is controlled** (`followTail` + `onFollowChange`), so the
+    follow state is readable and writable by an agent over a bridge, as the
+    Human+ contract requires. The `↓ n new` pill is yours to render, from
+    `onUnseenChange`.
+  - **Tail-follow breaks on INTENT, not on scroll position.** Any upward wheel,
+    drag, `PageUp` or `Home` stops following at once — even while still pinned to
+    the bottom with `scrollTop` unchanged. Position cannot distinguish "the human
+    scrolled up" from "content grew downward", so a position-only implementation
+    follows through a wheel-up and yanks the reader back on the next append.
+
+  `scrollToId` resolves asynchronously when the target is far down an unmeasured
+  list, and `onScrollToIdResolved(id, landed)` reports when it has settled.
+  `landed` is `false` when the id is not in `items` — a deep link to a pruned row
+  must be distinguishable from a successful scroll to the top.
+
+- **`ActivityLight` — an activity indicator for an EDGE**, a relationship
+  between two parties, with a recency ramp (`live` / `recent` / `quiet` /
+  `unseen`), an optional direction and an optional count. **Nothing to do.**
+
+  It is not a presence dot and does not replace `Avatar status`: that belongs to
+  one party and says whether *they* are online, while this belongs to a pair and
+  says when *the link between them* last moved.
+
+  **It distinguishes "none" from "cannot see", and that is the point.**
+  `level: null` means the edge is real but undatable and renders **nothing** — no
+  dot, no dash, no placeholder, because a grey dot asserts "quiet", which is a
+  claim that cannot be made. `count: null` or omitted renders no number. But a
+  measured **`count: 0` does render**, because "we looked and it was none" is a
+  fact, and suppressing it would be indistinguishable from never having looked.
+  A zero that should have been "unknown" tells a reader an agent works alone, and
+  they believe it.
+
+### Changed
+
+- Both new components are reachable by subpath — `@particle-academy/react-fancy/virtual-list`
+  and `/activity-light` — alongside the barrel, like every other component.
+
 ### Security
 
 - `source-map-js` is pinned forward to `^1.2.2` via `overrides`. Versions up to
@@ -22,6 +82,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   sits beside — `shell-quote` `^1.9.0`, added for an earlier advisory — was
   carried with no note of why, and had drifted back inside the vulnerable range
   before anyone looked.
+
+### Notes
+
+- **This release shipped without a `lab:run`.** The estate's rule is to run the
+  lab before any release; the Anthropic key behind it has been returning 401
+  since before the previous release wave (tracked as `fancy-labs` #5), so it has
+  judged nothing. This went out on a green package suite (469 tests) plus
+  sabotage verification of the new suites instead. Stated here because a reader
+  should not have to find it out.
+- The new suites were checked by breaking the implementation on purpose, since a
+  new test that passes either way proves nothing. Removing height measurement
+  fails 4 of the `VirtualList` tests; making tail-follow watch position instead
+  of intent fails 2; gating the count on `count` rather than "is it counted" —
+  the classic falsy-zero bug — fails both `ActivityLight` zero cases.
 
 ## [5.33.0] - 2026-10-04
 

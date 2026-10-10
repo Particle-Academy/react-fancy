@@ -85,6 +85,10 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-badge]` | Badge |
 | `[data-react-fancy-icon]` | Icon |
 | `[data-react-fancy-avatar]` | Avatar |
+| `[data-react-fancy-activity-light]` | ActivityLight (the attribute VALUE is the level) |
+| `[data-react-fancy-activity-light-dot]` | ActivityLight dot |
+| `[data-react-fancy-activity-light-arrow]` | ActivityLight direction glyph |
+| `[data-react-fancy-activity-light-count]` | ActivityLight count |
 | `[data-react-fancy-brand]` | Brand |
 | `[data-react-fancy-profile]` | Profile |
 | `[data-react-fancy-skeleton]` | Skeleton |
@@ -186,6 +190,10 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-table-tray]` | Table row tray |
 | `[data-react-fancy-table-row-tray]` | Table row tray (expanded) |
 | `[data-react-fancy-calendar]` | Calendar |
+| `[data-react-fancy-virtual-list]` | VirtualList (the scroll viewport) |
+| `[data-react-fancy-virtual-list-sizer]` | VirtualList full scroll range |
+| `[data-react-fancy-virtual-list-window]` | VirtualList rendered window |
+| `[data-react-fancy-virtual-row-id]` | VirtualList row (the attribute VALUE is the row id) |
 
 #### Interactive Canvas
 

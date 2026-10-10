@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "5.33.0",
+  "version": "5.34.0",
   "description": "React UI component library for Human+ UX — controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
@@ -421,6 +421,26 @@
       "require": {
         "types": "./dist/image-viewer.d.cts",
         "default": "./dist/image-viewer.cjs"
+      }
+    },
+    "./activity-light": {
+      "import": {
+        "types": "./dist/activity-light.d.ts",
+        "default": "./dist/activity-light.js"
+      },
+      "require": {
+        "types": "./dist/activity-light.d.cts",
+        "default": "./dist/activity-light.cjs"
+      }
+    },
+    "./virtual-list": {
+      "import": {
+        "types": "./dist/virtual-list.d.ts",
+        "default": "./dist/virtual-list.js"
+      },
+      "require": {
+        "types": "./dist/virtual-list.d.cts",
+        "default": "./dist/virtual-list.cjs"
       }
     },
     "./index-list": {
