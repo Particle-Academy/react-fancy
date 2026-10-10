@@ -146,7 +146,38 @@ describe("direction", () => {
         }
     });
 
-    it("claims no direction when none was given", () => {
+    it("draws its direction marks from a repertoire a lean container HAS", () => {
+    // `both` was U+21C4, which the Liberation fonts do not cover — so in a
+    // container carrying only those, `in` and `out` drew arrows and `both` drew
+    // a tofu box. ONE of three states failing is the expensive shape: the reader
+    // sees two working indicators and cannot tell a font gap from a state.
+    //
+    // MEASURED, not reasoned: `claude · tynn` rasterised each candidate in a
+    // Liberation-only container against a Private Use Area codepoint no font
+    // covers. U+2190–2195 draw; U+21C4 and U+21C6 do not. The falsifier is the
+    // part that makes it evidence — had U+21C6 drawn too, the finding would have
+    // been "Liberation covers arrows" rather than "Liberation covers WGL4", and
+    // this set would be the wrong fix.
+    //
+    // This asserts the EXPECTED CODE POINTS rather than "not U+21C4", so
+    // swapping in any other uncovered arrow fails here too.
+    const expected: Record<"in" | "out" | "both", number> = {
+      in: 0x2190,
+      out: 0x2192,
+      both: 0x2194,
+    };
+
+    for (const direction of ["in", "out", "both"] as const) {
+      const host = mount(<ActivityLight level="live" direction={direction} label="edge" />);
+      const arrow = host.querySelector("[data-react-fancy-activity-light-arrow]");
+
+      // Guard: no arrow element means the loop below asserts nothing.
+      expect(arrow, direction).not.toBeNull();
+      expect(arrow!.textContent!.codePointAt(0), direction).toBe(expected[direction]);
+    }
+  });
+
+  it("claims no direction when none was given", () => {
         // Undirected is its own state, not a default of "both" — asserting
         // traffic in both directions nobody observed would be the same class of
         // false claim as a grey dot.

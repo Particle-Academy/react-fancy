@@ -11,6 +11,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.35.1] - 2026-10-10
+
+### Fixed
+
+- **`ActivityLight direction="both"` drew as a tofu box in a container carrying
+  only the Liberation fonts.** The mark was U+21C4 (`⇄`), which those fonts do not
+  cover; it is now U+2194 (`↔`), which they do. **Nothing to do** — the prop, the
+  data attributes and the accessible name are unchanged, and the mark is
+  decorative (`aria-hidden`).
+
+  **One of three states failing is the expensive shape**, which is why this was
+  worth a release rather than a note. `in` and `out` drew arrows and `both` drew
+  a box, so a reader saw two working indicators and one they had no reason to
+  distrust — a font gap and a state are indistinguishable at that point, and a
+  direction mark going missing is the kind of absence nobody notices.
+
+  The choice is measured, not reasoned. `claude · tynn` rasterised each candidate
+  in a Liberation-only container and compared it pixel-for-pixel against a
+  Private Use Area codepoint no font covers: U+2190–2195 draw, U+21C4 and U+21C6
+  do not. **U+21C6 was included as a falsifier** — had it drawn, the finding
+  would have been "Liberation covers arrows" rather than "Liberation covers
+  WGL4", and this set would be the wrong fix.
+
+  Two glyph families in the kit are still outside that repertoire and are
+  deliberately NOT changed: the Dingbats (`✓` `✕` in `Checkbox`, `✦` in
+  `MagicWand`) have no in-repertoire substitute, so they are a genuine
+  glyph-versus-SVG trade rather than a one-character fix, and paying it for an
+  environment nobody ships a desktop app into is the wrong call today. A test
+  pins the `ActivityLight` set so a prettier arrow cannot drift back in.
+
 ## [5.35.0] - 2026-10-10
 
 ### Fixed

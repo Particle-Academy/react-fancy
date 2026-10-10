@@ -96,8 +96,30 @@ const LEVEL_CLASS: Record<ActivityLevel, string> = {
   unseen: "text-amber-500 dark:text-amber-400",
 };
 
+/**
+ * The direction marks, CHOSEN FOR FONT COVERAGE as much as for meaning.
+ *
+ * `both` was U+21C4 (⇄), which has no coverage in the Liberation fonts — so in
+ * a container carrying only those, `in` and `out` drew arrows and `both` drew a
+ * tofu box. One of three states failing is worse than all three failing,
+ * because the reader cannot tell a font gap from a state: they see two working
+ * indicators and one they have no reason to distrust.
+ *
+ * U+2194 (↔) is in **WGL4**, the repertoire Liberation targets, and that is the
+ * line these three sit on — U+2190–2195 are in it, U+21C4 and the whole
+ * Dingbats block are not. MEASURED by `claude · tynn` in a Liberation-only
+ * container (2026-10-10), rasterising each character and comparing it
+ * pixel-for-pixel against a Private Use Area codepoint no font covers: `↔`
+ * draws, and U+21C6 `⇆` — the near neighbour, included as a falsifier — does
+ * not, which is what makes it evidence of the repertoire rather than of
+ * "Liberation covers arrows".
+ *
+ * **So do not "improve" `both` back to a prettier arrow.** U+21C4, U+21C6 and
+ * the Dingbats (`✓` `✕` `✦`) all need a font many lean images do not ship.
+ * A test pins this set.
+ */
 const DIRECTION_GLYPH: Record<"in" | "out" | "both", string> = {
   in: "←",
   out: "→",
-  both: "⇄",
+  both: "↔",
 };
