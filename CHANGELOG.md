@@ -11,6 +11,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.37.0] - 2026-10-11
+
+### Changed
+
+- **`<QrCode>` is documented as what it always was: a byte container, not a
+  link component.** Owner's ruling — a consumer's request says what to build,
+  never the final pattern, and every package here has to suit any project
+  rather than the one that asked.
+
+  **Nothing to do. No API changed and no behaviour changed** — `value` has
+  always accepted any string and the encoder has always picked numeric,
+  alphanumeric or byte mode for it. What changed is everything that *taught*
+  the component: 5.36.x led with a device-pairing URL in the JSDoc, the docs,
+  the showcase tile and the interactive demo, because that is what the
+  requesting consumer needed. A general implementation framed narrowly is a
+  narrow component in practice — nobody reaches for a "pairing code" component
+  to print an asset label.
+
+  The examples now lead with payloads that have no network in them at all,
+  because those are the cases where the format earns its place: an asset or
+  serial number, a bare numeric reference, a WiFi credential block
+  (`WIFI:T:WPA;S:…;P:…;;`), a MeCard contact, a `tel:` or `geo:` URI. A URL is
+  one payload among them.
+
+  Two things the docs now say that are worth knowing even if you never read
+  them:
+
+  - **Uppercase matters.** Alphanumeric mode covers `0-9 A-Z` and `$%*+-./: `
+    only, so lower-casing an identifier pushes it into byte mode and makes the
+    symbol bigger for the same information. If you control the format of a code
+    you are printing, uppercase it.
+  - **Capacity at the largest symbol** (version 40, level `L`) is 7,089 digits,
+    4,296 alphanumeric characters, or 2,953 bytes.
+
+  `label` guidance changed with it: describe what the code is *for* ("Asset tag
+  for pump 14"), not its destination — "destination" was itself the link
+  framing.
+
 ## [5.36.2] - 2026-10-11
 
 ### Security

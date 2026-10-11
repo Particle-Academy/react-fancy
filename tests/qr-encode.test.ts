@@ -336,9 +336,15 @@ function decodeSymbol(modules: readonly boolean[][]): { text: string; ec: QrErro
 
 describe("round-tripping a symbol back through a scanner's path", () => {
     const cases: { label: string; value: string; ec?: QrErrorCorrection }[] = [
-        { label: "a pairing URL with a PIN fragment", value: "https://device.example.com/pair#482913" },
-        { label: "a six-digit PIN (numeric mode)", value: "482913" },
-        { label: "an uppercase code (alphanumeric mode)", value: "PAIR-482913 OK" },
+        // `value` is any string, so the cases are deliberately NOT all URLs:
+        // most of what belongs in a QR code is an identifier or a credential
+        // block that needs no network at all.
+        { label: "an asset serial (alphanumeric mode)", value: "SN-4829-13" },
+        { label: "a bare numeric reference", value: "482913" },
+        { label: "a WiFi credential block", value: "WIFI:T:WPA;S:Guest;P:hunter2;;" },
+        { label: "a MeCard contact", value: "MECARD:N:Okafor,Ada;TEL:+15550100;EMAIL:ada@example.com;;" },
+        { label: "a tel: URI", value: "tel:+15550100" },
+        { label: "a URL — one payload among many", value: "https://example.com/menu" },
         { label: "a single character", value: "x" },
         { label: "the golden vector's input", value: GOLDEN_INPUT },
         { label: "multi-byte UTF-8", value: "héllo — 世界 🜛" },

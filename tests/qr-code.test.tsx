@@ -113,9 +113,9 @@ describe("QrCode", () => {
          * in the run-length packing, or a dropped last column is caught here
          * rather than by a human squinting at a screenshot.
          */
-        const value = "https://device.example.com/pair#482913";
+        const value = "SN-4829-13";
         const symbol = encodeQr(value, { errorCorrection: "M" });
-        const host = mount(<QrCode value={value} label="Pair this device" quietZone={0} />);
+        const host = mount(<QrCode value={value} label="Asset tag for pump 14" quietZone={0} />);
         const d = svgOf(host).querySelector("path")?.getAttribute("d") ?? "";
 
         const drawn = Array.from({ length: symbol.size }, () =>
@@ -143,11 +143,11 @@ describe("QrCode", () => {
         expect(subpaths).toBeLessThan(darkModules);
     });
 
-    it("names the destination for a screen reader, since the image is unusable to one", () => {
-        const host = mount(<QrCode value="https://example.com" label="Pair this device" />);
+    it("names what the code is FOR, since the image is unusable to a screen reader", () => {
+        const host = mount(<QrCode value="SN-4829-13" label="Asset tag for pump 14" />);
         const svg = svgOf(host);
         expect(svg.getAttribute("role")).toBe("img");
-        expect(svg.getAttribute("aria-label")).toBe("Pair this device");
+        expect(svg.getAttribute("aria-label")).toBe("Asset tag for pump 14");
     });
 
     it("inherits text colour by default and takes explicit colours", () => {

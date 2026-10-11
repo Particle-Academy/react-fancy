@@ -17,7 +17,17 @@ export type { QrErrorCorrection, QrMode };
 export interface QrCodeProps
   extends Omit<SVGAttributes<SVGSVGElement>, "children" | "viewBox" | "version"> {
   /**
-   * What the code carries. Any string — a URL, a PIN, a token.
+   * What the code carries. **Any string** — this is not a link component.
+   *
+   * A QR code is a byte container, and most of what goes in one is not a web
+   * address: a serial or asset number, a batch or lot code, a ticket or order
+   * id, a WiFi credential block (`WIFI:T:WPA;S:ssid;P:pass;;`), a contact card
+   * (vCard / MeCard), a `tel:` / `mailto:` / `geo:` URI, a shipment code, a
+   * bare numeric reference, or arbitrary text. Several of those are the cases
+   * where a QR code earns its place, because they work with no network at all.
+   *
+   * The encoder picks the narrowest mode the value allows, so a digits-only
+   * value is a third of the size it would be as text — see {@link mode}.
    *
    * An empty string renders a valid (empty) symbol rather than throwing, so a
    * controlled surface can render before its value arrives.
@@ -37,15 +47,15 @@ export interface QrCodeProps
    */
   errorCorrection?: QrErrorCorrection;
   /**
-   * Accessible name. **Required**, and it must describe the DESTINATION rather
-   * than the artefact: "Pair this device" tells a screen-reader user what the
-   * code is for, where "QR code" tells them only that an image they cannot use
-   * is present.
+   * Accessible name. **Required**, and it must describe WHAT THE CODE IS FOR
+   * rather than the artefact: "Asset tag for pump 14" or "Join the guest WiFi"
+   * tells a screen-reader user something useful, where "QR code" tells them
+   * only that an image they cannot use is present.
    *
-   * It is not a substitute for the value being reachable another way. A QR code
+   * It is not a substitute for the value being available another way. A QR code
    * is unusable by anyone who cannot point a second device at this screen, so
-   * the value should also appear as text or a link nearby — the `aria-label`
-   * cannot carry a URL a user is expected to type.
+   * the value should also appear as selectable text nearby — the `aria-label`
+   * cannot carry a serial number or a password someone is expected to read off.
    */
   label: string;
   /**
