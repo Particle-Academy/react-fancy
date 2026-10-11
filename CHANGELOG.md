@@ -11,6 +11,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.36.2] - 2026-10-11
+
+### Security
+
+- **The `<QrCode>` example value was changed to an RFC 2606 reserved host.**
+  5.36.0 and 5.36.1 shipped a JSDoc `@example` — and therefore a string inside
+  `dist/qr-code.d.ts` — using a host of the form
+  `<name>.<tailnet>.ts.net:<port>/pair#<pin>`. That reads as a machine on a
+  private Tailscale network, and it arrived as an illustrative value in a
+  feature request rather than from anything in this repository.
+
+  It is now `https://device.example.com/pair#482913`. `example.com` is reserved
+  by RFC 2606 and can never resolve, so an example that is scanned or pasted
+  reaches nothing.
+
+  **Nothing to do** — no API changed, and the value only ever appeared in
+  documentation and examples, never in code that runs.
+
+  Why this is filed under Security rather than Docs: an example host in a
+  published package is copied, rendered on public pages, and in this case
+  **encoded into a scannable QR code**, which turns a documentation string into
+  a pointer anyone can follow with a phone. An example value is part of a
+  package's attack surface, and a reserved domain is the only kind that cannot
+  become one.
+
 ## [5.36.1] - 2026-10-11
 
 ### Security

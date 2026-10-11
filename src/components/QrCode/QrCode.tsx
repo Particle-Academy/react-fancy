@@ -32,7 +32,7 @@ import type { QrCodeProps } from "./QrCode.types";
  * @example
  * ```tsx
  * <QrCode
- *   value="https://alphar.tail1234.ts.net:7421/pair#482913"
+ *   value="https://device.example.com/pair#482913"
  *   size={192}
  *   label="Pair this device"
  * />

@@ -336,7 +336,7 @@ function decodeSymbol(modules: readonly boolean[][]): { text: string; ec: QrErro
 
 describe("round-tripping a symbol back through a scanner's path", () => {
     const cases: { label: string; value: string; ec?: QrErrorCorrection }[] = [
-        { label: "a pairing URL with a PIN fragment", value: "https://alphar.tail1234.ts.net:7421/pair#482913" },
+        { label: "a pairing URL with a PIN fragment", value: "https://device.example.com/pair#482913" },
         { label: "a six-digit PIN (numeric mode)", value: "482913" },
         { label: "an uppercase code (alphanumeric mode)", value: "PAIR-482913 OK" },
         { label: "a single character", value: "x" },

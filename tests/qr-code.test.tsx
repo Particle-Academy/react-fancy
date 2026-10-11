@@ -113,7 +113,7 @@ describe("QrCode", () => {
          * in the run-length packing, or a dropped last column is caught here
          * rather than by a human squinting at a screenshot.
          */
-        const value = "https://alphar.tail1234.ts.net:7421/pair#482913";
+        const value = "https://device.example.com/pair#482913";
         const symbol = encodeQr(value, { errorCorrection: "M" });
         const host = mount(<QrCode value={value} label="Pair this device" quietZone={0} />);
         const d = svgOf(host).querySelector("path")?.getAttribute("d") ?? "";
