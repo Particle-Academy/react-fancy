@@ -4,6 +4,7 @@ import {
     dataCodewords,
     encodeQr,
     interleave,
+    maxCharacters,
     penalty,
     rawDataModules,
     reservedModules,
@@ -579,6 +580,51 @@ describe("mode selection", () => {
 });
 
 describe("refusals", () => {
+    it("derives the published maximum capacity for each mode", () => {
+        // 7089 / 4296 / 2953 are the standard's figures at version 40 level L.
+        // They are DERIVED from the block table here rather than transcribed,
+        // so they cannot drift from the capacities the encoder enforces -- and
+        // asserting them against the published numbers is what makes the
+        // derivation trustworthy rather than merely self-consistent.
+        expect(maxCharacters("numeric")).toBe(7089);
+        expect(maxCharacters("alphanumeric")).toBe(4296);
+        expect(maxCharacters("byte")).toBe(2953);
+    });
+
+    it("refuses an impossible value in O(1), without walking it", () => {
+        /**
+         * `value` is text this code did not author, and the encoder reaches
+         * consumers as VENDORED SOURCE as well as a package -- `fancy-cli add
+         * qr-code` copies it in with no manifest, so nothing watches it.
+         *
+         * `selectVersion` used to walk versions 1-40 and re-encode the payload
+         * at each, so an oversized value was encoded forty times before being
+         * refused: measured at 342 ms for 100 kB and 2.0 s for 500 kB on the
+         * built bundle, linear, which is tens of seconds of blocked main
+         * thread for a few megabytes through `<QrCode value={userInput} />`.
+         *
+         * The refusal was always correct. The COST of the refusal was the
+         * defect, which is why this test measures time rather than behaviour.
+         */
+        const huge = "a".repeat(2_000_000);
+        const started = performance.now();
+        expect(() => encodeQr(huge)).toThrow(RangeError);
+        const elapsed = performance.now() - started;
+
+        // A generous bound: the old code needed seconds for a quarter of this.
+        // What is being pinned is the ORDER of magnitude, not a benchmark.
+        expect(elapsed).toBeLessThan(100);
+    });
+
+    it("still encodes a value right at the capacity boundary", () => {
+        // The guard must not reject something that genuinely fits. The
+        // boundary is the one place an off-by-one hides.
+        expect(encodeQr("a".repeat(2953), { errorCorrection: "L" }).version).toBe(40);
+        expect(() => encodeQr("a".repeat(2954), { errorCorrection: "L" })).toThrow(RangeError);
+        expect(encodeQr("1".repeat(7089), { errorCorrection: "L" }).version).toBe(40);
+        expect(() => encodeQr("1".repeat(7090), { errorCorrection: "L" })).toThrow(RangeError);
+    });
+
     it("throws rather than truncating a value that cannot fit", () => {
         // The alternative is a symbol that scans cleanly and yields the wrong
         // string -- silent corruption on a surface whose whole job is to carry

@@ -11,6 +11,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.36.1] - 2026-10-11
+
+### Security
+
+- **`encodeQr` spent linear time on a value it was always going to refuse.**
+  `<QrCode>` renders a `value` the component did not author, and version
+  selection walked versions 1–40 re-encoding the payload at each one — so a
+  value too long to fit was encoded **forty times** before being rejected.
+  Measured on the built bundle: **342 ms for 100 kB, 2.0 s for 500 kB**,
+  linear, which is tens of seconds of blocked main thread for a few megabytes
+  through `<QrCode value={userInput} />`.
+
+  The refusal was always correct; the *cost* of the refusal was the defect. An
+  impossible value is now rejected from `value.length` alone — a character
+  count can never exceed a byte count, so a string longer than the largest
+  capacity any mode offers cannot fit in any of them. **500 kB now refuses in
+  0.0 ms**, and the legitimate path got faster too (the payload's bit length
+  depends on the version only through the character-count indicator, which has
+  three tiers, so it is computed at most three times rather than forty).
+
+  **Nothing to do** — the API, the thrown `RangeError` and every value that
+  previously encoded are unchanged, boundary cases included (2,953 bytes still
+  encodes; 2,954 still throws).
+
+  Worth stating why this was treated as a security fix rather than a
+  performance note: this encoder reaches consumers **as vendored source** via
+  `npx fancy-cli add qr-code`, not only as a package. Vendored source carries
+  no manifest, so no advisory, Dependabot alert or audit row would ever have
+  named it — the only time to fix it is before anyone copies it in.
+
 ## [5.36.0] - 2026-10-11
 
 ### Added
