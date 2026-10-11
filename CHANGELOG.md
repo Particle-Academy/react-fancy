@@ -11,6 +11,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.36.0] - 2026-10-11
+
+### Added
+
+- **`<QrCode>` — a QR code as an SVG, with no dependencies.** ISO/IEC 18004,
+  versions 1–40, error correction L/M/Q/H, and numeric / alphanumeric / byte
+  modes selected automatically. **Nothing to do** — it is a new component and
+  nothing else changed.
+
+  ```tsx
+  <QrCode value="https://host/pair#482913" size={192} label="Pair this device" />
+  ```
+
+  `label` is required. A QR code is unusable to anyone who cannot point a second
+  device at the screen, so it needs an accessible name describing the
+  *destination* — and the value should also appear as text or a link nearby,
+  which an `aria-label` cannot substitute for.
+
+  Also exported on the `./qr-code` subpath, and **the encoder is exported
+  separately** (`encodeQr`, `selectMode`) for a consumer that needs the modules
+  rather than an SVG — a canvas, a PDF, a thermal printer, a terminal. Without
+  that, getting at them would mean adding a dependency for something already in
+  the package.
+
+  Three notes that decide whether a code actually scans, none of which are
+  visible in a screenshot:
+
+  - **The quiet zone is not padding.** It is how a scanner finds the symbol's
+    edge, so it defaults to the standard's minimum of 4 modules. `quietZone={0}`
+    is allowed and is not a space saving.
+  - **`background` defaults to `"transparent"`**, which inherits whatever is
+    behind it — so on a dark surface the symbol renders dark-on-dark and most
+    scanners refuse it. Set `foreground` and `background` together there.
+  - **`"H"` is not a free upgrade over `"M"`.** It survives more damage and
+    holds a third less, so at the same pixel width the modules are smaller; on a
+    phone screen it can read *worse*. Raise it for print or a covered symbol.
+
+  Rendered as a single `<path>` on a module-unit `viewBox` rather than a `<rect>`
+  per module: a version 10 symbol has over three thousand modules, and the
+  module-unit viewBox is what lets `size` scale with no resampling — a raster
+  code at a non-integer multiple of its module size has blurred module edges,
+  and a scanner reading a blurred edge guesses.
+
+  `encodeQr` throws a `RangeError` rather than truncating a value that will not
+  fit, because a truncated symbol scans cleanly and yields the wrong string.
+  Kanji mode and structured append are not supported; an untested branch in an
+  encoder fails as a code a phone quietly refuses to read.
+
+  Built for `claude · tynn`'s device-pairing panel (Genie 2 §6.8), which
+  previously had only a typed URL.
+
 ## [5.35.1] - 2026-10-10
 
 ### Fixed

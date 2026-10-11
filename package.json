@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "5.35.1",
+  "version": "5.36.0",
   "description": "React UI component library for Human+ UX — controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
@@ -711,6 +711,16 @@
       "require": {
         "types": "./dist/pull-quote.d.cts",
         "default": "./dist/pull-quote.cjs"
+      }
+    },
+    "./qr-code": {
+      "import": {
+        "types": "./dist/qr-code.d.ts",
+        "default": "./dist/qr-code.js"
+      },
+      "require": {
+        "types": "./dist/qr-code.d.cts",
+        "default": "./dist/qr-code.cjs"
       }
     },
     "./radio-group": {

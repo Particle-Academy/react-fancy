@@ -150,6 +150,13 @@ export { VirtualList } from "./components/VirtualList";
 export type { VirtualListProps, VirtualListRow } from "./components/VirtualList";
 export { ActivityLight } from "./components/ActivityLight";
 export type { ActivityLightProps, ActivityLevel, ActivityDirection } from "./components/ActivityLight";
+export { QrCode } from "./components/QrCode";
+export type { QrCodeProps, QrErrorCorrection, QrMode } from "./components/QrCode";
+// The encoder is exported alongside the component: a consumer that needs the
+// modules rather than an SVG (a canvas, a PDF, a printer, a terminal) would
+// otherwise have to add a dependency to get what is already here.
+export { encodeQr, selectMode } from "./components/QrCode";
+export type { EncodeOptions, QrSymbol } from "./components/QrCode";
 export { PullQuote } from "./components/PullQuote";
 export type { PullQuoteProps } from "./components/PullQuote";
 export { Stat, StatBand } from "./components/Stat";
