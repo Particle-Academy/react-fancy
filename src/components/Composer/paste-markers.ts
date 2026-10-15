@@ -26,9 +26,9 @@ export interface HeldImage {
  * Only a marker whose id the composer actually holds is a pill; anything else is
  * left as text, so a stray U+FFFC in pasted content cannot invent an attachment.
  */
-export const PILL_MARK = "￼";
+export const PILL_MARK = "\uFFFC";
 
-const MARKER = /￼([^￼\n]+)￼/g;
+const MARKER = /\uFFFC([^\uFFFC\n]+)\uFFFC/g;
 
 /** The marker for a held paste or image, for a host or agent writing `value` itself. */
 export function pasteMarker(id: string): string {

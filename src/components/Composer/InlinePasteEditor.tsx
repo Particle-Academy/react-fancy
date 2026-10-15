@@ -53,7 +53,7 @@ function serialize(parent: Node, keep: (id: string) => boolean): string {
 
   children.forEach((node, i) => {
     if (node.nodeType === Node.TEXT_NODE) {
-      out += (node.textContent ?? "").replace(/ /g, " ");
+      out += (node.textContent ?? "").replace(/\u00A0/g, " ");
       return;
     }
     if (!(node instanceof HTMLElement)) return;
