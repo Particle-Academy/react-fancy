@@ -1,10 +1,30 @@
-import { forwardRef, useCallback, useRef } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import { usePastePills, type HeldPaste } from "../../hooks/use-paste-pills";
-import type { ComposerProps } from "./Composer.types";
+import { Tooltip } from "../Tooltip";
+import {
+  InlinePasteEditor,
+  type InlinePasteEditorHandle,
+  type PillToInsert,
+} from "./InlinePasteEditor";
+import { expandMarkers, markedIds, type HeldImage } from "./paste-markers";
+import type {
+  ComposerPasteClassNames,
+  ComposerPastePreview,
+  ComposerProps,
+} from "./Composer.types";
 
-/** Characters of a held paste shown at each end of the hover preview. */
+/** Characters of a held paste shown at each end of the hover preview, unless `previewChars` says otherwise. */
 const PREVIEW_CHARS = 20;
 
 /**
@@ -20,10 +40,103 @@ function withSeparators(n: number): string {
 }
 
 /** First and last N characters, middle elided. The ends say WHICH paste this is. */
-function endsOf(text: string): string {
-  if (text.length <= PREVIEW_CHARS * 2) return text;
+function endsOf(text: string, chars: number): string {
+  if (text.length <= chars * 2) return text;
 
-  return `${text.slice(0, PREVIEW_CHARS)} … ${text.slice(-PREVIEW_CHARS)}`;
+  return `${text.slice(0, chars)} … ${text.slice(-chars)}`;
+}
+
+const PILL_BASE =
+  "inline-flex select-none items-center rounded-md px-2 py-0.5 text-xs leading-5 transition-colors";
+const TEXT_PILL =
+  "cursor-pointer bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700";
+const IMAGE_PILL =
+  "bg-rose-100 font-medium text-rose-600 dark:bg-rose-500/20 dark:text-rose-300";
+const PREVIEW_BASE = "max-w-xs whitespace-pre-wrap break-all text-xs";
+
+/** An image's thumbnail, made from the File only while the preview is open. */
+function ImageThumb({ file }: { file: File }) {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof URL.createObjectURL !== "function") return;
+    const made = URL.createObjectURL(file);
+    setUrl(made);
+    return () => URL.revokeObjectURL(made);
+  }, [file]);
+
+  return url ? (
+    <img src={url} alt="" className="max-h-40 max-w-[16rem] rounded" />
+  ) : (
+    <span>{file.name}</span>
+  );
+}
+
+interface InlinePillProps {
+  preview: ComposerPastePreview;
+  previewChars: number;
+  renderPastePreview?: (preview: ComposerPastePreview) => ReactNode;
+  classNames?: ComposerPasteClassNames;
+  disabled: boolean;
+  onExpand: (id: string) => void;
+}
+
+/**
+ * One pill inside the message. The hover preview is a portalled `Tooltip`, so the
+ * scrolling input cannot clip it.
+ */
+function InlinePill({
+  preview,
+  previewChars,
+  renderPastePreview,
+  classNames,
+  disabled,
+  onExpand,
+}: InlinePillProps) {
+  const id = preview.kind === "text" ? preview.paste.id : preview.image.id;
+  const content = (
+    <span data-react-fancy-composer-paste-pill-preview={id}>
+      {renderPastePreview?.(preview) ??
+        (preview.kind === "text" ? (
+          endsOf(preview.paste.text, previewChars)
+        ) : (
+          <ImageThumb file={preview.image.file} />
+        ))}
+    </span>
+  );
+  const tooltipClass = cn(PREVIEW_BASE, classNames?.preview);
+
+  if (preview.kind === "image") {
+    return (
+      <Tooltip content={content} className={tooltipClass}>
+        <span
+          data-react-fancy-composer-image-pill={id}
+          role="img"
+          aria-label={preview.image.label}
+          className={cn(PILL_BASE, IMAGE_PILL, classNames?.pill, classNames?.imagePill)}
+        >
+          {preview.image.label}
+        </span>
+      </Tooltip>
+    );
+  }
+
+  const count = withSeparators(preview.paste.text.length);
+
+  return (
+    <Tooltip content={content} className={tooltipClass}>
+      <button
+        type="button"
+        data-react-fancy-composer-paste-pill={id}
+        onClick={() => onExpand(id)}
+        disabled={disabled}
+        aria-label={`Insert this pasted text, ${count} characters`}
+        className={cn(PILL_BASE, TEXT_PILL, classNames?.pill, classNames?.textPill)}
+      >
+        Pasted text · {count} characters
+      </button>
+    </Tooltip>
+  );
 }
 
 export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
@@ -38,11 +151,19 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       disabled = false,
       className,
       pasteThreshold,
+      pastePlacement = "above",
+      pasteImages = false,
+      previewChars = PREVIEW_CHARS,
+      renderPastePreview,
+      classNames,
       heldPastes: controlledHeldPastes,
       onHeldPastesChange,
+      heldImages: controlledHeldImages,
+      onHeldImagesChange,
     },
     ref,
   ) {
+    const inline = pastePlacement === "inline";
     const [value, setValue] = useControllableState(
       controlledValue,
       defaultValue,
@@ -64,7 +185,19 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       onHeldPastesChange,
     });
     const heldPastes = pills.heldPastes;
+    const [heldImages, setHeldImages] = useControllableState<HeldImage[]>(
+      controlledHeldImages,
+      [],
+      onHeldImagesChange,
+    );
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const editorRef = useRef<InlinePasteEditorHandle>(null);
+    const imageCount = useRef(0);
+
+    const known = useMemo(
+      () => new Set([...heldPastes.map((p) => p.id), ...heldImages.map((i) => i.id)]),
+      [heldPastes, heldImages],
+    );
 
     const handlePaste = useCallback(
       (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -75,13 +208,90 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       [pills],
     );
 
-    /** Everything the person believes they are sending, in the order they built it. */
-    const composeOutgoing = useCallback(
-      () => [value, ...heldPastes.map((p) => p.text)].filter(Boolean).join("\n\n"),
-      [value, heldPastes],
+    const holdImage = useCallback(
+      (file: File): string => {
+        let id: string;
+        do {
+          imageCount.current += 1;
+          id = `image-${imageCount.current}`;
+        } while (heldImages.some((i) => i.id === id));
+
+        const image = { id, file, label: `Pasted image ${imageCount.current}` };
+        setHeldImages((current) => [...current, image]);
+
+        return id;
+      },
+      [heldImages, setHeldImages],
     );
 
-    const hasContent = value.trim().length > 0 || heldPastes.length > 0;
+    /** Inline placement: decide what a paste becomes. `null` means "just text". */
+    const decidePaste = useCallback(
+      (data: DataTransfer | null): PillToInsert[] | null => {
+        const text = data?.getData("text/plain") ?? "";
+
+        // Only a PURE image paste: a clipboard with text as well usually carries a
+        // picture OF that text (copying from a document), and holding it would turn
+        // every pasted sentence into a screenshot of the sentence.
+        if (pasteImages && text === "") {
+          const files = Array.from(data?.files ?? []).filter((f) =>
+            f.type.startsWith("image/"),
+          );
+          if (files.length > 0) {
+            return files.map((file) => ({ id: holdImage(file), block: false }));
+          }
+        }
+
+        if (pasteThreshold && pasteThreshold > 0 && text.length >= pasteThreshold) {
+          return [{ id: pills.hold(text), block: true }];
+        }
+
+        return null;
+      },
+      [pasteImages, pasteThreshold, holdImage, pills],
+    );
+
+    /*
+     * Inline placement: the message is the record of what is attached. A pill
+     * backspaced out of it is no longer attached, so its held entry goes too —
+     * otherwise state would say "attached" about something the message no longer
+     * contains, which is the second-place-to-answer problem markers exist to end.
+     */
+    const handleInlineChange = useCallback(
+      (next: string) => {
+        setValue(next);
+
+        const present = new Set(markedIds(next));
+        for (const paste of heldPastes) if (!present.has(paste.id)) pills.remove(paste.id);
+        if (heldImages.some((i) => !present.has(i.id))) {
+          setHeldImages((current) => current.filter((i) => present.has(i.id)));
+        }
+      },
+      [setValue, heldPastes, heldImages, pills, setHeldImages],
+    );
+
+    const [hosts, setHosts] = useState<ReadonlyMap<string, HTMLElement>>(new Map());
+    const handleHostsChange = useCallback((next: ReadonlyMap<string, HTMLElement>) => {
+      setHosts((prev) => {
+        if (prev.size === next.size && [...next].every(([id, el]) => prev.get(id) === el)) {
+          return prev;
+        }
+        return next;
+      });
+    }, []);
+
+    /** Everything the person believes they are sending, in the order they built it. */
+    const composeOutgoing = useCallback(() => {
+      if (inline) return expandMarkers(value, heldPastes, heldImages);
+
+      return [value, ...heldPastes.map((p) => p.text)].filter(Boolean).join("\n\n");
+    }, [inline, value, heldPastes, heldImages]);
+
+    const hasContent = value.trim().length > 0 || (!inline && heldPastes.length > 0);
+
+    const focusInput = useCallback(() => {
+      if (inline) editorRef.current?.focus();
+      else textareaRef.current?.focus();
+    }, [inline]);
 
     const handleSubmit = useCallback(() => {
       if (!hasContent || disabled) return;
@@ -93,14 +303,33 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
        * can tell: the sender believes it went, the receiver sees a question about
        * nothing.
        *
-       * Held pastes go out in arrival order, after what was typed, because people
-       * type the question BEFORE pasting the thing it is about.
+       * Above the input, held pastes go out in arrival order after what was typed,
+       * because people type the question BEFORE pasting the thing it is about.
+       * Inline, every pill goes out exactly where it sits.
        */
-      onSubmit?.(composeOutgoing());
+      const order = markedIds(value);
+      const images = inline
+        ? order.flatMap((id) => heldImages.filter((i) => i.id === id))
+        : [];
+
+      onSubmit?.(composeOutgoing(), { images });
       setValue("");
       pills.clear();
-      textareaRef.current?.focus();
-    }, [hasContent, disabled, onSubmit, composeOutgoing, setValue, pills]);
+      setHeldImages([]);
+      focusInput();
+    }, [
+      hasContent,
+      disabled,
+      value,
+      inline,
+      heldImages,
+      onSubmit,
+      composeOutgoing,
+      setValue,
+      pills,
+      setHeldImages,
+      focusInput,
+    ]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
@@ -109,7 +338,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       }
     };
 
-    /** Click a pill: dump it into the input, APPENDED to what is already typed. */
+    /** Above the input: click a pill to dump it in, APPENDED to what is already typed. */
     const insertPaste = useCallback(
       (paste: HeldPaste) => {
         // `expand` removes it and hands back the text; inserting is this
@@ -124,6 +353,18 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       [pills, setValue],
     );
 
+    /** Inline: click a text pill and its full text takes the pill's place. */
+    const expandInline = useCallback(
+      (id: string) => {
+        const text = pills.expand(id);
+
+        if (text === undefined) return;
+
+        editorRef.current?.replacePill(id, text);
+      },
+      [pills],
+    );
+
     return (
       <div
         data-react-fancy-composer=""
@@ -134,7 +375,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
           className,
         )}
       >
-        {heldPastes.length > 0 && (
+        {!inline && heldPastes.length > 0 && (
           <div
             data-react-fancy-composer-paste-pills=""
             className="flex flex-wrap gap-1.5 px-3 pt-3"
@@ -159,7 +400,11 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   // `pr-7` leaves room for the absolutely-positioned × that sits
                   // over this button's right edge. With a smaller right padding the
                   // × lands on top of the label.
-                  className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 py-1 pl-2.5 pr-7 text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 py-1 pl-2.5 pr-7 text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700",
+                    classNames?.pill,
+                    classNames?.textPill,
+                  )}
                 >
                   <span>
                     Pasted text · {withSeparators(paste.text.length)} characters
@@ -172,7 +417,10 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   onClick={() => pills.remove(paste.id)}
                   disabled={disabled}
                   aria-label="Discard this pasted text"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full px-1 text-xs text-zinc-400 transition-colors hover:text-zinc-700 dark:hover:text-zinc-100"
+                  className={cn(
+                    "absolute right-1 top-1/2 -translate-y-1/2 rounded-full px-1 text-xs text-zinc-400 transition-colors hover:text-zinc-700 dark:hover:text-zinc-100",
+                    classNames?.remove,
+                  )}
                 >
                   ×
                 </button>
@@ -181,26 +429,74 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   id={`${paste.id}-preview`}
                   data-react-fancy-composer-paste-pill-preview={paste.id}
                   role="tooltip"
-                  className="pointer-events-none absolute bottom-full left-0 z-10 mb-1 hidden max-w-xs whitespace-pre-wrap break-all rounded-md bg-zinc-900 px-2 py-1 text-xs text-white group-hover:block dark:bg-zinc-100 dark:text-zinc-900"
+                  className={cn(
+                    "pointer-events-none absolute bottom-full left-0 z-10 mb-1 hidden max-w-xs whitespace-pre-wrap break-all rounded-md bg-zinc-900 px-2 py-1 text-xs text-white group-hover:block dark:bg-zinc-100 dark:text-zinc-900",
+                    classNames?.preview,
+                  )}
                 >
-                  {endsOf(paste.text)}
+                  {renderPastePreview?.({ kind: "text", paste }) ??
+                    endsOf(paste.text, previewChars)}
                 </span>
               </span>
             ))}
           </div>
         )}
 
-        <textarea
-          ref={textareaRef}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-          placeholder={placeholder}
-          disabled={disabled}
-          rows={3}
-          className="w-full resize-none bg-transparent px-4 pt-3 text-sm outline-none placeholder:text-zinc-400"
-        />
+        {inline ? (
+          <>
+            <InlinePasteEditor
+              ref={editorRef}
+              value={value}
+              known={known}
+              onChange={handleInlineChange}
+              onSubmit={handleSubmit}
+              onPaste={decidePaste}
+              onHostsChange={handleHostsChange}
+              placeholder={placeholder}
+              disabled={disabled}
+              className={classNames?.input}
+            />
+            {Array.from(hosts, ([id, host]) => {
+              const paste = heldPastes.find((p) => p.id === id);
+              const image = paste ? undefined : heldImages.find((i) => i.id === id);
+              const preview: ComposerPastePreview | null = paste
+                ? { kind: "text", paste }
+                : image
+                  ? { kind: "image", image }
+                  : null;
+
+              return preview
+                ? createPortal(
+                    <InlinePill
+                      preview={preview}
+                      previewChars={previewChars}
+                      renderPastePreview={renderPastePreview}
+                      classNames={classNames}
+                      disabled={disabled}
+                      onExpand={expandInline}
+                    />,
+                    host,
+                    id,
+                  )
+                : null;
+            })}
+          </>
+        ) : (
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            placeholder={placeholder}
+            disabled={disabled}
+            rows={3}
+            className={cn(
+              "w-full resize-none bg-transparent px-4 pt-3 text-sm outline-none placeholder:text-zinc-400",
+              classNames?.input,
+            )}
+          />
+        )}
         <div className="flex items-center justify-between border-t border-zinc-100 px-3 py-2 dark:border-zinc-800">
           <div className="flex items-center gap-1">{actions}</div>
           <button

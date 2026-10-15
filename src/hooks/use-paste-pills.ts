@@ -58,6 +58,14 @@ export interface UsePastePillsResult {
    */
   handlePaste: (event: PasteEventLike) => boolean;
   /**
+   * Hold `text` unconditionally and return the new pill's id.
+   *
+   * For a host that decides for itself what to hold and needs to know WHICH pill
+   * it made — `Composer`'s inline placement puts the pill at the caret, so it needs
+   * the id at paste time. Ignores `threshold`; the caller has already decided.
+   */
+  hold: (text: string) => string;
+  /**
    * Removes the paste and returns its text, for the host to insert into its own
    * surface. `undefined` if there is no such id.
    *
@@ -113,6 +121,10 @@ export interface UsePastePillsResult {
  * **It gets no further surface without a real caller.** No extra options, no second
  * hook. An API with one hypothetical consumer is how a package accumulates surface
  * nobody uses.
+ *
+ * `hold` (5.38.0) met that bar: `Composer`'s inline placement — MOIC's
+ * pill-inside-the-message design, built into the component — needs the id of the
+ * pill it just made so it can put it at the caret.
  */
 export function usePastePills({
   threshold,
@@ -135,6 +147,27 @@ export function usePastePills({
    */
   const nextId = useRef(0);
 
+  const hold = useCallback(
+    (text: string): string => {
+      /*
+       * Skip any id the list already holds. A controlled list can arrive seeded
+       * (restored drafts, an agent attaching a paste) before this counter has
+       * counted anything, and minting `paste-1` beside an existing `paste-1` gives
+       * two pills one id — expanding either then takes both.
+       */
+      let id: string;
+      do {
+        nextId.current += 1;
+        id = `paste-${nextId.current}`;
+      } while (heldPastes.some((p) => p.id === id));
+
+      setHeldPastes((current) => [...current, { id, text }]);
+
+      return id;
+    },
+    [heldPastes, setHeldPastes],
+  );
+
   const handlePaste = useCallback(
     (event: PasteEventLike): boolean => {
       if (!threshold || threshold <= 0) return false;
@@ -147,13 +180,11 @@ export function usePastePills({
       if (text.length < threshold) return false;
 
       event.preventDefault();
-      nextId.current += 1;
-      const id = `paste-${nextId.current}`;
-      setHeldPastes((current) => [...current, { id, text }]);
+      hold(text);
 
       return true;
     },
-    [threshold, setHeldPastes],
+    [threshold, hold],
   );
 
   const expand = useCallback(
@@ -176,5 +207,5 @@ export function usePastePills({
 
   const clear = useCallback(() => setHeldPastes([]), [setHeldPastes]);
 
-  return { heldPastes, handlePaste, expand, remove, clear };
+  return { heldPastes, handlePaste, hold, expand, remove, clear };
 }

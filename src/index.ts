@@ -345,8 +345,15 @@ export type {
 } from "./components/Calendar";
 
 // Phase 6: Rich Content Components
-export { Composer } from "./components/Composer";
-export type { ComposerProps, HeldPaste } from "./components/Composer";
+export { Composer, pasteMarker } from "./components/Composer";
+export type {
+  ComposerProps,
+  ComposerPasteClassNames,
+  ComposerPastePreview,
+  ComposerSubmitExtras,
+  HeldImage,
+  HeldPaste,
+} from "./components/Composer";
 
 export { Chart } from "./components/Chart";
 export type {

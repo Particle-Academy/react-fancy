@@ -11,6 +11,82 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.38.0] - 2026-10-14
+
+### Added
+
+- **`Composer` can put paste pills IN the message, where the paste happened.**
+
+  ```tsx
+  <Composer pasteThreshold={500} pastePlacement="inline" pasteImages previewChars={30}
+    onSubmit={(text, { images }) => send(text, images)} />
+  ```
+
+  ```
+  This is what [Pasted image 1] I mean and this
+  [Pasted text · 669 characters]
+  ```
+
+  - **A text pill gets a line to itself** — a newline above (unless it is already
+    at the start of a line) and below (unless one already follows).
+  - **Clicking a text pill removes it and puts the full text exactly where it
+    sat**, not appended to the end.
+  - **An image pill sits in the sentence** — `Pasted image 1`, numbered by
+    arrival, and the number survives deleting an earlier one. Hovering shows a
+    thumbnail. Opt-in with `pasteImages`; see below for why.
+  - **Backspace deletes a pill like a character**, and the held paste goes with
+    it: the message is the one record of what is attached.
+  - **A send carries every pill where it sits.** Text pills are expanded in place;
+    each image's place is marked `[Pasted image N]` in the text and the images
+    arrive as `onSubmit`'s new second argument, in message order.
+
+  With `pastePlacement="inline"`, `value` carries a marker per pill
+  (`pasteMarker(id)`, exported), so a host or agent can attach a paste by writing
+  the marker and the held paste. `onSubmit` never sees a marker. A marker naming
+  nothing held stays text, so pasted content cannot invent an attachment.
+
+  This is the MOIC estate's own design — the pill as a marker inside the message —
+  which is why they never adopted the beside-the-input layout. Asked for by the
+  owner against screenshots of exactly that layout.
+
+  **`pasteImages` is off by default** because turning it on is a promise to read
+  `onSubmit`'s second argument: a pill reads as "attached", and an image a host
+  never sends is one the person believes went and did not. A clipboard with text
+  AND an image pastes the text — copying from a document often adds a picture of
+  the selection, and holding it would turn a pasted sentence into a screenshot of
+  it.
+
+- **The pills and their hover popover are restyleable.** `classNames` —
+  `pill`, `textPill`, `imagePill`, `preview`, `remove`, `input` — merged onto the
+  defaults, so a restyle can be one class or a whole new look.
+  `renderPastePreview` replaces what the popover shows. Both placements.
+
+- **`previewChars`** — characters of a held paste shown at each end of the hover
+  preview. Default stays 20.
+
+- **`heldImages` / `onHeldImagesChange`** — controllable, per the component
+  contract, like `heldPastes`.
+
+- **`usePastePills().hold(text)`** — hold a paste unconditionally and get its id
+  back, for a host that places the pill itself. `Composer`'s inline placement is
+  its caller.
+
+### Fixed
+
+- **`usePastePills` could mint an id a controlled list already held.** Its counter
+  started at 1 whatever the list contained, so a host that seeded `paste-1` got a
+  second `paste-1` on the next paste — two pills on one id, and expanding either
+  took both. It now skips taken ids.
+
+- **`Tooltip`'s arrow kept its own dark colour when the bubble was restyled**, so
+  `className="bg-white"` gave a dark arrow pointing out of a white bubble. The
+  arrow now inherits the bubble's background.
+
+**What you must DO: nothing.** `pastePlacement` defaults to `"above"`, which is
+5.31.0's behaviour unchanged; `pasteImages` is off; `previewChars` defaults to the
+old 20; and `onSubmit`'s second argument is ignorable, so a one-argument handler
+still type-checks.
+
 ## [5.37.0] - 2026-10-11
 
 ### Changed

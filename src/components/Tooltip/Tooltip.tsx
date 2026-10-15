@@ -62,7 +62,10 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
               {content}
               <div
                 className={cn(
-                  "absolute h-2 w-2 rotate-45 bg-zinc-900 dark:bg-zinc-700",
+                  // `bg-inherit`, not a colour of its own: a `className` that
+                  // restyles the bubble would otherwise leave a dark arrow
+                  // pointing out of a light one.
+                  "absolute h-2 w-2 rotate-45 bg-inherit",
                   position.placement.startsWith("top") &&
                     "bottom-[-4px] left-1/2 -translate-x-1/2",
                   position.placement.startsWith("bottom") &&

@@ -283,6 +283,50 @@ describe("usePastePills", () => {
     unmount();
   });
 
+  it("hold(text) holds a paste and returns its id, for a host that places the pill itself", () => {
+    // Composer's inline placement puts the pill AT THE CARET, so it needs the id
+    // in hand at paste time -- a boolean from handlePaste does not say which pill.
+    const box: { current: ReturnType<typeof usePastePills> | null } = { current: null };
+    const { unmount } = mount(
+      <Probe threshold={500} onResult={(r) => (box.current = r)} />,
+    );
+
+    let id = "";
+    act(() => {
+      id = latest(box).hold(WALL);
+    });
+
+    expect(latest(box).heldPastes).toEqual([{ id, text: WALL }]);
+
+    unmount();
+  });
+
+  it("never mints an id a controlled list already holds", () => {
+    // A host that seeds its own list (restored drafts, an agent attaching a paste)
+    // holds `paste-1` before the hook has counted anything. The counter used to
+    // start at 1 regardless, so the next paste was ALSO `paste-1`: two pills on one
+    // id, and expanding either one took both.
+    function Seeded({ onResult }: { onResult: (r: ReturnType<typeof usePastePills>) => void }) {
+      const [pastes, setPastes] = useState<HeldPaste[]>([{ id: "paste-1", text: "seeded" }]);
+      const pills = usePastePills({ threshold: 500, heldPastes: pastes, onHeldPastesChange: setPastes });
+      onResult(pills);
+      return null;
+    }
+
+    const box: { current: ReturnType<typeof usePastePills> | null } = { current: null };
+    const { unmount } = mount(<Seeded onResult={(r) => (box.current = r)} />);
+
+    act(() => {
+      latest(box).handlePaste(clipboard(WALL).event);
+    });
+
+    const ids = latest(box).heldPastes.map((p) => p.id);
+    expect(ids).toHaveLength(2);
+    expect(new Set(ids).size).toBe(2);
+
+    unmount();
+  });
+
   it("tolerates a clipboard event carrying nothing", () => {
     // Pasting an image gives a clipboardData whose text/plain is empty, and some
     // synthetic events have no clipboardData at all. Neither is a crash.
