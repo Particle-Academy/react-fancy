@@ -11,11 +11,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.39.0] - 2026-10-15
+
+### Added
+
+- **`PromptInput` gets inline paste pills** — the same ones `Composer` gained in
+  5.38.0, built on the same code (react-fancy#32, asked for by Genie 2, whose chat
+  composer this is).
+
+  ```tsx
+  <PromptInput budgetTokens={200_000} pasteThreshold={500} pasteImages previewChars={30}
+    onSubmit={(text, attachments) => send(text, attachments)} />
+  ```
+
+  - A paste of `pasteThreshold`+ characters becomes `Pasted text · N characters`
+    **where it was pasted**, on a line of its own. Clicking it puts the full text
+    back right there; hovering shows the first and last `previewChars`.
+  - **`pasteImages`**: a pasted image becomes an inline `Pasted image N` pill AND
+    arrives in `onSubmit`'s attachments with its File, in message order. The text
+    marks where it sat as `[Pasted image N]`.
+  - `onSubmit` receives every text pill expanded where it sits — never a marker —
+    and **a message that is only a paste can be sent**.
+  - **The send contract is unchanged**: Ctrl/⌘+Enter sends, plain Enter is a
+    newline, and the `/` and `@` pickers, drop-to-attach and the file picker all
+    work in the inline editor exactly as in the textarea.
+  - `renderPastePreview` and `pasteClassNames` restyle the pills and popover.
+
+  Asked for as chips beside the input carried as `text/plain` attachments; built
+  inline instead, to the owner's own spec given against screenshots of this
+  composer. The text still reaches the model — positioned where the person put it.
+
+- **A quieter `PromptInput` footer**, each part opt-in:
+  - `attachButton="icon"` — paperclip only, with an accessible name and a tooltip.
+  - `sendButton="icon"` — a compact send button whose tooltip carries the shortcut
+    (`Send · Ctrl+Enter`), replacing the inline kbd hint.
+  - `meter="near-limit"` — hidden until usage passes `meterShowAt` (0.75), muted
+    until `meterWarnAt` (0.9), warning colour past it. `meter="hidden"` never
+    shows it.
+  - **`usedTokens`** — the caller's REAL usage (an agent's context, say). The
+    meter shows it plus the draft's estimate; before, it could only estimate the
+    draft as length ÷ `charsPerToken`, which is why a host had to fake the budget.
+
+  Handles: `data-react-fancy-prompt-input-attach`, `-send`, `-meter` (with
+  `data-level`: `ok` / `caution` / `warn` / `muted`).
+
 ### Changed
 
+- `Composer` and `PromptInput` now share one implementation of inline paste
+  pills (`useInlinePaste`), so the two cannot disagree about what a pill means.
+  No behaviour change to `Composer`; all its tests pass untouched.
 - `Composer`'s internal inline pill moved to its own file. No behaviour or API
   change; its props were being read as `Composer`'s by the showcase's docs
   coverage check.
+
+**What you must DO: nothing.** Every option defaults to the old behaviour: no
+`pasteThreshold` or `pasteImages` means the textarea you had, and the footer is
+unchanged unless you ask.
 
 ## [5.38.0] - 2026-10-14
 

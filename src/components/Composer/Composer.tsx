@@ -1,16 +1,11 @@
-import { forwardRef, useCallback, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { forwardRef, useCallback, useRef } from "react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
-import { usePastePills, type HeldPaste } from "../../hooks/use-paste-pills";
-import { InlinePill, endsOf, withSeparators } from "./InlinePill";
-import {
-  InlinePasteEditor,
-  type InlinePasteEditorHandle,
-  type PillToInsert,
-} from "./InlinePasteEditor";
-import { expandMarkers, markedIds, type HeldImage } from "./paste-markers";
-import type { ComposerPastePreview, ComposerProps } from "./Composer.types";
+import type { HeldPaste } from "../../hooks/use-paste-pills";
+import { endsOf, withSeparators } from "./InlinePill";
+import { InlinePasteEditor, type InlinePasteEditorHandle } from "./InlinePasteEditor";
+import { useInlinePaste } from "./use-inline-paste";
+import type { ComposerProps } from "./Composer.types";
 
 /** Characters of a held paste shown at each end of the hover preview, unless `previewChars` says otherwise. */
 const PREVIEW_CHARS = 20;
@@ -45,35 +40,29 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       defaultValue,
       onChange,
     );
-    /*
-     * The holding logic lives in `usePastePills` and this is its first caller.
-     *
-     * It moved out in 5.32.0 because the estate that specified the feature cannot
-     * use this component at all — their chat input is a contenteditable rendering
-     * inline tag badges, which a textarea cannot do. One implementation rather than
-     * two: two copies of a rule drift, and the copy nobody reads is the one that
-     * rots. The rule that must not drift is the one below — a send with pills still
-     * closed carries the text.
-     */
-    const pills = usePastePills({
-      threshold: pasteThreshold,
-      heldPastes: controlledHeldPastes,
-      onHeldPastesChange,
-    });
-    const heldPastes = pills.heldPastes;
-    const [heldImages, setHeldImages] = useControllableState<HeldImage[]>(
-      controlledHeldImages,
-      [],
-      onHeldImagesChange,
-    );
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const editorRef = useRef<InlinePasteEditorHandle>(null);
-    const imageCount = useRef(0);
-
-    const known = useMemo(
-      () => new Set([...heldPastes.map((p) => p.id), ...heldImages.map((i) => i.id)]),
-      [heldPastes, heldImages],
-    );
+    /*
+     * The holding logic lives in `usePastePills`, wrapped by `useInlinePaste` for
+     * the inline placement — which `PromptInput` shares, so the two components
+     * cannot disagree about what a pill means. The rule that must not drift is
+     * the one below: a send with pills still closed carries the text.
+     */
+    const paste = useInlinePaste({
+      pasteThreshold,
+      pasteImages,
+      previewChars,
+      renderPastePreview,
+      classNames,
+      disabled,
+      heldPastes: controlledHeldPastes,
+      onHeldPastesChange,
+      heldImages: controlledHeldImages,
+      onHeldImagesChange,
+      editorRef,
+    });
+    const pills = paste.pills;
+    const heldPastes = paste.heldPastes;
 
     const handlePaste = useCallback(
       (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -84,83 +73,20 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       [pills],
     );
 
-    const holdImage = useCallback(
-      (file: File): string => {
-        let id: string;
-        do {
-          imageCount.current += 1;
-          id = `image-${imageCount.current}`;
-        } while (heldImages.some((i) => i.id === id));
-
-        const image = { id, file, label: `Pasted image ${imageCount.current}` };
-        setHeldImages((current) => [...current, image]);
-
-        return id;
-      },
-      [heldImages, setHeldImages],
-    );
-
-    /** Inline placement: decide what a paste becomes. `null` means "just text". */
-    const decidePaste = useCallback(
-      (data: DataTransfer | null): PillToInsert[] | null => {
-        const text = data?.getData("text/plain") ?? "";
-
-        // Only a PURE image paste: a clipboard with text as well usually carries a
-        // picture OF that text (copying from a document), and holding it would turn
-        // every pasted sentence into a screenshot of the sentence.
-        if (pasteImages && text === "") {
-          const files = Array.from(data?.files ?? []).filter((f) =>
-            f.type.startsWith("image/"),
-          );
-          if (files.length > 0) {
-            return files.map((file) => ({ id: holdImage(file), block: false }));
-          }
-        }
-
-        if (pasteThreshold && pasteThreshold > 0 && text.length >= pasteThreshold) {
-          return [{ id: pills.hold(text), block: true }];
-        }
-
-        return null;
-      },
-      [pasteImages, pasteThreshold, holdImage, pills],
-    );
-
-    /*
-     * Inline placement: the message is the record of what is attached. A pill
-     * backspaced out of it is no longer attached, so its held entry goes too —
-     * otherwise state would say "attached" about something the message no longer
-     * contains, which is the second-place-to-answer problem markers exist to end.
-     */
     const handleInlineChange = useCallback(
       (next: string) => {
         setValue(next);
-
-        const present = new Set(markedIds(next));
-        for (const paste of heldPastes) if (!present.has(paste.id)) pills.remove(paste.id);
-        if (heldImages.some((i) => !present.has(i.id))) {
-          setHeldImages((current) => current.filter((i) => present.has(i.id)));
-        }
+        paste.prune(next);
       },
-      [setValue, heldPastes, heldImages, pills, setHeldImages],
+      [setValue, paste],
     );
-
-    const [hosts, setHosts] = useState<ReadonlyMap<string, HTMLElement>>(new Map());
-    const handleHostsChange = useCallback((next: ReadonlyMap<string, HTMLElement>) => {
-      setHosts((prev) => {
-        if (prev.size === next.size && [...next].every(([id, el]) => prev.get(id) === el)) {
-          return prev;
-        }
-        return next;
-      });
-    }, []);
 
     /** Everything the person believes they are sending, in the order they built it. */
     const composeOutgoing = useCallback(() => {
-      if (inline) return expandMarkers(value, heldPastes, heldImages);
+      if (inline) return paste.expand(value);
 
       return [value, ...heldPastes.map((p) => p.text)].filter(Boolean).join("\n\n");
-    }, [inline, value, heldPastes, heldImages]);
+    }, [inline, value, heldPastes, paste]);
 
     const hasContent = value.trim().length > 0 || (!inline && heldPastes.length > 0);
 
@@ -183,29 +109,13 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
        * because people type the question BEFORE pasting the thing it is about.
        * Inline, every pill goes out exactly where it sits.
        */
-      const order = markedIds(value);
-      const images = inline
-        ? order.flatMap((id) => heldImages.filter((i) => i.id === id))
-        : [];
+      const images = inline ? paste.imagesIn(value) : [];
 
       onSubmit?.(composeOutgoing(), { images });
       setValue("");
-      pills.clear();
-      setHeldImages([]);
+      paste.clear();
       focusInput();
-    }, [
-      hasContent,
-      disabled,
-      value,
-      inline,
-      heldImages,
-      onSubmit,
-      composeOutgoing,
-      setValue,
-      pills,
-      setHeldImages,
-      focusInput,
-    ]);
+    }, [hasContent, disabled, value, inline, paste, onSubmit, composeOutgoing, setValue, focusInput]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
@@ -216,10 +126,10 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
 
     /** Above the input: click a pill to dump it in, APPENDED to what is already typed. */
     const insertPaste = useCallback(
-      (paste: HeldPaste) => {
+      (held: HeldPaste) => {
         // `expand` removes it and hands back the text; inserting is this
         // component's job because the hook owns no DOM.
-        const text = pills.expand(paste.id);
+        const text = pills.expand(held.id);
 
         if (text === undefined) return;
 
@@ -227,18 +137,6 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
         textareaRef.current?.focus();
       },
       [pills, setValue],
-    );
-
-    /** Inline: click a text pill and its full text takes the pill's place. */
-    const expandInline = useCallback(
-      (id: string) => {
-        const text = pills.expand(id);
-
-        if (text === undefined) return;
-
-        editorRef.current?.replacePill(id, text);
-      },
-      [pills],
     );
 
     return (
@@ -323,39 +221,16 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
             <InlinePasteEditor
               ref={editorRef}
               value={value}
-              known={known}
+              known={paste.known}
               onChange={handleInlineChange}
               onSubmit={handleSubmit}
-              onPaste={decidePaste}
-              onHostsChange={handleHostsChange}
+              onPaste={paste.decidePaste}
+              onHostsChange={paste.onHostsChange}
               placeholder={placeholder}
               disabled={disabled}
               className={classNames?.input}
             />
-            {Array.from(hosts, ([id, host]) => {
-              const paste = heldPastes.find((p) => p.id === id);
-              const image = paste ? undefined : heldImages.find((i) => i.id === id);
-              const preview: ComposerPastePreview | null = paste
-                ? { kind: "text", paste }
-                : image
-                  ? { kind: "image", image }
-                  : null;
-
-              return preview
-                ? createPortal(
-                    <InlinePill
-                      preview={preview}
-                      previewChars={previewChars}
-                      renderPastePreview={renderPastePreview}
-                      classNames={classNames}
-                      disabled={disabled}
-                      onExpand={expandInline}
-                    />,
-                    host,
-                    id,
-                  )
-                : null;
-            })}
+            {paste.portals}
           </>
         ) : (
           <textarea

@@ -11,6 +11,15 @@ import { Button } from "../Button";
 import { Icon } from "../Icon";
 import { Tooltip } from "../Tooltip";
 import {
+  InlinePasteEditor,
+  type InlinePasteEditorHandle,
+} from "../Composer/InlinePasteEditor";
+import { useInlinePaste } from "../Composer/use-inline-paste";
+import type {
+  ComposerPasteClassNames,
+  ComposerPastePreview,
+} from "../Composer/Composer.types";
+import {
   browserPlatformHints,
   detectPlatform,
   modifierKeyLabel,
@@ -114,6 +123,50 @@ export interface PromptInputProps
    * the drawer and composer share one visual panel. See {@link ChatDrawer}.
    */
   aboveInput?: ReactNode;
+  /**
+   * Hold a paste of at least this many characters as a pill IN the message,
+   * where it was pasted: on a line of its own, its full text put back in place
+   * when clicked, and expanded where it sits when sent. Omit it and paste is
+   * unchanged. Setting this (or `pasteImages`) swaps the textarea for an inline
+   * editor that keeps the `/` and `@` pickers and the send key.
+   */
+  pasteThreshold?: number;
+  /**
+   * A pasted image becomes an inline `Pasted image N` pill AND reaches
+   * `onSubmit`'s attachments, with its File, in message order; the text marks
+   * where it sat as `[Pasted image N]`. Without it a pasted image is an
+   * ordinary attachment chip, as before.
+   */
+  pasteImages?: boolean;
+  /** Characters of a held paste shown at EACH end of its hover preview. Default 20. */
+  previewChars?: number;
+  /** Replace the paste pills' hover popover content. */
+  renderPastePreview?: (preview: ComposerPastePreview) => ReactNode;
+  /** Restyle the paste pills, their popover and the inline editor. Merged onto the defaults. */
+  pasteClassNames?: ComposerPasteClassNames;
+  /** `"icon"`: an icon-only attach button whose tooltip says what it does. Default `"label"`. */
+  attachButton?: "label" | "icon";
+  /**
+   * `"icon"`: a compact icon send button whose tooltip carries the shortcut —
+   * replacing the inline `Ctrl + Enter to send` hint. Default `"label"`.
+   */
+  sendButton?: "label" | "icon";
+  /**
+   * Tokens already used — the caller's REAL value, e.g. an agent's context
+   * usage. The meter shows this plus the estimate for the draft. Without it the
+   * meter estimates the draft alone, as before.
+   */
+  usedTokens?: number;
+  /**
+   * `"always"` (default) — as before. `"near-limit"` — hidden until usage passes
+   * `meterShowAt`, muted until `meterWarnAt`, warning colour past that.
+   * `"hidden"` — never shown.
+   */
+  meter?: "always" | "near-limit" | "hidden";
+  /** Fraction of `budgetTokens` at which a `"near-limit"` meter appears. Default 0.75. */
+  meterShowAt?: number;
+  /** Fraction of `budgetTokens` past which a `"near-limit"` meter takes the warning colour. Default 0.9. */
+  meterWarnAt?: number;
 }
 
 const DEFAULT_MENTION_COLOR: Record<string, string> = {
@@ -135,9 +188,32 @@ export function PromptInput({
   maxHeight = 280,
   aboveInput,
   className,
+  pasteThreshold,
+  pasteImages = false,
+  previewChars = 20,
+  renderPastePreview,
+  pasteClassNames,
+  attachButton = "label",
+  sendButton = "label",
+  usedTokens,
+  meter = "always",
+  meterShowAt = 0.75,
+  meterWarnAt = 0.9,
   ...rest
 }: PromptInputProps) {
   const [text, setText] = useState("");
+  /** Inline pills need an editor that can hold them; a textarea cannot. */
+  const inline = pasteThreshold !== undefined || pasteImages;
+  const editorRef = useRef<InlinePasteEditorHandle>(null);
+  const paste = useInlinePaste({
+    pasteThreshold,
+    pasteImages,
+    previewChars,
+    renderPastePreview,
+    classNames: pasteClassNames,
+    disabled: false,
+    editorRef,
+  });
   const [attachments, setAttachments] = useState<PromptAttachment[]>([]);
   const [picker, setPicker] = useState<null | {
     kind: "cmd" | "mention";
@@ -172,12 +248,37 @@ export function PromptInput({
     placeholder ??
     `Ask anything. Type / for commands, @ for mentions. ${modKey}+Enter to send.`;
 
-  const tokens = useMemo(
-    () => Math.ceil(text.length / Math.max(1, charsPerToken)),
-    [text, charsPerToken],
+  // Estimated from what will actually be SENT — pills expanded — so a held
+  // paste counts for its text, not for the few characters of its marker.
+  const draftTokens = useMemo(
+    () =>
+      Math.ceil((inline ? paste.expand(text) : text).length / Math.max(1, charsPerToken)),
+    [text, inline, paste, charsPerToken],
   );
+  const tokens = (usedTokens ?? 0) + draftTokens;
   const ratio = Math.min(1, tokens / budgetTokens);
-  const meterColor = ratio < 0.6 ? "#10b981" : ratio < 0.85 ? "#f59e0b" : "#ef4444";
+  const meterLevel: "ok" | "caution" | "warn" | "muted" | null =
+    meter === "hidden"
+      ? null
+      : meter === "near-limit"
+        ? ratio < meterShowAt
+          ? null
+          : ratio >= meterWarnAt
+            ? "warn"
+            : "muted"
+        : ratio < 0.6
+          ? "ok"
+          : ratio < 0.85
+            ? "caution"
+            : "warn";
+  const meterColor =
+    meterLevel === "ok"
+      ? "#10b981"
+      : meterLevel === "caution"
+        ? "#f59e0b"
+        : meterLevel === "warn"
+          ? "#ef4444"
+          : "#a1a1aa";
 
   const filteredCmds = useMemo(
     () =>
@@ -249,6 +350,11 @@ export function PromptInput({
     const next = before + insert + after;
     setText(next);
     setPicker(null);
+    if (inline) {
+      // The editor rebuilds from the value and puts the caret back itself.
+      editorRef.current?.setValue(next, before.length + insert.length);
+      return;
+    }
     requestAnimationFrame(() => {
       const ta = taRef.current;
       if (!ta) return;
@@ -259,14 +365,30 @@ export function PromptInput({
   };
 
   const submit = () => {
+    // A message that is only a paste counts: its marker is in `text`.
     if (!text.trim() && attachments.length === 0) return;
-    onSubmit(text, attachments);
+
+    if (inline) {
+      // Every pill goes out where it sits; pasted images join the attachments
+      // in message order, with their Files, so a host sends them like any other.
+      const pastedImages: PromptAttachment[] = paste.imagesIn(text).map((image) => ({
+        id: image.id,
+        name: image.file.name,
+        bytes: image.file.size,
+        file: image.file,
+        type: image.file.type,
+      }));
+      onSubmit(paste.expand(text), [...attachments, ...pastedImages]);
+      paste.clear();
+    } else {
+      onSubmit(text, attachments);
+    }
     setText("");
     setAttachments([]);
     setPicker(null);
   };
 
-  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const onKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
     if (picker) {
       if (e.key === "ArrowDown") {
         e.preventDefault();
@@ -405,17 +527,45 @@ export function PromptInput({
       )}
 
       <div className="relative">
-        <textarea
-          ref={taRef}
-          value={text}
-          onChange={(e) => updateText(e.target.value, e.target.selectionStart)}
-          onKeyDown={onKeyDown}
-          onPaste={onPaste}
-          placeholder={resolvedPlaceholder}
-          spellCheck={false}
-          className="block w-full resize-none bg-transparent px-3 py-2.5 text-[14px] leading-relaxed outline-none placeholder:text-zinc-400"
-          rows={3}
-        />
+        {inline ? (
+          <>
+            <InlinePasteEditor
+              ref={editorRef}
+              value={text}
+              known={paste.known}
+              onChange={(next, caret) => {
+                updateText(next, caret);
+                paste.prune(next);
+              }}
+              onSubmit={submit}
+              submitKey="mod-enter"
+              onKeyDown={onKeyDown}
+              onPaste={paste.decidePaste}
+              onHostsChange={paste.onHostsChange}
+              placeholder={resolvedPlaceholder}
+              disabled={false}
+              maxHeight={maxHeight}
+              placeholderClassName="left-3 top-2.5 text-[14px] leading-relaxed"
+              className={cn(
+                "block min-h-[5.5rem] px-3 py-2.5 text-[14px] leading-relaxed",
+                pasteClassNames?.input,
+              )}
+            />
+            {paste.portals}
+          </>
+        ) : (
+          <textarea
+            ref={taRef}
+            value={text}
+            onChange={(e) => updateText(e.target.value, e.target.selectionStart)}
+            onKeyDown={onKeyDown}
+            onPaste={onPaste}
+            placeholder={resolvedPlaceholder}
+            spellCheck={false}
+            className="block w-full resize-none bg-transparent px-3 py-2.5 text-[14px] leading-relaxed outline-none placeholder:text-zinc-400"
+            rows={3}
+          />
+        )}
 
         {picker && items.length > 0 && (
           <div className="absolute bottom-full left-2 z-10 mb-1 w-72 overflow-hidden rounded-md border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
@@ -484,15 +634,18 @@ export function PromptInput({
       </div>
 
       <div className="flex items-center gap-2 border-t border-zinc-200 bg-zinc-50/60 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/40">
-        <Tooltip content="Drop files here, or click">
+        <Tooltip content={attachButton === "icon" ? "Attach files — or drop them here" : "Drop files here, or click"}>
           <Button
             variant="ghost"
             size="sm"
             icon="paperclip"
             className="shrink-0"
+            data-react-fancy-prompt-input-attach=""
+            // An icon alone has no name; the tooltip is not one a screen reader reads.
+            aria-label={attachButton === "icon" ? "Attach files" : undefined}
             onClick={() => fileRef.current?.click()}
           >
-            attach
+            {attachButton === "icon" ? null : "attach"}
           </Button>
         </Tooltip>
         {/*
@@ -518,19 +671,26 @@ export function PromptInput({
             e.target.value = "";
           }}
         />
-        <div className="ml-2 flex min-w-0 items-center gap-1.5 overflow-hidden">
-          <div className="h-1.5 w-24 shrink overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-            <div
-              className="h-full rounded-full transition-all"
-              style={{ width: `${ratio * 100}%`, backgroundColor: meterColor }}
-            />
+        {meterLevel !== null && (
+          <div
+            data-react-fancy-prompt-input-meter=""
+            data-level={meterLevel}
+            className="ml-2 flex min-w-0 items-center gap-1.5 overflow-hidden"
+          >
+            <div className="h-1.5 w-24 shrink overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
+              <div
+                className="h-full rounded-full transition-all"
+                style={{ width: `${ratio * 100}%`, backgroundColor: meterColor }}
+              />
+            </div>
+            <span className="font-mono text-[11px]" style={{ color: meterColor }}>
+              {fmtTokens(tokens)} / {fmtTokens(budgetTokens)}
+            </span>
           </div>
-          <span className="font-mono text-[11px]" style={{ color: meterColor }}>
-            {fmtTokens(tokens)} / {fmtTokens(budgetTokens)}
-          </span>
-        </div>
+        )}
         <div className="ml-auto flex shrink-0 items-center gap-2">
-          {showHint && (
+          {/* With an icon send button the shortcut lives in its tooltip instead. */}
+          {showHint && sendButton !== "icon" && (
             <span
               className="hidden text-[10px] text-zinc-500 sm:inline"
               data-react-fancy-prompt-input-hint={modKey === "⌘" ? "apple" : "generic"}
@@ -545,15 +705,30 @@ export function PromptInput({
               to send
             </span>
           )}
-          <Button
-            color="violet"
-            size="sm"
-            iconTrailing="arrow-right"
-            className="shrink-0"
-            onClick={submit}
-          >
-            send
-          </Button>
+          {sendButton === "icon" ? (
+            <Tooltip content={`Send · ${modKey}+Enter`}>
+              <Button
+                color="violet"
+                size="sm"
+                icon="arrow-up"
+                className="shrink-0"
+                data-react-fancy-prompt-input-send=""
+                aria-label="Send"
+                onClick={submit}
+              />
+            </Tooltip>
+          ) : (
+            <Button
+              color="violet"
+              size="sm"
+              iconTrailing="arrow-right"
+              className="shrink-0"
+              data-react-fancy-prompt-input-send=""
+              onClick={submit}
+            >
+              send
+            </Button>
+          )}
         </div>
       </div>
     </div>

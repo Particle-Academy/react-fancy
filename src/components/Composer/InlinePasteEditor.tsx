@@ -21,14 +21,31 @@ export interface InlinePasteEditorHandle {
   focus(): void;
   /** Swap a pill for plain text, where it sits. */
   replacePill(id: string, text: string): void;
+  /**
+   * Replace the whole value and put the caret at `caret` (an offset into the
+   * value). For a host that edits text itself — `PromptInput`'s `/` and `@`
+   * pickers — where rebuilding from `value` alone would lose the caret.
+   */
+  setValue(value: string, caret: number): void;
 }
 
 interface InlinePasteEditorProps {
   value: string;
   /** Ids the composer holds. A marker for anything else stays text. */
   known: ReadonlySet<string>;
-  onChange(value: string): void;
+  /** `caret` is the caret's offset into `value`, or `value.length` if it is elsewhere. */
+  onChange(value: string, caret: number): void;
   onSubmit(): void;
+  /**
+   * Which key sends. `"enter"` (default): Enter sends, Shift+Enter is a newline.
+   * `"mod-enter"`: Ctrl/⌘+Enter sends and a plain Enter is a newline.
+   */
+  submitKey?: "enter" | "mod-enter";
+  /** Runs BEFORE the editor's own key handling; `preventDefault()` to claim the key. */
+  onKeyDown?(e: React.KeyboardEvent<HTMLDivElement>): void;
+  placeholderClassName?: string;
+  /** Height in px past which the input scrolls. Defaults to the class's max height. */
+  maxHeight?: number;
   /** Return the pills a paste becomes, or null to insert its text as typed. */
   onPaste(data: DataTransfer | null): PillToInsert[] | null;
   /** Every pill placeholder currently in the editor, for the composer to portal into. */
@@ -105,6 +122,53 @@ function placeCaretAfter(node: Node) {
 }
 
 /**
+ * Put the caret `offset` characters into the serialised value. Walks the shape
+ * `render` produces — text nodes, pill hosts (each worth its marker's length) and
+ * a trailing `<br>` — so it is only called straight after a render.
+ */
+function placeCaretAtOffset(root: HTMLElement, offset: number, keep: (id: string) => boolean) {
+  const selection = window.getSelection();
+  if (!selection) return;
+
+  const range = document.createRange();
+  let remaining = offset;
+  let placed = false;
+
+  for (const node of Array.from(root.childNodes)) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const length = node.textContent?.length ?? 0;
+      if (remaining <= length) {
+        range.setStart(node, remaining);
+        placed = true;
+        break;
+      }
+      remaining -= length;
+      continue;
+    }
+    const id = node instanceof HTMLElement ? node.getAttribute(HOST_ATTR) : null;
+    if (id !== null && keep(id)) {
+      const length = pasteMarker(id).length;
+      if (remaining < length) {
+        range.setStartAfter(node);
+        placed = true;
+        break;
+      }
+      remaining -= length;
+    }
+  }
+
+  if (!placed) {
+    range.selectNodeContents(root);
+    range.collapse(false);
+    const last = root.lastChild;
+    if (last instanceof HTMLElement && last.tagName === "BR") range.setStartBefore(last);
+  }
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
+/**
  * The plain-text-plus-pills surface behind `Composer`'s inline placement.
  *
  * The DOM is the source of truth WHILE TYPING and `value` is its serialisation;
@@ -117,7 +181,21 @@ function placeCaretAfter(node: Node) {
  */
 export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePasteEditorProps>(
   function InlinePasteEditor(
-    { value, known, onChange, onSubmit, onPaste, onHostsChange, placeholder, disabled, className },
+    {
+      value,
+      known,
+      onChange,
+      onSubmit,
+      onPaste,
+      onHostsChange,
+      placeholder,
+      disabled,
+      className,
+      submitKey = "enter",
+      onKeyDown,
+      placeholderClassName,
+      maxHeight,
+    },
     ref,
   ) {
     const rootRef = useRef<HTMLDivElement>(null);
@@ -148,6 +226,24 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
       onHostsChange(hosts);
     }, [keep, onHostsChange]);
 
+    /** The caret's offset into the serialised value, or its length if the caret is elsewhere. */
+    const caretOffset = useCallback(
+      (whole: string): number => {
+        const root = rootRef.current;
+        const selection = window.getSelection();
+        if (!root || !selection || selection.rangeCount === 0) return whole.length;
+
+        const range = selection.getRangeAt(0);
+        if (!root.contains(range.endContainer)) return whole.length;
+
+        const head = document.createRange();
+        head.selectNodeContents(root);
+        head.setEnd(range.endContainer, range.endOffset);
+        return serialize(head.cloneContents(), keep).length;
+      },
+      [keep],
+    );
+
     /** Read the DOM back into a value and tell the composer. */
     const emit = useCallback(() => {
       const root = rootRef.current;
@@ -157,11 +253,32 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
       ensureTrailingBreak(root, next);
       reportHosts();
 
-      if (next !== lastValue.current) {
+      // Reported even when the value is unchanged: a host reading the caret (a
+      // `/` picker) needs to hear about it.
+      lastValue.current = next;
+      onChange(next, caretOffset(next));
+    }, [keep, onChange, reportHosts, caretOffset]);
+
+    /** Rebuild the DOM from a value. Throws the caret away; callers put it back. */
+    const render = useCallback(
+      (next: string) => {
+        const root = rootRef.current;
+        if (!root) return;
+
+        root.replaceChildren();
+        for (const segment of segmentValue(next, knownRef.current)) {
+          if (segment.type === "text") {
+            root.append(document.createTextNode(segment.text));
+          } else {
+            root.append(makeHost(segment.id));
+          }
+        }
+        ensureTrailingBreak(root, next);
         lastValue.current = next;
-        onChange(next);
-      }
-    }, [keep, onChange, reportHosts]);
+        reportHosts();
+      },
+      [reportHosts],
+    );
 
     /** The caret's range, or the end of the editor if the caret is elsewhere. */
     const caret = useCallback((): Range => {
@@ -239,18 +356,8 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
 
       if (value === lastValue.current && wanted === onScreen) return;
 
-      root.replaceChildren();
-      for (const segment of segmentValue(value, known)) {
-        if (segment.type === "text") {
-          root.append(document.createTextNode(segment.text));
-        } else {
-          root.append(makeHost(segment.id));
-        }
-      }
-      ensureTrailingBreak(root, value);
-      lastValue.current = value;
-      reportHosts();
-    }, [value, known, keep, reportHosts]);
+      render(value);
+    }, [value, known, keep, render]);
 
     useImperativeHandle(
       ref,
@@ -277,8 +384,17 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
           placeCaretAfter(node);
           emit();
         },
+        setValue(next, offset) {
+          const root = rootRef.current;
+          if (!root) return;
+
+          render(next);
+          root.focus();
+          placeCaretAtOffset(root, offset, keep);
+          emit();
+        },
       }),
-      [caret, emit],
+      [caret, emit, render, keep],
     );
 
     const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
@@ -324,13 +440,17 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      onKeyDown?.(e);
+      if (e.defaultPrevented) return;
       if (e.key !== "Enter" || e.nativeEvent.isComposing) return;
 
       e.preventDefault();
-      if (e.shiftKey) {
-        insertText("\n");
-      } else {
+      const sends =
+        submitKey === "mod-enter" ? e.ctrlKey || e.metaKey : !e.shiftKey;
+      if (sends) {
         onSubmit();
+      } else {
+        insertText("\n");
       }
     };
 
@@ -339,7 +459,10 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
         {value === "" && (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute left-4 top-3 text-sm text-zinc-400"
+            className={cn(
+              "pointer-events-none absolute left-4 top-3 text-sm text-zinc-400",
+              placeholderClassName,
+            )}
           >
             {placeholder}
           </span>
@@ -356,6 +479,7 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
           onInput={emit}
           onPaste={handlePaste}
           onKeyDown={handleKeyDown}
+          style={maxHeight === undefined ? undefined : { maxHeight }}
           className={cn(
             "max-h-72 min-h-[4.5rem] w-full overflow-y-auto whitespace-pre-wrap break-words bg-transparent px-4 pt-3 text-sm outline-none",
             className,
