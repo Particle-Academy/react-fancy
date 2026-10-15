@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `Composer`'s internal inline pill moved to its own file. No behaviour or API
+  change; its props were being read as `Composer`'s by the showcase's docs
+  coverage check.
+
 ## [5.38.0] - 2026-10-14
 
 ### Added
