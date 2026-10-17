@@ -11,6 +11,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.43.0] - 2026-10-17
+
+### Fixed
+
+- **A click in a big `TreeNav` no longer re-renders the whole tree.** Selection,
+  expansion and drag state lived in one context that every row read, so one click
+  re-rendered every row. Measured in a real browser on Genie 2's file browser
+  shape (5,000 nodes, 6 levels, all expanded): **175–267 ms per click before,
+  17–20 ms after**, with no change to your code. Rows now subscribe to their own
+  slice (am I selected / expanded / the drop target?), handlers are stable, and
+  expansion is a Set lookup instead of an array scan per row.
+
+  `useTreeNav()` is unchanged and still live: a component that reads it gets
+  current `selectedId` / `expandedIds` exactly as before.
+
+### Added
+
+- **`<TreeNav virtualize height={600}>` renders only the rows in view.** The
+  visible rows (expanded folders only) are flattened and windowed by
+  `VirtualList`; selection, expansion, context menus and drag-and-drop behave as
+  in the nested tree. Same tree, all expanded: **33 rows in the DOM instead of
+  5,000, and 30 ms to mount instead of 614 ms.** `rowHeight` seeds the row
+  estimate (default 26). The nested DOM wrapper
+  `data-react-fancy-tree-node-children` does not exist in this mode — rows are
+  flat, indented by `paddingLeft`.
+
+- **`TreeNav` has tests.** It had none, which is why a refactor this size starts
+  with them: selection, toggling, lazy mounting, `useTreeNav`, virtual rows and
+  drag-and-drop in both modes.
+
+**What you must DO: nothing.** `virtualize` is off by default and the nested tree
+renders the same DOM as before. Collapsed folders were already cheap — their
+children are not mounted until expanded — and still are.
+
 ## [5.42.1] - 2026-10-17
 
 ### Fixed

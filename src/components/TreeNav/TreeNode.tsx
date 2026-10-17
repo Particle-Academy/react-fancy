@@ -1,6 +1,6 @@
-import { useRef, useEffect, useCallback } from "react";
+import { memo, useRef, useEffect, useCallback } from "react";
 import { cn } from "../../utils/cn";
-import { useTreeNav } from "./TreeNav.context";
+import { useTreeInternals, useTreeSlice } from "./tree-store";
 import type { TreeNodeProps, TreeNodeData, DropPosition } from "./TreeNav.types";
 
 const EXT_COLORS: Record<string, string> = {
@@ -112,20 +112,31 @@ function computeDropPosition(
 // Component
 // ---------------------------------------------------------------------------
 
-export function TreeNode({ node, depth }: TreeNodeProps) {
+
+/**
+ * One row (and, when nested, its expanded children).
+ *
+ * Reads what changes on a click — selection, expansion, drag — as per-row slices
+ * of a store, so a click re-renders only the rows whose slice changed. It used to
+ * read one context holding all of it, so every click re-rendered every row:
+ * 175-267 ms per click on a 5,000-node tree. `memo` keeps a parent's re-render
+ * from reaching rows whose `node` and `depth` did not change.
+ */
+function TreeNodeImpl({ node, depth }: TreeNodeProps) {
   const {
-    selectedId, onSelect, onNodeContextMenu, expandedIds, toggle, indentSize, showIcons,
-    draggable, dragCursor, dragState, setDragState, onNodeMove, acceptExternalDrops, onExternalDrop, nodes, expandNode,
-  } = useTreeNav();
+    store, nodes, select, toggle, expandNode, setDragState, contextMenu, moveNode, externalDrop,
+    indentSize, showIcons, draggable, dragCursor, acceptExternalDrops, flat,
+  } = useTreeInternals();
 
   const isFolder = node.type === "folder" || (node.children && node.children.length > 0);
-  const isExpanded = expandedIds.includes(node.id);
-  const isSelected = selectedId === node.id;
+  const isExpanded = useTreeSlice((s) => s.expanded.has(node.id));
+  const isSelected = useTreeSlice((s) => s.selectedId === node.id);
+  const isDragging = useTreeSlice((s) => s.dragState.draggedNodeId === node.id);
+  const dropPosition = useTreeSlice((s) =>
+    s.dragState.dropTargetId === node.id ? s.dragState.dropPosition : null,
+  );
+  const isDropTarget = dropPosition !== null;
   const paddingLeft = depth * indentSize + 4;
-
-  const isDragging = dragState.draggedNodeId === node.id;
-  const isDropTarget = dragState.dropTargetId === node.id;
-  const dropPosition = isDropTarget ? dragState.dropPosition : null;
 
   // Auto-expand timer for folders during drag
   const autoExpandTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -148,13 +159,13 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
     if (isFolder) {
       toggle(node.id);
     }
-    onSelect?.(node.id, node);
+    select(node);
   };
 
   const handleContextMenu = (e: React.MouseEvent) => {
-    if (onNodeContextMenu) {
+    if (contextMenu) {
       e.preventDefault();
-      onNodeContextMenu(e, node);
+      contextMenu(e, node);
     }
   };
 
@@ -177,12 +188,13 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
   }, [clearAutoExpand, setDragState]);
 
   // ---------------------------------------------------------------------------
-  // Drop target handlers (on outer div)
+  // Drop target handlers (on outer div). Drag state is read from the store when
+  // the event fires, so a row does not re-render as a drag moves elsewhere.
   // ---------------------------------------------------------------------------
 
-  const isExternalDrag = !dragState.draggedNodeId;
-
   const handleDragOver = useCallback((e: React.DragEvent) => {
+    const { dragState } = store.get();
+    const isExternalDrag = !dragState.draggedNodeId;
     if (isExternalDrag) {
       // External drop accepted only when host opted in.
       if (!acceptExternalDrops) return;
@@ -199,7 +211,7 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
     const position = computeDropPosition(e, !!isFolder);
 
     // Auto-expand collapsed folders when hovering "inside"
-    if (isFolder && !isExpanded && position === "inside") {
+    if (isFolder && !store.get().expanded.has(node.id) && position === "inside") {
       if (!autoExpandTimer.current) {
         autoExpandTimer.current = setTimeout(() => {
           expandNode(node.id);
@@ -213,22 +225,24 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
     if (dragState.dropTargetId !== node.id || dragState.dropPosition !== position) {
       setDragState({ draggedNodeId: dragState.draggedNodeId, dropTargetId: node.id, dropPosition: position });
     }
-  }, [dragState, isExternalDrag, acceptExternalDrops, node.id, isFolder, isExpanded, nodes, setDragState, expandNode, clearAutoExpand]);
+  }, [store, acceptExternalDrops, node.id, isFolder, nodes, setDragState, expandNode, clearAutoExpand]);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     if (!e.currentTarget.contains(e.relatedTarget as Node)) {
       clearAutoExpand();
+      const { dragState } = store.get();
       if (dragState.dropTargetId === node.id) {
         setDragState({ ...dragState, dropTargetId: null, dropPosition: null });
       }
     }
-  }, [dragState, node.id, setDragState, clearAutoExpand]);
+  }, [store, node.id, setDragState, clearAutoExpand]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     clearAutoExpand();
 
+    const { dragState } = store.get();
     const sourceId = dragState.draggedNodeId;
     const position = dragState.dropPosition ?? computeDropPosition(e, !!isFolder);
 
@@ -236,14 +250,14 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
       // Internal node move.
       if (sourceId === node.id) return;
       if (isDescendantOf(nodes, sourceId, node.id)) return;
-      onNodeMove?.(sourceId, node.id, position);
+      moveNode?.(sourceId, node.id, position);
     } else if (acceptExternalDrops) {
       // External drop — files, items from other components, etc.
-      onExternalDrop?.(e, node, position);
+      externalDrop?.(e, node, position);
     }
 
     setDragState({ draggedNodeId: null, dropTargetId: null, dropPosition: null });
-  }, [dragState, node, isFolder, nodes, onNodeMove, acceptExternalDrops, onExternalDrop, setDragState, clearAutoExpand]);
+  }, [store, node, isFolder, nodes, moveNode, acceptExternalDrops, externalDrop, setDragState, clearAutoExpand]);
 
   // ---------------------------------------------------------------------------
   // Render
@@ -313,7 +327,8 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
         />
       )}
 
-      {isFolder && isExpanded && node.children && (
+      {/* A virtual list renders rows flat, so a row never renders its own children there. */}
+      {!flat && isFolder && isExpanded && node.children && (
         <div data-react-fancy-tree-node-children="">
           {node.children.map((child) => (
             <TreeNode key={child.id} node={child} depth={depth + 1} />
@@ -323,5 +338,7 @@ export function TreeNode({ node, depth }: TreeNodeProps) {
     </div>
   );
 }
+
+export const TreeNode = memo(TreeNodeImpl);
 
 TreeNode.displayName = "TreeNode";

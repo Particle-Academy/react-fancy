@@ -71,6 +71,18 @@ export interface TreeNavProps {
    * @default "none"
    */
   dragCursor?: "grab" | "none";
+  /**
+   * Render only the rows in view. For big trees — thousands of expanded nodes —
+   * where mounting every visible row is itself the cost. The visible rows are
+   * flattened (expanded folders only) and windowed by `VirtualList`; selection,
+   * expansion, context menus and drag-and-drop behave as in the nested tree.
+   * Needs a `height`. Default `false`.
+   */
+  virtualize?: boolean;
+  /** Height of the scroll viewport when `virtualize` is on. Default 400. */
+  height?: number | string;
+  /** Estimated row height in px when `virtualize` is on; real heights replace it as rows render. Default 26. */
+  rowHeight?: number;
   /** Custom className */
   className?: string;
 }
