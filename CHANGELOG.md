@@ -11,6 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.40.0] - 2026-10-17
+
+### Added
+
+- **`<Command shouldFilter={false}>` turns off the built-in filter.** Every
+  `Command.Item` renders and the caller decides which to render; the input,
+  active index and keyboard handling are unchanged. Same name as cmdk's.
+
+  A palette with its own matching could not use `Command`: Genie 2's Command
+  Window reads `w> tynn` as "workspaces matching tynn", and every item hid itself
+  because no item's text contains `w> tynn`.
+
+- **`query` / `onQueryChange` make the search text controllable.** Filtering for
+  yourself needs the query, and it was internal-only state — which the component
+  contract does not allow for anything an agent might read or write.
+
+**What you must DO: nothing.** `shouldFilter` defaults to `true`, and an
+uncontrolled `Command` keeps its own query exactly as before.
+
 ## [5.39.0] - 2026-10-15
 
 ### Added

@@ -8,11 +8,11 @@ export function CommandItem({
   onSelect,
   className,
 }: CommandItemProps) {
-  const { query, close } = useCommand();
+  const { query, close, shouldFilter } = useCommand();
 
-  // Filter by query
+  // Filter by query — unless the caller filters for itself (`shouldFilter={false}`).
   const text = value ?? (typeof children === "string" ? children : "");
-  if (query && !text.toLowerCase().includes(query.toLowerCase())) {
+  if (shouldFilter && query && !text.toLowerCase().includes(query.toLowerCase())) {
     return null;
   }
 

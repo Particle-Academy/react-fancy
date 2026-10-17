@@ -10,10 +10,19 @@ import { CommandEmpty } from "./CommandEmpty";
 import { useFocusTrap } from "../../hooks/use-focus-trap";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import { useAnimation } from "../../hooks/use-animation";
+import { useControllableState } from "../../hooks/use-controllable-state";
 import type { CommandProps } from "./Command.types";
 
-function CommandRoot({ children, open, onClose, className }: CommandProps) {
-  const [query, setQuery] = useState("");
+function CommandRoot({
+  children,
+  open,
+  onClose,
+  className,
+  shouldFilter = true,
+  query: controlledQuery,
+  onQueryChange,
+}: CommandProps) {
+  const [query, setQuery] = useControllableState(controlledQuery, "", onQueryChange);
   const [activeIndex, setActiveIndex] = useState(-1);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -71,8 +80,8 @@ function CommandRoot({ children, open, onClose, className }: CommandProps) {
   });
 
   const ctx = useMemo(
-    () => ({ open, close, query, setQuery, activeIndex, setActiveIndex }),
-    [open, close, query, activeIndex],
+    () => ({ open, close, query, setQuery, activeIndex, setActiveIndex, shouldFilter }),
+    [open, close, query, setQuery, activeIndex, shouldFilter],
   );
 
   if (!mounted) return null;
