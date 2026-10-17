@@ -158,7 +158,10 @@ function getIconColorClasses(
     // Ghost variant: icon inherits currentColor from the button text
     return "text-current";
   }
-  if (color || active || checked) return "text-white";
+  // A filled button's icon takes the label's colour — whatever that colour class
+  // says, including a host's per-mode `text-brand-contrast` and the dark labels on
+  // amber / yellow / lime. Hard-coded white was invisible on any light fill.
+  if (color || active || checked) return "text-current";
   if (warn) return "text-amber-600 dark:text-amber-400";
   return "text-zinc-500 dark:text-zinc-400";
 }
@@ -173,7 +176,8 @@ function getBadgeClasses(
   if (ghost) {
     return "bg-current/10 text-current";
   }
-  if (isColored(color, active, checked)) return "bg-white/20 text-white";
+  // Tinted with the label's own colour, for the same reason as the icon.
+  if (isColored(color, active, checked)) return "bg-current/20 text-current";
   if (warn) return "bg-amber-200 text-amber-800 dark:bg-amber-800 dark:text-amber-200";
   return "bg-zinc-200 text-zinc-700 dark:bg-zinc-600 dark:text-zinc-200";
 }
@@ -302,6 +306,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           return (
             <span
               key={`icon-${trailing ? "t" : "l"}`}
+              data-action-icon={trailing ? "trailing" : "leading"}
               className={cn("inline-flex items-center flex-shrink-0", iconColorCls)}
             >
               <Icon name={iconSlug} size={iconSizeMap[size]} />
@@ -310,7 +315,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         }
         case "a": {
           if (!avatar) return null;
-          const isTrailing = avatarTrailing ?? trailing;
+          const isTrailing = avatarTrailing ?? false;
           if (isTrailing !== trailing) return null;
           return (
             <img
@@ -324,7 +329,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         }
         case "b": {
           if (!badge) return null;
-          const isTrailing = badgeTrailing ?? trailing;
+          const isTrailing = badgeTrailing ?? false;
           if (isTrailing !== trailing) return null;
           return (
             <span

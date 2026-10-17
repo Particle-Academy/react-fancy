@@ -11,6 +11,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.42.1] - 2026-10-17
+
+### Fixed
+
+- **A filled `Button`'s icon and badge now take the label's colour** (react-fancy#34,
+  from the MOIC estate). They were hard-coded `text-white`, so on
+  `color="brand"` with a host's per-mode pair (pale blue `#BFD7EA` with navy
+  `#003057` contrast) the label turned navy and the icon stayed WHITE on pale
+  blue — nearly invisible. The same bug hit **every host** on `amber`, `yellow`
+  and `lime`, whose labels are dark: white icons on yellow. The icon is now
+  `text-current` and the badge `bg-current/20 text-current`, following the
+  colour's own text class. White-label colours (`blue`, `red`, …) look exactly
+  as before.
+- **A `badge` or `avatar` no longer renders twice.** With `badgeTrailing` /
+  `avatarTrailing` unset, the check `badgeTrailing ?? trailing` was true in BOTH
+  the leading and trailing passes, so every badge appeared before and after the
+  label. They now render once, leading unless the `…Trailing` prop says
+  otherwise, as the docs and `alertIconTrailing` already had it.
+
+### Added
+
+- `data-action-icon` (`leading` / `trailing`) on a Button's icon wrapper, beside
+  the existing `data-action-badge` / `data-action-avatar` handles.
+
+**What you must DO: nothing.** If you had added a `className` to force a dark
+icon onto a light-filled button, you can remove it; if you had hidden one of
+the two duplicate badges with CSS, remove that too.
+
 ## [5.42.0] - 2026-10-17
 
 ### Fixed
