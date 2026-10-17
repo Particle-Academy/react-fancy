@@ -59,4 +59,5 @@ function ToastProvider({
 export const Toast = {
   Provider: ToastProvider,
   Stack: ToastStack,
+  Item: ToastItem,
 };

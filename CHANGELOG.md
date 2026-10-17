@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.41.1] - 2026-10-17
+
+### Fixed
+
+- **`Toast.Item` is now exported.** The docs describe it for rendering your own
+  viewport, and its props type `ToastItemProps` was exported, but the part was
+  not: following the docs gave `undefined` and a render crash. **Nothing to do**
+  unless you had worked around it, in which case `Toast.Item` now just works.
+
 ## [5.41.0] - 2026-10-17
 
 ### Added
