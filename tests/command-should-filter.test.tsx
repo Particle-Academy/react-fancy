@@ -135,6 +135,7 @@ describe("Command — shouldFilter={false}", () => {
       });
     }
 
-    expect(document.activeElement?.textContent).toBe("moic");
+    // Since 5.42.0 focus stays in the input and the ACTIVE item is marked instead.
+    expect(document.querySelector('[role="option"][aria-selected="true"]')?.textContent).toBe("moic");
   });
 });

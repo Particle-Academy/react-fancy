@@ -7,13 +7,19 @@ export function CommandInput({
   placeholder = "Type a command or search...",
   className,
 }: CommandInputProps) {
-  const { query, setQuery } = useCommand();
+  const { query, setQuery, listId } = useCommand();
 
   return (
     <div data-react-fancy-command-input="" className="flex items-center border-b border-zinc-200 px-4 dark:border-zinc-700">
       <Search size={16} className="shrink-0 text-zinc-400" />
       <input
         type="text"
+        // A combobox: focus stays here while the arrows move the active option,
+        // which Command announces through aria-activedescendant.
+        role="combobox"
+        aria-expanded="true"
+        aria-controls={listId}
+        aria-autocomplete="list"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={placeholder}

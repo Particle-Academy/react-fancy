@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { cn } from "../../utils/cn";
 import { Portal } from "../Portal";
 import { CommandContext } from "./Command.context";
@@ -25,6 +33,7 @@ function CommandRoot({
   const [query, setQuery] = useControllableState(controlledQuery, "", onQueryChange);
   const [activeIndex, setActiveIndex] = useState(-1);
   const panelRef = useRef<HTMLDivElement>(null);
+  const listId = useId();
 
   const close = useCallback(() => {
     onClose();
@@ -46,7 +55,15 @@ function CommandRoot({
     }
   }, [open]);
 
-  // Keyboard navigation
+  /*
+   * Keyboard navigation, as a combobox: the arrows move the ACTIVE item while
+   * focus stays in the input (announced through aria-activedescendant), and
+   * Enter picks the active item — or the first visible one when none is active.
+   *
+   * Focus used to move onto the items, and Enter was handled nowhere, so typing
+   * a query and pressing Enter did nothing: only a focused item took Enter, as a
+   * native click. Found by Genie 2's real-window test.
+   */
   useEffect(() => {
     if (!open) return;
 
@@ -58,20 +75,56 @@ function CommandRoot({
 
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        const next = activeIndex < items.length - 1 ? activeIndex + 1 : 0;
-        setActiveIndex(next);
-        items[next]?.focus();
+        setActiveIndex(activeIndex < items.length - 1 ? activeIndex + 1 : 0);
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        const prev = activeIndex > 0 ? activeIndex - 1 : items.length - 1;
-        setActiveIndex(prev);
-        items[prev]?.focus();
+        setActiveIndex(activeIndex > 0 ? activeIndex - 1 : items.length - 1);
+      } else if (e.key === "Enter") {
+        // A focused item takes Enter natively, as a click; picking here as well
+        // would select it twice.
+        if ((e.target as HTMLElement | null)?.getAttribute("role") === "option") return;
+        const pick = items[activeIndex] ?? items[0];
+        e.preventDefault();
+        pick.click();
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [open, activeIndex]);
+
+  /*
+   * Mark the active item and point the input at it. Done on the DOM after each
+   * render because an item cannot know its own index — that is its position
+   * among the options currently rendered, which filtering changes.
+   */
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const items = Array.from(panel.querySelectorAll<HTMLElement>('[role="option"]'));
+    const active = items[activeIndex];
+    items.forEach((item) => {
+      const on = item === active;
+      item.setAttribute("aria-selected", on ? "true" : "false");
+      if (on) item.setAttribute("data-active", "");
+      else item.removeAttribute("data-active");
+    });
+
+    const input = panel.querySelector<HTMLInputElement>("[data-react-fancy-command-input] input");
+    if (active?.id) input?.setAttribute("aria-activedescendant", active.id);
+    else input?.removeAttribute("aria-activedescendant");
+    active?.scrollIntoView?.({ block: "nearest" });
+  });
+
+  // A new query is a new list: nothing in it is active yet, so Enter picks the first match.
+  const changeQuery = useCallback(
+    (next: string) => {
+      setQuery(next);
+      setActiveIndex(-1);
+    },
+    [setQuery],
+  );
 
   const { mounted, className: animClass, ref: animRef } = useAnimation({
     open,
@@ -80,8 +133,17 @@ function CommandRoot({
   });
 
   const ctx = useMemo(
-    () => ({ open, close, query, setQuery, activeIndex, setActiveIndex, shouldFilter }),
-    [open, close, query, setQuery, activeIndex, shouldFilter],
+    () => ({
+      open,
+      close,
+      query,
+      setQuery: changeQuery,
+      activeIndex,
+      setActiveIndex,
+      shouldFilter,
+      listId,
+    }),
+    [open, close, query, changeQuery, activeIndex, shouldFilter, listId],
   );
 
   if (!mounted) return null;

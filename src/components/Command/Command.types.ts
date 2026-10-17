@@ -8,6 +8,8 @@ export interface CommandContextValue {
   activeIndex: number;
   setActiveIndex: (index: number) => void;
   shouldFilter: boolean;
+  /** The listbox's id, so the input can point at it (`aria-controls`). */
+  listId: string;
 }
 
 export interface CommandProps {

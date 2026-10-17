@@ -11,6 +11,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.42.0] - 2026-10-17
+
+### Fixed
+
+- **Enter in `Command.Input` now picks an item**: the active one, or the first
+  visible one when none is active. Before, typing a query and pressing Enter did
+  nothing — `Command` handled no Enter, and only a *focused* item took it, as a
+  native click. Found by Genie 2's real-window test.
+
+### Changed
+
+- **`Command` is a proper combobox: focus stays in the input.** ArrowUp/Down move
+  the *active* item (marked `aria-selected="true"` and `data-active`, scrolled into
+  view, highlighted) and the input announces it through `aria-activedescendant`;
+  the input is `role="combobox"` with `aria-controls` pointing at the list. Typing
+  resets the active item, so Enter picks the new first match. Hovering an item
+  makes it active.
+
+  **Visible change:** the arrows used to move keyboard focus onto the item buttons,
+  and items were in the Tab order; now focus stays in the input and items are
+  `tabIndex={-1}`. **What you must DO: nothing**, unless you styled
+  `:focus` on `Command.Item` to show the highlighted row — style `[data-active]`
+  (or `aria-selected="true"`) instead.
+
 ## [5.41.1] - 2026-10-17
 
 ### Fixed
