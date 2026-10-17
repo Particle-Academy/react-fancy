@@ -11,6 +11,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.41.0] - 2026-10-17
+
+### Added
+
+- **`Toast.Stack` — a controlled stack of actionable toasts** (react-fancy#33),
+  for requests a person walks through rather than races: an agent asking to add a
+  database, a site, a process.
+
+  ```tsx
+  <Toast.Stack
+    items={approvals}
+    renderItem={(r) => <Approval request={r} onAllow={…} onDeny={…} onLater={…} />}
+    depth={2} offset={8} scaleStep={0.05}
+    frontIndex={front} onFrontIndexChange={setFront}
+  />
+  ```
+
+  - **A view of YOUR list, so it never drops anything.** No timer, no limit; an
+    item leaves only when you remove it. (The imperative provider's `maxToasts`
+    silently drops the oldest — the reason this is a separate component.)
+  - `depth` cards peek out behind the front one, each `offset` px higher and
+    `scaleStep` smaller; they are `inert` and `aria-hidden`, so only the front
+    card is interactive. Anything beyond `depth` shows as `+N`.
+  - **The wheel walks the stack**, one card per notch, adding up small trackpad
+    deltas, wrapping at both ends — and keeps the page from scrolling underneath.
+  - **Arrow keys** move the front when the stack has focus (it is focusable, with a
+    visible ring); a text field inside a card keeps its own arrows.
+  - `renderItem` renders anything, so a card can carry as many actions as it
+    needs. When the front item is removed, the next comes forward; an index left
+    out of range by a shrinking list is clamped.
+  - `position`: a screen corner (default `bottom-right`) or `"inline"`.
+    `cardClassName` restyles the card shell. A polite live region says
+    "2 of 5" as the front changes.
+
+  Handles: `data-react-fancy-toast-stack`, `-stack-card` (`front` / `behind`),
+  `-stack-more`, `-stack-status`, `-stack-position`.
+
+**What you must DO: nothing.** `Toast.Provider` and `useToast` are unchanged.
+
 ## [5.40.0] - 2026-10-17
 
 ### Added

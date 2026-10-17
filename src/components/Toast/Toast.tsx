@@ -3,6 +3,7 @@ import { cn } from "../../utils/cn";
 import { Portal } from "../Portal";
 import { ToastContext } from "./Toast.context";
 import { ToastItem } from "./ToastItem";
+import { ToastStack } from "./ToastStack";
 import type { ToastData, ToastProviderProps } from "./Toast.types";
 
 const POSITION_STYLES = {
@@ -57,4 +58,5 @@ function ToastProvider({
 
 export const Toast = {
   Provider: ToastProvider,
+  Stack: ToastStack,
 };

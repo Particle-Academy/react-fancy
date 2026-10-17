@@ -260,6 +260,7 @@ export type {
   ToastPosition,
   ToastProviderProps,
   ToastContextValue,
+  ToastStackProps,
 } from "./components/Toast";
 
 export { Command, useCommand } from "./components/Command";
