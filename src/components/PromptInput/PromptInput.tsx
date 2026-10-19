@@ -408,7 +408,10 @@ export function PromptInput({
         setPicker((p) => (p ? { ...p, cursor: Math.max(0, p.cursor - 1) } : p));
         return;
       }
-      if (e.key === "Enter" && !e.metaKey && !e.ctrlKey && items.length > 0) {
+      // Tab completes, as Enter does: the autocomplete key people expect from a
+      // shell or Claude Code. Only while a menu is open; otherwise Tab moves
+      // focus as usual.
+      if (((e.key === "Enter" && !e.metaKey && !e.ctrlKey) || (e.key === "Tab" && !e.shiftKey)) && items.length > 0) {
         e.preventDefault();
         insertChoice(picker.cursor);
         return;

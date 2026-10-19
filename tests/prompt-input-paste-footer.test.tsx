@@ -226,6 +226,49 @@ describe("PromptInput — inline paste pills", () => {
     expect(input(host).textContent).toBe("hi @ada ");
   });
 
+  it("Tab accepts the highlighted / command, as Enter does", () => {
+    const { host } = mount(
+      <PromptInput
+        budgetTokens={100000}
+        pasteThreshold={500}
+        commands={[{ name: "/rewrite", hint: "rewrite it" }, { name: "/review", hint: "review it" }]}
+        onSubmit={() => {}}
+      />,
+    );
+
+    type(host, "/re");
+    key(input(host), "ArrowDown");
+    key(input(host), "Tab");
+
+    expect(input(host).textContent).toBe("/review ");
+  });
+
+  it("Tab accepts the highlighted @ mention", () => {
+    const { host } = mount(
+      <PromptInput
+        budgetTokens={100000}
+        pasteThreshold={500}
+        mentions={[{ id: "ada", name: "Ada", kind: "person" }]}
+        onSubmit={() => {}}
+      />,
+    );
+
+    type(host, "hi @Ad");
+    key(input(host), "Tab");
+
+    expect(input(host).textContent).toBe("hi @ada ");
+  });
+
+  it("leaves Tab alone when no menu is open, so focus moves on", () => {
+    const { host } = mount(<PromptInput budgetTokens={100000} pasteThreshold={500} onSubmit={() => {}} />);
+    type(host, "hello");
+    const ev = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true });
+    act(() => {
+      input(host).dispatchEvent(ev);
+    });
+    expect(ev.defaultPrevented).toBe(false);
+  });
+
   it("dropped files still attach in the inline editor", () => {
     let got: PromptAttachment[] = [];
     const { host } = mount(

@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.48.0] - 2026-10-19
+
+### Added
+
+- **Tab completes in `PromptInput`'s `/` and `@` menus**, as Enter does: the
+  highlighted command or mention goes in. Only while a menu is open; with no
+  menu, Tab moves focus as before. **Nothing to do.**
+
 ## [5.47.0] - 2026-10-19
 
 ### Added
