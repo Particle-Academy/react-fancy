@@ -129,6 +129,20 @@ describe("FauxClient controls", () => {
     expect(bar.closest(".border-b")).not.toBeNull();
   });
 
+  it("fills its parent's height with `fill`, for content that sizes itself to its box", () => {
+    const host = mount(<FauxClient variant="device" fill controls>c</FauxClient>);
+    const frame = host.querySelector("[data-react-fancy-faux-client]") as HTMLElement;
+    const content = q(host, "content") as HTMLElement;
+    expect(frame.className).toMatch(/\bh-full\b/);
+    expect(frame.className).toMatch(/\bflex-col\b/);
+    expect(content.parentElement!.className).toMatch(/\bflex-1\b/);
+    expect(content.className).toMatch(/\bh-full\b/);
+
+    // Without it, nothing changes for existing frames.
+    const plain = mount(<FauxClient variant="device">c</FauxClient>);
+    expect((plain.querySelector("[data-react-fancy-faux-client]") as HTMLElement).className).not.toMatch(/\bh-full\b/);
+  });
+
   it("can show zoom without full screen, or the reverse", () => {
     const a = mount(<FauxClient controls={{ fullscreen: false }}>c</FauxClient>);
     expect(q(a, "fullscreen")).toBeNull();

@@ -37,6 +37,12 @@ export interface FauxClientProps extends Omit<HTMLAttributes<HTMLDivElement>, "c
    * `data-fullscreen="true"` while it is, for styling the content.
    */
   onFullscreenChange?: (fullscreen: boolean) => void;
+  /**
+   * Take the parent's height, and give the content whatever the chrome leaves.
+   * For content that sizes itself to its box (a slide viewer, a spreadsheet)
+   * rather than to what is in it. Default `false`.
+   */
+  fill?: boolean;
   className?: string;
   /** Class for the browser bar. */
   barClassName?: string;

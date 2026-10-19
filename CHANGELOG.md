@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.46.0] - 2026-10-19
+
+### Added
+
+- **`FauxClient` `fill`**: the frame takes its parent's height and gives the
+  content whatever the chrome leaves, for content that sizes itself to its box
+  (a slide viewer, a spreadsheet) rather than to what is in it. Without it, a
+  viewer at `height: 100%` inside the frame collapsed to nothing.
+  **Nothing to do:** it defaults to `false`.
+
 ## [5.45.1] - 2026-10-19
 
 ### Changed

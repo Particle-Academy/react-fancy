@@ -37,6 +37,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
       minZoom = 0.5,
       maxZoom = 4,
       onFullscreenChange,
+      fill = false,
       className,
       barClassName,
       bodyClassName,
@@ -198,8 +199,11 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
           isBrowser && "rounded-2xl border border-zinc-200 shadow-xl dark:border-zinc-800",
           isDevice && "rounded-[2rem] border-[10px] border-zinc-800 shadow-2xl dark:border-zinc-700",
           variant === "bare" && "rounded-lg border border-zinc-200 dark:border-zinc-800",
-          // Full screen: the frame fills the screen and its body takes the room.
-          fullscreen && "flex flex-col rounded-none",
+          // Fill (or full screen): the frame takes its parent's height and its
+          // body takes whatever the chrome leaves.
+          (fill || fullscreen) && "flex flex-col",
+          fill && "h-full",
+          fullscreen && "rounded-none",
           className,
         )}
         {...rest}
@@ -230,7 +234,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
             "relative",
             // Zoomed in, the content is bigger than the frame: scroll to it.
             zoomed ? "overflow-auto" : "overflow-hidden",
-            fullscreen && "min-h-0 flex-1",
+            (fill || fullscreen) && "min-h-0 flex-1",
             bodyClassName,
           )}
           // The frame keeps its FIT height whatever the zoom; zooming scrolls.
@@ -257,7 +261,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
           ) : (
             <div
               data-react-fancy-faux-client-content=""
-              className={cn(fullscreen && "h-full")}
+              className={cn((fill || fullscreen) && "h-full")}
               // CSS `zoom` rather than a transform: it changes layout size, so the
               // content reflows and the viewport scrolls to all of it.
               style={zoomed ? { zoom: String(zoom) } : undefined}
