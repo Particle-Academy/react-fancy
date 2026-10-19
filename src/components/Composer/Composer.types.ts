@@ -1,41 +1,17 @@
 import type { ReactNode } from "react";
 
 /*
- * `HeldPaste` now lives with `usePastePills`, re-exported here so the import path
- * that 5.31.0 published keeps working.
- *
- * It moved because the hook is the general primitive and the component is one of
- * its callers — a hook depending on a component's types is the dependency the wrong
- * way round.
+ * The paste-pill shapes live with the shared core in `PastePills`, re-exported
+ * here so the import paths that 5.31.0 and 5.38.0 published keep working.
  */
-import type { HeldPaste } from "../../hooks/use-paste-pills";
-import type { HeldImage } from "./paste-markers";
+import type {
+  ComposerPasteClassNames,
+  ComposerPastePreview,
+  HeldImage,
+  HeldPaste,
+} from "../PastePills/PastePills.types";
 
-export type { HeldPaste, HeldImage };
-
-/** What a hover preview is being asked to show. */
-export type ComposerPastePreview =
-  | { kind: "text"; paste: HeldPaste }
-  | { kind: "image"; image: HeldImage };
-
-/**
- * Classes for the paste pills, MERGED onto the defaults rather than replacing them,
- * so a restyle can be one class or a whole new look.
- */
-export interface ComposerPasteClassNames {
-  /** Every pill, text or image. */
-  pill?: string;
-  /** Text pills only — `Pasted text · 669 characters`. */
-  textPill?: string;
-  /** Image pills only — `Pasted image 1`. */
-  imagePill?: string;
-  /** The hover popover. */
-  preview?: string;
-  /** The × discard control (beside-the-input placement only; inline pills are backspaced). */
-  remove?: string;
-  /** The editable surface itself. */
-  input?: string;
-}
+export type { ComposerPasteClassNames, ComposerPastePreview, HeldImage, HeldPaste };
 
 export interface ComposerSubmitExtras {
   /**
@@ -116,4 +92,13 @@ export interface ComposerProps {
   /** The held images, if you want to own them. Same reasoning as `heldPastes`. */
   heldImages?: HeldImage[];
   onHeldImagesChange?: (images: HeldImage[]) => void;
+  /**
+   * Submit pasted images with an enclosing `<form>`, under this field name.
+   *
+   * Renders a hidden `<input type="file" multiple>` that always holds the images
+   * still in the message, in message order — delete a pill and its file leaves
+   * the input. Needs `pasteImages`. Name it `photos[]` for a backend that
+   * reads arrays from brackets (PHP, Laravel).
+   */
+  pasteFilesName?: string;
 }

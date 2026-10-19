@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
 import { Tooltip } from "../Tooltip";
-import type { ComposerPasteClassNames, ComposerPastePreview } from "./Composer.types";
+import type { ComposerPasteClassNames, ComposerPastePreview } from "./PastePills.types";
 
 /**
  * Thousands separators, written out rather than left to `toLocaleString()`.

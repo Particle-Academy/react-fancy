@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { useControllableState } from "../../hooks/use-controllable-state";
-import { usePastePills, type HeldPaste } from "../../hooks/use-paste-pills";
+import { usePastePills, type HeldPaste } from "./use-paste-pills";
 import { InlinePill } from "./InlinePill";
 import type { InlinePasteEditorHandle, PillToInsert } from "./InlinePasteEditor";
 import { expandMarkers, markedIds, type HeldImage } from "./paste-markers";
-import type { ComposerPasteClassNames, ComposerPastePreview } from "./Composer.types";
+import type { ComposerPasteClassNames, ComposerPastePreview } from "./PastePills.types";
 
 export interface UseInlinePasteOptions {
   pasteThreshold?: number;
@@ -19,6 +19,11 @@ export interface UseInlinePasteOptions {
   heldImages?: HeldImage[];
   onHeldImagesChange?: (images: HeldImage[]) => void;
   editorRef: RefObject<InlinePasteEditorHandle | null>;
+  /**
+   * Give a text pill a line to itself. Default `true`; a single-line field
+   * (`Input`) has no lines to give, so its pills sit in the text.
+   */
+  blockText?: boolean;
 }
 
 /**
@@ -27,8 +32,8 @@ export interface UseInlinePasteOptions {
  * deleted from the message, rendering the pills into the editor, and expanding
  * them on send.
  *
- * Shared by `Composer` and `PromptInput` so the two cannot disagree about what a
- * pill means. The rule that must not drift is the one `expand` and `imagesIn`
+ * Shared by `Composer`, `PromptInput` and `Input` so they cannot disagree about
+ * what a pill means. The rule that must not drift is the one `expand` and `imagesIn`
  * carry: a send with pills still closed carries everything they hold.
  */
 export function useInlinePaste({
@@ -43,6 +48,7 @@ export function useInlinePaste({
   heldImages: controlledHeldImages,
   onHeldImagesChange,
   editorRef,
+  blockText = true,
 }: UseInlinePasteOptions) {
   const pills = usePastePills({
     threshold: pasteThreshold,
@@ -96,12 +102,12 @@ export function useInlinePaste({
       }
 
       if (pasteThreshold && pasteThreshold > 0 && text.length >= pasteThreshold) {
-        return [{ id: pills.hold(text), block: true }];
+        return [{ id: pills.hold(text), block: blockText }];
       }
 
       return null;
     },
-    [pasteImages, pasteThreshold, holdImage, pills],
+    [pasteImages, pasteThreshold, holdImage, pills, blockText],
   );
 
   /*

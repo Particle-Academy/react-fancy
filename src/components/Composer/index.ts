@@ -7,4 +7,4 @@ export type {
   HeldImage,
   HeldPaste,
 } from "./Composer.types";
-export { pasteMarker } from "./paste-markers";
+export { pasteMarker } from "../PastePills";

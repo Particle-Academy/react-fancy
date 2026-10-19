@@ -12,13 +12,12 @@ import { Icon } from "../Icon";
 import { Tooltip } from "../Tooltip";
 import {
   InlinePasteEditor,
+  PastedFilesInput,
+  useInlinePaste,
+  type ComposerPasteClassNames,
+  type ComposerPastePreview,
   type InlinePasteEditorHandle,
-} from "../Composer/InlinePasteEditor";
-import { useInlinePaste } from "../Composer/use-inline-paste";
-import type {
-  ComposerPasteClassNames,
-  ComposerPastePreview,
-} from "../Composer/Composer.types";
+} from "../PastePills";
 import {
   browserPlatformHints,
   detectPlatform,
@@ -144,6 +143,12 @@ export interface PromptInputProps
   renderPastePreview?: (preview: ComposerPastePreview) => ReactNode;
   /** Restyle the paste pills, their popover and the inline editor. Merged onto the defaults. */
   pasteClassNames?: ComposerPasteClassNames;
+  /**
+   * Submit pasted images with an enclosing `<form>`, under this field name: a
+   * hidden `<input type="file" multiple>` holds the images still in the message,
+   * in message order. Needs `pasteImages`. They reach `onSubmit` either way.
+   */
+  pasteFilesName?: string;
   /** `"icon"`: an icon-only attach button whose tooltip says what it does. Default `"label"`. */
   attachButton?: "label" | "icon";
   /**
@@ -193,6 +198,7 @@ export function PromptInput({
   previewChars = 20,
   renderPastePreview,
   pasteClassNames,
+  pasteFilesName,
   attachButton = "label",
   sendButton = "label",
   usedTokens,
@@ -552,6 +558,12 @@ export function PromptInput({
               )}
             />
             {paste.portals}
+            {pasteImages && pasteFilesName && (
+              <PastedFilesInput
+                name={pasteFilesName}
+                files={paste.imagesIn(text).map((i) => i.file)}
+              />
+            )}
           </>
         ) : (
           <textarea

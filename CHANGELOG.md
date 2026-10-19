@@ -11,6 +11,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.44.0] - 2026-10-19
+
+### Added
+
+- **`Input` holds a long paste as a pill**, as `Composer` and `PromptInput` do:
+  `<Input name="q" pasteThreshold={500} />`. The pill sits in the field (one
+  line, so no line of its own); clicking it puts the full text back. A hidden
+  `<input name={name}>` posts the value with every pill expanded, so a plain
+  `<form>` submit sends the whole paste. Enter still submits the form.
+  **Omit `pasteThreshold` and `pasteImages` and nothing changes**: it is the same
+  `<input>` as before. With either set, `ref` points at the hidden input,
+  `onValueChange` receives the value with a marker per pill, and `onChange` is
+  not called.
+- **Pasted files reach the form.** `pasteImages` on `Input` holds a pasted image
+  as a pill AND puts the file in a hidden `<input type="file" multiple>` in the
+  same form (`{name}_files[]` by default, or `pasteFilesName`), kept in step with
+  the pills: delete one and its file leaves the input. `Composer` and
+  `PromptInput` take `pasteFilesName` for the same hidden input.
+- **`PastePills`** (`@particle-academy/react-fancy/paste-pills`): the paste-pill
+  core in one place: `usePastePills`, `useInlinePaste`, `InlinePasteEditor`,
+  `PastedFilesInput` and the marker helpers. `Composer`, `PromptInput` and
+  `Input` all import it, so `npx fancy-cli add` copies it once, as a dependency,
+  instead of a copy per component.
+
+### Changed
+
+- The paste-pill files moved from `components/Composer/` and
+  `hooks/use-paste-pills.ts` into `components/PastePills/`. **What to do:**
+  nothing. Every public export is unchanged, and `hooks/use-paste-pills` still
+  re-exports the hook.
+
 ## [5.43.0] - 2026-10-17
 
 ### Fixed

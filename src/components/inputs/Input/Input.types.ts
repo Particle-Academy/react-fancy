@@ -1,5 +1,11 @@
 import type { InputHTMLAttributes, ReactNode } from "react";
 import type { InputBaseProps, InputAffixProps } from "../inputs.types";
+import type {
+  ComposerPasteClassNames,
+  ComposerPastePreview,
+  HeldImage,
+  HeldPaste,
+} from "../../PastePills";
 
 export interface InputProps
   extends InputBaseProps,
@@ -26,4 +32,37 @@ export interface InputProps
   /** Accessible label for the toggle. Defaults to "Show password" / "Hide password". */
   revealLabel?: string;
   hideLabel?: string;
+  /**
+   * Hold a paste of at least this many characters as a pill in the field, as
+   * `Composer` and `PromptInput` do — same code, from `PastePills`. Try 500.
+   *
+   * **Omit it (and `pasteImages`) and this is a plain `<input>`, exactly as
+   * before.** Setting either swaps it for a single-line editor that can hold a
+   * pill, plus a hidden `<input name={name}>` that posts the value with every pill
+   * expanded, so a native form submit sends the whole paste. `ref` then points at
+   * that hidden input; `onValueChange` receives the value with a marker for each
+   * pill (see `pasteMarker`), and `onChange` is not called.
+   */
+  pasteThreshold?: number;
+  /**
+   * Hold a pasted image as a pill, and put the file in a hidden
+   * `<input type="file" multiple>` in the same form so a submit posts it. The text
+   * marks where it sat as `[Pasted image N]`.
+   */
+  pasteImages?: boolean;
+  /**
+   * The field name pasted files are posted under. Defaults to `{name}_files[]`
+   * (an array for PHP / Laravel); without either, the files are held but not
+   * posted.
+   */
+  pasteFilesName?: string;
+  /** Characters of a held paste shown at EACH end of its hover preview. Default 20. */
+  previewChars?: number;
+  renderPastePreview?: (preview: ComposerPastePreview) => ReactNode;
+  pasteClassNames?: ComposerPasteClassNames;
+  /** The held pastes and images, if you want to own them (an agent attaching one, a restored draft). */
+  heldPastes?: HeldPaste[];
+  onHeldPastesChange?: (pastes: HeldPaste[]) => void;
+  heldImages?: HeldImage[];
+  onHeldImagesChange?: (images: HeldImage[]) => void;
 }

@@ -1,10 +1,15 @@
-import { forwardRef, useCallback, useRef } from "react";
+import { forwardRef, useCallback, useMemo, useRef } from "react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
-import type { HeldPaste } from "../../hooks/use-paste-pills";
-import { endsOf, withSeparators } from "./InlinePill";
-import { InlinePasteEditor, type InlinePasteEditorHandle } from "./InlinePasteEditor";
-import { useInlinePaste } from "./use-inline-paste";
+import {
+  endsOf,
+  InlinePasteEditor,
+  PastedFilesInput,
+  useInlinePaste,
+  withSeparators,
+  type HeldPaste,
+  type InlinePasteEditorHandle,
+} from "../PastePills";
 import type { ComposerProps } from "./Composer.types";
 
 /** Characters of a held paste shown at each end of the hover preview, unless `previewChars` says otherwise. */
@@ -31,6 +36,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       onHeldPastesChange,
       heldImages: controlledHeldImages,
       onHeldImagesChange,
+      pasteFilesName,
     },
     ref,
   ) {
@@ -63,6 +69,10 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
     });
     const pills = paste.pills;
     const heldPastes = paste.heldPastes;
+    const pastedFiles = useMemo(
+      () => (inline && pasteImages ? paste.imagesIn(value).map((i) => i.file) : []),
+      [inline, pasteImages, paste, value],
+    );
 
     const handlePaste = useCallback(
       (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -231,6 +241,9 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
               className={classNames?.input}
             />
             {paste.portals}
+            {pasteImages && pasteFilesName && (
+              <PastedFilesInput name={pasteFilesName} files={pastedFiles} />
+            )}
           </>
         ) : (
           <textarea

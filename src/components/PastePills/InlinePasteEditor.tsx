@@ -53,6 +53,19 @@ interface InlinePasteEditorProps {
   placeholder: string;
   disabled: boolean;
   className?: string;
+  /**
+   * `false` makes it a single-line field, as `Input` uses it: Enter always
+   * submits, and a newline in pasted text becomes a space, as a browser does for
+   * an `<input>`. A held paste keeps its newlines; it is only the field that has
+   * one line. Default `true`.
+   */
+  multiline?: boolean;
+  /** The editable surface's id, so a host can find it. */
+  id?: string;
+  /** Names the textbox for assistive tech; a `<div>` cannot be the target of a `<label>`. */
+  ariaLabelledBy?: string;
+  ariaInvalid?: boolean;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -195,6 +208,11 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
       onKeyDown,
       placeholderClassName,
       maxHeight,
+      multiline = true,
+      id,
+      ariaLabelledBy,
+      ariaInvalid,
+      style,
     },
     ref,
   ) {
@@ -406,7 +424,8 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
       const pills = onPaste(e.clipboardData);
 
       if (pills === null) {
-        insertText((e.clipboardData?.getData("text/plain") ?? "").replace(/\r\n?/g, "\n"));
+        const text = (e.clipboardData?.getData("text/plain") ?? "").replace(/\r\n?/g, "\n");
+        insertText(multiline ? text : text.replace(/\n+/g, " "));
         return;
       }
 
@@ -446,7 +465,7 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
 
       e.preventDefault();
       const sends =
-        submitKey === "mod-enter" ? e.ctrlKey || e.metaKey : !e.shiftKey;
+        !multiline || (submitKey === "mod-enter" ? e.ctrlKey || e.metaKey : !e.shiftKey);
       if (sends) {
         onSubmit();
       } else {
@@ -469,9 +488,12 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
         )}
         <div
           ref={rootRef}
+          id={id}
           data-react-fancy-composer-input=""
           role="textbox"
-          aria-multiline="true"
+          aria-multiline={multiline}
+          aria-labelledby={ariaLabelledBy}
+          aria-invalid={ariaInvalid || undefined}
           aria-placeholder={placeholder}
           aria-disabled={disabled || undefined}
           contentEditable={!disabled}
@@ -479,7 +501,7 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
           onInput={emit}
           onPaste={handlePaste}
           onKeyDown={handleKeyDown}
-          style={maxHeight === undefined ? undefined : { maxHeight }}
+          style={maxHeight === undefined ? style : { ...style, maxHeight }}
           className={cn(
             "max-h-72 min-h-[4.5rem] w-full overflow-y-auto whitespace-pre-wrap break-words bg-transparent px-4 pt-3 text-sm outline-none",
             className,

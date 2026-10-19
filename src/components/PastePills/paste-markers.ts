@@ -1,4 +1,4 @@
-import type { HeldPaste } from "../../hooks/use-paste-pills";
+import type { HeldPaste } from "./use-paste-pills";
 
 /**
  * An image pasted into a `Composer` and held as a pill.

@@ -614,11 +614,16 @@ export {
   THEME_STORAGE_KEY,
 } from "./theme";
 export type { ThemePreference, ResolvedTheme } from "./theme";
-export { usePastePills } from "./hooks/use-paste-pills";
+export { usePastePills, useInlinePaste, InlinePasteEditor, PastedFilesInput } from "./components/PastePills";
 export type {
   UsePastePillsOptions,
   UsePastePillsResult,
   PasteEventLike,
-} from "./hooks/use-paste-pills";
+  UseInlinePasteOptions,
+  InlinePasteEditorHandle,
+  PastedFilesInputProps,
+  PastePreview,
+  PasteClassNames,
+} from "./components/PastePills";
 export { useTheme } from "./hooks/use-theme";
 export type { UseThemeResult } from "./hooks/use-theme";
