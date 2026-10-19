@@ -112,6 +112,23 @@ describe("FauxClient controls", () => {
     expect(frame.getAttribute("data-fullscreen")).toBe("false");
   });
 
+  it("keeps the controls out of sight until the frame is hovered or focused", () => {
+    const host = mount(<FauxClient variant="device" controls>c</FauxClient>);
+    const bar = q(host, "controls") as HTMLElement;
+    expect(bar.className).toContain("opacity-0");
+    expect(bar.className).toContain("group-hover/faux-client:opacity-100");
+    expect(bar.className).toContain("focus-within:opacity-100");
+    // No hover on touch: always shown there, or it could never be reached.
+    expect(bar.className).toContain("[@media(hover:none)]:opacity-100");
+    expect(host.querySelector("[data-react-fancy-faux-client]")!.className).toContain("group/faux-client");
+  });
+
+  it("sits inline in the address bar of a browser frame", () => {
+    const host = mount(<FauxClient variant="browser" url="report.pptx" controls>c</FauxClient>);
+    const bar = q(host, "controls") as HTMLElement;
+    expect(bar.closest(".border-b")).not.toBeNull();
+  });
+
   it("can show zoom without full screen, or the reverse", () => {
     const a = mount(<FauxClient controls={{ fullscreen: false }}>c</FauxClient>);
     expect(q(a, "fullscreen")).toBeNull();

@@ -113,6 +113,80 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
     const isDevice = variant === "device";
     const effective = fit * zoom;
     const zoomed = zoom !== 1;
+    const hasControls = showZoom || showFullscreen;
+
+    /*
+     * Out of the way until wanted: hidden, and revealed when the pointer is over
+     * the frame or focus is inside it (keyboard). Always shown where there is no
+     * hover to reveal it (touch), or it could never be reached.
+     *
+     * In the browser chrome it sits in the address bar, inline. On a device or a
+     * bare frame there is no chrome, so it floats top-right as a slim strip: the
+     * bottom corners belong to the content (a slide viewer's page count lives
+     * there).
+     */
+    const controlsBar = hasControls ? (
+      <div
+        data-react-fancy-faux-client-controls=""
+        className={cn(
+          "pointer-events-auto flex shrink-0 items-center gap-px opacity-0 transition-opacity duration-150",
+          "group-hover/faux-client:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100",
+          isBrowser
+            ? "-my-1 text-zinc-400 dark:text-zinc-500"
+            : "rounded-full bg-zinc-900/60 px-1 py-0.5 text-white/80 shadow-sm backdrop-blur-sm",
+        )}
+      >
+        {showZoom && (
+          <>
+            <button
+              type="button"
+              data-react-fancy-faux-client-zoom-out=""
+              aria-label="Zoom out"
+              title="Zoom out"
+              disabled={zoom <= minZoom}
+              onClick={() => zoomBy(1 / ZOOM_STEP)}
+              className={controlButton(isBrowser)}
+            >
+              <ZoomOutIcon />
+            </button>
+            <button
+              type="button"
+              data-react-fancy-faux-client-zoom-reset=""
+              aria-label="Reset zoom"
+              title="Reset zoom"
+              onClick={() => setZoom(1)}
+              className={cn(controlButton(isBrowser), "w-auto min-w-[2.25rem] px-1 font-sans text-[10.5px] tabular-nums")}
+            >
+              {Math.round(zoom * 100)}%
+            </button>
+            <button
+              type="button"
+              data-react-fancy-faux-client-zoom-in=""
+              aria-label="Zoom in"
+              title="Zoom in"
+              disabled={zoom >= maxZoom}
+              onClick={() => zoomBy(ZOOM_STEP)}
+              className={controlButton(isBrowser)}
+            >
+              <ZoomInIcon />
+            </button>
+          </>
+        )}
+        {showFullscreen && (
+          <button
+            type="button"
+            data-react-fancy-faux-client-fullscreen=""
+            aria-label={fullscreen ? "Exit full screen" : "Full screen"}
+            aria-pressed={fullscreen}
+            title={fullscreen ? "Exit full screen" : "Full screen"}
+            onClick={toggleFullscreen}
+            className={controlButton(isBrowser)}
+          >
+            {fullscreen ? <ExitFullscreenIcon /> : <FullscreenIcon />}
+          </button>
+        )}
+      </div>
+    ) : null;
 
     return (
       <div
@@ -120,7 +194,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
         data-react-fancy-faux-client=""
         data-fullscreen={showFullscreen ? String(fullscreen) : undefined}
         className={cn(
-          "relative overflow-hidden bg-white dark:bg-zinc-900",
+          "group/faux-client relative overflow-hidden bg-white dark:bg-zinc-900",
           isBrowser && "rounded-2xl border border-zinc-200 shadow-xl dark:border-zinc-800",
           isDevice && "rounded-[2rem] border-[10px] border-zinc-800 shadow-2xl dark:border-zinc-700",
           variant === "bare" && "rounded-lg border border-zinc-200 dark:border-zinc-800",
@@ -146,6 +220,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
             )}
             {url != null && <span className="min-w-0 flex-1 truncate">{url}</span>}
             {meta != null && <span className="shrink-0 text-zinc-400 dark:text-zinc-500">{meta}</span>}
+            {hasControls && <div className={cn(url == null && meta == null && "ml-auto")}>{controlsBar}</div>}
           </div>
         )}
 
@@ -192,58 +267,8 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
           )}
         </div>
 
-        {(showZoom || showFullscreen) && (
-          <div
-            data-react-fancy-faux-client-controls=""
-            className="absolute bottom-2 right-2 z-10 flex items-center gap-0.5 rounded-md border border-zinc-200 bg-white/90 p-0.5 text-zinc-700 shadow-sm backdrop-blur dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-200"
-          >
-            {showZoom && (
-              <>
-                <button
-                  type="button"
-                  data-react-fancy-faux-client-zoom-out=""
-                  aria-label="Zoom out"
-                  disabled={zoom <= minZoom}
-                  onClick={() => zoomBy(1 / ZOOM_STEP)}
-                  className="flex h-6 w-6 items-center justify-center rounded text-base leading-none hover:bg-zinc-100 disabled:opacity-40 dark:hover:bg-zinc-800"
-                >
-                  −
-                </button>
-                <button
-                  type="button"
-                  data-react-fancy-faux-client-zoom-reset=""
-                  aria-label="Reset zoom"
-                  onClick={() => setZoom(1)}
-                  className="min-w-[3rem] rounded px-1 text-center text-xs tabular-nums hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                >
-                  {Math.round(zoom * 100)}%
-                </button>
-                <button
-                  type="button"
-                  data-react-fancy-faux-client-zoom-in=""
-                  aria-label="Zoom in"
-                  disabled={zoom >= maxZoom}
-                  onClick={() => zoomBy(ZOOM_STEP)}
-                  className="flex h-6 w-6 items-center justify-center rounded text-base leading-none hover:bg-zinc-100 disabled:opacity-40 dark:hover:bg-zinc-800"
-                >
-                  +
-                </button>
-              </>
-            )}
-            {showFullscreen && (
-              <button
-                type="button"
-                data-react-fancy-faux-client-fullscreen=""
-                aria-label={fullscreen ? "Exit full screen" : "Full screen"}
-                aria-pressed={fullscreen}
-                title={fullscreen ? "Exit full screen" : "Full screen"}
-                onClick={toggleFullscreen}
-                className="flex h-6 w-6 items-center justify-center rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              >
-                {fullscreen ? <ExitFullscreenIcon /> : <FullscreenIcon />}
-              </button>
-            )}
-          </div>
+        {hasControls && !isBrowser && (
+          <div className="pointer-events-none absolute right-2 top-2 z-10">{controlsBar}</div>
         )}
       </div>
     );
@@ -251,6 +276,38 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
 );
 
 FauxClient.displayName = "FauxClient";
+
+/** Ghost icon buttons: no box of their own, so the bar reads as part of the frame. */
+function controlButton(inBar: boolean): string {
+  return cn(
+    "flex h-6 w-6 items-center justify-center rounded-full transition-colors disabled:pointer-events-none disabled:opacity-30",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50",
+    inBar
+      ? "hover:bg-zinc-900/5 hover:text-zinc-700 dark:hover:bg-white/10 dark:hover:text-zinc-200"
+      : "hover:bg-white/15 hover:text-white",
+  );
+}
+
+function ZoomOutIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+      <path d="M8 11h6" />
+    </svg>
+  );
+}
+
+function ZoomInIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+      <path d="M8 11h6" />
+      <path d="M11 8v6" />
+    </svg>
+  );
+}
 
 /** Inline, like `Input`'s reveal icons: a frame should not need an icon set configured. */
 function FullscreenIcon() {

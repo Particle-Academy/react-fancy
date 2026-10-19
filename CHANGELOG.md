@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.45.1] - 2026-10-19
+
+### Changed
+
+- **`FauxClient`'s controls stay out of sight until wanted.** They are hidden,
+  and fade in when the pointer is over the frame or focus is inside it; on a
+  touch screen, which has no hover, they are always shown. In a browser frame
+  they sit inline in the address bar as ghost icons; on a device or bare frame
+  they are a slim pill in the top-right corner, leaving the bottom corners to
+  the content (a slide viewer's page count lives there). 5.45.0 drew them as a
+  bordered box over the content's bottom-right corner, permanently.
+  **Nothing to do:** same props, same `data-*` handles.
+
 ## [5.45.0] - 2026-10-19
 
 ### Added
