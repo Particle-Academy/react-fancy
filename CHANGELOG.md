@@ -11,6 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.45.0] - 2026-10-19
+
+### Added
+
+- **`FauxClient` zoom and full screen**, for content that has to be read rather
+  than glanced at, such as a slide or a sheet shrunk to fit a panel.
+  `<FauxClient variant="device" controls>` adds a zoom bar (−, percentage, +;
+  the same bar `ImageViewer` has) and a full-screen button in the frame's
+  corner. Zooming keeps the frame its size and scrolls the content inside it.
+  The zoom is controllable (`zoom` / `defaultZoom` / `onZoomChange`, bounded by
+  `minZoom` / `maxZoom`) so an agent can read and set it. Full screen follows
+  the browser's own state: Esc leaves the button telling the truth, and
+  `onFullscreenChange` and `data-fullscreen` report it.
+  **Nothing to do** unless you want them: `controls` defaults to `false`, and a
+  frame without it renders as before.
+
 ## [5.44.0] - 2026-10-19
 
 ### Added

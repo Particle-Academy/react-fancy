@@ -17,6 +17,26 @@ export interface FauxClientProps extends Omit<HTMLAttributes<HTMLDivElement>, "c
   width?: number;
   /** `"fit"` scales the logical {@link FauxClientProps.width} to the frame; a number is a fixed scale. */
   scale?: number | "fit";
+  /**
+   * A zoom bar (−, percentage, +) and a full-screen button, in the frame's
+   * bottom-right corner. `true` for both; `{ zoom: false }` or
+   * `{ fullscreen: false }` to leave one out. Default `false`.
+   */
+  controls?: boolean | { zoom?: boolean; fullscreen?: boolean };
+  /** The zoom, 1 = fit. Controllable, so an agent can read and set it. */
+  zoom?: number;
+  defaultZoom?: number;
+  onZoomChange?: (zoom: number) => void;
+  /** Default 0.5. */
+  minZoom?: number;
+  /** Default 4. */
+  maxZoom?: number;
+  /**
+   * Called when the frame enters or leaves full screen, however it happened
+   * (the button, Esc, the browser). The frame also carries
+   * `data-fullscreen="true"` while it is, for styling the content.
+   */
+  onFullscreenChange?: (fullscreen: boolean) => void;
   className?: string;
   /** Class for the browser bar. */
   barClassName?: string;
