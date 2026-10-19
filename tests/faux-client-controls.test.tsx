@@ -143,6 +143,18 @@ describe("FauxClient controls", () => {
     expect((plain.querySelector("[data-react-fancy-faux-client]") as HTMLElement).className).not.toMatch(/\bh-full\b/);
   });
 
+  it("leaves the zoom to the content with applyZoom={false}", () => {
+    // A viewer that fits itself to its box (a slide) re-fits under CSS zoom and
+    // ends up the same size, with its own chrome enlarged. It zooms itself; the
+    // frame keeps the controls and the state.
+    const seen: number[] = [];
+    const host = mount(<FauxClient controls applyZoom={false} onZoomChange={(z) => seen.push(z)}>c</FauxClient>);
+    click(q(host, "zoom-in"));
+    expect(seen).toEqual([1.25]);
+    expect((q(host, "content") as HTMLElement).style.zoom).toBe("");
+    expect(q(host, "zoom-reset")!.textContent).toBe("125%");
+  });
+
   it("can show zoom without full screen, or the reverse", () => {
     const a = mount(<FauxClient controls={{ fullscreen: false }}>c</FauxClient>);
     expect(q(a, "fullscreen")).toBeNull();

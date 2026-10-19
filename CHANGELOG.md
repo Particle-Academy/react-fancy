@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.47.0] - 2026-10-19
+
+### Added
+
+- **`FauxClient` `applyZoom={false}`**: the frame shows the zoom controls and
+  keeps the zoom state, but leaves the zooming to the content. A viewer that
+  fits itself to its box (a slide viewer) only re-fits under a scaled frame, so
+  it ended up the same size with its own buttons enlarged; it now reads the zoom
+  and magnifies itself. **Nothing to do:** it defaults to `true`.
+
 ## [5.46.0] - 2026-10-19
 
 ### Added

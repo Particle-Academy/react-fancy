@@ -43,6 +43,13 @@ export interface FauxClientProps extends Omit<HTMLAttributes<HTMLDivElement>, "c
    * rather than to what is in it. Default `false`.
    */
   fill?: boolean;
+  /**
+   * `false`: the frame shows the zoom controls and keeps the zoom state, but
+   * does not scale the content; the content reads `zoom` (via `onZoomChange` or
+   * a controlled `zoom`) and zooms itself. For content that fits itself to its
+   * box (a slide viewer), which a scaled frame only re-fits. Default `true`.
+   */
+  applyZoom?: boolean;
   className?: string;
   /** Class for the browser bar. */
   barClassName?: string;

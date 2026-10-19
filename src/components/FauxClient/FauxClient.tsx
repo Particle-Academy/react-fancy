@@ -38,6 +38,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
       maxZoom = 4,
       onFullscreenChange,
       fill = false,
+      applyZoom = true,
       className,
       barClassName,
       bodyClassName,
@@ -112,8 +113,10 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
 
     const isBrowser = variant === "browser";
     const isDevice = variant === "device";
-    const effective = fit * zoom;
-    const zoomed = zoom !== 1;
+    // The zoom the FRAME applies: none when the content zooms itself.
+    const appliedZoom = applyZoom ? zoom : 1;
+    const effective = fit * appliedZoom;
+    const zoomed = appliedZoom !== 1;
     const hasControls = showZoom || showFullscreen;
 
     /*
@@ -264,7 +267,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
               className={cn((fill || fullscreen) && "h-full")}
               // CSS `zoom` rather than a transform: it changes layout size, so the
               // content reflows and the viewport scrolls to all of it.
-              style={zoomed ? { zoom: String(zoom) } : undefined}
+              style={zoomed ? { zoom: String(appliedZoom) } : undefined}
             >
               {children}
             </div>
