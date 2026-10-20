@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
 import { cn } from "../../utils/cn";
+import { FauxClient } from "../FauxClient";
 import type { PdfViewerProps } from "./PdfViewer.types";
 
 /**
@@ -13,8 +14,8 @@ import type { PdfViewerProps } from "./PdfViewer.types";
  * ```
  */
 export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(
-  ({ src, title = "PDF document", className, style }, ref) => {
-    return (
+  ({ src, title = "PDF document", className, style, frame = false, frameProps }, ref) => {
+    const viewer = (
       <div
         ref={ref}
         data-react-fancy-pdf-viewer=""
@@ -42,6 +43,22 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(
           </div>
         </object>
       </div>
+    );
+
+    if (!frame) return viewer;
+
+    // Full screen from the frame; zoom stays on the browser's PDF toolbar. A
+    // plugin fits the page to its box, so scaling the box only re-fits it, and
+    // the `#zoom=` open parameter is relative to the page's real size, which a
+    // frame cannot know -- its bar would jump by uneven steps.
+    return (
+      // The browser variant, because the plugin swallows the pointer: hover over
+      // the PDF never reaches the frame, so controls over it could not be
+      // revealed, and its top-right corner is the PDF toolbar's. In the address
+      // bar they are reachable and collide with nothing.
+      <FauxClient variant="browser" url={title} controls={{ zoom: false }} fill {...frameProps}>
+        {viewer}
+      </FauxClient>
     );
   },
 );

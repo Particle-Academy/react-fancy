@@ -1,3 +1,4 @@
+import type { FauxClientProps } from "../FauxClient/FauxClient.types";
 import type { CSSProperties } from "react";
 
 /** Pan offset (in container pixels) + zoom factor for an `<ImageViewer>`. */
@@ -8,6 +9,14 @@ export interface ImageViewerViewport {
 }
 
 export interface ImageViewerProps {
+  /**
+   * Show the image in react-fancy's `FauxClient` frame: zoom and full screen,
+   * revealed on hover. The frame's zoom bar drives this viewer's own pan/zoom
+   * and replaces its boxed controls. Default `false`.
+   */
+  frame?: boolean;
+  /** Passed to the frame (`variant`, `onFullscreenChange`, …). */
+  frameProps?: Partial<FauxClientProps>;
   /** Image source — an `http(s):`, `data:`, or `blob:` URL. */
   src: string;
   /** Alt text for the image (also used as the download filename hint). */

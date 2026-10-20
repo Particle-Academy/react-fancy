@@ -11,6 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.49.0] - 2026-10-19
+
+### Added
+
+- **`ImageViewer` and `PdfViewer` take `frame`**: the `FauxClient` frame every
+  file viewer carries, with full screen and (for images) zoom, revealed on
+  hover. Each zooms the way its content can:
+  - **Image:** the frame's zoom bar drives the viewer's own pan/zoom about the
+    centre, and replaces its boxed bar; wheel zoom shows in the frame's
+    percentage.
+  - **PDF:** full screen from the frame; zoom stays on the browser's PDF
+    toolbar. A plugin fits the page to its box, so scaling the box only re-fits
+    it, and `#zoom=` is relative to the page's real size, which a frame cannot
+    know. The PDF sits in the browser variant with its title in the address
+    bar, because the plugin swallows the pointer: controls over it could never
+    be revealed by hover, and its top-right corner is the PDF toolbar's.
+  `frameProps` reaches the frame. **Nothing to do:** `frame` defaults to
+  `false`.
+
 ## [5.48.1] - 2026-10-19
 
 ### Security

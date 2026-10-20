@@ -1,3 +1,4 @@
+import { FauxClient } from "../FauxClient";
 import {
   forwardRef,
   useCallback,
@@ -52,6 +53,8 @@ export const ImageViewer = forwardRef<HTMLDivElement, ImageViewerProps>(
       onError,
       className,
       style,
+      frame = false,
+      frameProps,
     },
     ref,
   ) => {
@@ -115,15 +118,17 @@ export const ImageViewer = forwardRef<HTMLDivElement, ImageViewerProps>(
 
     const reset = useCallback(() => setViewport(DEFAULT_VIEWPORT), [setViewport]);
 
-    const showControls = (controls ?? zoomable) && interactive;
+    const showControls = !frame && (controls ?? zoomable) && interactive;
     const transform = `translate(${current.panX}px, ${current.panY}px) scale(${current.zoom})`;
 
-    return (
+    const viewer = (
       <div
         ref={ref}
         data-react-fancy-image-viewer=""
         className={cn(
           "relative isolate overflow-hidden rounded-md select-none",
+          // In the frame it fills the frame's body; standalone, the caller sizes it.
+          frame && "h-full w-full rounded-none",
           checkerboard
             ? "fancy-checkerboard"
             : "bg-zinc-100 dark:bg-zinc-900",
@@ -215,6 +220,26 @@ export const ImageViewer = forwardRef<HTMLDivElement, ImageViewerProps>(
           </div>
         )}
       </div>
+    );
+
+    if (!frame) return viewer;
+
+    // The frame's bar drives the image's own zoom (about the centre), and the
+    // image's boxed bar steps aside: one set of controls, revealed on hover.
+    return (
+      <FauxClient
+        variant="device"
+        controls
+        fill
+        applyZoom={false}
+        zoom={current.zoom}
+        onZoomChange={(z) => (z === 1 ? reset() : zoomBy(z / current.zoom))}
+        minZoom={minZoom}
+        maxZoom={maxZoom}
+        {...frameProps}
+      >
+        {viewer}
+      </FauxClient>
     );
   },
 );
