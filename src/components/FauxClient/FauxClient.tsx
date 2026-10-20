@@ -241,7 +241,9 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
             bodyClassName,
           )}
           // The frame keeps its FIT height whatever the zoom; zooming scrolls.
-          style={scaled && !fullscreen && naturalHeight !== undefined ? { height: naturalHeight * fit } : undefined}
+          // ...unless it fills its parent (or the screen): then the body is the
+          // room the chrome leaves, and long content scrolls inside it.
+          style={scaled && !fullscreen && !fill && naturalHeight !== undefined ? { height: naturalHeight * fit } : undefined}
         >
           {scaled ? (
             // A sizer the size of the zoomed content, so the scrollbars are right.

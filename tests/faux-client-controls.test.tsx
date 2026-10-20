@@ -143,6 +143,30 @@ describe("FauxClient controls", () => {
     expect((plain.querySelector("[data-react-fancy-faux-client]") as HTMLElement).className).not.toMatch(/\bh-full\b/);
   });
 
+  it("with fill and a logical width, scrolls inside the frame instead of growing to the content", () => {
+    // Scaled mode pinned the body to the content's full scaled height, so a
+    // long document in a filled frame was clipped instead of scrollable.
+    const RO = globalThis.ResizeObserver;
+    (globalThis as { ResizeObserver?: unknown }).ResizeObserver = class {
+      private cb: () => void;
+      constructor(cb: () => void) { this.cb = cb; }
+      observe() { this.cb(); }
+      disconnect() {}
+    };
+    try {
+      const host = mount(
+        <FauxClient variant="device" fill width={800} controls>
+          <div style={{ height: 3000 }}>long</div>
+        </FauxClient>,
+      );
+      const body = (q(host, "content") as HTMLElement).parentElement!.parentElement!;
+      expect(body.style.height).toBe("");
+      expect(body.className).toMatch(/\bflex-1\b/);
+    } finally {
+      (globalThis as { ResizeObserver?: unknown }).ResizeObserver = RO;
+    }
+  });
+
   it("leaves the zoom to the content with applyZoom={false}", () => {
     // A viewer that fits itself to its box (a slide) re-fits under CSS zoom and
     // ends up the same size, with its own chrome enlarged. It zooms itself; the

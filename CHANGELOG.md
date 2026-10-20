@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.49.1] - 2026-10-19
+
+### Fixed
+
+- **A `FauxClient` with both `fill` and a logical `width` scrolls its content.**
+  Scaled mode pinned the body to the content's full scaled height, so a long
+  document in a frame that fills its parent was clipped at the frame's edge
+  instead of scrolling inside it. Found putting a real multi-page .docx in the
+  new fancy-docs viewer. **Nothing to do.**
+
 ## [5.49.0] - 2026-10-19
 
 ### Added
