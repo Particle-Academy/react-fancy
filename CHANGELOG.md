@@ -11,6 +11,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.50.0] - 2026-10-19
+
+### Added
+
+- **`sanitizeHtml(html, options)` has an allowlist mode** (#35). Pass
+  `{ allowedTags, allowedAttributes, allowedSchemes, allowRelative }` and only
+  what is listed survives: unlisted tags are unwrapped (text kept), unlisted
+  attributes and URL schemes are removed, and comments go. `allowedAttributes`
+  is one list or a per-tag map with `"*"` for every tag, and `"data-*"`-style
+  prefixes. `allowedSchemes` defaults to `http:`, `https:`, `mailto:`;
+  `allowRelative` (default `false`) keeps same-site relative URLs and fragments
+  but never `//host`.
+  **An allowlist can only narrow.** Event handlers, `srcdoc`, `srcset`,
+  `javascript:` / `vbscript:` URLs and script-capable or foreign-content tags
+  (`script`, `style`, `iframe`, `object`, `embed`, `form`, `template`, `svg`,
+  `math`, ...) are removed even when listed. Without a DOM (SSR) allowlist mode
+  returns the input as escaped text rather than passing it through.
+- **`renderMarkdown(markdown, sanitize?)`**: the markdown `ContentRenderer`
+  renders, as a sanitised HTML string (blocklist by default, the allowlist when
+  given options), so a host no longer imports the markdown parser behind our
+  back. `ContentRenderer` now uses the same function, so the two cannot drift.
+- `SanitizeHtmlOptions` type export.
+
+**Nothing to do:** `sanitizeHtml(html)` with no options is unchanged, byte for
+byte.
+
 ## [5.49.1] - 2026-10-19
 
 ### Fixed

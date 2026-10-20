@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { marked } from "marked";
 import { cn } from "../../utils/cn";
+import { markdownToRawHtml } from "../../utils/markdown";
 import { sanitizeHtml } from "../../utils/sanitize";
 import { proseClasses, detectFormat } from "../Editor/editor.utils";
 import { mergeExtensions } from "./extensions";
@@ -26,9 +26,7 @@ export function ContentRenderer({
     // React tree. Treat missing content as empty.
     const safe = value ?? "";
     const resolvedFormat = format === "auto" ? detectFormat(safe) : format;
-    const raw = resolvedFormat === "markdown"
-      ? (marked.parse(safe, { async: false }) as string)
-      : safe;
+    const raw = resolvedFormat === "markdown" ? markdownToRawHtml(safe) : safe;
     return unsafe ? raw : sanitizeHtml(raw);
   }, [value, format, unsafe]);
 

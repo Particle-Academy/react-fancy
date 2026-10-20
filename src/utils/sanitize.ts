@@ -93,14 +93,243 @@ function walk(el: Element, removeQueue: Element[]): void {
 }
 
 /**
- * Sanitize an HTML string by removing dangerous tags (script, iframe, etc.),
- * event-handler attributes (`onclick`, `onerror`, ...), and dangerous URI
- * schemes in `href`/`src` attributes.
- *
- * Uses the browser's `DOMParser`. In non-browser environments returns the
- * input unchanged — sanitize on the server in those cases.
+ * Allowlist options for {@link sanitizeHtml}. Passing ANY options object
+ * (even `{}`) switches from the default blocklist to allowlist mode, where
+ * everything not listed is removed.
  */
-export function sanitizeHtml(html: string): string {
+export interface SanitizeHtmlOptions {
+  /**
+   * Tags to keep, e.g. `["p", "a", "strong"]`. A tag that is not listed is
+   * removed but its text and (cleaned) children are kept. Default: none, so
+   * only text survives.
+   *
+   * Some tags are removed WITH their content even when listed, because no
+   * attribute filtering makes them safe: `script`, `style`, `iframe`, `frame`,
+   * `frameset`, `object`, `embed`, `applet`, `link`, `meta`, `base`, `form`,
+   * `title`, `template`, `noscript`, `noembed`, `noframes`, `xmp`,
+   * `plaintext`, `svg` and `math`.
+   */
+  allowedTags?: readonly string[];
+  /**
+   * Attributes to keep. Either one list for every allowed tag, or a map from
+   * tag name to its list, where the key `"*"` applies to every tag. A trailing
+   * `*` matches a prefix (`"data-*"`, `"aria-*"`). Default: none.
+   *
+   * Never kept, even when listed: event handlers (`on*`), `srcdoc` and
+   * `srcset`.
+   */
+  allowedAttributes?: readonly string[] | Readonly<Record<string, readonly string[]>>;
+  /**
+   * URL schemes allowed in URL attributes (`href`, `src`, `action`,
+   * `formaction`, `cite`, `poster`, `background`, `ping`, `xlink:href`), with
+   * the colon: `["https:", "mailto:"]`. A URL attribute whose scheme is not
+   * listed is removed. Default: `["http:", "https:", "mailto:"]`.
+   *
+   * `javascript:` and `vbscript:` are never kept, even when listed.
+   */
+  allowedSchemes?: readonly string[];
+  /**
+   * Keep URLs with no scheme that stay on this site: `/x`, `x/y`, `../x`,
+   * `?q`, `#frag`. Protocol-relative URLs (`//host/x`, and the backslash
+   * spellings a browser treats the same way) leave the site and are always
+   * removed. Default: `false`.
+   */
+  allowRelative?: boolean;
+}
+
+/** Removed with their content in allowlist mode, whatever the options say. */
+const ALWAYS_REMOVED_TAGS = new Set([
+  ...DANGEROUS_TAGS,
+  "frame",
+  "frameset",
+  "applet",
+  "template",
+  "noscript",
+  "noembed",
+  "noframes",
+  "xmp",
+  "plaintext",
+  // Foreign content: namespace confusion is how mutation XSS gets past
+  // sanitisers that re-serialise, as this one does.
+  "svg",
+  "math",
+]);
+
+const ALLOWLIST_URL_ATTRS = new Set([
+  "href",
+  "src",
+  "action",
+  "formaction",
+  "cite",
+  "poster",
+  "background",
+  "ping",
+  "xlink:href",
+]);
+
+const NEVER_ALLOWED_ATTRS = new Set(["srcdoc", "srcset"]);
+
+const NEVER_ALLOWED_SCHEMES = new Set(["javascript:", "vbscript:"]);
+
+const DEFAULT_SCHEMES = ["http:", "https:", "mailto:"];
+
+const SCHEME = /^([a-z][a-z0-9+.-]*:)/i;
+
+const SLASH = 47;
+const BACKSLASH = 92;
+
+interface Policy {
+  tags: Set<string>;
+  globalAttrs: string[];
+  tagAttrs: Map<string, string[]>;
+  schemes: Set<string>;
+  allowRelative: boolean;
+}
+
+function lowerAll(list: readonly string[] | undefined): string[] {
+  return (list ?? []).map((s) => s.toLowerCase());
+}
+
+function toPolicy(options: SanitizeHtmlOptions): Policy {
+  const tagAttrs = new Map<string, string[]>();
+  let globalAttrs: string[] = [];
+  const attrs = options.allowedAttributes;
+  if (Array.isArray(attrs)) {
+    globalAttrs = lowerAll(attrs);
+  } else if (attrs) {
+    for (const [tag, list] of Object.entries(attrs as Record<string, readonly string[]>)) {
+      if (tag === "*") globalAttrs = lowerAll(list);
+      else tagAttrs.set(tag.toLowerCase(), lowerAll(list));
+    }
+  }
+  return {
+    tags: new Set(lowerAll(options.allowedTags)),
+    globalAttrs,
+    tagAttrs,
+    schemes: new Set(lowerAll(options.allowedSchemes ?? DEFAULT_SCHEMES)),
+    allowRelative: options.allowRelative === true,
+  };
+}
+
+function attrListed(name: string, list: string[] | undefined): boolean {
+  if (!list) return false;
+  for (const entry of list) {
+    if (entry === name) return true;
+    if (entry.endsWith("*") && name.startsWith(entry.slice(0, -1))) return true;
+  }
+  return false;
+}
+
+/**
+ * Browsers ignore ASCII whitespace and control characters inside a URL's
+ * scheme (`java<TAB>script:` runs), so judge the URL with them removed.
+ */
+function stripControlAndSpace(value: string): string {
+  let out = "";
+  for (let i = 0; i < value.length; i++) {
+    if (value.charCodeAt(i) > 32) out += value[i];
+  }
+  return out;
+}
+
+function urlAllowed(value: string, policy: Policy): boolean {
+  const url = stripControlAndSpace(value);
+  const match = SCHEME.exec(url);
+  if (match) {
+    const scheme = match[1].toLowerCase();
+    return !NEVER_ALLOWED_SCHEMES.has(scheme) && policy.schemes.has(scheme);
+  }
+  if (!policy.allowRelative) return false;
+  const a = url.charCodeAt(0);
+  const b = url.charCodeAt(1);
+  const isSlash = (c: number) => c === SLASH || c === BACKSLASH;
+  // `//host`, and its backslash spellings, is another site.
+  return !(isSlash(a) && isSlash(b));
+}
+
+function cleanAttributes(el: Element, tag: string, policy: Policy): void {
+  const names: string[] = [];
+  for (let i = 0; i < el.attributes.length; i++) {
+    names.push(el.attributes[i].name);
+  }
+  for (const name of names) {
+    const lower = name.toLowerCase();
+    const keep =
+      !lower.startsWith("on") &&
+      !NEVER_ALLOWED_ATTRS.has(lower) &&
+      (attrListed(lower, policy.globalAttrs) || attrListed(lower, policy.tagAttrs.get(tag))) &&
+      (!ALLOWLIST_URL_ATTRS.has(lower) || urlAllowed(el.getAttribute(name) ?? "", policy));
+    if (!keep) el.removeAttribute(name);
+  }
+}
+
+function cleanChildren(parent: Node, policy: Policy): void {
+  for (const node of Array.from(parent.childNodes)) {
+    if (node.nodeType === 3) continue; // text
+    if (node.nodeType !== 1) {
+      // comments, processing instructions, CDATA
+      parent.removeChild(node);
+      continue;
+    }
+    const el = node as Element;
+    const tag = el.tagName.toLowerCase();
+    if (ALWAYS_REMOVED_TAGS.has(tag)) {
+      parent.removeChild(el);
+      continue;
+    }
+    cleanChildren(el, policy);
+    if (!policy.tags.has(tag)) {
+      while (el.firstChild) parent.insertBefore(el.firstChild, el);
+      parent.removeChild(el);
+      continue;
+    }
+    cleanAttributes(el, tag, policy);
+  }
+}
+
+function escapeText(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function sanitizeAllowlist(html: string, options: SanitizeHtmlOptions): string {
+  if (typeof window === "undefined" || typeof DOMParser === "undefined") {
+    // Fail closed: with no parser we cannot tell markup from text, so the
+    // whole input is returned as escaped text rather than passed through.
+    return escapeText(html);
+  }
+  const doc = new DOMParser().parseFromString(`<body>${html}</body>`, "text/html");
+  const body = doc.body;
+  if (!body) return "";
+  cleanChildren(body, toPolicy(options));
+  return body.innerHTML;
+}
+
+/**
+ * Sanitize an HTML string.
+ *
+ * **With no options** (the default blocklist): removes dangerous tags (script,
+ * iframe, etc.), event-handler attributes (`onclick`, `onerror`, ...), and
+ * dangerous URI schemes in `href`/`src` attributes. Everything else is kept.
+ * In non-browser environments returns the input unchanged — sanitize on the
+ * server in those cases.
+ *
+ * **With options** (allowlist mode): keeps ONLY the listed tags, attributes and
+ * URL schemes; see {@link SanitizeHtmlOptions}. The allowlist can only narrow:
+ * event handlers, `javascript:` URLs and script-capable tags never survive,
+ * even when listed. In non-browser environments the input is returned as
+ * escaped text (fail closed).
+ *
+ * Uses the browser's `DOMParser`.
+ */
+export function sanitizeHtml(html: string, options?: SanitizeHtmlOptions): string {
+  if (options !== undefined && options !== null) {
+    return sanitizeAllowlist(html, options);
+  }
   if (typeof window === "undefined" || typeof DOMParser === "undefined") {
     return html;
   }

@@ -91,3 +91,39 @@ registerExtension({
 ```tsx
 <ContentRenderer value="# Title\n\nParagraph with **bold** text." format="markdown" />
 ```
+
+## Markdown and sanitising without the component
+
+`renderMarkdown(markdown, sanitize?)` returns the same HTML `ContentRenderer`
+renders, already sanitised, so a host never imports the markdown parser itself.
+
+`sanitizeHtml(html)` is a blocklist: it strips what can run (script, iframe,
+event handlers, `javascript:` URLs, ...) and keeps the rest. Pass options and it
+becomes an **allowlist** that keeps only what you list:
+
+```ts
+import { renderMarkdown, sanitizeHtml, type SanitizeHtmlOptions } from "@particle-academy/react-fancy";
+
+const CHAT_PROSE: SanitizeHtmlOptions = {
+  allowedTags: ["p", "br", "strong", "em", "a", "ul", "ol", "li", "code", "pre"],
+  allowedAttributes: ["href", "title"],         // or { "*": ["title"], a: ["href"], span: ["data-*"] }
+  allowedSchemes: ["https:", "http:", "mailto:"], // the default
+  allowRelative: true,                           // /x, ../x, ?q, #frag; never //host. Default false
+};
+
+renderMarkdown(md, CHAT_PROSE);       // same as sanitizeHtml(renderMarkdown(md), CHAT_PROSE)
+sanitizeHtml(html, CHAT_PROSE);
+```
+
+| Rule | Allowlist mode |
+|------|----------------|
+| Tag not listed | removed, its text and cleaned children kept |
+| `script`, `style`, `iframe`, `frame(set)`, `object`, `embed`, `applet`, `link`, `meta`, `base`, `form`, `title`, `template`, `noscript`, `noembed`, `noframes`, `xmp`, `plaintext`, `svg`, `math` | removed WITH content, even when listed |
+| Attribute not listed | removed |
+| `on*`, `srcdoc`, `srcset` | removed, even when listed |
+| URL attribute with an unlisted scheme | removed |
+| `javascript:`, `vbscript:` | removed, even when listed |
+| Comments | removed |
+| No DOM (SSR) | input returned as escaped text (fails closed) |
+
+The allowlist can only narrow: nothing you list widens past the blocklist.

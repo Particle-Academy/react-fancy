@@ -474,6 +474,8 @@ export type {
 // Utilities
 export { cn } from "./utils/cn";
 export { sanitizeHtml, sanitizeHref } from "./utils/sanitize";
+export type { SanitizeHtmlOptions } from "./utils/sanitize";
+export { renderMarkdown } from "./utils/markdown";
 export { resolveMediaType } from "./utils/media-type";
 export type { MediaKind, ResolveMediaTypeInput } from "./utils/media-type";
 export { detectPlatform, modifierKeyLabel, browserPlatformHints } from "./utils/platform";
