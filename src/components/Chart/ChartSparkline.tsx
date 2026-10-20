@@ -8,17 +8,21 @@ export function ChartSparkline({
   width = 120,
   height = 32,
   color = "#3b82f6",
+  min: floor,
   className,
 }: ChartSparklineProps) {
   const d = useMemo(() => {
     if (data.length < 2) return "";
-    const min = Math.min(...data);
+    // `min` lowers the bottom of the scale. A value below it still extends the
+    // scale, as `Chart.Line` does with zero, so no point lands outside the box.
+    const dataMin = Math.min(...data);
+    const min = floor === undefined ? dataMin : Math.min(floor, dataMin);
     const max = Math.max(...data);
     const xScale = createLinearScale([0, data.length - 1], [1, width - 1]);
     const yScale = createLinearScale([min, max], [height - 2, 2]);
     const points: [number, number][] = data.map((v, i) => [xScale(i), yScale(v)]);
     return monotonePath(points);
-  }, [data, width, height]);
+  }, [data, width, height, floor]);
 
   return (
     <svg

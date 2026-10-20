@@ -72,6 +72,14 @@ export interface ChartSparklineProps {
   width?: number;
   height?: number;
   color?: string;
+  /**
+   * The value the bottom edge stands for. Default: the data's own minimum, so
+   * the line uses the full height. `min={0}` scales from zero, as `Chart.Line`
+   * and `Chart.Bar` always do, so a run of busy-but-quiet values does not sit on
+   * the floor. A value below `min` extends the scale rather than being drawn
+   * outside the box.
+   */
+  min?: number;
   className?: string;
 }
 

@@ -379,7 +379,7 @@ describe("Composer - inline paste pills", () => {
       expect(pill.className).toContain("my-text");
 
       const preview = hoverPreview(host, "[data-react-fancy-composer-paste-pill]");
-      expect(preview?.closest("[data-react-fancy-tooltip]")?.className).toContain("my-pop");
+      expect(preview?.closest("[data-react-fancy-popover]")?.className).toContain("my-pop");
     });
 
     it("renderPastePreview replaces what the popover shows", () => {

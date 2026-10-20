@@ -36,14 +36,41 @@ const actions: MagicWandAction[] = [
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| value | `string` | — | Controlled textarea value. |
-| onValueChange | `(v: string) => void` | — | Fires on every edit. |
+| value | `string` | — | Controlled value, of the built-in textarea or of `target`. |
+| onValueChange | `(v: string) => void` | — | Fires on every edit, and with an action's result. |
 | actions | `MagicWandAction[]` | — | Action list. Each invokes a callback with the selection. |
+| target | `RefObject<HTMLTextAreaElement \| HTMLInputElement> \| MagicWandTargetAdapter` | — | Act on a field or editor the host renders. MagicWand then renders no textarea, only the wand. See below. |
 | appearance | `"floating" \| "pill"` | `"floating"` | `"pill"` is icon-only and compact. |
 | autoHide | `boolean` | `true` | Hide the wand on click-away or scroll. |
 | rows | `number` | `6` | Textarea rows. |
 | placeholder | `string` | — | Textarea placeholder. |
 | onAction | `(action, selection, replacement) => void` | — | Fires after an action successfully runs. |
+
+## Acting on a field you own (`target`)
+
+Pass a ref to your own textarea or input. MagicWand listens on it and floats the wand (portalled, viewport-positioned) over the selection; the result still arrives through `onValueChange`, so your `value` stays the one source of truth.
+
+```tsx
+const ref = useRef<HTMLTextAreaElement>(null);
+
+<textarea ref={ref} value={body} onChange={(e) => setBody(e.target.value)} />
+<MagicWand target={ref} value={body} onValueChange={setBody} actions={actions} />
+```
+
+For anything that is not a textarea or input (a code editor, a contenteditable), pass an adapter. It is read-only: the write is `onValueChange`.
+
+```tsx
+<MagicWand
+  target={{
+    element: editorRef,                        // listened on for mouseup / keyup / select
+    getSelection: () => editor.selection(),    // { start, end } offsets into `value`, or null
+    getSelectionRect: () => editor.selectionRect(), // optional; default: top-centre of `element`
+  }}
+  value={code}
+  onValueChange={setCode}
+  actions={actions}
+/>
+```
 
 ## Action shape
 

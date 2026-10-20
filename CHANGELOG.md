@@ -11,6 +11,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.51.0] - 2026-10-20
+
+### Added
+
+- **`Chart.Sparkline` takes `min`**: the value the bottom edge stands for.
+  `min={0}` scales from zero, the way `Chart.Line` and `Chart.Bar` always do, so
+  a window where every point had activity no longer draws its quietest point on
+  the floor (and a flat busy series draws along the top, not the bottom). A value
+  below `min` extends the scale instead of being drawn outside the box.
+  **Nothing to do:** without `min` the scale still starts at the data's minimum.
+- **`MagicWand` takes `target`**, so it can act on a textarea, input or editor
+  the HOST renders. Pass a ref to a textarea / input as is, or for anything else
+  (a code editor, a contenteditable) an adapter:
+  `{ element, getSelection: () => ({ start, end }) | null, getSelectionRect? }`.
+  With `target`, MagicWand renders no textarea of its own, only the wand
+  (portalled, viewport-positioned). The write still goes through
+  `onValueChange`, and `value` must be the target's current value.
+  **Nothing to do** without `target`: the built-in textarea is unchanged.
+- `MagicWandTarget`, `MagicWandTargetAdapter`, `MagicWandRect` type exports.
+- Stable handles on the wand: `data-react-fancy-magic-wand` on the toolbar and
+  `data-react-fancy-magic-wand-action="<id>"` on each action.
+
+### Changed
+
+- **Paste pills preview in a `Popover`, not a `Tooltip`** (`Composer`,
+  `PromptInput` and `Input` with inline paste). It opens on hover AND on focus,
+  so a keyboard user gets the same preview; the image pill is now focusable
+  (`tabIndex=0`) for that. An image pill shows its thumbnail; if the image cannot
+  load (typically a CSP without `blob:` in `img-src`) it shows its label instead
+  of an empty box, and the `<img>` now carries the label as `alt`.
+  **If you relied on the tooltip:** the preview now sits in
+  `[data-react-fancy-popover]`, not `[data-react-fancy-tooltip]`, and has no
+  `role="tooltip"`; update any selector or test that looked for those. It looks
+  like a Popover (light panel, border) rather than the dark tooltip bubble;
+  `classNames.preview` still merges onto it, so restyle there. It stays open
+  while the pointer is over it and closes ~300ms after leaving, and Escape closes
+  it. `data-react-fancy-composer-paste-pill-preview` and `renderPastePreview` are
+  unchanged: that is already the slot for supplying your own preview content.
+
+### Fixed
+
+- **A closed `Drawer` unmounts even when no exit animation runs.** `useAnimation`
+  unmounted ONLY on `animationend`, so in an app that does not load Fancy's
+  stylesheet (and in jsdom) a closed panel stayed in the DOM forever. It now
+  measures the exit (`getAnimations()`, else the computed animation / transition
+  duration): nothing running unmounts at once, something running unmounts on its
+  own `animationend` or after its measured duration, whichever comes first. A
+  child's `animationend` bubbling up no longer ends the exit early. The same hook
+  drives **`Modal`, `Command`, `ContextMenu`, `Dropdown` and `MobileMenu`'s
+  flyout**, which had the same defect and get the same fix. **Nothing to do**; if
+  you worked around it (forcing a remount, a `key`, your own timeout), you can
+  remove the workaround.
+
 ## [5.50.0] - 2026-10-19
 
 ### Added

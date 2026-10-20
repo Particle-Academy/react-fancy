@@ -123,4 +123,10 @@ Same as `Chart.Line` without the `fill` prop (area fill is always enabled).
 | width | `number` | - | Chart width in px |
 | height | `number` | - | Chart height in px |
 | color | `string` | - | Line color |
+| min | `number` | data minimum | The value the bottom edge stands for. `min={0}` scales from zero, as `Chart.Line` / `Chart.Bar` do. A value below `min` extends the scale. |
 | className | `string` | - | Additional CSS classes |
+
+```tsx
+// Activity per minute: a busy-but-quiet minute should not sit on the floor.
+<Chart.Sparkline data={perMinute} min={0} />
+```

@@ -187,7 +187,9 @@ describe("PromptInput — inline paste pills", () => {
     const text = `${"A".repeat(30)}${"m".repeat(600)}${"Z".repeat(30)}`;
 
     paste(host, { text });
-    const tip = hover(input(host).querySelector("[data-react-fancy-composer-paste-pill]")!);
+    hover(input(host).querySelector("[data-react-fancy-composer-paste-pill]")!);
+    // A Popover since 5.51.0, not a Tooltip.
+    const tip = document.querySelector("[data-react-fancy-popover]");
 
     expect(tip?.textContent).toContain(`${"A".repeat(30)} … ${"Z".repeat(30)}`);
   });

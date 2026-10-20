@@ -543,7 +543,7 @@ export type {
 } from "./components/InputTag";
 
 export { MagicWand } from "./components/MagicWand";
-export type { MagicWandProps, MagicWandAction, MagicWandSelection, MagicWandAppearance } from "./components/MagicWand";
+export type { MagicWandProps, MagicWandAction, MagicWandSelection, MagicWandAppearance, MagicWandTarget, MagicWandTargetAdapter, MagicWandRect } from "./components/MagicWand";
 
 // Media viewers — standalone image / video / audio / PDF viewers, plus a
 // type-resolving <MediaViewer> that picks the right one from a mime/src.

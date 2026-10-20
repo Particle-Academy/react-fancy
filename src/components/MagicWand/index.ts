@@ -4,4 +4,7 @@ export type {
   MagicWandAction,
   MagicWandSelection,
   MagicWandAppearance,
+  MagicWandTarget,
+  MagicWandTargetAdapter,
+  MagicWandRect,
 } from "./MagicWand";

@@ -577,10 +577,10 @@
   animation: fancy-slide-out-bottom 0.2s ease-in forwards;
 }
 
-/* Reduced motion collapses the travel — but must NOT use `animation: none`.
-   `useAnimation` unmounts on `animationend`, so removing the animation removes
-   the event, and a closed drawer would stay in the DOM forever. A ~0 duration
-   still fires it. */
+/* Reduced motion collapses the travel to a ~0 duration. Since 5.51.0
+   `useAnimation` also unmounts when no animation runs at all, so this is no
+   longer what keeps a closed drawer from staying in the DOM — but a ~0 duration
+   keeps the exit on the same path as every other close. */
 @media (prefers-reduced-motion: reduce) {
   .fancy-slide-in-left,
   .fancy-slide-out-left,
