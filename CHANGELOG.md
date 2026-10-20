@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.48.1] - 2026-10-19
+
+### Security
+
+- **Untrusted HTML can no longer retitle the host page.** `sanitizeHtml` (used
+  by `ContentRenderer` and everything that renders user or file HTML through
+  it) kept `<title>`, and a `<title>` anywhere in the document renames the
+  browser tab, so any HTML a person opened could rename the app it was opened
+  in. Found rendering a real HTML file in fancy-code's `FileViewer`. `<title>`
+  is now stripped with `<script>`, `<style>`, `<meta>`, `<link>`, `<base>`,
+  `<iframe>` and the rest, and the sanitiser has tests for all of them; it had
+  none. **Nothing to do** beyond upgrading.
+
 ## [5.48.0] - 2026-10-19
 
 ### Added

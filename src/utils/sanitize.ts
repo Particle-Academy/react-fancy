@@ -21,6 +21,8 @@ const DANGEROUS_TAGS = new Set([
   "meta",
   "base",
   "form",
+  // A <title> anywhere in the document retitles the host's tab.
+  "title",
 ]);
 
 const URL_ATTRS = new Set(["href", "src", "action", "formaction", "xlink:href"]);
