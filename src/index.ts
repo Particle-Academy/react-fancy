@@ -560,7 +560,7 @@ export { AudioViewer } from "./components/AudioViewer";
 export type { AudioViewerProps } from "./components/AudioViewer";
 
 export { PdfViewer } from "./components/PdfViewer";
-export type { PdfViewerProps } from "./components/PdfViewer";
+export type { PdfViewerProps, PdfPageSource, PdfViewerPolicy, PdfViewerWatermark } from "./components/PdfViewer";
 
 // JSON editing — a key/value surface over nested JSON, typed by a `keyMap`
 // string. The helpers ship alongside the component because they are the seam an

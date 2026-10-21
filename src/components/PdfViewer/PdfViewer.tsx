@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { cn } from "../../utils/cn";
 import { FauxClient } from "../FauxClient";
+import { PdfPages } from "./PdfPages";
 import type { PdfViewerProps } from "./PdfViewer.types";
 
 /**
@@ -12,9 +13,69 @@ import type { PdfViewerProps } from "./PdfViewer.types";
  * ```tsx
  * <PdfViewer src="/report.pdf" title="report.pdf" style={{ height: 600 }} />
  * ```
+ *
+ * With `pages` it shows page images the app rendered instead, and never
+ * fetches or references the PDF; `policy` and `watermark` apply there.
+ *
+ * ```tsx
+ * <PdfViewer
+ *   pages={{ count: 12, url: (n, scale) => `/docs/7/pages/${n}.png?scale=${scale}` }}
+ *   policy={{ download: false, print: false, copy: false, screenshot: "deter" }}
+ *   watermark={{ text: "jane@example.com" }}
+ * />
+ * ```
  */
 export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(
-  ({ src, title = "PDF document", className, style, frame = false, frameProps }, ref) => {
+  (
+    {
+      src,
+      pages,
+      page,
+      defaultPage,
+      onPageChange,
+      zoom,
+      defaultZoom,
+      onZoomChange,
+      policy,
+      watermark,
+      title = "PDF document",
+      className,
+      style,
+      frame = false,
+      frameProps,
+    },
+    ref,
+  ) => {
+    if (pages) {
+      // `src` is deliberately not passed on: in this mode the PDF is never
+      // referenced, so it cannot leak through an attribute or a fallback link.
+      const pageViewer = (
+        <PdfPages
+          ref={ref}
+          pages={pages}
+          page={page}
+          defaultPage={defaultPage}
+          onPageChange={onPageChange}
+          zoom={zoom}
+          defaultZoom={defaultZoom}
+          onZoomChange={onZoomChange}
+          policy={policy}
+          watermark={watermark}
+          title={title}
+          className={cn(frame && "rounded-none", className)}
+          style={style}
+        />
+      );
+      if (!frame) return pageViewer;
+      // Zoom lives on the viewer's own toolbar, which knows the page size; the
+      // frame adds full screen.
+      return (
+        <FauxClient variant="browser" url={title} controls={{ zoom: false }} fill {...frameProps}>
+          {pageViewer}
+        </FauxClient>
+      );
+    }
+
     const viewer = (
       <div
         ref={ref}

@@ -11,6 +11,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.54.0] - 2026-10-21
+
+### Added
+
+- **`PdfViewer` page-image mode (`pages`), with an access `policy` and a
+  `watermark`** (react-fancy#36). For showing a PDF without handing over the
+  file: your app renders the PDF to page images on its server, behind its own
+  auth, and the viewer only displays them.
+  - `pages={{ count, url: (page, scale) => string, aspectRatio? }}`. The page
+    images are the **only** requests the viewer makes. It never fetches or
+    references the PDF, and `src` is ignored in this mode even if passed.
+    `scale` is zoom x devicePixelRatio, rounded up to 1, 1.5, 2, 3 or 4.
+  - Its own toolbar: previous / next page, zoom out / reset / in, fit width,
+    fit page. With `frame`, full screen comes from the `FauxClient` frame.
+    Pages near the viewport get images; the rest are sized placeholders.
+  - Controlled `page` / `onPageChange` and `zoom` / `onZoomChange`, with stable
+    `data-react-fancy-pdf-viewer-*` handles on each page and button.
+  - **No search**: page images have no text to search. That is the cost of
+    not sending the PDF.
+  - `policy={{ download?, print?, copy?, screenshot? }}`, all allowed by default.
+    **Every flag is a deterrent, not a guarantee.** The real protection is that
+    the PDF never reaches the browser:
+    - `download: false`: no context menu on the pages and the images are not
+      draggable. Page images can still be captured (devtools, cache, screen).
+    - `print: false`: print CSS blanks the viewer, and Ctrl/Cmd+P is
+      intercepted while focus is inside it.
+    - `copy: false`: user selection off (there is no text layer anyway).
+    - `screenshot: "deter"`: the pages blur while the tab is hidden or the
+      window loses focus, and for 1.5 s after PrintScreen (which also tries to
+      clear the clipboard, best effort). **A web page cannot prevent
+      screenshots.**
+  - `watermark={{ text, opacity?, angle?, density? }}`: a tiled overlay on every
+    page, `pointer-events: none`. **It can be removed with devtools.** If it
+    must hold, burn it into the images on your server; `url(page, scale)` is
+    where to ask for that.
+  - `policy` and `watermark` apply only in page-image mode. The native-plugin
+    mode (`src`) is unchanged and cannot be restricted.
+  - New types: `PdfPageSource`, `PdfViewerPolicy`, `PdfViewerWatermark`.
+  - `MediaViewer` (`pdfProps`) and fancy-code's `FileViewer`
+    (`mediaProps.pdfProps`) already forward these untouched, so neither needed a
+    change.
+- **What to do:** nothing unless you want it. `src` is now optional in the
+  types, since page-image mode does not need one; every existing call compiles
+  and renders as before. No new dependencies.
+
 ## [5.53.1] - 2026-10-21
 
 ### Fixed
