@@ -202,11 +202,17 @@ export function ToastStack<T>({
       style={{ paddingTop: visibleBehind * offset }}
     >
       <div className="relative">
-        {/* z-index decides what paints on top; the front card sizes the box. */}
+        {/*
+         * z-index decides what paints on top; the front card sizes the box.
+         * The front card comes FIRST in the DOM, then the cards behind in walk
+         * order: the ones behind are absolutely positioned against this box, so
+         * their place in the source changes nothing visible -- but it is what
+         * a DOM query, `textContent` and copy-paste read.
+         */}
+        {card(front, 0)}
         {Array.from({ length: visibleBehind }, (_, i) => i + 1).map((k) =>
           card((front + k) % count, k),
         )}
-        {card(front, 0)}
       </div>
       {hidden > 0 && (
         /*

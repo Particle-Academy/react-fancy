@@ -11,6 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.51.2] - 2026-10-21
+
+### Fixed
+
+- **`Toast.Stack` puts the front card first in the DOM**, then the cards behind
+  in walk order. It rendered the cards behind first, so with three cards the
+  DOM read 2, 3, 1 -- and a `querySelector`, the stack's `textContent` or a
+  copy-paste got a card behind before the one in front. (Reported via MOIC
+  against fancy-app-update's `AppUpdateStack`.)
+  - **Assistive tech was not affected**, checked in Chromium before the fix: the
+    cards behind are `aria-hidden` and `inert`, so the accessibility tree held
+    only the front card, Tab never entered a card behind, and find-in-page did
+    not match their text. The order mattered to anything reading the DOM.
+  - **Nothing visible changes.** z-index decides what paints on top and the
+    cards behind are absolutely positioned; a screenshot of the stack before and
+    after is byte-identical.
+  - **Nothing to do**, unless you selected the front card by its position among
+    the cards (e.g. `:last-child`). Select it with
+    `[data-react-fancy-toast-stack-card="front"]`, which was always the way.
+
 ## [5.51.1] - 2026-10-20
 
 ### Fixed

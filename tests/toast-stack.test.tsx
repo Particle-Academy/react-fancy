@@ -93,6 +93,28 @@ describe("Toast.Stack", () => {
     }
   });
 
+  /*
+   * fancy-app-update (MOIC): with three cards the DOM read 2, 3, 1 -- the cards
+   * behind came first. Assistive tech never reached them (aria-hidden + inert),
+   * but anything reading the DOM in order did: a `querySelector` for the count,
+   * the stack's `textContent`, copy-paste. z-index decides what paints on top
+   * and the front card is the only one in flow, so it can come first in the DOM
+   * at no visual cost -- and the walk stays in order behind it.
+   */
+  it("puts the front card first in the DOM, then the cards behind in order", () => {
+    mount(<Basic n={3} depth={2} />);
+    const order = () =>
+      Array.from(document.querySelectorAll<HTMLElement>("[data-react-fancy-toast-stack-card]")).map(
+        (el) => `${el.getAttribute("data-react-fancy-toast-stack-card")}:${el.textContent}`,
+      );
+    expect(order()).toEqual(["front:Request 1", "behind:Request 2", "behind:Request 3"]);
+
+    wheel(100);
+    expect(order()).toEqual(["front:Request 2", "behind:Request 3", "behind:Request 1"]);
+    // The first match is the front card, which is what a DOM query expects.
+    expect(document.querySelector("[data-react-fancy-toast-stack-card]")!.textContent).toBe("Request 2");
+  });
+
   it("offsets each card behind upward and scales it down", () => {
     mount(<Basic n={3} depth={2} offset={8} scaleStep={0.05} />);
 
