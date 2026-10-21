@@ -37,10 +37,10 @@ export function TabsList({ children, className }: TabsListProps) {
       onKeyDown={handleKeyDown}
       className={cn(
         "flex",
-        variant === "underline" && "gap-0 border-b border-zinc-200 dark:border-zinc-700",
-        variant === "pills" && "gap-0 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800",
+        variant === "underline" && "gap-0 border-b border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
+        variant === "pills" && "gap-0 rounded-lg bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] p-1 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         variant === "boxed" &&
-          "gap-0 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800",
+          "gap-0 rounded-lg bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] p-1 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         className,
       )}
     >

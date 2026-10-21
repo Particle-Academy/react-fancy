@@ -117,10 +117,10 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
               : undefined
           }
           className={cn(
-            "text-sm text-zinc-900 dark:text-zinc-100",
-            !value && "text-zinc-400 dark:text-zinc-500",
+            "text-sm text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
+            !value && "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
             interactive &&
-              "cursor-pointer rounded-md outline-none transition-colors hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:hover:bg-zinc-800",
+              "cursor-pointer rounded-md outline-none transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
             className,
           )}
         >
@@ -162,14 +162,14 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
           role="combobox"
           aria-expanded={open}
           aria-autocomplete="list"
-          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-[border-color,box-shadow] duration-150 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-zinc-700 dark:bg-[#1e1e24] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+          className="w-full rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-input,var(--color-white))] px-3 py-2 text-sm text-[color:var(--fancy-text,var(--color-zinc-900))] placeholder:text-[color:var(--fancy-text-faint,var(--color-zinc-400))] outline-none transition-[border-color,box-shadow] duration-150 focus:border-[color:var(--fancy-focus,var(--color-blue-500))] focus:ring-2 focus:ring-[color:var(--fancy-focus,var(--color-blue-500))]/40 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))] dark:placeholder:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))] dark:focus:border-[color:var(--fancy-focus-dark,var(--color-blue-400))] dark:focus:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]/20"
         />
         {open && (
           <Portal>
             <div
               ref={listRef}
               role="listbox"
-              className="fixed z-50 max-h-60 min-w-[8rem] overflow-y-auto rounded-xl border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-zinc-950/50 fancy-scale-in"
+              className="fixed z-50 max-h-60 min-w-[8rem] overflow-y-auto rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:shadow-zinc-950/50 fancy-scale-in"
               style={{
                 left: position.x,
                 top: position.y,
@@ -194,7 +194,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
                     className={cn(
                       "flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-zinc-700 transition-colors dark:text-zinc-200",
                       i === activeIndex
-                        ? "bg-zinc-100 dark:bg-zinc-800"
+                        ? "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
                         : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
                       option.disabled && "cursor-not-allowed opacity-50",
                     )}

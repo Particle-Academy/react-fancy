@@ -32,7 +32,7 @@ export const AudioViewer = forwardRef<HTMLDivElement, AudioViewerProps>(
         ref={ref}
         data-react-fancy-audio-viewer=""
         className={cn(
-          "flex flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900",
+          "flex flex-col gap-2 rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-4 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           className,
         )}
         style={style}
@@ -43,7 +43,7 @@ export const AudioViewer = forwardRef<HTMLDivElement, AudioViewerProps>(
           </div>
         )}
         {errored ? (
-          <div className="text-sm text-zinc-500 dark:text-zinc-400">
+          <div className="text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
             Couldn&apos;t load audio.
           </div>
         ) : (

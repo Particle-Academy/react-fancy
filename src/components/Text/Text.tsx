@@ -17,8 +17,8 @@ const weightClasses: Record<NonNullable<TextProps["weight"]>, string> = {
 };
 
 const colorClasses: Record<NonNullable<TextProps["color"]>, string> = {
-  default: "text-zinc-900 dark:text-zinc-100",
-  muted: "text-zinc-500 dark:text-zinc-400",
+  default: "text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
+  muted: "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
   accent: "text-blue-600 dark:text-blue-400",
   danger: "text-red-600 dark:text-red-400",
   success: "text-emerald-600 dark:text-emerald-400",

@@ -5,7 +5,7 @@ import type { ToastItemProps } from "./Toast.types";
 
 const VARIANT_STYLES = {
   default:
-    "border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900",
+    "border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
   success:
     "border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950",
   error:
@@ -56,9 +56,9 @@ export function ToastItem({ data, onDismiss }: ToastItemProps) {
           {variant === "info" && <Info size={16} />}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{title}</p>
+          <p className="text-sm font-medium text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]">{title}</p>
           {description && (
-            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
               {description}
             </p>
           )}
@@ -72,7 +72,7 @@ export function ToastItem({ data, onDismiss }: ToastItemProps) {
               // already-undone action.
               onDismiss(id);
             }}
-            className="shrink-0 self-center rounded-md px-2 py-1 text-xs font-medium text-zinc-700 underline-offset-2 transition-colors hover:bg-zinc-100 hover:underline dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="shrink-0 self-center rounded-md px-2 py-1 text-xs font-medium text-zinc-700 underline-offset-2 transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:underline dark:text-zinc-200 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
           >
             {action.label}
           </button>

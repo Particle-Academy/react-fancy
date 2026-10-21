@@ -29,7 +29,7 @@ export const StatList = forwardRef<HTMLDivElement, StatListProps>(
         data-react-fancy-stat-list=""
         data-align={align}
         className={cn(
-          "flex flex-col gap-0.5 font-mono text-[11.5px] text-zinc-500 dark:text-zinc-400",
+          "flex flex-col gap-0.5 font-mono text-[11.5px] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
           align === "right" ? "items-end text-right" : "items-start text-left",
           className,
         )}
@@ -39,7 +39,7 @@ export const StatList = forwardRef<HTMLDivElement, StatListProps>(
             key={item.key ?? (typeof item.label === "string" ? item.label : i)}
             data-stat={item.key ?? (typeof item.label === "string" ? item.label : undefined)}
           >
-            <b className="font-medium text-zinc-900 dark:text-zinc-100">{item.value}</b>{" "}
+            <b className="font-medium text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]">{item.value}</b>{" "}
             {item.label}
           </span>
         ))}

@@ -35,7 +35,7 @@ const alertIconSizeMap: Record<Size, "xs" | "sm" | "md" | "lg" | "xl"> = {
 // ---------------------------------------------------------------------------
 
 const defaultClasses =
-  "bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700";
+  "bg-white text-[color:var(--fancy-text-soft,var(--color-zinc-700))] border border-[color:var(--fancy-border,var(--color-zinc-200))] hover:bg-zinc-50 hover:border-zinc-300 dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:hover:bg-zinc-700";
 
 const activeClasses =
   "bg-blue-500 text-white border border-blue-600 hover:bg-blue-600 dark:bg-blue-600 dark:border-blue-500 dark:hover:bg-blue-500";
@@ -47,7 +47,7 @@ const warnClasses =
   "bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700 dark:hover:bg-amber-900/50";
 
 const ghostDefaultClasses =
-  "bg-transparent text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800";
+  "bg-transparent text-[color:var(--fancy-text-soft,var(--color-zinc-700))] hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]";
 
 const ghostActiveClasses =
   "bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-950";
@@ -163,7 +163,7 @@ function getIconColorClasses(
   // amber / yellow / lime. Hard-coded white was invisible on any light fill.
   if (color || active || checked) return "text-current";
   if (warn) return "text-amber-600 dark:text-amber-400";
-  return "text-zinc-500 dark:text-zinc-400";
+  return "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]";
 }
 
 function getBadgeClasses(

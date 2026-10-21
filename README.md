@@ -275,6 +275,49 @@ against the brand usually stands against it in both modes.
 Reported by a consumer running a three-colour palette; the wrong version above
 is the one they hit first.
 
+## Semantic tokens
+
+The kit's neutral chrome -- surfaces, outlines, text, form fields, focus -- reads
+ten semantic tokens, so you can repaint it with your own palette without
+remapping Tailwind's `zinc`. Each role is two variables: one per mode.
+
+| Role | Light variable | Dark variable | Default (light / dark) | Used for |
+|---|---|---|---|---|
+| `surface` | `--fancy-surface` | `--fancy-surface-dark` | white / zinc-900 | cards, overlays, sidebars, navbars |
+| `surface-muted` | `--fancy-surface-muted` | `--fancy-surface-muted-dark` | zinc-100 / zinc-800 | hover + selected rows, chips, wells |
+| `border` | `--fancy-border` | `--fancy-border-dark` | zinc-200 / zinc-700 | outlines, dividers, tracks |
+| `border-strong` | `--fancy-border-strong` | `--fancy-border-strong-dark` | zinc-300 / zinc-700 | form-control outlines, keycaps |
+| `input` | `--fancy-input` | `--fancy-input-dark` | white / `#1e1e24` | text inputs, checkboxes, radios, OTP |
+| `text` | `--fancy-text` | `--fancy-text-dark` | zinc-900 / zinc-100 | headings, values, active items |
+| `text-soft` | `--fancy-text-soft` | `--fancy-text-soft-dark` | zinc-700 / zinc-300 | body copy, menu items |
+| `text-muted` | `--fancy-text-muted` | `--fancy-text-muted-dark` | zinc-500 / zinc-400 | descriptions, captions |
+| `text-faint` | `--fancy-text-faint` | `--fancy-text-faint-dark` | zinc-400 / zinc-500 | placeholders, decorative icons |
+| `focus` | `--fancy-focus` | `--fancy-focus-dark` | blue-500 / blue-400 | focus border + ring on fields |
+
+```css
+/* A cream/terracotta light theme and a blue-grey dark one. */
+:root {
+  --fancy-surface: #fbf6ee;   --fancy-surface-dark: #1f2833;
+  --fancy-border: #e4d3bd;    --fancy-border-dark: #3a4757;
+  --fancy-input: #fffdf9;     --fancy-input-dark: #18202a;
+  --fancy-text: #3b2a1e;      --fancy-text-dark: #e6edf5;
+  --fancy-focus: #c2603d;     --fancy-focus-dark: #7fb0e0;
+}
+```
+
+- **Set nothing and nothing changes.** Components read each token through a
+  `var()` fallback that is the colour they used before, so an unset token
+  renders exactly the old value.
+- **Set them anywhere the variable is in scope** -- `:root`, `body`, or a
+  wrapper to theme one region. There is no selector or specificity to beat.
+- **Both modes are stated, not derived.** Which variable applies is decided by
+  your `dark:` variant (see Dark Mode below).
+- The table is exported as `THEME_TOKENS` for docs and tooling.
+- **Not covered, on purpose:** colours that encode data (chart series,
+  file-type marks, mood and confidence scales, event kinds) and the hues you
+  pick with a `color` prop. Some neutral pairs no single token reproduces
+  exactly in both modes still use zinc; see CHANGELOG 5.52.0.
+
 ## Dark Mode
 
 Dark mode works via Tailwind's `dark:` class strategy. The library's `Portal` component automatically detects the `dark` class (or `data-theme="dark"`) on `<html>` and propagates it into portaled content (modals, dropdowns, tooltips, toasts, etc.).

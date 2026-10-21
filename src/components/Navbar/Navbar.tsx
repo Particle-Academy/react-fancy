@@ -20,7 +20,7 @@ function NavbarRoot({ children, className }: NavbarProps) {
       <nav
         data-react-fancy-navbar=""
         className={cn(
-          "border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900",
+          "border-b border-zinc-200 bg-[color:var(--fancy-surface,var(--color-white))] px-4 py-3 dark:border-zinc-800 dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           className,
         )}
       >

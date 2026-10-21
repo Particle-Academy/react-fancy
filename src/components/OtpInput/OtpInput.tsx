@@ -106,7 +106,7 @@ export const OtpInput = forwardRef<HTMLDivElement, OtpInputProps>(
               : undefined
           }
           className={cn(
-            "font-mono text-lg tracking-[0.4em] text-zinc-900 dark:text-zinc-100",
+            "font-mono text-lg tracking-[0.4em] text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
             interactive &&
               "cursor-pointer rounded-md outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-blue-500/40",
             className,
@@ -142,7 +142,7 @@ export const OtpInput = forwardRef<HTMLDivElement, OtpInputProps>(
             onFocus={(e) => e.target.select()}
             disabled={disabled}
             autoFocus={(autoFocus || interactive) && i === 0}
-            className="h-12 w-10 rounded-lg border border-zinc-200 bg-white text-center text-lg font-medium text-zinc-900 outline-none transition-[border-color,box-shadow] duration-150 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-zinc-700 dark:bg-[#1e1e24] dark:text-zinc-100 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+            className="h-12 w-10 rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-input,var(--color-white))] text-center text-lg font-medium text-[color:var(--fancy-text,var(--color-zinc-900))] outline-none transition-[border-color,box-shadow] duration-150 focus:border-[color:var(--fancy-focus,var(--color-blue-500))] focus:ring-2 focus:ring-[color:var(--fancy-focus,var(--color-blue-500))]/40 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))] dark:focus:border-[color:var(--fancy-focus-dark,var(--color-blue-400))] dark:focus:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]/20"
             aria-label={`Digit ${i + 1}`}
           />
         ))}

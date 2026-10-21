@@ -91,7 +91,7 @@ export function MultiSwitch<V = string>({
         if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
       }}
       className={cn(
-        "relative inline-flex rounded-lg border border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800",
+        "relative inline-flex rounded-lg border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         dirty && "ring-2 ring-amber-400/50",
         error && "ring-2 ring-red-500/50",
         disabled && "opacity-50 cursor-not-allowed",
@@ -128,7 +128,7 @@ export function MultiSwitch<V = string>({
               sizeClasses[size],
               isSelected
                 ? "text-white"
-                : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100",
+                : "text-zinc-600 hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-zinc-400 dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
               (disabled || option.disabled) && "cursor-not-allowed",
             )}
           >

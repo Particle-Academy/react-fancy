@@ -24,7 +24,7 @@ export function MediaFallback({ src, mime, label, className }: MediaFallbackProp
     <div
       data-react-fancy-media-fallback=""
       className={cn(
-        "flex flex-col items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white p-6 text-center dark:border-zinc-700 dark:bg-zinc-900",
+        "flex flex-col items-center justify-center gap-2 rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-6 text-center dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
         className,
       )}
     >
@@ -32,7 +32,7 @@ export function MediaFallback({ src, mime, label, className }: MediaFallbackProp
         No preview available
       </span>
       {(name || mime) && (
-        <span className="max-w-full truncate text-xs text-zinc-500 dark:text-zinc-400">
+        <span className="max-w-full truncate text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
           {name}
           {name && mime ? " · " : ""}
           {mime}

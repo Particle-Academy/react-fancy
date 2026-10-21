@@ -181,7 +181,7 @@ export const ImageViewer = forwardRef<HTMLDivElement, ImageViewerProps>(
         {status === "error" && (
           <div
             data-react-fancy-image-viewer-error=""
-            className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-4 text-center text-sm text-zinc-500 dark:text-zinc-400"
+            className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-4 text-center text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"
           >
             <span className="font-medium">Couldn&apos;t load image</span>
             <span className="max-w-full truncate text-xs opacity-70">{alt || src}</span>
@@ -191,13 +191,13 @@ export const ImageViewer = forwardRef<HTMLDivElement, ImageViewerProps>(
         {showControls && (
           <div
             data-react-fancy-image-viewer-controls=""
-            className="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-md border border-zinc-200 bg-white/90 p-0.5 text-zinc-700 shadow-sm backdrop-blur dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-200"
+            className="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-white/90 p-0.5 text-zinc-700 shadow-sm backdrop-blur dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-900/90 dark:text-zinc-200"
           >
             <button
               type="button"
               aria-label="Zoom out"
               onClick={() => zoomBy(1 / 1.25)}
-              className="flex h-6 w-6 items-center justify-center rounded text-base leading-none hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="flex h-6 w-6 items-center justify-center rounded text-base leading-none hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             >
               −
             </button>
@@ -205,7 +205,7 @@ export const ImageViewer = forwardRef<HTMLDivElement, ImageViewerProps>(
               type="button"
               aria-label="Reset zoom"
               onClick={reset}
-              className="min-w-[3rem] rounded px-1 text-center text-xs tabular-nums hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="min-w-[3rem] rounded px-1 text-center text-xs tabular-nums hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             >
               {Math.round(current.zoom * 100)}%
             </button>
@@ -213,7 +213,7 @@ export const ImageViewer = forwardRef<HTMLDivElement, ImageViewerProps>(
               type="button"
               aria-label="Zoom in"
               onClick={() => zoomBy(1.25)}
-              className="flex h-6 w-6 items-center justify-center rounded text-base leading-none hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="flex h-6 w-6 items-center justify-center rounded text-base leading-none hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             >
               +
             </button>

@@ -37,7 +37,7 @@ const insidePaddingRight: Record<Size, string> = {
 };
 
 const affixOutsideClasses =
-  "inline-flex items-center border border-zinc-300 bg-zinc-50 px-3 text-sm text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400";
+  "inline-flex items-center border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] bg-zinc-50 px-3 text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]";
 
 export function InputWrapper({
   children,
@@ -72,7 +72,7 @@ export function InputWrapper({
           )}
         >
           {hasInsidePrefix && (
-            <span className="pointer-events-none absolute left-3 z-10 text-zinc-400 dark:text-zinc-500">
+            <span className="pointer-events-none absolute left-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
               {prefix}
             </span>
           )}
@@ -88,7 +88,7 @@ export function InputWrapper({
             {children}
           </div>
           {hasInsideSuffix && (
-            <span className="pointer-events-none absolute right-3 z-10 text-zinc-400 dark:text-zinc-500">
+            <span className="pointer-events-none absolute right-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
               {suffix}
             </span>
           )}
@@ -106,7 +106,7 @@ export function InputWrapper({
   return (
     <div data-react-fancy-input-wrapper="" className="relative flex items-center">
       {hasInsidePrefix && (
-        <span className="pointer-events-none absolute left-3 z-10 text-zinc-400 dark:text-zinc-500">
+        <span className="pointer-events-none absolute left-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
           {prefix}
         </span>
       )}
@@ -120,7 +120,7 @@ export function InputWrapper({
         {children}
       </div>
       {hasInsideSuffix && (
-        <span className="pointer-events-none absolute right-3 z-10 text-zinc-400 dark:text-zinc-500">
+        <span className="pointer-events-none absolute right-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
           {suffix}
         </span>
       )}

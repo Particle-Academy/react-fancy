@@ -154,7 +154,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
         data-react-fancy-composer=""
         ref={ref}
         className={cn(
-          "rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900",
+          "rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           disabled && "opacity-50",
           className,
         )}
@@ -185,7 +185,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   // over this button's right edge. With a smaller right padding the
                   // × lands on top of the label.
                   className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 py-1 pl-2.5 pr-7 text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700",
+                    "inline-flex items-center gap-1.5 rounded-full border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-zinc-50 py-1 pl-2.5 pr-7 text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700",
                     classNames?.pill,
                     classNames?.textPill,
                   )}

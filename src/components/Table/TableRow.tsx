@@ -30,7 +30,7 @@ export function TableRow({
           e.stopPropagation();
           setExpanded(!expanded);
         }}
-        className="inline-flex items-center justify-center rounded p-1 text-zinc-400 transition-colors hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
+        className="inline-flex items-center justify-center rounded p-1 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] transition-colors hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
         aria-label={expanded ? "Collapse row" : "Expand row"}
       >
         <svg

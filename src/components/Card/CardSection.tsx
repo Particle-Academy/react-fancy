@@ -72,8 +72,8 @@ export const CardSection = forwardRef<HTMLDivElement, CardSectionInternalProps>(
           ruled &&
             !dividerInset &&
             (edge === "bottom"
-              ? "border-b border-zinc-200 dark:border-zinc-700"
-              : "border-t border-zinc-200 dark:border-zinc-700"),
+              ? "border-b border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]"
+              : "border-t border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]"),
           // An inset rule cannot be a border: a border draws on the element's
           // own edge, and the whole point is to stop short of it. So it is a
           // one-pixel pseudo-element, inset by the same step the padding uses —
@@ -83,8 +83,8 @@ export const CardSection = forwardRef<HTMLDivElement, CardSectionInternalProps>(
             cn(
               "relative",
               edge === "bottom"
-                ? "after:absolute after:bottom-0 after:h-px after:bg-zinc-200 dark:after:bg-zinc-700"
-                : "before:absolute before:top-0 before:h-px before:bg-zinc-200 dark:before:bg-zinc-700",
+                ? "after:absolute after:bottom-0 after:h-px after:bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:after:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]"
+                : "before:absolute before:top-0 before:h-px before:bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:before:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
               edge === "bottom"
                 ? dividerInsetAfter[padding]
                 : dividerInsetBefore[padding],

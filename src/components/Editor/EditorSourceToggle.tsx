@@ -25,8 +25,8 @@ export function EditorSourceToggle({
       className={cn(
         "inline-flex h-8 items-center justify-center rounded-md px-2 font-mono text-xs transition-colors",
         showSource
-          ? "bg-zinc-200 dark:bg-zinc-700"
-          : "hover:bg-zinc-100 dark:hover:bg-zinc-800",
+          ? "bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]"
+          : "hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         className,
       )}
     >

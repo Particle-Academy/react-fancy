@@ -102,6 +102,7 @@ describe("Button — icon and badge follow the label colour", () => {
   it("an uncoloured button keeps its muted icon", () => {
     const host = mount(<Button icon="plus">Plain</Button>);
 
-    expect(iconWrap(host).className).toContain("text-zinc-500");
+    // zinc-500 since 5.52.0 arrives through the text-muted token's fallback.
+    expect(iconWrap(host).className).toContain("text-[color:var(--fancy-text-muted,var(--color-zinc-500))]");
   });
 });

@@ -34,7 +34,7 @@ function SidebarRoot({
           // and actively wrong inside a container that already draws its own —
           // a 240px rail in a 300px card puts its right border 240px in, which
           // reads as a stray line slicing the panel rather than an edge.
-          !embedded && "border-r border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900",
+          !embedded && "border-r border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           // Collapsed is a fixed icon rail either way; only the expanded width
           // defers to the container.
           collapsed ? "w-16" : embedded ? "w-full" : "w-60",

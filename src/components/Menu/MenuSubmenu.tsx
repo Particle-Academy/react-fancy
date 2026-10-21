@@ -40,7 +40,7 @@ export function MenuSubmenu({
             "group-hover:visible group-hover:opacity-100",
           )}
         >
-          <div className="rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] py-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]">
             {children}
           </div>
         </div>
@@ -76,7 +76,7 @@ export function MenuSubmenu({
         )}
       >
         <div className="overflow-hidden">
-          <div className="ml-4 border-l border-zinc-200 pl-2 pt-1 dark:border-zinc-700">
+          <div className="ml-4 border-l border-[color:var(--fancy-border,var(--color-zinc-200))] pl-2 pt-1 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]">
             {children}
           </div>
         </div>

@@ -6,7 +6,7 @@ export function TableRowTray({ children, className }: TableRowTrayProps) {
     <div
       data-react-fancy-table-row-tray=""
       className={cn(
-        "border-t border-zinc-200 px-4 py-3 dark:border-zinc-700",
+        "border-t border-[color:var(--fancy-border,var(--color-zinc-200))] px-4 py-3 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
         className,
       )}
     >

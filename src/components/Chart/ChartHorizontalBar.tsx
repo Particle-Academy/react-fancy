@@ -27,7 +27,7 @@ export function ChartHorizontalBar({
 
           return (
             <div key={item.label} className="flex items-center gap-3">
-              <span className="w-20 shrink-0 truncate text-right text-xs text-zinc-500 dark:text-zinc-400">
+              <span className="w-20 shrink-0 truncate text-right text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                 {item.label}
               </span>
               <div className="relative flex-1">

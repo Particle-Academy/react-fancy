@@ -259,7 +259,7 @@ const RangeDatePicker = forwardRef<
           className={inputClasses}
           autoFocus={interactive}
         />
-        <span className="text-sm text-zinc-500 dark:text-zinc-400">to</span>
+        <span className="text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">to</span>
         <input
           type={inputType}
           name={name ? `${name}_end` : undefined}

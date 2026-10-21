@@ -69,19 +69,19 @@ export function DisplayValue({
       onClick={interactive ? onActivate : undefined}
       onKeyDown={onKeyDown}
       className={cn(
-        "flex w-full items-center gap-2 text-zinc-900 dark:text-zinc-100",
+        "flex w-full items-center gap-2 text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
         inputSizeClasses[size],
         // Strip the editable box look — keep only the size/padding rhythm.
         "border-0 bg-transparent px-0",
         interactive &&
-          "-mx-2 cursor-text rounded-md px-2 outline-none transition-colors hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:hover:bg-zinc-800",
-        empties && "text-zinc-400 dark:text-zinc-500",
+          "-mx-2 cursor-text rounded-md px-2 outline-none transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
+        empties && "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
         className,
       )}
     >
-      {leading && <span className="text-zinc-400 dark:text-zinc-500">{leading}</span>}
+      {leading && <span className="text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">{leading}</span>}
       <span className="min-w-0 truncate">{empties ? empty : children}</span>
-      {trailing && <span className="text-zinc-400 dark:text-zinc-500">{trailing}</span>}
+      {trailing && <span className="text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">{trailing}</span>}
     </div>
   );
 }

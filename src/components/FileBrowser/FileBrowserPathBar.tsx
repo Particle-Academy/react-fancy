@@ -9,7 +9,7 @@ import type { FileBrowserPathBarProps } from "./FileBrowser.types";
 // is href-only and collapses to a dropdown on mobile, so the path bar renders
 // its own always-visible, click-to-navigate trail).
 const SEGMENT_CLASS =
-  "shrink-0 rounded text-[13px] text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300";
+  "shrink-0 rounded text-[13px] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] transition-colors hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]";
 const ACTIVE_SEGMENT_CLASS = "shrink-0 truncate text-[13px] font-medium text-zinc-900 dark:text-white";
 
 /**
@@ -43,7 +43,7 @@ export function FileBrowserPathBar({
     <div
       data-react-fancy-file-browser-path=""
       className={cn(
-        "flex items-center gap-1 border-b border-zinc-200 px-2 py-1.5 dark:border-zinc-700",
+        "flex items-center gap-1 border-b border-[color:var(--fancy-border,var(--color-zinc-200))] px-2 py-1.5 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
         className,
       )}
     >
@@ -67,7 +67,7 @@ export function FileBrowserPathBar({
           spellCheck={false}
           placeholder={placeholder}
           aria-label="Path"
-          className="min-w-0 flex-1 rounded-md border border-zinc-300 bg-transparent px-2 py-0.5 font-mono text-xs text-zinc-700 outline-none placeholder:text-zinc-400 focus:border-blue-400 dark:border-zinc-600 dark:text-zinc-300"
+          className="min-w-0 flex-1 rounded-md border border-zinc-300 bg-transparent px-2 py-0.5 font-mono text-xs text-[color:var(--fancy-text-soft,var(--color-zinc-700))] outline-none placeholder:text-zinc-400 focus:border-blue-400 dark:border-zinc-600 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
         />
       ) : (
         <nav
@@ -124,7 +124,7 @@ export function FileBrowserPathBar({
           type="button"
           aria-label="Edit path"
           onClick={startEdit}
-          className="shrink-0 rounded-md p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+          className="shrink-0 rounded-md p-1 text-zinc-400 transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-600 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-300"
         >
           <Pencil size={13} />
         </button>

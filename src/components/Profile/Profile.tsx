@@ -51,7 +51,7 @@ export const Profile = forwardRef<HTMLDivElement, ProfileProps>(
         <div className="flex min-w-0 flex-col">
           <span
             className={cn(
-              "truncate font-medium text-zinc-900 dark:text-zinc-100",
+              "truncate font-medium text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
               nameClasses[size],
             )}
           >
@@ -60,7 +60,7 @@ export const Profile = forwardRef<HTMLDivElement, ProfileProps>(
           {subtitle && (
             <span
               className={cn(
-                "truncate text-zinc-500 dark:text-zinc-400",
+                "truncate text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
                 subtitleClasses[size],
               )}
             >

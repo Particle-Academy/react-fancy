@@ -14,7 +14,7 @@ export function ChartTooltip({ visible, x, y, content, className }: ChartTooltip
   return (
     <div
       className={cn(
-        "pointer-events-none absolute z-50 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
+        "pointer-events-none absolute z-50 rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] px-3 py-2 text-xs shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
         className,
       )}
       style={{

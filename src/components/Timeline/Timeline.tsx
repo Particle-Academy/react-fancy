@@ -54,15 +54,15 @@ const TimelineRoot = forwardRef<HTMLDivElement, TimelineProps>(
         {(heading || description) && (
           <div className="mb-8">
             {heading && <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">{heading}</h2>}
-            {description && <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{description}</p>}
+            {description && <p className="mt-1 text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">{description}</p>}
           </div>
         )}
 
         {isHorizontal ? (
           <div
             ref={scrollRef}
-            className="overflow-x-auto pb-4 -mb-4"
-            style={{ scrollbarWidth: "thin", scrollbarColor: "rgb(161 161 170) transparent" }}
+            className="overflow-x-auto pb-4 -mb-4 [scrollbar-color:var(--fancy-text-faint,rgb(161_161_170))_transparent] dark:[scrollbar-color:var(--fancy-text-faint-dark,rgb(161_161_170))_transparent]"
+            style={{ scrollbarWidth: "thin" }}
             onWheel={handleWheel}
           >
             <div className="flex min-w-max items-start">
@@ -74,7 +74,7 @@ const TimelineRoot = forwardRef<HTMLDivElement, TimelineProps>(
           <div className="relative">
             {items.length > 1 && (
               <div className={cn(
-                "absolute top-0 bottom-0 w-px bg-zinc-200 dark:bg-zinc-700",
+                "absolute top-0 bottom-0 w-px bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
                 isAlternating
                   ? "left-4 md:left-1/2 md:-translate-x-px"
                   : "left-4",

@@ -38,7 +38,7 @@ export function CommandItem({
       }}
       className={cn(
         "flex w-full items-center rounded-lg px-3 py-2 text-left text-sm transition-colors",
-        "text-zinc-700 hover:bg-zinc-100 data-[active]:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:data-[active]:bg-zinc-800",
+        "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] data-[active]:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:data-[active]:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         className,
       )}
       onClick={() => {

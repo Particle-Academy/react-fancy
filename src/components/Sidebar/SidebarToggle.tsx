@@ -14,7 +14,7 @@ export function SidebarToggle({ className }: SidebarToggleProps) {
       title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       className={cn(
         "flex items-center justify-center rounded-md p-1.5 text-zinc-400 transition-colors",
-        "hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300",
+        "hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-600 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-300",
         className,
       )}
     >

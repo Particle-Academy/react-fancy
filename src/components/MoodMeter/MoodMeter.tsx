@@ -145,7 +145,7 @@ export function MoodMeter({
               x2={`${p * 100}%`}
               y1="0"
               y2="100%"
-              stroke="#a1a1aa"
+              className="stroke-[color:var(--fancy-text-faint,#a1a1aa)] dark:stroke-[color:var(--fancy-text-faint-dark,#a1a1aa)]"
               strokeOpacity={0.18}
               strokeDasharray="3 4"
             />
@@ -157,7 +157,7 @@ export function MoodMeter({
               x2="100%"
               y1={`${p * 100}%`}
               y2={`${p * 100}%`}
-              stroke="#a1a1aa"
+              className="stroke-[color:var(--fancy-text-faint,#a1a1aa)] dark:stroke-[color:var(--fancy-text-faint-dark,#a1a1aa)]"
               strokeOpacity={0.18}
               strokeDasharray="3 4"
             />
@@ -232,7 +232,7 @@ function Handle({
         }}
       />
       <div
-        className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-white dark:ring-zinc-900"
+        className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[color:var(--fancy-surface,var(--color-white))] dark:ring-[color:var(--fancy-surface-dark,var(--color-zinc-900))]"
         style={{
           left: `${xPct}%`,
           top: `${yPct}%`,

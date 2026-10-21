@@ -12,7 +12,7 @@ export function NavbarToggle({ className }: NavbarToggleProps) {
       type="button"
       onClick={() => setMobileOpen(!mobileOpen)}
       className={cn(
-        "inline-flex items-center rounded-lg p-2 text-zinc-500 hover:bg-zinc-100 md:hidden dark:hover:bg-zinc-800",
+        "inline-flex items-center rounded-lg p-2 text-zinc-500 hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] md:hidden dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         className,
       )}
       aria-label="Toggle navigation"

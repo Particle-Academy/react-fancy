@@ -294,7 +294,7 @@ function TreeNodeImpl({ node, depth }: TreeNodeProps) {
           "flex w-full items-center gap-1 rounded-md py-0.5 text-left text-[13px] transition-colors",
           isSelected
             ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
-            : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
+            : "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
           node.disabled && "pointer-events-none opacity-40",
           isDragging && "opacity-50",
           // Grab affordance. By default (`dragCursor="none"`) the row keeps its

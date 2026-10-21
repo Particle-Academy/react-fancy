@@ -57,7 +57,7 @@ export function Pagination({
   const btnBase =
     "inline-flex h-9 min-w-9 items-center justify-center rounded-lg border text-sm transition-colors";
   const btnDefault =
-    "border-zinc-200 bg-white hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800";
+    "border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] hover:bg-zinc-50 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:hover:bg-zinc-800";
   const btnActive =
     "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900";
   const btnDisabled = "cursor-not-allowed opacity-50";

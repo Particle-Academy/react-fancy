@@ -188,7 +188,7 @@ function EditorRoot({
         data-react-fancy-editor=""
         data-mode="view"
         className={cn(
-          "overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900",
+          "overflow-hidden rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           className,
         )}
       >
@@ -210,7 +210,7 @@ function EditorRoot({
         data-react-fancy-editor=""
         data-mode="edit"
         className={cn(
-          "flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900",
+          "flex flex-col overflow-hidden rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           className,
         )}
       >

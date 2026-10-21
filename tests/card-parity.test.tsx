@@ -6,6 +6,11 @@ import { Card } from "../src/components/Card/Card";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
+/** Card's neutral surfaces, as semantic tokens since 5.52.0. */
+const SURFACE = "bg-[color:var(--fancy-surface,var(--color-white))]";
+const SURFACE_DARK = "dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]";
+const SURFACE_MUTED = "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))]";
+
 function mount(el: ReactElement) {
   const host = document.createElement("div");
   document.body.append(host);
@@ -251,7 +256,7 @@ describe("size", () => {
 describe("variant tint ramp", () => {
   it("adds muted and soft between outlined and flat", () => {
     const { host: m, unmount: u1 } = mount(<Card variant="muted">b</Card>);
-    expect(classesOf(m, "data-react-fancy-card")).toContain("bg-zinc-100");
+    expect(classesOf(m, "data-react-fancy-card")).toContain(SURFACE_MUTED);
     u1();
 
     const { host: s, unmount: u2 } = mount(<Card variant="soft">b</Card>);
@@ -485,15 +490,17 @@ describe("variant beats the base background", () => {
     const { host, unmount } = mount(<Card variant={variant}>b</Card>);
     const cls = classesOf(host, "data-react-fancy-card").split(/\s+/);
 
-    expect(cls).not.toContain("bg-white");
-    expect(cls).not.toContain("dark:bg-zinc-900");
+    // Since 5.52.0 the base surface is the surface TOKEN (bg-white was its
+    // fallback). Assert on the token classes, or these pass vacuously.
+    expect(cls).not.toContain(SURFACE);
+    expect(cls).not.toContain(SURFACE_DARK);
     unmount();
   });
 
-  it("keeps bg-white on the untinted variants", () => {
+  it("keeps the surface on the untinted variants", () => {
     for (const variant of ["outlined", "elevated"] as const) {
       const { host, unmount } = mount(<Card variant={variant}>b</Card>);
-      expect(classesOf(host, "data-react-fancy-card").split(/\s+/)).toContain("bg-white");
+      expect(classesOf(host, "data-react-fancy-card").split(/\s+/)).toContain(SURFACE);
       unmount();
     }
   });

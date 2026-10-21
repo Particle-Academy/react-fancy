@@ -165,7 +165,7 @@ function CommandRoot({
             }}
             data-react-fancy-command=""
             className={cn(
-              "relative w-full max-w-lg overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-700 dark:bg-zinc-900",
+              "relative w-full max-w-lg overflow-hidden rounded-2xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-2xl dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
               animClass,
               className,
             )}

@@ -91,7 +91,7 @@ export function ChatDrawer({
                   "group inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] font-medium transition",
                   active
                     ? "border-violet-500 bg-violet-500 text-white"
-                    : "border-zinc-200 bg-transparent text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-800",
+                    : "border-[color:var(--fancy-border,var(--color-zinc-200))] bg-transparent text-[color:var(--fancy-text-soft,var(--color-zinc-700))] hover:border-zinc-300 hover:bg-zinc-50 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:border-zinc-600 dark:hover:bg-zinc-800",
                 ].join(" ")}
                 aria-pressed={active}
               >
@@ -101,7 +101,7 @@ export function ChatDrawer({
                       "inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-semibold",
                       active
                         ? "bg-white/20 text-white"
-                        : "bg-zinc-200 text-zinc-600 group-hover:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-300",
+                        : "bg-[color:var(--fancy-border,var(--color-zinc-200))] text-zinc-600 group-hover:bg-zinc-300 dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:text-zinc-300",
                     ].join(" ")}
                   >
                     {number}
@@ -117,7 +117,7 @@ export function ChatDrawer({
           onClick={handleToggle}
           aria-label={open ? "Collapse drawer" : "Expand drawer"}
           aria-expanded={open}
-          className="ml-auto inline-flex h-6 w-6 items-center justify-center rounded-full text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+          className="ml-auto inline-flex h-6 w-6 items-center justify-center rounded-full text-zinc-400 transition hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-700 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-200"
         >
           <Icon
             name={open ? "chevron-down" : "chevron-up"}

@@ -30,19 +30,19 @@ export function TabsTab({
           "border-b-2 px-4 py-2.5",
           isActive
             ? "border-zinc-900 text-zinc-900 dark:border-white dark:text-white"
-            : "border-transparent text-zinc-500 hover:border-zinc-300 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300",
+            : "border-transparent text-[color:var(--fancy-text-muted,var(--color-zinc-500))] hover:border-zinc-300 hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
         ],
         variant === "pills" && [
           "rounded-md px-4 py-1.5",
           isActive
-            ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-900 dark:text-white"
-            : "text-zinc-500 dark:text-zinc-400",
+            ? "bg-[color:var(--fancy-surface,var(--color-white))] text-zinc-900 shadow-sm dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:text-white"
+            : "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
         ],
         variant === "boxed" && [
           "flex-1 rounded-md px-4 py-1.5",
           isActive
-            ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-900 dark:text-white"
-            : "text-zinc-500 dark:text-zinc-400",
+            ? "bg-[color:var(--fancy-surface,var(--color-white))] text-zinc-900 shadow-sm dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:text-white"
+            : "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
         ],
         className,
       )}

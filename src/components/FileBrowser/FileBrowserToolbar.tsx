@@ -22,13 +22,13 @@ export function FileBrowserToolbar({ filterPlaceholder = "Filter", className }: 
     <div
       data-react-fancy-file-browser-toolbar=""
       className={cn(
-        "flex items-center gap-2 border-b border-zinc-200 px-2 py-1.5 dark:border-zinc-700",
+        "flex items-center gap-2 border-b border-[color:var(--fancy-border,var(--color-zinc-200))] px-2 py-1.5 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
         className,
       )}
     >
       <div
         data-react-fancy-file-browser-filter=""
-        className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md border border-zinc-200 px-2 dark:border-zinc-700"
+        className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] px-2 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]"
       >
         <Search size={13} aria-hidden="true" className="shrink-0 text-zinc-400" />
         <input
@@ -38,7 +38,7 @@ export function FileBrowserToolbar({ filterPlaceholder = "Filter", className }: 
           placeholder={filterPlaceholder}
           aria-label="Filter by name"
           spellCheck={false}
-          className="min-w-0 flex-1 bg-transparent py-1 text-xs text-zinc-700 outline-none placeholder:text-zinc-400 dark:text-zinc-300"
+          className="min-w-0 flex-1 bg-transparent py-1 text-xs text-[color:var(--fancy-text-soft,var(--color-zinc-700))] outline-none placeholder:text-zinc-400 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
         />
         {filter !== "" && (
           <button
@@ -75,8 +75,8 @@ export function FileBrowserToolbar({ filterPlaceholder = "Filter", className }: 
               className={cn(
                 "flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs transition-colors",
                 active
-                  ? "bg-zinc-100 font-medium text-zinc-900 dark:bg-zinc-800 dark:text-white"
-                  : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300",
+                  ? "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] font-medium text-zinc-900 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-white"
+                  : "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
               )}
             >
               {label}

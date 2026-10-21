@@ -20,7 +20,7 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
         aria-hidden="true"
         data-react-fancy-skeleton=""
         className={cn(
-          "animate-pulse bg-zinc-200 dark:bg-zinc-700",
+          "animate-pulse bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
           shape === "rect" && "rounded-lg",
           shape === "circle" && "rounded-full aspect-square",
           shape === "text" && "rounded h-4 w-full",

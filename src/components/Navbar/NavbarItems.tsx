@@ -11,7 +11,7 @@ export function NavbarItems({ children, className }: NavbarItemsProps) {
       className={cn(
         "items-center gap-1",
         mobileOpen
-          ? "flex flex-col border-t border-zinc-200 pt-4 dark:border-zinc-700"
+          ? "flex flex-col border-t border-[color:var(--fancy-border,var(--color-zinc-200))] pt-4 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]"
           : "hidden md:flex md:flex-row",
         className,
       )}

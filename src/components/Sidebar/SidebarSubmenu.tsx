@@ -72,7 +72,7 @@ export function SidebarSubmenu({
         )}
       >
         <div className="overflow-hidden">
-          <div className="ml-4 border-l border-zinc-200 pl-2 pt-1 dark:border-zinc-700">
+          <div className="ml-4 border-l border-[color:var(--fancy-border,var(--color-zinc-200))] pl-2 pt-1 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]">
             {children}
           </div>
         </div>

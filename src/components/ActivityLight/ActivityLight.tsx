@@ -92,7 +92,7 @@ ActivityLight.displayName = "ActivityLight";
 const LEVEL_CLASS: Record<ActivityLevel, string> = {
   live: "text-emerald-500 dark:text-emerald-400",
   recent: "text-sky-500 dark:text-sky-400",
-  quiet: "text-zinc-400 dark:text-zinc-500",
+  quiet: "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
   unseen: "text-amber-500 dark:text-amber-400",
 };
 

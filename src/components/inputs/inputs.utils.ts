@@ -30,7 +30,7 @@ export function errorClasses(error?: string): string {
 }
 
 export const inputBaseClasses =
-  "border border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-400 transition-[border-color,box-shadow] duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-[#1e1e24] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20";
+  "border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] bg-[color:var(--fancy-input,var(--color-white))] text-[color:var(--fancy-text,var(--color-zinc-900))] placeholder:text-[color:var(--fancy-text-faint,var(--color-zinc-400))] transition-[border-color,box-shadow] duration-150 focus:outline-none focus:ring-2 focus:ring-[color:var(--fancy-focus,var(--color-blue-500))]/40 focus:border-[color:var(--fancy-focus,var(--color-blue-500))] disabled:opacity-50 disabled:cursor-not-allowed dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))] dark:placeholder:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))] dark:focus:border-[color:var(--fancy-focus-dark,var(--color-blue-400))] dark:focus:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]/20";
 
 export function resolveOption<V = string>(
   option: InputOption<V>,

@@ -73,7 +73,7 @@ export function DropdownItems({ children, className }: DropdownItemsProps) {
         data-react-fancy-dropdown=""
         role="menu"
         className={cn(
-          "fixed z-50 min-w-[8rem] rounded-xl border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
+          "fixed z-50 min-w-[8rem] rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           animClass,
           className,
         )}

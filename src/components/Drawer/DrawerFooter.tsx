@@ -6,7 +6,7 @@ export function DrawerFooter({ children, className }: DrawerFooterProps) {
     <div
       data-react-fancy-drawer-footer=""
       className={cn(
-        "flex shrink-0 items-center justify-end gap-2 border-t border-zinc-200 px-4 py-3 dark:border-zinc-700",
+        "flex shrink-0 items-center justify-end gap-2 border-t border-[color:var(--fancy-border,var(--color-zinc-200))] px-4 py-3 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
         className,
       )}
     >

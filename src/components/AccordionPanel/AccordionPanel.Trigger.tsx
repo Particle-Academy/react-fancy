@@ -66,12 +66,12 @@ export function AccordionPanelTrigger({
         className={cn(
           "group relative flex shrink-0 items-center justify-center cursor-pointer",
           "text-zinc-500 dark:text-zinc-500",
-          "hover:text-zinc-900 dark:hover:text-zinc-100",
+          "hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
           // Wide hitbox + thin visible line (drawn via ::before).
           orientation === "horizontal"
             ? "w-3 self-stretch"
             : "h-3 self-stretch",
-          "before:absolute before:bg-zinc-200 dark:before:bg-zinc-700",
+          "before:absolute before:bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:before:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
           "before:transition-colors group-hover:before:bg-zinc-400 dark:group-hover:before:bg-zinc-500",
           orientation === "horizontal"
             ? "before:top-0 before:bottom-0 before:w-px before:left-1/2 before:-translate-x-1/2"
@@ -100,9 +100,9 @@ export function AccordionPanelTrigger({
       data-orientation={orientation}
       className={cn(
         "flex shrink-0 items-center justify-center rounded-md",
-        "text-zinc-400 dark:text-zinc-500",
-        "hover:text-zinc-900 dark:hover:text-zinc-100",
-        "hover:bg-zinc-100 dark:hover:bg-zinc-800",
+        "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
+        "hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
+        "hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         "transition-colors cursor-pointer",
         orientation === "horizontal" ? "h-8 w-6 mx-0.5" : "w-8 h-6 my-0.5",
         className,

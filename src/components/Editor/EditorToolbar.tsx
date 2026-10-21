@@ -23,7 +23,7 @@ export function EditorToolbar({
     <div
       data-react-fancy-editor-toolbar=""
       className={cn(
-        "flex shrink-0 items-center gap-0.5 border-b border-zinc-200 px-2 py-1.5 dark:border-zinc-700",
+        "flex shrink-0 items-center gap-0.5 border-b border-[color:var(--fancy-border,var(--color-zinc-200))] px-2 py-1.5 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
         className,
       )}
     >
@@ -46,8 +46,8 @@ export function EditorToolbar({
               className={cn(
                 "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm transition-colors",
                 action.active
-                  ? "bg-zinc-200 dark:bg-zinc-700"
-                  : "hover:bg-zinc-100 dark:hover:bg-zinc-800",
+                  ? "bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]"
+                  : "hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
                 showSource && "cursor-not-allowed opacity-40 hover:bg-transparent",
               )}
             >

@@ -25,7 +25,7 @@ export function endsOf(text: string, chars: number): string {
 const PILL_BASE =
   "inline-flex select-none items-center rounded-md px-2 py-0.5 text-xs leading-5 transition-colors";
 const TEXT_PILL =
-  "cursor-pointer bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700";
+  "cursor-pointer bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] text-zinc-700 hover:bg-zinc-200 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-zinc-200 dark:hover:bg-zinc-700";
 const IMAGE_PILL =
   "bg-rose-100 font-medium text-rose-600 dark:bg-rose-500/20 dark:text-rose-300";
 /** Merged onto the Popover panel's own defaults: tighter padding for a preview. */

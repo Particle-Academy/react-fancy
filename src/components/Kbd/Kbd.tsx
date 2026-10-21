@@ -41,7 +41,7 @@ export const Kbd = forwardRef<HTMLElement, KbdProps>(
           {keys.map((k, i) => (
             <Fragment key={i}>
               {i > 0 && (
-                <span aria-hidden className="text-zinc-400 dark:text-zinc-500">
+                <span aria-hidden className="text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
                   {separator}
                 </span>
               )}

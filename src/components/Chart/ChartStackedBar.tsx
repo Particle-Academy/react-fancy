@@ -138,7 +138,7 @@ export function ChartStackedBar({
                   <span className="font-medium">{s.data[hoverIdx] ?? 0}</span>
                 </div>
               ))}
-              <div className="mt-1 border-t border-zinc-200 pt-1 text-zinc-500 dark:border-zinc-700">
+              <div className="mt-1 border-t border-[color:var(--fancy-border,var(--color-zinc-200))] pt-1 text-zinc-500 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]">
                 Total: <span className="font-medium text-zinc-900 dark:text-white">{stackTotals[hoverIdx]}</span>
               </div>
             </div>

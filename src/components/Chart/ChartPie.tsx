@@ -61,9 +61,10 @@ export function ChartPie({
             <path
               d={slice.d}
               fill={slice.color}
-              stroke="white"
               strokeWidth={2}
-              className="transition-opacity"
+              // The gap between slices is the surface showing through. White in
+              // both modes before tokens, so both fallbacks stay white.
+              className="transition-opacity stroke-[color:var(--fancy-surface,var(--color-white))] dark:stroke-[color:var(--fancy-surface-dark,var(--color-white))]"
               opacity={hoverIdx !== null && hoverIdx !== i ? 0.5 : 1}
               onMouseEnter={() => setHoverIdx(i)}
               onMouseLeave={() => setHoverIdx(null)}

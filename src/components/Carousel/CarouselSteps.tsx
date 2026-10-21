@@ -28,7 +28,7 @@ export const CarouselSteps = forwardRef<HTMLDivElement, CarouselStepsProps>(
                   "flex items-center gap-1.5 text-sm font-medium transition-colors",
                   isActive && "text-blue-600 dark:text-blue-400",
                   isCompleted && "text-green-600 dark:text-green-400",
-                  !isActive && !isCompleted && "text-zinc-400 dark:text-zinc-500",
+                  !isActive && !isCompleted && "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
                 )}
                 aria-label={name || `Step ${i + 1}`}
                 aria-current={isActive ? "step" : undefined}
@@ -38,7 +38,7 @@ export const CarouselSteps = forwardRef<HTMLDivElement, CarouselStepsProps>(
                     "flex h-6 w-6 items-center justify-center rounded-full text-xs",
                     isActive && "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
                     isCompleted && "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-                    !isActive && !isCompleted && "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500",
+                    !isActive && !isCompleted && "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] text-zinc-500 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-zinc-500",
                   )}
                 >
                   {isCompleted ? "\u2713" : i + 1}

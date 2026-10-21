@@ -12,7 +12,7 @@ export function AccordionItem({
       <div
         data-react-fancy-accordion-item=""
         className={cn(
-          "border-b border-zinc-200 dark:border-zinc-700",
+          "border-b border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
           className,
         )}
       >

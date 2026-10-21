@@ -207,7 +207,7 @@ export function KanbanColumn({
                 "rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
                 overWip
                   ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-                  : "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300",
+                  : "bg-[color:var(--fancy-border,var(--color-zinc-200))] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
               )}
             >
               {cardCount}

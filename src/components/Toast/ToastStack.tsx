@@ -45,7 +45,7 @@ const POSITION_STYLES: Record<ToastPosition, string> = {
 const WHEEL_STEP = 50;
 
 const CARD =
-  "rounded-xl border border-zinc-200 bg-white p-4 shadow-lg dark:border-zinc-700 dark:bg-zinc-900";
+  "rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-4 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]";
 
 function defaultKey(item: unknown, index: number): string {
   const id = (item as { id?: unknown } | null)?.id;
@@ -228,7 +228,7 @@ export function ToastStack<T>({
           size="sm"
           variant="soft"
           color="zinc"
-          className="absolute -top-2 right-2 z-20 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:ring-zinc-700"
+          className="absolute -top-2 right-2 z-20 shadow-sm ring-1 ring-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-zinc-800 dark:text-zinc-100 dark:ring-[color:var(--fancy-border-dark,var(--color-zinc-700))]"
         >
           +{hidden}
         </Badge>

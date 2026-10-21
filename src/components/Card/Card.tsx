@@ -10,7 +10,7 @@ import { paddingClasses, radiusClasses, sizePadding } from "./Card.scales";
 import type { CardContextValue, CardProps } from "./Card.types";
 
 const variantClasses: Record<NonNullable<CardProps["variant"]>, string> = {
-  outlined: "border border-zinc-200 dark:border-zinc-700",
+  outlined: "border border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
   elevated: "shadow-md border border-zinc-100 dark:border-zinc-800",
   flat: "bg-zinc-50 dark:bg-zinc-800/50",
   // Tint steps between "no tint" and `flat`. They work the same way `flat`
@@ -18,7 +18,7 @@ const variantClasses: Record<NonNullable<CardProps["variant"]>, string> = {
   // `cn` is tailwind-merge and resolves conflicting utilities last-wins. Class
   // ORDER decides this, not CSS specificity — so these must stay after the base
   // background in the `cn(...)` call below.
-  muted: "bg-zinc-100 dark:bg-zinc-800",
+  muted: "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
   soft: "bg-zinc-50/70 dark:bg-zinc-800/40",
 };
 
@@ -74,7 +74,7 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
           ref={ref}
           data-react-fancy-card=""
           className={cn(
-            "bg-white dark:bg-zinc-900",
+            "bg-[color:var(--fancy-surface,var(--color-white))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
             radiusClasses[size],
             variantClasses[variant],
             // A pseudo-element rather than an inset box-shadow: `shadow-*` and

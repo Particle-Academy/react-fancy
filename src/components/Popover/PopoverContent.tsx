@@ -36,7 +36,7 @@ export function PopoverContent({ children, className, style, ...rest }: PopoverC
         }}
         data-react-fancy-popover=""
         className={cn(
-          "fixed z-50 rounded-xl border border-zinc-200 bg-white p-4 text-zinc-700 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:shadow-zinc-950/50",
+          "fixed z-50 rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-4 text-zinc-700 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:text-zinc-200 dark:shadow-zinc-950/50",
           positioned ? "fancy-scale-in" : "invisible",
           className,
         )}

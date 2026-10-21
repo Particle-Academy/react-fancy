@@ -39,7 +39,7 @@ function Dot({ icon, emoji, color, active }: Pick<TimelineItemProps, "icon" | "e
 
   if (emoji) {
     return (
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]">
         <span className="text-sm">{emoji}</span>
       </span>
     );
@@ -115,17 +115,17 @@ export const TimelineItem = forwardRef<HTMLDivElement, TimelineItemProps>(
           {/* Dot + horizontal line (fixed height for alignment) */}
           <div className="flex h-8 w-full items-center">
             {index > 0
-              ? <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+              ? <div className="h-px flex-1 bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]" />
               : <div className="flex-1" />}
             <Dot icon={icon} emoji={emoji} color={color} active={active} />
             {!isLast
-              ? <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+              ? <div className="h-px flex-1 bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]" />
               : <div className="flex-1" />}
           </div>
 
           {/* Content below */}
           <div className="mt-3 max-w-40 px-2 text-center">
-            {date && <time className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{date}</time>}
+            {date && <time className="text-xs font-medium uppercase tracking-wide text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">{date}</time>}
             {children}
           </div>
         </div>
@@ -157,7 +157,7 @@ export const TimelineItem = forwardRef<HTMLDivElement, TimelineItemProps>(
             isLargeDot && "pt-1",
             isEven ? "md:col-start-1 md:row-start-1 md:text-right" : "md:col-start-3",
           )}>
-            {date && <time className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{date}</time>}
+            {date && <time className="text-xs font-medium uppercase tracking-wide text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">{date}</time>}
             {children}
           </div>
         </div>
@@ -185,7 +185,7 @@ export const TimelineItem = forwardRef<HTMLDivElement, TimelineItemProps>(
 
         {/* Content */}
         <div className={cn("min-w-0 flex-1", !isLast && "pb-8", isLargeDot && "pt-1")}>
-          {date && <time className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{date}</time>}
+          {date && <time className="text-xs font-medium uppercase tracking-wide text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">{date}</time>}
           {children}
         </div>
       </div>

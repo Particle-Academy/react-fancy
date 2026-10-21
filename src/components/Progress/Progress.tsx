@@ -96,7 +96,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
               r={radius}
               fill="none"
               strokeWidth={strokeWidth}
-              className={cn("stroke-zinc-200 dark:stroke-zinc-700", trackClassName)}
+              className={cn("stroke-[color:var(--fancy-border,var(--color-zinc-200))] dark:stroke-[color:var(--fancy-border-dark,var(--color-zinc-700))]", trackClassName)}
             />
             <circle
               cx={diameter / 2}
@@ -143,7 +143,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       >
         <div
           className={cn(
-            "w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700",
+            "w-full overflow-hidden rounded-full bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
             barHeightClasses[named],
             trackClassName,
           )}

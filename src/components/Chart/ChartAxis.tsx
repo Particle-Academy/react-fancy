@@ -34,14 +34,14 @@ export function ChartAxis({
           return (
             <g key={tick}>
               <line x1={tx} y1={y} x2={tx} y2={y + 4} stroke="currentColor" className="text-zinc-300 dark:text-zinc-600" />
-              <text x={tx} y={y + 16} textAnchor="middle" className="fill-zinc-500 text-[10px] dark:fill-zinc-400">
+              <text x={tx} y={y + 16} textAnchor="middle" className="fill-[color:var(--fancy-text-muted,var(--color-zinc-500))] text-[10px] dark:fill-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                 {formatTick(tick)}
               </text>
             </g>
           );
         })}
         {label && (
-          <text x={x + length / 2} y={y + 32} textAnchor="middle" className="fill-zinc-500 text-[11px] dark:fill-zinc-400">
+          <text x={x + length / 2} y={y + 32} textAnchor="middle" className="fill-[color:var(--fancy-text-muted,var(--color-zinc-500))] text-[11px] dark:fill-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
             {label}
           </text>
         )}
@@ -57,7 +57,7 @@ export function ChartAxis({
         return (
           <g key={tick}>
             <line x1={x - 4} y1={ty} x2={x} y2={ty} stroke="currentColor" className="text-zinc-300 dark:text-zinc-600" />
-            <text x={x - 8} y={ty + 3} textAnchor="end" className="fill-zinc-500 text-[10px] dark:fill-zinc-400">
+            <text x={x - 8} y={ty + 3} textAnchor="end" className="fill-[color:var(--fancy-text-muted,var(--color-zinc-500))] text-[10px] dark:fill-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
               {formatTick(tick)}
             </text>
           </g>
@@ -69,7 +69,7 @@ export function ChartAxis({
           y={y + length / 2}
           textAnchor="middle"
           transform={`rotate(-90, ${x - 36}, ${y + length / 2})`}
-          className="fill-zinc-500 text-[11px] dark:fill-zinc-400"
+          className="fill-[color:var(--fancy-text-muted,var(--color-zinc-500))] text-[11px] dark:fill-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"
         >
           {label}
         </text>

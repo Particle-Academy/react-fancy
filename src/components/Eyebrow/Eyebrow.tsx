@@ -23,7 +23,7 @@ export const Eyebrow = forwardRef<HTMLDivElement, EyebrowProps>(
         ref={ref}
         data-react-fancy-eyebrow=""
         className={cn(
-          "flex items-baseline gap-3 font-mono text-[11.5px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400",
+          "flex items-baseline gap-3 font-mono text-[11.5px] uppercase tracking-wider text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
           rule && "border-b border-zinc-200 pb-2 dark:border-zinc-800",
           className,
         )}
@@ -33,7 +33,7 @@ export const Eyebrow = forwardRef<HTMLDivElement, EyebrowProps>(
           <span>
             {num != null && (
               <>
-                <b className="font-medium text-zinc-900 dark:text-zinc-100">{num}</b>
+                <b className="font-medium text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]">{num}</b>
                 {label != null && " — "}
               </>
             )}

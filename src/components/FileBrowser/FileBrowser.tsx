@@ -414,7 +414,7 @@ function FileBrowserRoot({
       <div
         data-react-fancy-file-browser=""
         className={cn(
-          "flex flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white text-sm dark:border-zinc-700 dark:bg-zinc-900",
+          "flex flex-col overflow-hidden rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] text-sm dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           className,
         )}
       >

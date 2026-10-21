@@ -100,9 +100,9 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
               : undefined
           }
           className={cn(
-            "text-sm font-medium tabular-nums text-zinc-900 dark:text-zinc-100",
+            "text-sm font-medium tabular-nums text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
             interactive &&
-              "cursor-pointer rounded-md outline-none transition-colors hover:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:hover:bg-zinc-800",
+              "cursor-pointer rounded-md outline-none transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
             className,
           )}
         >
@@ -112,7 +112,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
     }
 
     const spinBtnClass =
-      "flex h-7 w-full items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 disabled:opacity-50";
+      "flex h-7 w-full items-center justify-center rounded text-zinc-400 transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-600 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-300 disabled:opacity-50";
     const displayClass =
       "flex h-10 w-12 items-center justify-center text-lg font-medium tabular-nums";
 
@@ -124,7 +124,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
           if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
         }}
         className={cn(
-          "inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white p-2 dark:border-zinc-700 dark:bg-zinc-900",
+          "inline-flex items-center gap-1 rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-2 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           disabled && "opacity-50",
           className,
         )}
@@ -159,7 +159,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
             type="button"
             onClick={toggleAmPm}
             disabled={disabled}
-            className="ml-1 rounded-lg bg-zinc-100 px-2 py-1 text-sm font-medium transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+            className="ml-1 rounded-lg bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] px-2 py-1 text-sm font-medium transition-colors hover:bg-zinc-200 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:bg-zinc-700"
           >
             {isPM ? "PM" : "AM"}
           </button>

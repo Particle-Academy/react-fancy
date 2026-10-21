@@ -10,7 +10,7 @@ export function CommandInput({
   const { query, setQuery, listId } = useCommand();
 
   return (
-    <div data-react-fancy-command-input="" className="flex items-center border-b border-zinc-200 px-4 dark:border-zinc-700">
+    <div data-react-fancy-command-input="" className="flex items-center border-b border-[color:var(--fancy-border,var(--color-zinc-200))] px-4 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]">
       <Search size={16} className="shrink-0 text-zinc-400" />
       <input
         type="text"

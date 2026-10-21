@@ -499,7 +499,7 @@ export function PromptInput({
       onDragLeave={() => setDragOver(false)}
       onDrop={onDrop}
       className={cn(
-        "relative rounded-md border bg-white transition dark:bg-zinc-900",
+        "relative rounded-md border bg-[color:var(--fancy-surface,var(--color-white))] transition dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
         dragOver
           ? "border-violet-400 bg-violet-50/50 dark:border-violet-600 dark:bg-violet-950/30"
           : "border-zinc-200 dark:border-zinc-800",
@@ -516,7 +516,7 @@ export function PromptInput({
           {attachments.map((a) => (
             <span
               key={a.id}
-              className="inline-flex items-center gap-1.5 rounded-md bg-zinc-100 px-2 py-0.5 text-[11px] dark:bg-zinc-800"
+              className="inline-flex items-center gap-1.5 rounded-md bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] px-2 py-0.5 text-[11px] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             >
               <Icon name="paperclip" size="xs" className="text-zinc-400" />
               <span className="font-mono">{a.name}</span>
@@ -583,7 +583,7 @@ export function PromptInput({
         )}
 
         {picker && items.length > 0 && (
-          <div className="absolute bottom-full left-2 z-10 mb-1 w-72 overflow-hidden rounded-md border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="absolute bottom-full left-2 z-10 mb-1 w-72 overflow-hidden rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]">
             <div className="border-b border-zinc-100 bg-zinc-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950">
               {picker.kind === "cmd" ? "Commands" : "Mention"} · {items.length}
             </div>
@@ -692,7 +692,7 @@ export function PromptInput({
             data-level={meterLevel}
             className="ml-2 flex min-w-0 items-center gap-1.5 overflow-hidden"
           >
-            <div className="h-1.5 w-24 shrink overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
+            <div className="h-1.5 w-24 shrink overflow-hidden rounded-full bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]">
               <div
                 className="h-full rounded-full transition-all"
                 style={{ width: `${ratio * 100}%`, backgroundColor: meterColor }}
@@ -710,11 +710,11 @@ export function PromptInput({
               className="hidden text-[10px] text-zinc-500 sm:inline"
               data-react-fancy-prompt-input-hint={modKey === "⌘" ? "apple" : "generic"}
             >
-              <kbd className="rounded border border-zinc-300 bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              <kbd className="rounded border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
                 {modKey}
               </kbd>{" "}
               +{" "}
-              <kbd className="rounded border border-zinc-300 bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              <kbd className="rounded border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
                 Enter
               </kbd>{" "}
               to send

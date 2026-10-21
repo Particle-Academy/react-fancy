@@ -21,7 +21,7 @@ export function ChartBar({
           {data.map((item) => (
             <div
               key={item.label}
-              className="flex-1 text-center text-xs font-medium text-zinc-500 dark:text-zinc-400"
+              className="flex-1 text-center text-xs font-medium text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"
             >
               {item.value}
             </div>
@@ -59,7 +59,7 @@ export function ChartBar({
         {data.map((item) => (
           <div
             key={item.label}
-            className="flex-1 text-center text-xs text-zinc-500 dark:text-zinc-400"
+            className="flex-1 text-center text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"
           >
             {item.label}
           </div>

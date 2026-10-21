@@ -139,7 +139,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {leading && (
             <span
               ref={leadingRef}
-              className="pointer-events-none absolute left-3 text-zinc-400 dark:text-zinc-500"
+              className="pointer-events-none absolute left-3 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
             >
               {leading}
             </span>
@@ -261,7 +261,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               // most people do not want. Still reachable by click and by
               // screen readers.
               tabIndex={-1}
-              className="absolute right-2 inline-flex items-center justify-center rounded p-1 text-zinc-400 transition-colors hover:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:cursor-not-allowed disabled:opacity-50 dark:text-zinc-500 dark:hover:text-zinc-300"
+              className="absolute right-2 inline-flex items-center justify-center rounded p-1 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] transition-colors hover:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:cursor-not-allowed disabled:opacity-50 dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))] dark:hover:text-zinc-300"
             >
               {shown ? <EyeOffIcon /> : <EyeIcon />}
             </button>
@@ -269,7 +269,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             trailing && (
               <span
                 ref={trailingRef}
-                className="pointer-events-none absolute right-3 text-zinc-400 dark:text-zinc-500"
+                className="pointer-events-none absolute right-3 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
               >
                 {trailing}
               </span>

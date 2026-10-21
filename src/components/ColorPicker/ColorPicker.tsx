@@ -97,7 +97,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
             className={cn(
               "select-all font-mono uppercase",
               TEXT_SIZES[size],
-              "text-zinc-700 dark:text-zinc-300",
+              "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
             )}
           >
             {color.toUpperCase()}
@@ -149,7 +149,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
           className={cn(
             "select-all font-mono uppercase",
             TEXT_SIZES[size],
-            "text-zinc-700 dark:text-zinc-300",
+            "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
             disabled && "opacity-50",
           )}
         >

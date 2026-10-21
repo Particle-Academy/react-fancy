@@ -99,8 +99,8 @@ export function ContextMenuSubTrigger({ children, className }: ContextMenuSubTri
       aria-expanded={open}
       className={cn(
         "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors",
-        "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
-        open && "bg-zinc-100 dark:bg-zinc-800",
+        "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
+        open && "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         className,
       )}
       onMouseEnter={() => {
@@ -158,7 +158,7 @@ export function ContextMenuSubContent({ children, className }: ContextMenuSubCon
       data-react-fancy-context-menu-sub-content=""
       role="menu"
       className={cn(
-        "absolute z-50 min-w-[8rem] rounded-xl border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
+        "absolute z-50 min-w-[8rem] rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
         flipLeft ? "right-full mr-1" : "left-full ml-1",
         maxH && "overflow-y-auto",
         className,

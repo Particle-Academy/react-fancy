@@ -107,20 +107,20 @@ export function EmojiSelect({ value, defaultValue, onChange, placeholder = "Sear
     <div className={cn("relative inline-block", className)} data-react-fancy-emoji-select="">
       <button
         type="button"
-        className="flex items-center gap-2 rounded-lg border border-zinc-300 px-3 py-2 text-sm transition-[border-color,box-shadow] duration-150 dark:border-zinc-700 dark:bg-[#1e1e24]"
+        className="flex items-center gap-2 rounded-lg border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] px-3 py-2 text-sm transition-[border-color,box-shadow] duration-150 dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-input-dark,#1e1e24)]"
         onClick={() => setOpen((v) => !v)}
       >
         {selected ? <span className="text-xl">{selected}</span> : <span className="text-zinc-400">Pick emoji</span>}
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-80 rounded-lg border border-zinc-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-800 fancy-fade-in">
+        <div className="absolute z-50 mt-1 w-80 rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-white p-2 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800 fancy-fade-in">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={placeholder}
-            className="mb-2 w-full rounded-md border border-zinc-200 px-2 py-1 text-sm transition-[border-color,box-shadow] duration-150 dark:border-zinc-700 dark:bg-[#1e1e24] dark:text-zinc-100"
+            className="mb-2 w-full rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] px-2 py-1 text-sm transition-[border-color,box-shadow] duration-150 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:text-zinc-100"
             autoFocus
           />
 
@@ -327,7 +327,7 @@ function TonePopover({ target, onPickBase, onPickTone, onMouseEnter, onMouseLeav
   return (
     <div
       style={{ ...style, zIndex: 9999 }}
-      className="flex gap-0.5 rounded-md border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-800"
+      className="flex gap-0.5 rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-white p-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >

@@ -63,7 +63,7 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
         className={cn(
           "relative inline-flex items-center justify-center rounded-full",
           containerSizeClasses[size],
-          !src && "bg-zinc-200 dark:bg-zinc-700",
+          !src && "bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
           className,
         )}
       >
@@ -94,7 +94,7 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
         {status && (
           <span
             className={cn(
-              "absolute bottom-0 right-0 rounded-full ring-2 ring-white dark:ring-zinc-900",
+              "absolute bottom-0 right-0 rounded-full ring-2 ring-[color:var(--fancy-surface,var(--color-white))] dark:ring-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
               statusSizeClasses[size],
               statusColorClasses[status],
             )}

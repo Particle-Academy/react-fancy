@@ -27,7 +27,7 @@ function ThumbnailItem({ file, index, onRemove }: { file: File; index: number; o
 
   return (
     <div className="group relative flex w-20 flex-col items-center gap-1">
-      <div className="relative h-20 w-20 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800">
+      <div className="relative h-20 w-20 overflow-hidden rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-zinc-50 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800">
         {isImage && objectUrl ? (
           <img src={objectUrl} alt={file.name} className="h-full w-full object-cover" />
         ) : (
@@ -70,7 +70,7 @@ export function FileUploadList({ thumbnail, className }: FileUploadListProps) {
       {files.map((file, i) => (
         <li
           key={`${file.name}-${i}`}
-          className="flex items-center gap-3 rounded-lg border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-700"
+          className="flex items-center gap-3 rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] px-3 py-2 text-sm dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]"
         >
           <File size={16} className="shrink-0 text-zinc-400" />
           <span className="flex-1 truncate">{file.name}</span>

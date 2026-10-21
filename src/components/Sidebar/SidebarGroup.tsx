@@ -8,12 +8,12 @@ export function SidebarGroup({ children, label, className }: SidebarGroupProps) 
   return (
     <div data-react-fancy-sidebar-group="" className={cn("py-1", className)}>
       {label && !collapsed && (
-        <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+        <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
           {label}
         </p>
       )}
       {label && collapsed && (
-        <div className="mx-auto mb-1 h-px w-6 bg-zinc-200 dark:bg-zinc-700" />
+        <div className="mx-auto mb-1 h-px w-6 bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]" />
       )}
       {children}
     </div>

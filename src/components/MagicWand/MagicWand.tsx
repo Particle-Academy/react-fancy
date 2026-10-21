@@ -304,7 +304,7 @@ function Wand({
       className={`${fixed ? "fixed z-50" : "absolute z-20"} -translate-x-1/2 -translate-y-full`}
       style={{ left: pos.x, top: pos.y - 6 }}
     >
-      <div className="flex items-center gap-1 rounded-full border border-violet-300 bg-white px-1.5 py-1 shadow-lg ring-1 ring-violet-200 dark:border-violet-700 dark:bg-zinc-900 dark:ring-violet-900">
+      <div className="flex items-center gap-1 rounded-full border border-violet-300 bg-[color:var(--fancy-surface,var(--color-white))] px-1.5 py-1 shadow-lg ring-1 ring-violet-200 dark:border-violet-700 dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:ring-violet-900">
         <span className="ml-1 mr-0.5 inline-flex items-center gap-1 text-[10px] font-medium text-violet-700 dark:text-violet-300">
           <span aria-hidden>✦</span>
           {appearance === "floating" && (
@@ -323,7 +323,7 @@ function Wand({
           >
             {busy === a.id ? "…" : appearance === "pill" ? a.label[0] : a.label}
             {appearance === "floating" && a.tag && (
-              <span className="ml-1 rounded-full bg-zinc-100 px-1 text-[9px] font-medium text-zinc-500 dark:bg-zinc-800">
+              <span className="ml-1 rounded-full bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] px-1 text-[9px] font-medium text-zinc-500 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]">
                 {a.tag}
               </span>
             )}
@@ -331,7 +331,7 @@ function Wand({
         ))}
       </div>
       <div className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-px">
-        <div className="h-2 w-2 rotate-45 border-b border-r border-violet-300 bg-white dark:border-violet-700 dark:bg-zinc-900" />
+        <div className="h-2 w-2 rotate-45 border-b border-r border-violet-300 bg-[color:var(--fancy-surface,var(--color-white))] dark:border-violet-700 dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]" />
       </div>
     </div>
   );

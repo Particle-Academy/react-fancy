@@ -15,7 +15,7 @@ export function BreadcrumbsItem({
     "text-sm",
     active
       ? "font-medium text-zinc-900 dark:text-white"
-      : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300",
+      : "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
     className,
   );
 

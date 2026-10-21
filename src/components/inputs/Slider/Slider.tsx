@@ -130,7 +130,7 @@ const SingleSlider = forwardRef<HTMLInputElement, SliderProps & { range?: false 
             )}
           />
           {showValue && (
-            <span className="min-w-[3ch] shrink-0 whitespace-nowrap text-right text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <span className="min-w-[3ch] shrink-0 whitespace-nowrap text-right text-sm font-medium text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
               {prefix}{value}{suffix}
             </span>
           )}
@@ -218,7 +218,7 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
       >
         <div className="flex items-center gap-3">
           <div className="relative w-full">
-            <div className="pointer-events-none absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-zinc-200 dark:bg-zinc-700" />
+            <div className="pointer-events-none absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]" />
             <div
               className="pointer-events-none absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-blue-500"
               style={{ left: `${leftPercent}%`, width: `${rightPercent - leftPercent}%` }}
@@ -251,7 +251,7 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
             <div className="h-6" />
           </div>
           {showValue && (
-            <span className="min-w-[6ch] shrink-0 whitespace-nowrap text-right text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <span className="min-w-[6ch] shrink-0 whitespace-nowrap text-right text-sm font-medium text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
               {prefix}{value[0]}{suffix}–{prefix}{value[1]}{suffix}
             </span>
           )}
@@ -290,7 +290,7 @@ function SliderMarks({
         return (
           <span
             key={mark.value}
-            className="absolute -translate-x-1/2 text-xs text-zinc-500 dark:text-zinc-400"
+            className="absolute -translate-x-1/2 text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"
             style={{ left: `${percent}%` }}
           >
             {mark.label ?? mark.value}

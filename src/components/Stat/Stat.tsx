@@ -30,7 +30,7 @@ const StatRoot = forwardRef<HTMLDivElement, StatProps>(
             <div
               data-react-fancy-stat-value=""
               className={cn(
-                "font-semibold leading-none tracking-tight text-zinc-900 tabular-nums dark:text-zinc-100",
+                "font-semibold leading-none tracking-tight text-[color:var(--fancy-text,var(--color-zinc-900))] tabular-nums dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
                 valueClasses[size],
               )}
             >
@@ -39,7 +39,7 @@ const StatRoot = forwardRef<HTMLDivElement, StatProps>(
             {label != null && (
               <div
                 data-react-fancy-stat-label=""
-                className="mt-1.5 font-mono text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400"
+                className="mt-1.5 font-mono text-xs uppercase tracking-wide text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"
               >
                 {label}
               </div>

@@ -13,7 +13,7 @@ export const proseClasses = [
   "[&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5",
   "[&_li]:mb-1",
   "[&_blockquote]:border-l-4 [&_blockquote]:border-zinc-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-zinc-600 dark:[&_blockquote]:border-zinc-600 dark:[&_blockquote]:text-zinc-400",
-  "[&_code]:bg-zinc-100 [&_code]:px-1 [&_code]:rounded [&_code]:text-sm dark:[&_code]:bg-zinc-800",
+  "[&_code]:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] [&_code]:px-1 [&_code]:rounded [&_code]:text-sm dark:[&_code]:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
   "[&_pre]:bg-zinc-950 [&_pre]:text-zinc-100 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto",
   "[&_pre_code]:bg-transparent [&_pre_code]:px-0",
   "[&_strong]:font-bold [&_em]:italic",

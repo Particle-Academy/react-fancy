@@ -95,7 +95,7 @@ export function FileBrowserNewFolder({ className }: { className?: string }) {
         title={`New folder in ${path}`}
         className={cn(
           "flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-xs text-zinc-500 transition-colors",
-          "hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300",
+          "hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
           className,
         )}
       >
@@ -148,8 +148,8 @@ export function FileBrowserNewFolder({ className }: { className?: string }) {
           }}
           className={cn(
             "w-32 min-w-0 rounded-md border px-1.5 py-0.5 text-xs outline-none",
-            "bg-transparent text-zinc-700 placeholder:text-zinc-400 dark:text-zinc-300",
-            shown ? "border-red-400 dark:border-red-500" : "border-zinc-200 dark:border-zinc-700",
+            "bg-transparent text-[color:var(--fancy-text-soft,var(--color-zinc-700))] placeholder:text-zinc-400 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
+            shown ? "border-red-400 dark:border-red-500" : "border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
           )}
         />
         <button
@@ -165,7 +165,7 @@ export function FileBrowserNewFolder({ className }: { className?: string }) {
           type="button"
           data-react-fancy-file-browser-new-folder-cancel=""
           onClick={close}
-          className="rounded-md px-1.5 py-0.5 text-xs text-zinc-500 transition-colors hover:text-zinc-700 dark:hover:text-zinc-300"
+          className="rounded-md px-1.5 py-0.5 text-xs text-zinc-500 transition-colors hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
         >
           Cancel
         </button>

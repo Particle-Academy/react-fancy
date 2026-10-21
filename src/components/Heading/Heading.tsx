@@ -56,7 +56,7 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(
         ref={ref}
         data-react-fancy-heading=""
         className={cn(
-          "text-zinc-900 dark:text-zinc-100",
+          "text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
           sizeClasses[size],
           trackingClasses[size],
           weightClasses[weight],

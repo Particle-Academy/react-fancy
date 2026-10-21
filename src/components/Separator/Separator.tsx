@@ -12,7 +12,7 @@ export const Separator = forwardRef<HTMLDivElement, SeparatorProps>(
           aria-orientation="vertical"
           data-react-fancy-separator=""
           className={cn(
-            "inline-block h-full border-l border-zinc-200 dark:border-zinc-700",
+            "inline-block h-full border-l border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
             className,
           )}
         />
@@ -27,11 +27,11 @@ export const Separator = forwardRef<HTMLDivElement, SeparatorProps>(
           data-react-fancy-separator=""
           className={cn("flex items-center gap-3", className)}
         >
-          <hr className="flex-1 border-zinc-200 dark:border-zinc-700" />
-          <span className="text-sm text-zinc-500 dark:text-zinc-400">
+          <hr className="flex-1 border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]" />
+          <span className="text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
             {label}
           </span>
-          <hr className="flex-1 border-zinc-200 dark:border-zinc-700" />
+          <hr className="flex-1 border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]" />
         </div>
       );
     }
@@ -42,7 +42,7 @@ export const Separator = forwardRef<HTMLDivElement, SeparatorProps>(
         role="separator"
         data-react-fancy-separator=""
         className={cn(
-          "border-zinc-200 dark:border-zinc-700",
+          "border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
           className,
         )}
       />

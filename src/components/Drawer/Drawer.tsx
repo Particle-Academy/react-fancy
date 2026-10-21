@@ -134,7 +134,7 @@ function DrawerRoot({
         aria-modal={isViewport || undefined}
         {...rest}
         className={cn(
-          "pointer-events-auto absolute flex flex-col border-zinc-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-zinc-900",
+          "pointer-events-auto absolute flex flex-col border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-xl dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           ANCHOR[side],
           EDGE[side],
           horizontal ? WIDTH[size] : HEIGHT[size],

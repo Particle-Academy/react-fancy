@@ -136,7 +136,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
           "pointer-events-auto flex shrink-0 items-center gap-px opacity-0 transition-opacity duration-150",
           "group-hover/faux-client:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100",
           isBrowser
-            ? "-my-1 text-zinc-400 dark:text-zinc-500"
+            ? "-my-1 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
             : "rounded-full bg-zinc-900/60 px-1 py-0.5 text-white/80 shadow-sm backdrop-blur-sm",
         )}
       >
@@ -198,7 +198,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
         data-react-fancy-faux-client=""
         data-fullscreen={showFullscreen ? String(fullscreen) : undefined}
         className={cn(
-          "group/faux-client relative overflow-hidden bg-white dark:bg-zinc-900",
+          "group/faux-client relative overflow-hidden bg-[color:var(--fancy-surface,var(--color-white))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           isBrowser && "rounded-2xl border border-zinc-200 shadow-xl dark:border-zinc-800",
           isDevice && "rounded-[2rem] border-[10px] border-zinc-800 shadow-2xl dark:border-zinc-700",
           variant === "bare" && "rounded-lg border border-zinc-200 dark:border-zinc-800",
@@ -214,7 +214,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
         {isBrowser && (
           <div
             className={cn(
-              "flex items-center gap-2 border-b border-zinc-200 bg-zinc-50 px-3.5 py-2.5 font-mono text-[11.5px] text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400",
+              "flex items-center gap-2 border-b border-zinc-200 bg-zinc-50 px-3.5 py-2.5 font-mono text-[11.5px] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:border-zinc-800 dark:bg-zinc-950 dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
               barClassName,
             )}
           >
@@ -226,7 +226,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
               </div>
             )}
             {url != null && <span className="min-w-0 flex-1 truncate">{url}</span>}
-            {meta != null && <span className="shrink-0 text-zinc-400 dark:text-zinc-500">{meta}</span>}
+            {meta != null && <span className="shrink-0 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">{meta}</span>}
             {hasControls && <div className={cn(url == null && meta == null && "ml-auto")}>{controlsBar}</div>}
           </div>
         )}

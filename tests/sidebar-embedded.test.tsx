@@ -44,7 +44,8 @@ describe("the default rail is unchanged", () => {
     const cls = rail().className;
 
     expect(cls).toContain("border-r");
-    expect(cls).toContain("bg-white");
+    // The rail's surface is the surface token since 5.52.0.
+    expect(cls).toContain("bg-[color:var(--fancy-surface,var(--color-white))]");
     expect(cls).toContain("w-60");
     expect(rail().getAttribute("data-embedded")).toBeNull();
     unmount();
@@ -61,8 +62,11 @@ describe("embedded", () => {
     // The line the host sees slicing their card.
     expect(cls).not.toContain("border-r");
     // The opaque block sitting on top of the card's own surface.
+    // Token names, not the old literals — `not.toContain("bg-white")` would
+    // pass vacuously now that the class is the surface token.
+    expect(cls).not.toContain("--fancy-surface,");
+    expect(cls).not.toContain("--fancy-surface-dark,");
     expect(cls).not.toContain("bg-white");
-    expect(cls).not.toContain("dark:bg-zinc-900");
     // The 240px rail inside a container of some other width.
     expect(cls).not.toContain("w-60");
     expect(cls).toContain("w-full");

@@ -11,6 +11,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.52.0] - 2026-10-21
+
+### Added
+
+- **Semantic theme tokens.** A host can now repaint the kit's neutral chrome
+  with its own palette, light and dark, WITHOUT remapping Tailwind's `zinc` or
+  `violet`. Ten roles, two CSS variables each (`--fancy-<role>` for light,
+  `--fancy-<role>-dark` for dark):
+  `surface`, `surface-muted`, `border`, `border-strong`, `input`, `text`,
+  `text-soft`, `text-muted`, `text-faint`, `focus`. The table, with each role's
+  default and what reads it, is exported as `THEME_TOKENS` and documented in
+  the README under "Semantic tokens".
+  ```css
+  :root {
+    --fancy-surface: #fbf6ee;      --fancy-surface-dark: #1f2833;
+    --fancy-border: #e4d3bd;       --fancy-border-dark: #3a4757;
+    --fancy-text: #3b2a1e;         --fancy-text-dark: #e6edf5;
+  }
+  ```
+  Set them anywhere the variable is in scope (`:root`, `body`, a wrapper) -- no
+  selector, layer or specificity to win.
+- 351 light/dark class pairs across 126 component files now read these tokens
+  (Card, the overlays, every form control, Table, Tabs, Menu, Sidebar, Navbar,
+  Toast, Timeline, Chart axes, FileBrowser, TreeNav, PromptInput chrome, …),
+  plus the dark-mode rules in `styles.css` (inputs, checkbox/radio, switch
+  track, input affixes, overlays, overlay hover + separators, field labels,
+  focus ring).
+- The literal colours TribeShare's 2026-10-21 audit found in chrome are gone:
+  the form controls' `#1e1e24` dark field (Input and `inputs.utils`, Checkbox,
+  CheckboxGroup, RadioGroup, Autocomplete, OtpInput, Pillbox, EmojiSelect) is
+  `--fancy-input-dark`; ChartLine's dot hole and ChartPie's slice gap (`white`)
+  are `surface`; MoodMeter's grid lines and Timeline's scrollbar thumb are
+  `text-faint`.
+
+### Changed
+
+- **Nothing you can see, unless you set a token.** Every converted class
+  carries its old colour as the `var()` fallback --
+  `bg-[color:var(--fancy-surface,var(--color-white))]` where it said
+  `bg-white` -- so with no token set the computed value is identical. Verified
+  two ways: the suite compiles each token class with Tailwind and asserts its
+  declaration is `var(--fancy-x, <the old utility's declaration>)`, and a
+  browser screenshot of 18 components in light and dark is **byte-identical**
+  before and after.
+- `className` overrides still win exactly as before: tailwind-merge classifies
+  the token classes as the same colour utilities they replaced.
+- **What to do:** nothing. If you asserted on a literal class string in your
+  own tests (`toContain("bg-white")` on a kit component), assert on the token
+  class or the computed colour instead.
+
+### Not covered -- deliberately
+
+- **Colours that encode data stay literal:** chart series palettes and the
+  Sparkline default, file-type marks and folder glyphs (FileBrowser, TreeNav),
+  MoodMeter's series colours, PromptInput's mention-kind marks and confidence
+  scale, ReasonTag's confidence scale, Avatar's glow per event kind,
+  ColorPicker's default value. Repainting them with a neutral palette would
+  erase what they mean. `tests/literal-colours.test.tsx` lists each with its
+  reason and exact values, so a new literal anywhere fails the suite.
+- **An explicit `color` prop is the host's choice, not chrome:** Badge, Button,
+  Callout, Progress, Switch and Timeline colour maps keep their hues.
+- **Coverage is not total.** A pair is converted only where one token
+  reproduces it exactly in BOTH modes. Near-misses keep zinc today -- e.g.
+  `text-zinc-600 / dark:text-zinc-400` (15 sites), `border-zinc-200 /
+  dark:border-zinc-800` (13), `text-zinc-900 / dark:text-white` (13), the
+  default Button and Badge. Widening a token over them would change their
+  look, which this release promises not to do.
+- **Dark mode still keys off your `dark:` variant and `.dark`.** Following
+  `[data-theme="dark"]` is the next release.
+
 ## [5.51.2] - 2026-10-21
 
 ### Fixed

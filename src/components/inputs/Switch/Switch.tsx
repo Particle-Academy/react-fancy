@@ -139,7 +139,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
               </label>
             )}
             {description && (
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">
+              <span className="text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                 {description}
               </span>
             )}

@@ -82,7 +82,7 @@ export function FileBrowserStatusRow({ depth, kind, message, onRetry }: FileBrow
           <button
             type="button"
             onClick={onRetry}
-            className="flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+            className="flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-700 dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-200"
           >
             <RotateCw size={11} />
             Retry
@@ -96,7 +96,7 @@ export function FileBrowserStatusRow({ depth, kind, message, onRetry }: FileBrow
     <div
       role="none"
       data-react-fancy-file-browser-status={kind}
-      className="flex items-center gap-1.5 py-0.5 text-xs text-zinc-400 italic dark:text-zinc-500"
+      className="flex items-center gap-1.5 py-0.5 text-xs text-[color:var(--fancy-text-faint,var(--color-zinc-400))] italic dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
       style={{ paddingLeft }}
     >
       {kind === "loading" && <Loader2 size={12} className="shrink-0 animate-spin" aria-hidden="true" />}
@@ -179,7 +179,7 @@ export function FileBrowserNode({ entry, depth }: FileBrowserNodeProps) {
           "flex w-full cursor-pointer items-center gap-1 rounded-md py-0.5 pr-2 text-left text-[13px] transition-colors select-none",
           selected
             ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
-            : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
+            : "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
           entry.disabled && "pointer-events-none opacity-40",
           "group-focus-visible:ring-2 group-focus-visible:ring-blue-500/40 group-focus-visible:ring-inset",
         )}
@@ -209,7 +209,7 @@ export function FileBrowserNode({ entry, depth }: FileBrowserNodeProps) {
           (entry.kind === "dir" ? <FolderIcon open={expanded} /> : <FileIcon ext={ext} />)}
         <span className="min-w-0 flex-1 truncate">{entry.name}</span>
         {entry.kind === "file" && entry.size !== undefined && (
-          <span className="shrink-0 text-[11px] text-zinc-400 tabular-nums dark:text-zinc-500">
+          <span className="shrink-0 text-[11px] text-[color:var(--fancy-text-faint,var(--color-zinc-400))] tabular-nums dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
             {formatFileSize(entry.size)}
           </span>
         )}

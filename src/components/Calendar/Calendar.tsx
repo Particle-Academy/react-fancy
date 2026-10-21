@@ -165,7 +165,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
         data-react-fancy-calendar=""
         ref={ref}
         className={cn(
-          "inline-block w-72 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900",
+          "inline-block w-72 rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-4 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           className,
         )}
       >
@@ -174,7 +174,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
           <button
             type="button"
             onClick={prevMonth}
-            className="rounded-lg p-1 text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="rounded-lg p-1 text-zinc-400 hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             aria-label="Previous month"
           >
             <ChevronLeft size={16} />
@@ -185,7 +185,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
           <button
             type="button"
             onClick={nextMonth}
-            className="rounded-lg p-1 text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="rounded-lg p-1 text-zinc-400 hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             aria-label="Next month"
           >
             <ChevronRight size={16} />
@@ -228,7 +228,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
                   isCurrentMonth &&
                     !selected &&
                     !inRange &&
-                    "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
+                    "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
                   inRange &&
                     "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
                   selected &&

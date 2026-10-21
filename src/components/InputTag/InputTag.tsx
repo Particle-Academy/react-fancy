@@ -279,7 +279,7 @@ export function InputTag({
       role="listbox"
       aria-label={cfg.label ?? `Pick a ${active.char === "/" ? "command" : "mention"}`}
       className={[
-        "fixed z-50 w-72 overflow-hidden rounded-md border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
+        "fixed z-50 w-72 overflow-hidden rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
         className ?? "",
       ]
         .filter(Boolean)

@@ -466,7 +466,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
           dirtyClasses(dirty),
           errorClasses(error),
           "flex w-full cursor-pointer items-center justify-between gap-2 text-left",
-          !hasValue && "text-zinc-400 dark:text-zinc-500",
+          !hasValue && "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
           className,
         )}
       >
@@ -491,7 +491,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
           ref={listRef}
           role="listbox"
           aria-multiselectable={multiple || undefined}
-          className="fixed z-50 max-h-60 min-w-[8rem] overflow-y-auto rounded-xl border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-zinc-950/50 fancy-scale-in"
+          className="fixed z-50 max-h-60 min-w-[8rem] overflow-y-auto rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:shadow-zinc-950/50 fancy-scale-in"
           style={{
             left: position.x,
             top: position.y,
@@ -510,7 +510,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder={creatable && !searchable ? "Type to add…" : "Search…"}
-                className="w-full rounded-md border-0 bg-zinc-100 px-2.5 py-1.5 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+                className="w-full rounded-md border-0 bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] px-2.5 py-1.5 text-sm text-[color:var(--fancy-text,var(--color-zinc-900))] placeholder:text-[color:var(--fancy-text-faint,var(--color-zinc-400))] outline-none dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))] dark:placeholder:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
               />
             </div>
           )}
@@ -544,11 +544,11 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
                   className={cn(
                     "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
                     i === activeIndex
-                      ? "bg-zinc-100 dark:bg-zinc-800"
+                      ? "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
                       : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
                     selected
-                      ? "text-zinc-900 dark:text-zinc-100"
-                      : "text-zinc-700 dark:text-zinc-300",
+                      ? "text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]"
+                      : "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
                     option.disabled && "cursor-not-allowed opacity-50",
                   )}
                 >
@@ -582,7 +582,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
                   <span className="min-w-0 flex-1">
                     <span className="block truncate">{option.label}</span>
                     {option.description && (
-                      <span className="block truncate text-xs text-zinc-400 dark:text-zinc-500">{option.description}</span>
+                      <span className="block truncate text-xs text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">{option.description}</span>
                     )}
                   </span>
                 </button>

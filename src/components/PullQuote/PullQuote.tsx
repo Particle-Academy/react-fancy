@@ -25,7 +25,7 @@ export const PullQuote = forwardRef<HTMLQuoteElement, PullQuoteProps>(
         cite={citeUrl}
         data-react-fancy-pull-quote=""
         className={cn(
-          "m-0 text-2xl font-medium leading-snug tracking-tight text-zinc-900 dark:text-zinc-100",
+          "m-0 text-2xl font-medium leading-snug tracking-tight text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
           rule && "border-y border-zinc-200 py-6 dark:border-zinc-800",
           className,
         )}
@@ -38,7 +38,7 @@ export const PullQuote = forwardRef<HTMLQuoteElement, PullQuoteProps>(
         {(attribution != null || source != null) && (
           <footer
             data-react-fancy-pull-quote-attribution=""
-            className="mt-3 text-sm font-normal tracking-normal text-zinc-500 dark:text-zinc-400"
+            className="mt-3 text-sm font-normal tracking-normal text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"
           >
             {attribution != null && <cite className="not-italic">{attribution}</cite>}
             {attribution != null && source != null && <span aria-hidden> · </span>}

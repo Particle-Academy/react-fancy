@@ -41,7 +41,7 @@ export function MobileMenuItem({
           "outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset",
           active
             ? "text-blue-600 dark:text-blue-400"
-            : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100",
+            : "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
           disabled && "pointer-events-none opacity-50",
           className,
         )}
@@ -66,8 +66,8 @@ export function MobileMenuItem({
         "flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
         "outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
         active
-          ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
-          : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-100",
+          ? "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] text-[color:var(--fancy-text,var(--color-zinc-900))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]"
+          : "text-zinc-600 hover:bg-zinc-50 hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
         disabled && "pointer-events-none opacity-50",
         className,
       )}

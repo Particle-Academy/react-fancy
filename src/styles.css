@@ -171,6 +171,10 @@
         no need to target the data-attribute.
    ──────────────────────────────────────────────────────────────────────────── */
 
+/* Every colour below reads a semantic token (`--fancy-<role>-dark`, see
+   THEME_TOKENS / README "Semantic tokens") with today's value as the fallback,
+   so a host that sets nothing sees exactly what it saw before. */
+
 /* Inputs / selects / textareas — darker bg for contrast against the page */
 :where(.dark [data-react-fancy-input] input),
 :where(.dark [data-react-fancy-textarea]),
@@ -180,8 +184,8 @@
 :where(.dark [data-react-fancy-pillbox]),
 :where(.dark [data-react-fancy-otp-input] input),
 :where(.dark [data-react-fancy-time-picker] input) {
-  background-color: #1e1e24;
-  border-color: #3f3f46;
+  background-color: var(--fancy-input-dark, #1e1e24);
+  border-color: var(--fancy-border-strong-dark, #3f3f46);
 }
 
 /* Focus ring — brighter border + subtle glow */
@@ -192,32 +196,33 @@
 :where(.dark [data-react-fancy-autocomplete] input:focus),
 :where(.dark [data-react-fancy-otp-input] input:focus),
 :where(.dark [data-react-fancy-time-picker] input:focus) {
-  border-color: #60a5fa;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+  border-color: var(--fancy-focus-dark, #60a5fa);
+  /* = rgba(96, 165, 250, 0.15) when the token is unset */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fancy-focus-dark, #60a5fa) 15%, transparent);
 }
 
 /* Field labels — brighter for readability */
 :where(.dark [data-react-fancy-field] > label:first-child) {
-  color: #f4f4f5;
+  color: var(--fancy-text-dark, #f4f4f5);
 }
 
 /* Checkbox & radio */
 :where(.dark [data-react-fancy-checkbox] input),
 :where(.dark [data-react-fancy-radio-group] input) {
-  background-color: #1e1e24;
-  border-color: #3f3f46;
+  background-color: var(--fancy-input-dark, #1e1e24);
+  border-color: var(--fancy-border-strong-dark, #3f3f46);
 }
 
 /* Switch unchecked track */
 :where(.dark [data-react-fancy-switch] button[aria-checked="false"]) {
-  background-color: #3f3f46;
+  background-color: var(--fancy-border-dark, #3f3f46);
 }
 
 /* Input wrapper affixes */
 :where(.dark [data-react-fancy-input-wrapper] > span:first-child),
 :where(.dark [data-react-fancy-input-wrapper] > span:last-child) {
-  border-color: #3f3f46;
-  background-color: #27272a;
+  border-color: var(--fancy-border-strong-dark, #3f3f46);
+  background-color: var(--fancy-surface-muted-dark, #27272a);
 }
 
 /* Date picker icon (calendar, clock) */
@@ -239,22 +244,22 @@
 :where(.dark [data-react-fancy-mobile-menu-flyout]),
 :where(.dark [data-react-fancy-modal]),
 :where(.dark [data-react-fancy-toast-item]) {
-  background-color: #18181b; /* zinc-900 */
-  border-color: #3f3f46; /* zinc-700 */
-  color: #d4d4d8; /* zinc-300 */
+  background-color: var(--fancy-surface-dark, #18181b); /* zinc-900 */
+  border-color: var(--fancy-border-dark, #3f3f46); /* zinc-700 */
+  color: var(--fancy-text-soft-dark, #d4d4d8); /* zinc-300 */
 }
 
 /* Overlay item hover states */
 :where(.dark [data-react-fancy-dropdown-item]:hover),
 :where(.dark [data-react-fancy-menu-item]:hover),
 :where(.dark [data-react-fancy-context-menu-item]:hover) {
-  background-color: #27272a; /* zinc-800 */
+  background-color: var(--fancy-surface-muted-dark, #27272a); /* zinc-800 */
 }
 
 /* Overlay separators */
 :where(.dark [data-react-fancy-dropdown-separator]),
 :where(.dark [data-react-fancy-context-menu-separator]) {
-  background-color: #3f3f46; /* zinc-700 */
+  background-color: var(--fancy-border-dark, #3f3f46); /* zinc-700 */
 }
 
 /* ─── Media viewer — transparency checkerboard ───────────────────────────────

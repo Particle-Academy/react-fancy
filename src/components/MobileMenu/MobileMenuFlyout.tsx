@@ -55,16 +55,16 @@ export function MobileMenuFlyout({
           <div
             ref={ref as React.RefObject<HTMLDivElement>}
             className={cn(
-              "absolute top-0 flex h-full w-72 max-w-[80vw] flex-col bg-white shadow-xl dark:bg-zinc-900",
+              "absolute top-0 flex h-full w-72 max-w-[80vw] flex-col bg-[color:var(--fancy-surface,var(--color-white))] shadow-xl dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
               isLeft ? "left-0" : "right-0",
               animClass,
               className,
             )}
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
+            <div className="flex items-center justify-between border-b border-[color:var(--fancy-border,var(--color-zinc-200))] px-4 py-3 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]">
               {title && (
-                <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                <span className="text-sm font-semibold text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]">
                   {title}
                 </span>
               )}
@@ -72,7 +72,7 @@ export function MobileMenuFlyout({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                className="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-600 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-300"
               >
                 <X className="h-4 w-4" />
               </button>

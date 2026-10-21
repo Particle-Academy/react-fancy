@@ -14,7 +14,7 @@ const TONE_CLASSES: Record<TimeGridTone, string> = {
 };
 
 const OFF_CLASSES =
-  "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700";
+  "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:bg-zinc-200 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:bg-zinc-700";
 
 export const TimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(
   (

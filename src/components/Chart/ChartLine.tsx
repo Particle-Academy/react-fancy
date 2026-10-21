@@ -114,7 +114,10 @@ export function ChartLine({
                   cx={px}
                   cy={py}
                   r={3}
-                  fill="white"
+                  // The dot's hole is the surface it sits on. It was white in
+                  // both modes, so both fallbacks stay white; a host's tokens
+                  // move it.
+                  className="fill-[color:var(--fancy-surface,var(--color-white))] dark:fill-[color:var(--fancy-surface-dark,var(--color-white))]"
                   stroke={color}
                   strokeWidth={2}
                 />

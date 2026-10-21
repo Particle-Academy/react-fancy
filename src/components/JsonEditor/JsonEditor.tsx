@@ -385,7 +385,7 @@ export const JsonEditor = forwardRef<HTMLDivElement, JsonEditorProps>(function J
         data-keymap-error={parsedKeyMap.ok ? undefined : "true"}
         data-mode={readOnly ? "readonly" : mode}
         className={cn(
-          "overflow-hidden rounded-lg border border-zinc-200 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100",
+          "overflow-hidden rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] text-[color:var(--fancy-text,var(--color-zinc-900))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
           className,
         )}
       >

@@ -37,7 +37,7 @@ export function TableColumn({
       data-react-fancy-table-column=""
       aria-sort={ariaSort}
       className={cn(
-        "px-4 py-3 text-left text-sm font-medium text-zinc-500 dark:text-zinc-400",
+        "px-4 py-3 text-left text-sm font-medium text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
         sortKey && "cursor-pointer select-none",
         className,
       )}
