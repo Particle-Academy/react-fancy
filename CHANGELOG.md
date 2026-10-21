@@ -11,6 +11,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.56.0] - 2026-10-21
+
+### Added
+
+- **`Calendar` per-day hooks and a controlled visible month.** All additive:
+  **nothing to do** for an existing Calendar, which renders and behaves as
+  before, plus new data attributes.
+  - Every day cell carries a stable id, `data-react-fancy-calendar-day`,
+    `YYYY-MM-DD` in local time by default (`dateId` replaces it). Leading and
+    trailing days carry `data-outside-month`; the heading carries
+    `data-react-fancy-calendar-month`.
+  - `renderDay(ctx)` draws a day's content, `dayClassName(ctx)` adds classes
+    to one day, `dayAriaLabel(ctx)` sets its accessible name. `ctx` is
+    `{ date, id, selected, disabled, inRange, outsideMonth, today }`, exported
+    as `CalendarDayContext`. A day shaded with `dayClassName` should get a
+    `dayAriaLabel` too: colour alone does not reach a screen reader.
+  - `visibleMonth` / `onVisibleMonthChange`: the shown month is controlled when
+    `visibleMonth` is given (the chevrons propose, the host decides);
+    uncontrolled it starts at today as before, and still reports each move.
+    The callback gets the 1st of the month.
+  - Opening a day on click is the existing `onChange` (single mode).
+  - Verified in Chrome in light, `.dark` and `[data-theme="dark"]`.
+
+The requester's wording was `month` / `onMonthChange`. The names here follow
+the spec (`visibleMonth` / `onVisibleMonthChange`), because `value` is already
+a date and a bare `month` reads as the selected one.
+
 ## [5.55.0] - 2026-10-21
 
 ### Added

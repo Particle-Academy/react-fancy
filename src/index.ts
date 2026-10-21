@@ -343,6 +343,7 @@ export type {
   CalendarProps,
   CalendarMode,
   DateRange,
+  CalendarDayContext,
 } from "./components/Calendar";
 
 // Phase 6: Rich Content Components

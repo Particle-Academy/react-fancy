@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "../../utils/cn";
-import type { CalendarProps, DateRange } from "./Calendar.types";
+import type { CalendarDayContext, CalendarProps, DateRange } from "./Calendar.types";
 
 const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MONTHS = [
@@ -15,6 +15,13 @@ function isSameDay(a: Date, b: Date): boolean {
     a.getMonth() === b.getMonth() &&
     a.getDate() === b.getDate()
   );
+}
+
+const pad2 = (n: number) => (n < 10 ? `0${n}` : String(n));
+
+/** `YYYY-MM-DD` in LOCAL time — never `toISOString()`, which shifts the day east of UTC. */
+function defaultDateId(date: Date): string {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
 }
 
 function getDaysInMonth(year: number, month: number): Date[] {
@@ -51,38 +58,40 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
       maxDate,
       disabledDates = [],
       className,
+      dateId = defaultDateId,
+      renderDay,
+      dayClassName,
+      dayAriaLabel,
+      visibleMonth,
+      onVisibleMonthChange,
     },
     ref,
   ) {
     const today = useMemo(() => new Date(), []);
-    const [viewMonth, setViewMonth] = useState(today.getMonth());
-    const [viewYear, setViewYear] = useState(today.getFullYear());
+    const [innerMonth, setInnerMonth] = useState(
+      () => new Date(today.getFullYear(), today.getMonth(), 1),
+    );
     const [rangeHover, setRangeHover] = useState<Date | null>(null);
+
+    const shown = visibleMonth ?? innerMonth;
+    const viewMonth = shown.getMonth();
+    const viewYear = shown.getFullYear();
 
     const days = useMemo(
       () => getDaysInMonth(viewYear, viewMonth),
       [viewYear, viewMonth],
     );
 
-    const prevMonth = useCallback(() => {
-      setViewMonth((m) => {
-        if (m === 0) {
-          setViewYear((y) => y - 1);
-          return 11;
-        }
-        return m - 1;
-      });
-    }, []);
-
-    const nextMonth = useCallback(() => {
-      setViewMonth((m) => {
-        if (m === 11) {
-          setViewYear((y) => y + 1);
-          return 0;
-        }
-        return m + 1;
-      });
-    }, []);
+    const goToMonth = useCallback(
+      (delta: number) => {
+        const next = new Date(viewYear, viewMonth + delta, 1);
+        if (visibleMonth === undefined) setInnerMonth(next);
+        onVisibleMonthChange?.(next);
+      },
+      [viewYear, viewMonth, visibleMonth, onVisibleMonthChange],
+    );
+    const prevMonth = useCallback(() => goToMonth(-1), [goToMonth]);
+    const nextMonth = useCallback(() => goToMonth(1), [goToMonth]);
 
     const isDisabled = useCallback(
       (date: Date): boolean => {
@@ -179,7 +188,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
           >
             <ChevronLeft size={16} />
           </button>
-          <span className="text-sm font-semibold">
+          <span className="text-sm font-semibold" data-react-fancy-calendar-month="">
             {MONTHS[viewMonth]} {viewYear}
           </span>
           <button
@@ -212,12 +221,24 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
             const inRange = isInRange(date);
             const disabled = isDisabled(date);
             const isToday = isSameDay(date, today);
+            const ctx: CalendarDayContext = {
+              date,
+              id: dateId(date),
+              selected,
+              disabled,
+              inRange,
+              outsideMonth: !isCurrentMonth,
+              today: isToday,
+            };
 
             return (
               <button
                 key={i}
                 type="button"
                 disabled={disabled}
+                data-react-fancy-calendar-day={ctx.id}
+                data-outside-month={isCurrentMonth ? undefined : ""}
+                aria-label={dayAriaLabel?.(ctx) || undefined}
                 onClick={() => handleSelect(date)}
                 onMouseEnter={() =>
                   mode === "range" && setRangeHover(date)
@@ -235,9 +256,10 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
                     "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900",
                   isToday && !selected && "font-bold",
                   disabled && "cursor-not-allowed opacity-30",
+                  dayClassName?.(ctx),
                 )}
               >
-                {date.getDate()}
+                {renderDay ? renderDay(ctx) : date.getDate()}
               </button>
             );
           })}
