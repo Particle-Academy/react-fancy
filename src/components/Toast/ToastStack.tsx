@@ -209,12 +209,20 @@ export function ToastStack<T>({
         {card(front, 0)}
       </div>
       {hidden > 0 && (
+        /*
+         * Opaque in BOTH themes, because it sits over the cards peeking out
+         * behind the front one -- often a light image header. The soft zinc
+         * Badge is `dark:bg-zinc-900/30`, which let that image through and left
+         * zinc-300 text on a light screenshot (fancy-app-update#1). The dark
+         * pair is overridden here, not in Badge, so every other soft badge
+         * keeps its look; the ring separates it from a zinc-900 card edge.
+         */
         <Badge
           data-react-fancy-toast-stack-more=""
           size="sm"
           variant="soft"
           color="zinc"
-          className="absolute -top-2 right-2 z-20"
+          className="absolute -top-2 right-2 z-20 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:ring-zinc-700"
         >
           +{hidden}
         </Badge>

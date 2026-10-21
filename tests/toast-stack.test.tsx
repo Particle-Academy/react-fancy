@@ -107,6 +107,31 @@ describe("Toast.Stack", () => {
     expect(document.querySelector("[data-react-fancy-toast-stack-more]")?.textContent).toBe("+3");
   });
 
+  /*
+   * fancy-app-update#1 (MOIC): the badge sits OVER the cards peeking out behind
+   * the front one. It was the soft zinc Badge, whose dark background is
+   * `dark:bg-zinc-900/30` -- 30% opaque -- so over a card with a light image
+   * header its zinc-300 text sat on a light screenshot and could not be read.
+   * Whatever is behind it, the badge must paint its own opaque background, in
+   * both themes. Asserted on the class string, as the kit's other dark-mode
+   * tests do: jsdom has no stylesheet to resolve a colour from.
+   */
+  it('"+N" paints an OPAQUE background in both themes, whatever is behind it', () => {
+    mount(<Basic n={6} depth={2} />);
+
+    const cls = document.querySelector("[data-react-fancy-toast-stack-more]")!.className.split(/\s+/);
+    const darkBg = cls.filter((c) => /^dark:bg-/.test(c));
+    const lightBg = cls.filter((c) => /^bg-/.test(c));
+
+    // Exactly one background per theme, so nothing translucent survives the merge.
+    expect(darkBg).toHaveLength(1);
+    expect(lightBg).toHaveLength(1);
+    // No alpha modifier on either (the bug was `dark:bg-zinc-900/30`).
+    for (const c of [...darkBg, ...lightBg]) expect(c).not.toMatch(/\//);
+    expect(darkBg[0]).not.toBe("dark:bg-transparent");
+    expect(lightBg[0]).not.toBe("bg-transparent");
+  });
+
   it('shows no "+N" when everything is visible', () => {
     mount(<Basic n={3} depth={2} />);
 

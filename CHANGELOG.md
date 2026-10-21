@@ -11,6 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.51.1] - 2026-10-20
+
+### Fixed
+
+- **`Toast.Stack`'s "+N" badge is readable in dark mode whatever is behind it**
+  (fancy-app-update#1). It was the soft zinc `Badge`, whose dark background is
+  `dark:bg-zinc-900/30` -- 30% opaque -- and it sits over the cards peeking out
+  behind the front one, so over a light image header its zinc-300 text was on a
+  light screenshot. It now paints an opaque `dark:bg-zinc-800` with
+  `dark:text-zinc-100`, plus a `ring-1` (`ring-zinc-200` / `dark:ring-zinc-700`)
+  and `shadow-sm` so it stands off a card edge. Light mode keeps `bg-zinc-100`
+  / `text-zinc-700`. Every `Toast.Stack` gets this, `AppUpdateStack` included.
+  **Nothing to do.** `Badge` itself is unchanged: every other soft badge keeps
+  its look.
+
 ## [5.51.0] - 2026-10-20
 
 ### Added
