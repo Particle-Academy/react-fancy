@@ -11,6 +11,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.54.1] - 2026-10-21
+
+### Fixed
+
+- **A `Button` narrower than its label now wraps the label inside itself.**
+  The showcase's own "Constrained width" example (104px columns, captioned
+  "multi-word labels stack left-aligned, icon stays put") had its labels
+  spilling past the buttons and over each other: the label carried
+  `whitespace-nowrap`, so text 92-116px wide had nowhere to go in a 54px slot.
+  It now wraps, left-aligned, with the icon staying put beside it; words are
+  never split. An unconstrained button is unchanged -- measured in Chrome, every
+  width and height in the probe row is identical to 5.54.0.
+  - **Want one line with an ellipsis instead?** `labelClassName="truncate"`.
+    The label has `min-w-0` and no white-space class of its own, so `truncate`
+    wins uncontested inside a button whose width you set (`w-full` in a narrow
+    column, `w-24`, `max-w-[120px]`, ...).
+  - **What to DO:** nothing, unless you relied on a squeezed button keeping its
+    label on one line (a flex row narrower than its buttons, a "send →" label
+    whose arrow is part of the text). 4.4.1 made that the default; it is now
+    opt-in: add `labelClassName="whitespace-nowrap"` to that button, or
+    `shrink-0` so the row cannot squeeze it.
+- **`Switch` honours `labelHidden`.** It was ignored, so the label was always
+  drawn. It is now visually hidden (`sr-only`) and still names the control, as
+  on Input, Field, DatePicker and CheckboxGroup.
+- **`aria-*` on a `Switch` now names the switch, not its wrapper.** Rest props
+  were spread on the wrapping `<div>`, so `aria-label` / `aria-labelledby`
+  labelled a div and left the `role="switch"` button unnamed. The split: every
+  `aria-*` prop goes on the button; everything else -- `className`, `style`,
+  `data-*`, event handlers -- stays on the wrapper exactly as before. (In
+  `mode="view"`, where there is no button, `aria-*` stays on the wrapper.)
+- **`Switch`'s unchecked track reads the `border` token** (`--fancy-border` /
+  `--fancy-border-dark`) instead of hard-coded zinc. Set nothing and nothing
+  changes: the fallbacks are today's `zinc-200` / `zinc-600` (the dark one is
+  one step lighter than the role's `zinc-700` default, so a track still reads
+  against a dark surface; listed as a deliberate exception in the token test).
+- **A `MultiSwitch` directly inside a `Tooltip` lost its selected thumb.**
+  Two halves, both fixed. `Tooltip` cloned its child with its own `ref` and
+  `onMouseEnter` / `onMouseLeave` / `onFocus` / `onBlur`, REPLACING the child's;
+  they are now composed, so a child's own ref and handlers keep working. And in
+  React 19 a ref reaches a function component as a plain prop, so the
+  Tooltip's ref arrived in `MultiSwitch`'s rest props and replaced the ref its
+  thumb is measured from; `MultiSwitch` now feeds both. A `ref` you put on a
+  `MultiSwitch` yourself reaches its radiogroup too. If you wrapped the switch
+  in a `<span>` to work around this, the wrapper can go.
+  - The same report said the switch also lost its `className`. It does not:
+    the class is in the DOM and paints in light mode, directly inside a Tooltip
+    or not. In DARK mode a bare `border-green-500` loses to the component's own
+    `dark:border-*`, with or without a Tooltip -- add `dark:border-green-500`.
+
+### Changed
+
+- Docs only: `icon-config.ts`'s comments now say `<Icon name="github-logo" />`
+  resolves the brand mark. fancy-brand-icons 0.4.0 registers every mark as
+  `<brand>-logo`, so a bare `github` is Lucide's icon.
+
 ## [5.54.0] - 2026-10-21
 
 ### Added

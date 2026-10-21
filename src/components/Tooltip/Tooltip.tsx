@@ -2,11 +2,14 @@ import {
   cloneElement,
   forwardRef,
   useCallback,
+  useMemo,
   useRef,
   useState,
   type ReactElement,
+  type Ref,
 } from "react";
 import { cn } from "../../utils/cn";
+import { composeRefs } from "../../utils/compose-refs";
 import { Portal } from "../Portal";
 import { useFloatingPosition } from "../../hooks/use-floating-position";
 import type { TooltipProps } from "./Tooltip.types";
@@ -36,12 +39,26 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
       setOpen(false);
     }, []);
 
-    const trigger = cloneElement(children as ReactElement<Record<string, unknown>>, {
-      ref: anchorRef,
-      onMouseEnter: show,
-      onMouseLeave: hide,
-      onFocus: show,
-      onBlur: hide,
+    // The trigger is the caller's element, so its own ref and handlers have to
+    // survive the clone. Overwriting them broke any child that needs its ref:
+    // a <MultiSwitch> measures its thumb from it, and rendered with none.
+    // className and every other prop are untouched — cloneElement keeps them.
+    const child = children as ReactElement<Record<string, unknown>>;
+    const childProps = child.props;
+    const childRef = childProps.ref as Ref<HTMLElement> | undefined;
+    const triggerRef = useMemo(() => composeRefs(childRef, anchorRef), [childRef]);
+    const chain =
+      (own: unknown, ours: () => void) =>
+      (event: unknown) => {
+        if (typeof own === "function") own(event);
+        ours();
+      };
+    const trigger = cloneElement(child, {
+      ref: triggerRef,
+      onMouseEnter: chain(childProps.onMouseEnter, show),
+      onMouseLeave: chain(childProps.onMouseLeave, hide),
+      onFocus: chain(childProps.onFocus, show),
+      onBlur: chain(childProps.onBlur, hide),
     });
 
     return (

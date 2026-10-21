@@ -10,7 +10,7 @@ let defaultSetName = "lucide";
  * Addendum layer — icon sets consulted across EVERY lookup, after the active
  * base set but before the lucide auto-fallback, regardless of `defaultSet`.
  * This is how a brand-icon pack (e.g. `@particle-academy/fancy-brand-icons`)
- * layers in: `<Icon name="github" />` resolves the brand mark on top of Lucide
+ * layers in: `<Icon name="github-logo" />` resolves the brand mark on top of Lucide
  * (or any swapped base) without a `set=` query. Base set still wins; addenda
  * supplement. Empty by default ⇒ behavior unchanged.
  */
@@ -155,7 +155,9 @@ export function resolveIcon(
   const registered = set ? set.resolve(name) : null;
   if (registered) return registered;
   // Addenda fill gaps after the base set, before the lucide auto-fallback — so a
-  // brand pack's `github` wins over lucide's auto-resolved one.
+  // brand pack's `github-logo` resolves before lucide is asked. (Since
+  // fancy-brand-icons 0.4.0 every mark is `<brand>-logo`, so a bare `github`
+  // stays lucide's icon.)
   const fromAddenda = resolveFromAddenda(name);
   if (fromAddenda) return fromAddenda;
   if (resolvedSet === "lucide") return resolveFromLucide(name);

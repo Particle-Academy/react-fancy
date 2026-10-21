@@ -1,5 +1,6 @@
-import { useRef, useState, useEffect, useCallback, useId } from "react";
+import { useRef, useState, useEffect, useCallback, useId, useMemo, type Ref } from "react";
 import { cn } from "../../../utils/cn";
+import { composeRefs } from "../../../utils/compose-refs";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { Field } from "../Field";
 import { useFieldMode } from "../mode/FieldMode.context";
@@ -49,6 +50,8 @@ export function MultiSwitch<V = string>({
   const [value, setValue] = useControllableState(controlledValue, fallback as V, onValueChange);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const externalRef = (rest as { ref?: Ref<HTMLDivElement> }).ref;
+  const containerSetRef = useMemo(() => composeRefs(externalRef, containerRef), [externalRef]);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [indicator, setIndicator] = useState<{ left: number; width: number } | null>(null);
 
@@ -81,8 +84,12 @@ export function MultiSwitch<V = string>({
     </DisplayValue>
   ) : (
     <div
-      ref={containerRef}
       {...rest}
+      // React 19 passes `ref` to a function component as a plain prop, so a
+      // caller's ref (Tooltip's anchor, or anyone's) arrives in `rest`. Spread
+      // after `ref={containerRef}` it REPLACED the ref the thumb is measured
+      // from, and the selected thumb never rendered. Feed both instead.
+      ref={containerSetRef}
       data-react-fancy-multi-switch=""
       role="radiogroup"
       id={id}

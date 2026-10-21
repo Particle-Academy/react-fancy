@@ -14,6 +14,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
       dirty,
       error,
       label,
+      labelHidden,
       description,
       required,
       disabled,
@@ -29,6 +30,17 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
     },
     ref,
   ) => {
+    // `aria-*` names and describes the CONTROL, so it goes on the role="switch"
+    // button; everything else (className, style, data-*, handlers) stays on the
+    // wrapper, where it has always gone. On the wrapper, an `aria-label` named a
+    // div and left the switch itself unnamed.
+    const wrapperProps: Record<string, unknown> = {};
+    const controlAria: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(rest)) {
+      if (key.startsWith("aria-")) controlAria[key] = value;
+      else wrapperProps[key] = value;
+    }
+
     const autoId = useId();
     const switchId = id ?? autoId;
     const resolvedMode = useFieldMode(mode);
@@ -64,7 +76,11 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
     }[size];
 
     return (
-      <div {...rest} data-react-fancy-switch="" className={cn("flex items-start gap-2", className)}>
+      <div
+        {...wrapperProps}
+        // View mode has no switch to name, so its aria-* stay on the wrapper.
+        {...(showControl ? undefined : controlAria)}
+        data-react-fancy-switch="" className={cn("flex items-start gap-2", className)}>
         {!showControl ? (
           <span
             data-react-fancy-display=""
@@ -93,6 +109,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           </span>
         ) : (
         <button
+          {...controlAria}
           ref={ref}
           id={switchId}
           type="button"
@@ -107,7 +124,12 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           className={cn(
             "relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
             trackSizes,
-            checked ? switchTrack[color] : "bg-zinc-200 dark:bg-zinc-600",
+            // The unchecked track is the `border` role ("tracks"). The dark
+            // fallback stays zinc-600, today's colour, not the role's zinc-700
+            // default — set nothing, see no change.
+            checked
+              ? switchTrack[color]
+              : "bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-600))]",
             dirtyRingClasses(dirty),
             error && "ring-2 ring-red-500/50",
           )}
@@ -132,6 +154,8 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
                 className={cn(
                   "cursor-pointer text-sm text-zinc-700 dark:text-zinc-100",
                   disabled && "cursor-not-allowed opacity-50",
+                  // Not drawn, still the accessible name (it labels the button).
+                  labelHidden && "sr-only",
                 )}
               >
                 {label}

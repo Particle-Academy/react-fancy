@@ -109,6 +109,19 @@ const SAME_IN_BOTH_MODES = new Set([
   "dark:stroke-[color:var(--fancy-text-faint-dark,#a1a1aa)]",
 ]);
 
+/**
+ * Elements whose colour today is NOT their role's default. They read the role's
+ * token, so a host's palette reaches them, but keep today's colour as the
+ * fallback — same rule as above: "set nothing, see no change". Listed by exact
+ * class so a new one has to be argued for here.
+ */
+const KEEPS_TODAYS_COLOUR = new Set([
+  // Switch's unchecked track (5.54.1): the `border` role ("tracks"), but it was
+  // `dark:bg-zinc-600`, one step lighter than the role's zinc-700 — a track has
+  // to read against a zinc-800/900 surface where a hairline border does not.
+  "dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-600))]",
+]);
+
 describe("THEME_TOKENS — the table", () => {
   it("is small, and names a light and a dark default for every role", () => {
     const roles = Object.keys(THEME_TOKENS);
@@ -142,7 +155,7 @@ describe("token classes in the components", () => {
         continue;
       }
       const expected = m[3] ? t.dark : t.light;
-      if (SAME_IN_BOTH_MODES.has(cls)) continue;
+      if (SAME_IN_BOTH_MODES.has(cls) || KEEPS_TODAYS_COLOUR.has(cls)) continue;
       // Arbitrary values spell spaces as underscores.
       const norm = (s: string) => s.replace(/_/g, " ").replace(/\s+/g, "").replace(/,\s*/g, ",");
       if (norm(m[4]) !== norm(expected)) wrong.push(`${cls}: fallback ${m[4]} but THEME_TOKENS says ${expected}`);

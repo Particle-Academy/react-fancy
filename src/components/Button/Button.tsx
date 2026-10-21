@@ -433,14 +433,20 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           <span
             data-react-fancy-button-label=""
             className={cn(
-              // A button label must stay on one line. When a host flex layout
-              // squeezes the button, `whitespace-nowrap` keeps the label and any
-              // trailing icon/arrow together instead of wrapping and stacking the
-              // icon below it (the classic "send" over "→" break). `min-w-0` keeps
-              // the span shrinkable so `truncate`/ellipsis still works; multi-line
-              // wrapping is opt-in via `labelClassName` ("whitespace-normal") or
-              // the `responsive` prop.
-              "min-w-0 whitespace-nowrap",
+              // A button narrower than its label WRAPS the label inside itself
+              // (left-aligned, via the button's `text-left`); the icon is its own
+              // shrink-0 flex item, so it stays put beside the text. `min-w-0`
+              // lets the span shrink below its text. Words are never split
+              // (measured: in the showcase's 104px column `break-words` turned
+              // "customer" into "custome/r"). Unconstrained, nothing wraps and
+              // the button looks as it always did.
+              //
+              // No white-space class here, on purpose: `labelClassName="truncate"`
+              // must win uncontested to give one line with an ellipsis, and a
+              // `whitespace-normal` would fight its nowrap in the cascade.
+              // (5.54.0 and earlier forced `whitespace-nowrap`, so a constrained
+              // label spilled out of the button and over its neighbours.)
+              "min-w-0",
               // `responsive` collapses to icon-only when squeezed, while keeping
               // the label readable to screen readers.
               responsive && "sr-only sm:not-sr-only",
