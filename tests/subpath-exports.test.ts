@@ -83,7 +83,9 @@ describe("subpath exports", () => {
   it("declares no subpath that has no component behind it", () => {
     // The other direction: a renamed or deleted component must not leave a
     // subpath pointing at a file the build no longer emits.
-    const known = new Set(["." , "./icons", "./styles.css"]);
+    // dark-variant.css (5.53.0) is a CSS entry, built from tsup.config.ts like
+    // styles.css; data-theme.test.ts pins that it exists.
+    const known = new Set(["." , "./icons", "./styles.css", "./dark-variant.css"]);
     const declared = Object.keys(pkg.exports).filter((k) => !known.has(k));
     const orphans = declared.filter((k) => !slugs.includes(k.slice(2)));
 

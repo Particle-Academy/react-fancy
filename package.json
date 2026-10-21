@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "5.52.0",
+  "version": "5.53.0",
   "description": "React UI component library for Human+ UX — controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
@@ -844,6 +844,7 @@
       }
     },
     "./styles.css": "./dist/styles.css",
+    "./dark-variant.css": "./dist/dark-variant.css",
     "./switch": {
       "import": {
         "types": "./dist/switch.d.ts",

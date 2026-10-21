@@ -49,6 +49,7 @@ export default defineConfig({
     index: "src/index.ts",
     icons: "src/icons.ts",
     styles: "src/styles.css",
+    "dark-variant": "src/dark-variant.css",
     ...componentEntries(),
   },
   format: ["esm", "cjs"],

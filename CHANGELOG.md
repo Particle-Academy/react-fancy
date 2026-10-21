@@ -11,6 +11,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.53.0] - 2026-10-21
+
+### Added
+
+- **`[data-theme="dark"]` now moves every surface `.dark` moves.** Switching the
+  attribute alone -- on `<html>` or any wrapper -- turns the kit dark, provided
+  your `dark:` variant follows it too (next item).
+- **`@particle-academy/react-fancy/dark-variant.css`** -- the one-line
+  `@custom-variant dark` that follows `.dark` OR `[data-theme="dark"]`, on the
+  element or an ancestor. Import it after `tailwindcss` in your CSS. Opt-in,
+  because it replaces the `dark` variant for your whole build.
+
+### Fixed
+
+- **`styles.css` ignored `[data-theme="dark"]`.** Its 37 dark selectors
+  (the `--color-secondary-*` flip, the inherent dark inputs, checkbox/radio,
+  switch track, input affixes, overlays, overlay hover + separators, field
+  labels, focus ring, the media checkerboard) were all written `:where(.dark …)`.
+  Each now reads `:where(.dark …, [data-theme="dark"] …)` -- still zero
+  specificity, so any override you had still wins.
+  - **Why binding `@custom-variant dark` to the attribute did not fix this:**
+    a custom variant rewrites what Tailwind compiles through the `dark`
+    VARIANT -- `dark:` utilities and `@variant dark` blocks. These were plain
+    selectors with `.dark` written into them, which no variant touches. The
+    most visible casualty was the secondary scale: `text-secondary-900` stayed
+    near-black on a dark page.
+  - **What to do:** if you switch themes with the class, nothing. If you
+    switch with `data-theme`, import `dark-variant.css` (or add
+    `[data-theme="dark"], [data-theme="dark"] *` to your own variant).
+
+### Not changed
+
+- Under `.dark` everything renders exactly as before: a browser screenshot of
+  18 components in light and `.dark` is byte-identical to 5.51.2 and 5.52.0,
+  with and without `dark-variant.css` imported.
+
 ## [5.52.0] - 2026-10-21
 
 ### Added

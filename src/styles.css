@@ -106,8 +106,13 @@
 
 /* Dark: the neutral scale flips, so "900" still means strongest foreground and
    "50" still means faintest surface. Wrapped in :where() for zero specificity,
-   matching the rest of this file — any consumer override beats it. */
-:where(.dark) {
+   matching the rest of this file — any consumer override beats it.
+
+   EVERY dark selector in this file names `[data-theme="dark"]` beside `.dark`
+   (5.53.0). A consumer's `@custom-variant dark` cannot reach these: it rewrites
+   `dark:` utilities, never a selector with `.dark` written into it.
+   tests/data-theme.test.ts fails on any `.dark` selector without its twin. */
+:where(.dark, [data-theme="dark"]) {
   --color-secondary-50: var(--color-zinc-950);
   --color-secondary-100: var(--color-zinc-900);
   --color-secondary-200: var(--color-zinc-800);
@@ -176,57 +181,57 @@
    so a host that sets nothing sees exactly what it saw before. */
 
 /* Inputs / selects / textareas — darker bg for contrast against the page */
-:where(.dark [data-react-fancy-input] input),
-:where(.dark [data-react-fancy-textarea]),
-:where(.dark [data-react-fancy-select]),
-:where(.dark [data-react-fancy-date-picker]),
-:where(.dark [data-react-fancy-autocomplete] input),
-:where(.dark [data-react-fancy-pillbox]),
-:where(.dark [data-react-fancy-otp-input] input),
-:where(.dark [data-react-fancy-time-picker] input) {
+:where(.dark [data-react-fancy-input] input, [data-theme="dark"] [data-react-fancy-input] input),
+:where(.dark [data-react-fancy-textarea], [data-theme="dark"] [data-react-fancy-textarea]),
+:where(.dark [data-react-fancy-select], [data-theme="dark"] [data-react-fancy-select]),
+:where(.dark [data-react-fancy-date-picker], [data-theme="dark"] [data-react-fancy-date-picker]),
+:where(.dark [data-react-fancy-autocomplete] input, [data-theme="dark"] [data-react-fancy-autocomplete] input),
+:where(.dark [data-react-fancy-pillbox], [data-theme="dark"] [data-react-fancy-pillbox]),
+:where(.dark [data-react-fancy-otp-input] input, [data-theme="dark"] [data-react-fancy-otp-input] input),
+:where(.dark [data-react-fancy-time-picker] input, [data-theme="dark"] [data-react-fancy-time-picker] input) {
   background-color: var(--fancy-input-dark, #1e1e24);
   border-color: var(--fancy-border-strong-dark, #3f3f46);
 }
 
 /* Focus ring — brighter border + subtle glow */
-:where(.dark [data-react-fancy-input] input:focus),
-:where(.dark [data-react-fancy-textarea]:focus),
-:where(.dark [data-react-fancy-select]:focus),
-:where(.dark [data-react-fancy-date-picker]:focus),
-:where(.dark [data-react-fancy-autocomplete] input:focus),
-:where(.dark [data-react-fancy-otp-input] input:focus),
-:where(.dark [data-react-fancy-time-picker] input:focus) {
+:where(.dark [data-react-fancy-input] input:focus, [data-theme="dark"] [data-react-fancy-input] input:focus),
+:where(.dark [data-react-fancy-textarea]:focus, [data-theme="dark"] [data-react-fancy-textarea]:focus),
+:where(.dark [data-react-fancy-select]:focus, [data-theme="dark"] [data-react-fancy-select]:focus),
+:where(.dark [data-react-fancy-date-picker]:focus, [data-theme="dark"] [data-react-fancy-date-picker]:focus),
+:where(.dark [data-react-fancy-autocomplete] input:focus, [data-theme="dark"] [data-react-fancy-autocomplete] input:focus),
+:where(.dark [data-react-fancy-otp-input] input:focus, [data-theme="dark"] [data-react-fancy-otp-input] input:focus),
+:where(.dark [data-react-fancy-time-picker] input:focus, [data-theme="dark"] [data-react-fancy-time-picker] input:focus) {
   border-color: var(--fancy-focus-dark, #60a5fa);
   /* = rgba(96, 165, 250, 0.15) when the token is unset */
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--fancy-focus-dark, #60a5fa) 15%, transparent);
 }
 
 /* Field labels — brighter for readability */
-:where(.dark [data-react-fancy-field] > label:first-child) {
+:where(.dark [data-react-fancy-field] > label:first-child, [data-theme="dark"] [data-react-fancy-field] > label:first-child) {
   color: var(--fancy-text-dark, #f4f4f5);
 }
 
 /* Checkbox & radio */
-:where(.dark [data-react-fancy-checkbox] input),
-:where(.dark [data-react-fancy-radio-group] input) {
+:where(.dark [data-react-fancy-checkbox] input, [data-theme="dark"] [data-react-fancy-checkbox] input),
+:where(.dark [data-react-fancy-radio-group] input, [data-theme="dark"] [data-react-fancy-radio-group] input) {
   background-color: var(--fancy-input-dark, #1e1e24);
   border-color: var(--fancy-border-strong-dark, #3f3f46);
 }
 
 /* Switch unchecked track */
-:where(.dark [data-react-fancy-switch] button[aria-checked="false"]) {
+:where(.dark [data-react-fancy-switch] button[aria-checked="false"], [data-theme="dark"] [data-react-fancy-switch] button[aria-checked="false"]) {
   background-color: var(--fancy-border-dark, #3f3f46);
 }
 
 /* Input wrapper affixes */
-:where(.dark [data-react-fancy-input-wrapper] > span:first-child),
-:where(.dark [data-react-fancy-input-wrapper] > span:last-child) {
+:where(.dark [data-react-fancy-input-wrapper] > span:first-child, [data-theme="dark"] [data-react-fancy-input-wrapper] > span:first-child),
+:where(.dark [data-react-fancy-input-wrapper] > span:last-child, [data-theme="dark"] [data-react-fancy-input-wrapper] > span:last-child) {
   border-color: var(--fancy-border-strong-dark, #3f3f46);
   background-color: var(--fancy-surface-muted-dark, #27272a);
 }
 
 /* Date picker icon (calendar, clock) */
-:where(.dark [data-react-fancy-date-picker]::-webkit-calendar-picker-indicator) {
+:where(.dark [data-react-fancy-date-picker]::-webkit-calendar-picker-indicator, [data-theme="dark"] [data-react-fancy-date-picker]::-webkit-calendar-picker-indicator) {
   filter: invert(0.8);
 }
 
@@ -236,29 +241,29 @@
    border, zinc-300 text) so overlays render correctly in dark mode WITHOUT the
    consumer @sourcing react-fancy. When those utilities ARE generated they win
    (specificity 0 here), so there's no drift or double-styling. */
-:where(.dark [data-react-fancy-dropdown]),
-:where(.dark [data-react-fancy-menu]),
-:where(.dark [data-react-fancy-popover]),
-:where(.dark [data-react-fancy-context-menu]),
-:where(.dark [data-react-fancy-context-menu-sub-content]),
-:where(.dark [data-react-fancy-mobile-menu-flyout]),
-:where(.dark [data-react-fancy-modal]),
-:where(.dark [data-react-fancy-toast-item]) {
+:where(.dark [data-react-fancy-dropdown], [data-theme="dark"] [data-react-fancy-dropdown]),
+:where(.dark [data-react-fancy-menu], [data-theme="dark"] [data-react-fancy-menu]),
+:where(.dark [data-react-fancy-popover], [data-theme="dark"] [data-react-fancy-popover]),
+:where(.dark [data-react-fancy-context-menu], [data-theme="dark"] [data-react-fancy-context-menu]),
+:where(.dark [data-react-fancy-context-menu-sub-content], [data-theme="dark"] [data-react-fancy-context-menu-sub-content]),
+:where(.dark [data-react-fancy-mobile-menu-flyout], [data-theme="dark"] [data-react-fancy-mobile-menu-flyout]),
+:where(.dark [data-react-fancy-modal], [data-theme="dark"] [data-react-fancy-modal]),
+:where(.dark [data-react-fancy-toast-item], [data-theme="dark"] [data-react-fancy-toast-item]) {
   background-color: var(--fancy-surface-dark, #18181b); /* zinc-900 */
   border-color: var(--fancy-border-dark, #3f3f46); /* zinc-700 */
   color: var(--fancy-text-soft-dark, #d4d4d8); /* zinc-300 */
 }
 
 /* Overlay item hover states */
-:where(.dark [data-react-fancy-dropdown-item]:hover),
-:where(.dark [data-react-fancy-menu-item]:hover),
-:where(.dark [data-react-fancy-context-menu-item]:hover) {
+:where(.dark [data-react-fancy-dropdown-item]:hover, [data-theme="dark"] [data-react-fancy-dropdown-item]:hover),
+:where(.dark [data-react-fancy-menu-item]:hover, [data-theme="dark"] [data-react-fancy-menu-item]:hover),
+:where(.dark [data-react-fancy-context-menu-item]:hover, [data-theme="dark"] [data-react-fancy-context-menu-item]:hover) {
   background-color: var(--fancy-surface-muted-dark, #27272a); /* zinc-800 */
 }
 
 /* Overlay separators */
-:where(.dark [data-react-fancy-dropdown-separator]),
-:where(.dark [data-react-fancy-context-menu-separator]) {
+:where(.dark [data-react-fancy-dropdown-separator], [data-theme="dark"] [data-react-fancy-dropdown-separator]),
+:where(.dark [data-react-fancy-context-menu-separator], [data-theme="dark"] [data-react-fancy-context-menu-separator]) {
   background-color: var(--fancy-border-dark, #3f3f46); /* zinc-700 */
 }
 
@@ -277,7 +282,7 @@
   background-position: 0 0, 0 8px, 8px -8px, -8px 0;
 }
 
-:where(.dark) .fancy-checkerboard {
+:where(.dark, [data-theme="dark"]) .fancy-checkerboard {
   background-color: #18181b; /* zinc-900 */
   background-image:
     linear-gradient(45deg, #27272a 25%, transparent 25%),

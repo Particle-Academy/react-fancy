@@ -322,6 +322,32 @@ remapping Tailwind's `zinc`. Each role is two variables: one per mode.
 
 Dark mode works via Tailwind's `dark:` class strategy. The library's `Portal` component automatically detects the `dark` class (or `data-theme="dark"`) on `<html>` and propagates it into portaled content (modals, dropdowns, tooltips, toasts, etc.).
 
+### `.dark` or `[data-theme="dark"]` -- either one moves everything
+
+Since 5.53.0 either hook works, on `<html>` or on any wrapper. Two halves, and
+you need the second if you switch with the attribute alone:
+
+1. **`styles.css` follows both on its own.** Every rule it ships for dark mode
+   (the secondary-scale flip, inherent dark inputs and overlays, the media
+   checkerboard) matches `.dark` and `[data-theme="dark"]`.
+2. **The components' `dark:` classes follow whatever YOUR `dark` variant says**,
+   because Tailwind compiles them in your build with your variant. Import the
+   one the kit ships:
+
+   ```css
+   @import "tailwindcss";
+   @import "@particle-academy/react-fancy/dark-variant.css";
+   @import "@particle-academy/react-fancy/styles.css";
+   ```
+
+   It is one line --
+   `@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));`
+   -- so if you already declare your own `@custom-variant dark`, add the
+   attribute to it instead.
+
+`.dark` keeps working exactly as before; nothing here is required if you toggle
+the class. (`initTheme()` sets both.)
+
 ## Architecture
 
 ### Directory Layout

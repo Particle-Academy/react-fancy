@@ -71,8 +71,9 @@ export function resolveTheme(preference: ThemePreference = getThemePreference())
 function applyToDocument(resolved: ResolvedTheme): void {
     if (!canUseDom()) return;
     const root = document.documentElement;
-    // The class is what this package's CSS keys off; the attribute is for
-    // consumers whose own styles key off `[data-theme]`.
+    // Both, because hosts key off either: this package's styles.css follows
+    // `.dark` and `[data-theme="dark"]` alike (5.53.0), and a consumer's
+    // `dark:` variant follows whichever their CSS declares.
     root.classList.toggle("dark", resolved === "dark");
     root.setAttribute("data-theme", resolved);
 }

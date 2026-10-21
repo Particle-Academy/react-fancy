@@ -1,0 +1,18 @@
+/* @particle-academy/react-fancy — dark variant that follows the class OR the attribute.
+
+   Import it in your Tailwind CSS, after tailwindcss and before your own rules:
+
+     @import "tailwindcss";
+     @import "@particle-academy/react-fancy/dark-variant.css";
+     @import "@particle-academy/react-fancy/styles.css";
+
+   It replaces the `dark` variant for your whole build, so every `dark:` utility
+   -- the kit's, compiled from its dist, and your own -- applies under either
+   `.dark` or `[data-theme="dark"]` on an ancestor (or the element itself).
+
+   Why a separate, opt-in file: the variant is defined in YOUR CSS, so
+   react-fancy cannot change it from inside styles.css without overriding a
+   choice you may have made on purpose (Tailwind's default follows
+   `prefers-color-scheme`). If you already declare your own `@custom-variant
+   dark`, keep it and add the attribute to it instead of importing this. */
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
