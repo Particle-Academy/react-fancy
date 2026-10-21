@@ -34,8 +34,15 @@ const alertIconSizeMap: Record<Size, "xs" | "sm" | "md" | "lg" | "xl"> = {
 // (default/active/checked/warn) branch on flags, not specific colors.
 // ---------------------------------------------------------------------------
 
+// The default button's fill reads the theme tokens, like its text and border
+// already did, so a host palette reaches it. Each fallback is the colour it
+// used before: light is the surface (white), dark is the muted surface
+// (zinc-800), and the light hover is surface-hover / border-strong. The dark
+// hover stays zinc-700: no role defaults to it (surface-hover-dark is a
+// translucent zinc-800, which would all but erase the hover on a zinc-800
+// button), so tokenising it would change every host that sets nothing.
 const defaultClasses =
-  "bg-white text-[color:var(--fancy-text-soft,var(--color-zinc-700))] border border-[color:var(--fancy-border,var(--color-zinc-200))] hover:bg-zinc-50 hover:border-zinc-300 dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:hover:bg-zinc-700";
+  "bg-[color:var(--fancy-surface,var(--color-white))] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] border border-[color:var(--fancy-border,var(--color-zinc-200))] hover:bg-[color:var(--fancy-surface-hover,var(--color-zinc-50))] hover:border-[color:var(--fancy-border-strong,var(--color-zinc-300))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:hover:bg-zinc-700";
 
 const activeClasses =
   "bg-blue-500 text-white border border-blue-600 hover:bg-blue-600 dark:bg-blue-600 dark:border-blue-500 dark:hover:bg-blue-500";

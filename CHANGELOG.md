@@ -11,6 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **The default `Button`'s fill follows the theme tokens.** Its text and
+  border already read `--fancy-text-soft` and `--fancy-border`; its background
+  and light hover were still raw `bg-white` / `dark:bg-zinc-800` /
+  `hover:bg-zinc-50` / `hover:border-zinc-300`, so a host palette recoloured
+  everything around a default button but the button itself. They now read
+  `--fancy-surface` (light), `--fancy-surface-muted-dark` (dark),
+  `--fancy-surface-hover` and `--fancy-border-strong`, each falling back to
+  the colour it was. A host that sets no tokens renders exactly as before.
+  - **Not yet tokenised:** the dark hover (`dark:hover:bg-zinc-700`). No role
+    defaults to zinc-700 for a fill; `--fancy-surface-hover-dark` defaults to
+    a translucent zinc-800, which on a zinc-800 button would all but erase the
+    hover. A `control-hover` role (or a different default) is the owner's call.
+
 ## [5.54.1] - 2026-10-21
 
 ### Fixed
