@@ -11,6 +11,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.55.0] - 2026-10-21
+
+### Added
+
+- **`TimeGrid` typed cells and range selection.** Pass `cells` (with `states`)
+  and the grid renders the host's own vocabulary instead of on/off. **Nothing
+  to do for an existing grid:** without `cells` it is the same boolean grid,
+  with the same DOM (byte-identical in Chrome against 5.54.2) and the same
+  timings. `value` / `onChange` are now optional in the type because a typed
+  grid does not use them.
+  - `cells: TimeGridCell[][]`: each cell is `{ state, disabled?, reasons?,
+    marks?, meta? }`. `meta` is handed back untouched in every callback.
+  - `states: Record<id, { tone?, label?, className? }>`: the exclusive
+    dimension (open / closed / booked …). `marks: Record<id, { tone?, icon?,
+    label? }>`: non-exclusive overlays. The kit declares the shape; the host
+    declares the vocabulary.
+  - `selectionShape: "rectangle" | "linear"`. A rectangle is the same window
+    across rows (09:00-17:00 Mon-Fri); a linear run goes in reading order and
+    crosses row ends (23:54 Mon to 00:06 Tue). `selection` is a discriminated
+    union, controlled or uncontrolled; `onSelectionChange(next, cells)` hands
+    the cells in selection order; `onSelectionCommit` fires when a drag ends
+    or Enter is pressed.
+  - Selection is derived from anchor + current cell, so a fast drag no longer
+    leaves gaps, and pointer capture keeps a drag tracking (clamped to the
+    edge) after it leaves the grid.
+  - `disabledRange: "clamp" | "refuse" | "span"` (default `clamp`) decides what
+    a range crossing a disabled cell does, identically in both shapes.
+    `onBlockedSelect(blocked)` reports clipped or refused cells with their
+    `reasons`.
+  - A disabled cell's `reasons` reach the `title`, the cell's
+    `aria-description`, and a tooltip shown while the cell has keyboard focus.
+  - Keyboard: the grid takes focus (`aria-activedescendant`), not every cell.
+    Arrows move, Shift+arrows extend from the anchor, Space selects the
+    focused cell, Enter commits, Escape clears. Header clicks select a whole
+    row or column.
+  - `onCellHover(cell, { r, c })` for a host-owned detail panel; `null, null`
+    on leave. `aria-label` names the grid.
+  - `cells` without `states` throws in development: an unknown vocabulary
+    would otherwise render as one colour. An unknown state id warns once and
+    renders neutral.
+  - Colours: state and mark tones from the existing `TimeGridTone` set; the
+    neutral fill, selection wash, focus outline, headers and tooltip read the
+    `--fancy-*` tokens. Dark mode follows `.dark` and `[data-theme="dark"]`.
+  - A mark's `icon` is a `ReactNode` (e.g. `<Icon name="lock" />`), not an
+    icon name: resolving names would import every Lucide glyph into any bundle
+    that uses TimeGrid (measured: 16k to 56k lines).
+- **Measured (Chrome, 4x CPU throttle, 240 columns, median of 7):** typed grid
+  mount 157 ms at 7 days, 260 ms at 14 days, 552 ms at 31 days; update
+  44-75 ms. The 14-day mount is still over the 200 ms budget. Column windowing
+  is the next release.
+
 ## [5.54.2] - 2026-10-21
 
 ### Fixed

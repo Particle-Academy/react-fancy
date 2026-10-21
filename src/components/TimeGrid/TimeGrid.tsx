@@ -1,6 +1,7 @@
 import { forwardRef, useState } from "react";
 import { cn } from "../../utils/cn";
 import type { TimeGridProps, TimeGridTone } from "./TimeGrid.types";
+import { TypedTimeGrid } from "./TypedTimeGrid";
 
 const TONE_CLASSES: Record<TimeGridTone, string> = {
   violet: "bg-violet-500 hover:bg-violet-600",
@@ -16,13 +17,25 @@ const TONE_CLASSES: Record<TimeGridTone, string> = {
 const OFF_CLASSES =
   "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:bg-zinc-200 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:bg-zinc-700";
 
-export const TimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(
+const NO_VALUE: boolean[][] = [];
+const noop = () => {};
+
+/**
+ * Two grids behind one name. `cells` (5.55.0) selects the typed grid: the
+ * host's state vocabulary, range selection, keyboard. Without it this is the
+ * boolean grid, unchanged since before 5.55.0.
+ */
+export const TimeGrid = forwardRef<HTMLDivElement, TimeGridProps>((props, ref) =>
+  props.cells ? <TypedTimeGrid ref={ref} {...props} /> : <BooleanTimeGrid ref={ref} {...props} />,
+);
+
+const BooleanTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(
   (
     {
       rows,
       cols,
-      value,
-      onChange,
+      value = NO_VALUE,
+      onChange = noop,
       toneOn = "violet",
       cellWidth = 20,
       cellHeight = 16,
@@ -148,3 +161,4 @@ export const TimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(
 );
 
 TimeGrid.displayName = "TimeGrid";
+BooleanTimeGrid.displayName = "BooleanTimeGrid";
