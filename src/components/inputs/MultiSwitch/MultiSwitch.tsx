@@ -128,7 +128,7 @@ export function MultiSwitch<V = string>({
               sizeClasses[size],
               isSelected
                 ? "text-white"
-                : "text-zinc-600 hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-zinc-400 dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
+                : "text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))] dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
               (disabled || option.disabled) && "cursor-not-allowed",
             )}
           >

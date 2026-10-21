@@ -32,7 +32,7 @@ const TimelineRoot = forwardRef<HTMLDivElement, TimelineProps>(
       ? events.map((e, i) => (
           <TimelineItem key={i} date={e.date} emoji={e.emoji} icon={e.icon} color={e.color}>
             {e.title && <h3 className="font-semibold text-zinc-900 dark:text-white">{e.title}</h3>}
-            {e.description && <div className="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{e.description}</div>}
+            {e.description && <div className="mt-1 text-sm leading-relaxed text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]">{e.description}</div>}
           </TimelineItem>
         ))
       : Children.toArray(children);

@@ -143,7 +143,9 @@ describe("token classes in the components", () => {
       }
       const expected = m[3] ? t.dark : t.light;
       if (SAME_IN_BOTH_MODES.has(cls)) continue;
-      if (m[4] !== expected) wrong.push(`${cls}: fallback ${m[4]} but THEME_TOKENS says ${expected}`);
+      // Arbitrary values spell spaces as underscores.
+      const norm = (s: string) => s.replace(/_/g, " ").replace(/\s+/g, "").replace(/,\s*/g, ",");
+      if (norm(m[4]) !== norm(expected)) wrong.push(`${cls}: fallback ${m[4]} but THEME_TOKENS says ${expected}`);
     }
     expect(wrong).toEqual([]);
   });
@@ -169,17 +171,31 @@ describe("token classes in the components", () => {
 describe("defaults reproduce today's look exactly", () => {
   it("each token's fallback is the declaration the old utility produced", async () => {
     const pairs: Array<[old: string, token: string]> = [];
+    const mixPairs: Array<[old: string, value: string]> = [];
     for (const [role, t] of Object.entries(THEME_TOKENS)) {
       for (const [value, variable] of [
         [t.light, t.variable],
         [t.dark, t.darkVariable],
       ] as const) {
         const palette = value.match(/^var\(--color-(.+)\)$/);
+        const mix = value.match(/^color-mix\(in oklab, var\(--color-(.+?)\) (\d+)%, transparent\)$/);
+        if (mix) {
+          // surface-hover-dark: Tailwind's `bg-zinc-800/50`. Its rule carries an
+          // sRGB fallback AND this exact oklab mix under @supports; the token's
+          // fallback must be that mix, verbatim.
+          mixPairs.push([`bg-${mix[1]}/${mix[2]}`, value]);
+          continue;
+        }
         const old = palette ? `bg-${palette[1]}` : `bg-[${value}]`;
         pairs.push([old, `bg-[color:var(${variable},${value})]`]);
         expect(role).toBeTruthy();
       }
     }
+    const mixCss = await compileFor(mixPairs.map(([old]) => old));
+    for (const [old, value] of mixPairs) {
+      expect(mixCss, old).toContain(`background-color: ${value};`);
+    }
+    expect(mixPairs.length).toBe(1);
     const css = await compileFor(pairs.flat());
     for (const [old, token] of pairs) {
       const before = declarationOf(css, old);

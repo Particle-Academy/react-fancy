@@ -30,8 +30,8 @@ export function SidebarSubmenu({
         title={label}
         className={cn(
           "flex items-center justify-center rounded-md px-2 py-2 text-sm font-medium transition-colors",
-          "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900",
-          "dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-100",
+          "text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] hover:bg-[color:var(--fancy-surface-hover,var(--color-zinc-50))] hover:text-[color:var(--fancy-text,var(--color-zinc-900))]",
+          "dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))] dark:hover:bg-[color:var(--fancy-surface-hover-dark,color-mix(in_oklab,var(--color-zinc-800)_50%,transparent))] dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
           className,
         )}
       >
@@ -52,8 +52,8 @@ export function SidebarSubmenu({
         onClick={() => setOpen((v) => !v)}
         className={cn(
           "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-          "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900",
-          "dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-100",
+          "text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] hover:bg-[color:var(--fancy-surface-hover,var(--color-zinc-50))] hover:text-[color:var(--fancy-text,var(--color-zinc-900))]",
+          "dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))] dark:hover:bg-[color:var(--fancy-surface-hover-dark,color-mix(in_oklab,var(--color-zinc-800)_50%,transparent))] dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
         )}
       >
         {icon && <span className="flex h-5 w-5 shrink-0 items-center justify-center">{icon}</span>}

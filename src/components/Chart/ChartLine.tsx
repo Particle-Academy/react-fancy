@@ -187,7 +187,7 @@ export function ChartLine({
                 className="inline-block h-2.5 w-2.5 rounded-full"
                 style={{ backgroundColor: s.color ?? DEFAULT_COLORS[si % DEFAULT_COLORS.length] }}
               />
-              <span className="text-zinc-600 dark:text-zinc-400">{s.label}</span>
+              <span className="text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]">{s.label}</span>
             </div>
           ))}
         </div>

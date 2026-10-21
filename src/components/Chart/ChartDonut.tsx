@@ -59,7 +59,7 @@ export function ChartDonut({
                 className="h-3 w-3 rounded-full"
                 style={{ backgroundColor: seg.color }}
               />
-              <span className="text-zinc-600 dark:text-zinc-400">
+              <span className="text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]">
                 {seg.label}
               </span>
               <span className="font-medium">{seg.value}</span>

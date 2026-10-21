@@ -21,7 +21,7 @@ export const TimelineBlock = forwardRef<HTMLDivElement, TimelineBlockProps>(
               {heading}
             </div>
           )}
-          <div className="text-sm text-zinc-600 dark:text-zinc-400">{children}</div>
+          <div className="text-sm text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]">{children}</div>
         </div>
       </TimelineItem>
     );

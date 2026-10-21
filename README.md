@@ -278,7 +278,7 @@ is the one they hit first.
 ## Semantic tokens
 
 The kit's neutral chrome -- surfaces, outlines, text, form fields, focus -- reads
-ten semantic tokens, so you can repaint it with your own palette without
+twelve semantic tokens, so you can repaint it with your own palette without
 remapping Tailwind's `zinc`. Each role is two variables: one per mode.
 
 | Role | Light variable | Dark variable | Default (light / dark) | Used for |
@@ -293,6 +293,8 @@ remapping Tailwind's `zinc`. Each role is two variables: one per mode.
 | `text-muted` | `--fancy-text-muted` | `--fancy-text-muted-dark` | zinc-500 / zinc-400 | descriptions, captions |
 | `text-faint` | `--fancy-text-faint` | `--fancy-text-faint-dark` | zinc-400 / zinc-500 | placeholders, decorative icons |
 | `focus` | `--fancy-focus` | `--fancy-focus-dark` | blue-500 / blue-400 | focus border + ring on fields |
+| `text-subtle` | `--fancy-text-subtle` | `--fancy-text-subtle-dark` | zinc-600 / zinc-400 | inactive nav labels (Sidebar, Menu, Navbar, MultiSwitch) |
+| `surface-hover` | `--fancy-surface-hover` | `--fancy-surface-hover-dark` | zinc-50 / zinc-800 at 50% | hover fill on nav items, options, rows |
 
 ```css
 /* A cream/terracotta light theme and a blue-grey dark one. */

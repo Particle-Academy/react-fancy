@@ -195,7 +195,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
                       "flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-zinc-700 transition-colors dark:text-zinc-200",
                       i === activeIndex
                         ? "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
-                        : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
+                        : "hover:bg-[color:var(--fancy-surface-hover,var(--color-zinc-50))] dark:hover:bg-[color:var(--fancy-surface-hover-dark,color-mix(in_oklab,var(--color-zinc-800)_50%,transparent))]",
                       option.disabled && "cursor-not-allowed opacity-50",
                     )}
                   >

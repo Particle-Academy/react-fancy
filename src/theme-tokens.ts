@@ -101,6 +101,21 @@ export const THEME_TOKENS = {
     dark: "var(--color-zinc-500)",
     description: "Placeholders, disabled hints, decorative icons.",
   },
+  "text-subtle": {
+    variable: "--fancy-text-subtle",
+    darkVariable: "--fancy-text-subtle-dark",
+    light: "var(--color-zinc-600)",
+    dark: "var(--color-zinc-400)",
+    description: "Inactive nav labels (Sidebar, Menu, Navbar, MultiSwitch) and secondary prose. Added 5.53.1.",
+  },
+  "surface-hover": {
+    variable: "--fancy-surface-hover",
+    darkVariable: "--fancy-surface-hover-dark",
+    light: "var(--color-zinc-50)",
+    // Tailwind's `bg-zinc-800/50`, written out so a host's value is used as-is.
+    dark: "color-mix(in oklab, var(--color-zinc-800) 50%, transparent)",
+    description: "The hover fill on nav items, list options and table rows. Added 5.53.1.",
+  },
   focus: {
     variable: "--fancy-focus",
     darkVariable: "--fancy-focus-dark",

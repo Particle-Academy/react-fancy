@@ -89,7 +89,7 @@ export function ChartPie({
         {slices.map((slice) => (
           <div key={slice.label} className="flex items-center gap-2 text-sm">
             <div className="h-3 w-3 rounded-full" style={{ backgroundColor: slice.color }} />
-            <span className="text-zinc-600 dark:text-zinc-400">{slice.label}</span>
+            <span className="text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]">{slice.label}</span>
             <span className="font-medium">{slice.value}</span>
           </div>
         ))}

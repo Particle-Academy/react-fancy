@@ -59,7 +59,7 @@ export function SidebarItem({
         collapsed ? "justify-center px-2 py-2" : "gap-2 px-3 py-2",
         active
           ? "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] text-[color:var(--fancy-text,var(--color-zinc-900))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]"
-          : "text-zinc-600 hover:bg-zinc-50 hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
+          : "text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] hover:bg-[color:var(--fancy-surface-hover,var(--color-zinc-50))] hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))] dark:hover:bg-[color:var(--fancy-surface-hover-dark,color-mix(in_oklab,var(--color-zinc-800)_50%,transparent))] dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
         disabled && "pointer-events-none opacity-50",
         className,
       )}

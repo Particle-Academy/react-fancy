@@ -11,6 +11,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.53.1] - 2026-10-21
+
+### Fixed
+
+- **Inactive nav labels and their hover fill ignored a host palette.**
+  TribeShare's runtime audit against 5.53.0 found the following still on raw
+  zinc, and beating its tokens in dark mode, so it was overriding them per
+  instance:
+  - MultiSwitch's unselected option label: `text-zinc-600 dark:text-zinc-400`.
+  - Sidebar.Item's inactive label (the same pair) and its hover fill:
+    `hover:bg-zinc-50 dark:hover:bg-zinc-800/50`.
+
+  None of the ten 5.52.0 roles reproduced either pair exactly, so there are
+  **two new roles**:
+  - `text-subtle` (`--fancy-text-subtle` / `-dark`): zinc-600 / zinc-400.
+  - `surface-hover` (`--fancy-surface-hover` / `-dark`): zinc-50 / zinc-800
+    at 50%. The dark default is written out as
+    `color-mix(in oklab, var(--color-zinc-800) 50%, transparent)`, so a value
+    you set is used as-is, not at half strength.
+
+  Both roles now cover every exact occurrence in the kit, not just the two
+  that were reported. That is 24 pairs in 19 files: MultiSwitch, Sidebar.Item,
+  Sidebar.Submenu, Menu.Item, Menu.Submenu, MobileMenu.Item, Navbar.Item, the
+  Select and Autocomplete option hover, Table row hover, Kanban, Accordion
+  content, the Chart axis and labels, Timeline, and the Editor's blockquote.
+  Their active and hover text uses the existing `text` role.
+- **What to do:** if you set nothing, nothing changes. Light and `.dark`
+  screenshots, including Sidebar, Menu and MultiSwitch, are byte-identical to
+  5.51.2, and the computed hover colours of Sidebar.Item and Menu.Item match in
+  both modes. If you were overriding these per instance, you can delete those
+  overrides and set the two new tokens instead.
+- **Still on zinc, because no token matches them exactly:**
+  - Navbar.Item's hover fill (`hover:bg-zinc-50 / dark:hover:bg-zinc-800`, which
+    is opaque rather than 50%).
+  - The active Tabs and Navbar label (`text-zinc-900 / dark:text-white`).
+  - SidebarToggle's hover text (`zinc-600 / zinc-300`).
+
 ## [5.53.0] - 2026-10-21
 
 ### Added

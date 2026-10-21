@@ -200,7 +200,7 @@ export function KanbanColumn({
         )}
       >
         {title && (
-          <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-600 dark:text-zinc-400">
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]">
             <span className="flex-1">{title}</span>
             <span
               className={cn(

@@ -55,7 +55,7 @@ export function TableRow({
         {...rest}
         data-react-fancy-table-row=""
         className={cn(
-          "transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
+          "transition-colors hover:bg-[color:var(--fancy-surface-hover,var(--color-zinc-50))] dark:hover:bg-[color:var(--fancy-surface-hover-dark,color-mix(in_oklab,var(--color-zinc-800)_50%,transparent))]",
           onClick && "cursor-pointer",
           className,
         )}

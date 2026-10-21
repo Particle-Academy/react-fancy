@@ -19,7 +19,7 @@ export function AccordionContent({
       )}
     >
       <div className="overflow-hidden">
-        <div className={cn("pb-4 text-sm text-zinc-600 dark:text-zinc-400", className)}>
+        <div className={cn("pb-4 text-sm text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]", className)}>
           {children}
         </div>
       </div>
