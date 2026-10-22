@@ -151,6 +151,14 @@ export interface TimeGridProps {
   onBlockedSelect?: (blocked: TimeGridBlockedCell[]) => void;
   /** Hover, for a host-owned detail panel. `null, null` when the pointer leaves. */
   onCellHover?: (cell: TimeGridCell | null, at: TimeGridCoord | null) => void;
+  /**
+   * Typed grid: render only the columns in view (plus overscan), holding the
+   * rest of the width with spacers. Default: on above 500 columns. Cell ids,
+   * selection and callbacks still cover every cell — they come from `cells`,
+   * not the DOM — and keyboard focus or an out-of-view `selection` scrolls the
+   * window to it.
+   */
+  windowColumns?: boolean;
   /** Accessible name of the grid (typed grid). */
   "aria-label"?: string;
 }

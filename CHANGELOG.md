@@ -11,6 +11,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.57.0] - 2026-10-22
+
+### Added
+
+- **`TimeGrid` column windowing (typed grid).** `windowColumns` renders only
+  the columns in view plus overscan. It is on by default above 500 columns,
+  and `windowColumns` forces it on or off. **Nothing to do for an existing
+  grid:** at 500 columns or fewer nothing changes unless you ask, and a
+  boolean grid (no `cells`) is never windowed.
+  - Stable handles and selection still cover every cell. Ids and the cells
+    passed to `onSelectionChange` come from `cells`, not the DOM, so a
+    selection across unrendered columns reports all of them.
+  - Keyboard focus moved past the window, or a `selection` set from outside
+    (a host, an agent through a bridge) that is out of view, scrolls it into
+    view. Windowed cells carry `aria-colindex`.
+  - The column tracks stay the full grid while scrolling. A jump is rendered
+    before the next paint, so the viewport never flashes blank. On the server
+    a windowed grid renders its frame with no cells.
+  - Measured in Chrome (Playwright, CDP 4x CPU throttle, 240 columns, median
+    of 7 page loads, 2026-10-22). Mount, 5.56.0 against 5.57.0 windowed:
+
+    | container | 7 days | 14 days | 31 days |
+    |---|---|---|---|
+    | 800px | 182 → 119 ms | 329 → 209 ms | 624 → 370 ms |
+    | 1280px | 139 → 131 ms | 286 → 263 ms | 632 → 524 ms |
+
+    The gain depends on how much of the grid is off screen: at 1280px the
+    window still holds 208 of 240 columns. 14 days in 1280px still misses a
+    200 ms budget.
+
+### Changed
+
+- Typed `TimeGrid` cells render in memoised 16-column chunks, so a selection
+  change re-renders only the chunks it touches. Unwindowed 31 days mounts in
+  545 ms against 632 ms in 5.56.0 (1280px, same setup as above).
+
 ## [5.56.0] - 2026-10-21
 
 ### Added

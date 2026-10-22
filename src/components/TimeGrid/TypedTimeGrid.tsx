@@ -10,8 +10,11 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
+  type CSSProperties,
+  type ReactNode,
   type RefObject,
 } from "react";
+import { flushSync } from "react-dom";
 import { cn } from "../../utils/cn";
 import { composeRefs } from "../../utils/compose-refs";
 import {
@@ -47,7 +50,7 @@ const TONE_FILL: Record<TimeGridTone, string> = {
 const NEUTRAL_FILL =
   "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]";
 
-const CELL_BASE = "relative m-px rounded-sm";
+const CELL_BASE = "relative m-px h-[var(--tg-cell-h)] w-[var(--tg-cell-w)] rounded-sm";
 const CELL_ENABLED = "cursor-pointer hover:brightness-90 dark:hover:brightness-125";
 const CELL_DISABLED = "cursor-not-allowed opacity-40";
 /** Selected: a translucent focus-colour wash over the state's own tone, so both stay readable. */
@@ -83,6 +86,13 @@ function isDev(): boolean {
 }
 
 const EMPTY = {} as Record<string, never>;
+/** Windowing turns itself on above this many columns unless `windowColumns` says otherwise. */
+const WINDOW_DEFAULT_ABOVE = 500;
+const WINDOW_MIN_OVERSCAN = 16;
+/** Columns per memoised cell chunk. The window moves in whole chunks. */
+const CHUNK = 16;
+const WINDOW_CHUNK = CHUNK;
+const ROW_START = { gridColumnStart: 1 } as const;
 const warnedStates = new Set<string>();
 let warnedNoStates = false;
 
@@ -119,8 +129,18 @@ type RowProps = {
   /** Column of the keyboard-focused cell when it is in this row AND the grid has focus, else -1. */
   activeCol: number;
   onRowHeader?: (r: number) => void;
+  /** Rendered column window, inclusive. The whole row when not windowed. */
+  colStart: number;
+  colEnd: number;
+  windowed: boolean;
 };
 
+/**
+ * A row renders as fixed 16-column chunks, each memoised on primitives. A
+ * window shift mounts the chunks entering view and skips the rest; a selection
+ * change re-renders only the chunks it touches. Before this, every shift
+ * rebuilt every cell of every row (31d: p95 157 ms/frame scrolling at 4x CPU).
+ */
 const TypedRow = memo(function TypedRow({
   ctx,
   r,
@@ -129,22 +149,84 @@ const TypedRow = memo(function TypedRow({
   selEnd,
   activeCol,
   onRowHeader,
+  colStart,
+  colEnd,
+  windowed,
 }: RowProps) {
-  const { baseId, rows, cols, states, marks, stateClass, cellWidth, cellHeight } = ctx;
-  const { cellId, ariaCell } = ctx.fns.current;
-  const out = new Array(cols.length + 1);
-  out[0] = (
+  const out: ReactNode[] = [];
+  out.push(
     <div
       key="h"
       role="rowheader"
       data-react-fancy-timegrid-row={r}
+      style={windowed ? ROW_START : undefined}
       onClick={onRowHeader ? () => onRowHeader(r) : undefined}
       className={onRowHeader ? `${HEADER_ROW} ${HEADER_HOVER}` : HEADER_ROW}
     >
-      {rows[r]}
+      {ctx.rows[r]}
+    </div>,
+  );
+  if (colEnd >= colStart) {
+    const k0 = Math.floor(colStart / CHUNK);
+    const k1 = Math.floor(colEnd / CHUNK);
+    for (let k = k0; k <= k1; k++) {
+      const from = Math.max(k * CHUNK, colStart);
+      const to = Math.min(k * CHUNK + CHUNK - 1, colEnd);
+      const overlaps = selEnd >= from && selStart <= to;
+      out.push(
+        <CellChunk
+          key={k}
+          ctx={ctx}
+          r={r}
+          rowCells={rowCells}
+          from={from}
+          to={to}
+          selStart={overlaps ? Math.max(selStart, from) : -1}
+          selEnd={overlaps ? Math.min(selEnd, to) : -2}
+          activeCol={activeCol >= from && activeCol <= to ? activeCol : -1}
+          place={windowed && from === colStart}
+          windowed={windowed}
+        />,
+      );
+    }
+  }
+  return (
+    <div role="row" className="contents">
+      {out}
     </div>
   );
-  for (let c = 0; c < cols.length; c++) {
+});
+
+type ChunkProps = {
+  ctx: Ctx;
+  r: number;
+  rowCells: TimeGridCell[];
+  from: number;
+  to: number;
+  selStart: number;
+  selEnd: number;
+  activeCol: number;
+  /** Place the first cell explicitly (the first rendered chunk of a windowed row). */
+  place: boolean;
+  windowed: boolean;
+};
+
+const CellChunk = memo(function CellChunk({
+  ctx,
+  r,
+  rowCells,
+  from,
+  to,
+  selStart,
+  selEnd,
+  activeCol,
+  place,
+  windowed,
+}: ChunkProps) {
+  const { baseId, rows, cols, states, marks, stateClass } = ctx;
+  const { cellId, ariaCell } = ctx.fns.current;
+  const out: ReactNode[] = [];
+  for (let c = from; c <= to; c++) {
     const cell = rowCells?.[c];
     const state = cell?.state ?? "";
     const selected = c >= selStart && c <= selEnd;
@@ -160,11 +242,15 @@ const TypedRow = memo(function TypedRow({
     let cls = stateClass(state) + " " + (cell?.disabled ? CELL_DISABLED : CELL_ENABLED);
     if (selected) cls += " " + CELL_SELECTED;
     if (c === activeCol) cls += " " + CELL_ACTIVE;
-    out[c + 1] = (
+    out.push(
       <div
         key={c}
         id={cellDomId(baseId, r, c)}
         role="gridcell"
+        aria-colindex={windowed ? c + 2 : undefined}
+        // Windowed, the tracks stay the full grid; the row's first rendered
+        // cell is placed and the rest flow after it.
+        style={place && c === from ? { gridColumnStart: c + 2 } : undefined}
         data-react-fancy-timegrid-cell={cellId ? cellId(r, c) : `${r}:${c}`}
         data-state={state}
         data-marks={markIds?.length ? markIds.join(" ") : undefined}
@@ -174,7 +260,6 @@ const TypedRow = memo(function TypedRow({
         aria-description={reasons}
         title={reasons}
         className={cls}
-        style={{ width: cellWidth, height: cellHeight }}
       >
         {markIds?.length ? (
           <span aria-hidden className="pointer-events-none absolute right-0 top-0 flex gap-px">
@@ -194,14 +279,10 @@ const TypedRow = memo(function TypedRow({
             })}
           </span>
         ) : null}
-      </div>
+      </div>,
     );
   }
-  return (
-    <div role="row" className="contents">
-      {out}
-    </div>
-  );
+  return out;
 });
 
 type Gesture = {
@@ -232,6 +313,7 @@ export const TypedTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(function 
     disabledRange = "clamp",
     onBlockedSelect,
     onCellHover,
+    windowColumns,
     "aria-label": ariaLabel,
   },
   ref,
@@ -266,6 +348,86 @@ export const TypedTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(function 
   const anchorRef = useRef<TimeGridCoord | null>(null);
   const gestureRef = useRef<Gesture | null>(null);
   const hoverRef = useRef<string>("");
+
+  /* ── column windowing ───────────────────────────────────────────────── */
+
+  const pitchX = cellWidth + 2;
+  const windowed = windowColumns ?? nCols > WINDOW_DEFAULT_ABOVE;
+  // `null` until measured. Windowed, the first pass renders the frame with NO
+  // cells (cheap to lay out, and identical on the server), measures, then
+  // renders the real window once. Guessing a width instead cost a full extra
+  // render + layout: 31d x 240 mounted slower windowed than not.
+  //
+  // The raw scroll metrics live in a ref; STATE holds only the chunk-snapped
+  // window, so a scroll that stays inside it renders nothing at all.
+  const metrics = useRef({ left: 0, width: 0, headerW: 0 });
+  const [win, setWin] = useState<{ start: number; end: number } | null>(null);
+
+  /** First / last column strictly in view, from the current metrics. */
+  const visibleRange = useCallback((): [number, number] => {
+    const { left, width, headerW } = metrics.current;
+    const first = Math.max(0, Math.floor((left - headerW) / pitchX));
+    const last = Math.min(nCols - 1, Math.max(first, Math.ceil((left + width - headerW) / pitchX)));
+    return [first, last];
+  }, [pitchX, nCols]);
+
+  const measure = useCallback(() => {
+    const el = outerRef.current;
+    if (!el) return;
+    const rh = el.querySelector<HTMLElement>('[role="rowheader"]');
+    metrics.current = {
+      left: el.scrollLeft,
+      width: el.clientWidth || (typeof window !== "undefined" ? window.innerWidth : 1024),
+      headerW: rh ? rh.offsetWidth + 2 : 0,
+    };
+    // Overscan a quarter viewport each side, snapped to chunks.
+    const [first, last] = visibleRange();
+    const over = Math.max(WINDOW_MIN_OVERSCAN, Math.ceil((last - first) / 4));
+    const start = Math.max(0, Math.floor((first - over) / WINDOW_CHUNK) * WINDOW_CHUNK);
+    const end = Math.min(nCols - 1, Math.ceil((last + over + 1) / WINDOW_CHUNK) * WINDOW_CHUNK - 1);
+    setWin((w) => (w && w.start === start && w.end === end ? w : { start, end }));
+  }, [visibleRange, nCols]);
+
+  useLayoutEffect(() => {
+    if (!windowed) return;
+    measure();
+    const el = outerRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [windowed, measure]);
+
+  // Applied synchronously: a jump (scrollbar click, a scrolled-to cell) must be
+  // in the DOM before the browser paints, or the viewport flashes blank.
+  const onScroll = useCallback(() => flushSync(measure), [measure]);
+
+  let colStart = 0;
+  let colEnd = nCols - 1;
+  if (windowed) {
+    // Unmeasured: the frame only, no cells.
+    colStart = win ? win.start : 0;
+    colEnd = win ? Math.min(win.end, nCols - 1) : -1;
+  }
+
+  /** Scroll so column `c` is in view (arithmetic: it may not be rendered yet). */
+  const revealCol = useCallback(
+    (c: number) => {
+      const el = outerRef.current;
+      if (!el) return;
+      const { headerW } = metrics.current;
+      const width = el.clientWidth || metrics.current.width;
+      const x = headerW + c * pitchX;
+      let left = el.scrollLeft;
+      if (x < left + headerW) left = Math.max(0, x - headerW);
+      else if (x + pitchX > left + width) left = x + pitchX - width;
+      if (left !== el.scrollLeft) {
+        el.scrollLeft = left;
+        measure();
+      }
+    },
+    [pitchX, measure],
+  );
 
   // Latest values for handlers, so they stay stable across renders.
   const live = useRef({ cells, selection, selectionShape, disabledRange, onSelectionChange, onSelectionCommit, onBlockedSelect, onCellHover });
@@ -358,6 +520,29 @@ export const TypedTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(function 
 
   /* ── pointer ────────────────────────────────────────────────────────── */
 
+  /**
+   * Outside every cell (a captured drag past the grid's edge): the nearest cell
+   * by geometry, measured from the first and last RENDERED cell's boxes, so it
+   * holds when the grid is windowed.
+   */
+  const clampToGrid = useCallback(
+    (x: number, y: number): TimeGridCoord | null => {
+      const first = document.getElementById(cellDomId(baseId, 0, colStart));
+      const last = document.getElementById(cellDomId(baseId, nRows - 1, colEnd));
+      if (!first || !last) return null;
+      const a = first.getBoundingClientRect();
+      const b = last.getBoundingClientRect();
+      const w = (b.right - a.left) / (colEnd - colStart + 1);
+      const h = (b.bottom - a.top) / nRows;
+      if (!(w > 0) || !(h > 0)) return null;
+      return {
+        r: Math.min(nRows - 1, Math.max(0, Math.floor((y - a.top) / h))),
+        c: Math.min(nCols - 1, Math.max(0, colStart + Math.floor((x - a.left) / w))),
+      };
+    },
+    [baseId, nRows, nCols, colStart, colEnd],
+  );
+
   const coordFromEvent = useCallback(
     (e: ReactPointerEvent): TimeGridCoord | null => {
       const t = e.target as Element;
@@ -369,28 +554,8 @@ export const TypedTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(function 
       if (!hit) hit = clampToGrid(e.clientX, e.clientY);
       return hit;
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [baseId, nRows, nCols],
+    [baseId, clampToGrid],
   );
-
-  /**
-   * Outside every cell (a captured drag past the grid's edge): the nearest cell
-   * by geometry, measured from the first and last cell's boxes.
-   */
-  function clampToGrid(x: number, y: number): TimeGridCoord | null {
-    const first = document.getElementById(cellDomId(baseId, 0, 0));
-    const last = document.getElementById(cellDomId(baseId, nRows - 1, nCols - 1));
-    if (!first || !last) return null;
-    const a = first.getBoundingClientRect();
-    const b = last.getBoundingClientRect();
-    const w = (b.right - a.left) / nCols;
-    const h = (b.bottom - a.top) / nRows;
-    if (!(w > 0) || !(h > 0)) return null;
-    return {
-      r: Math.min(nRows - 1, Math.max(0, Math.floor((y - a.top) / h))),
-      c: Math.min(nCols - 1, Math.max(0, Math.floor((x - a.left) / w))),
-    };
-  }
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
@@ -537,15 +702,40 @@ export const TypedTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(function 
     setTipPos({ left: b.left - o.left + outer.scrollLeft, top: b.bottom - o.top + outer.scrollTop + 4 });
   }, [activeReasons, active.r, active.c, baseId]);
 
-  // Keep the active cell in view when the keyboard moves it.
+  const reveal = useRef({ revealCol, windowed: windowed && !!win, visibleRange });
+  reveal.current = { revealCol, windowed: windowed && !!win, visibleRange };
+
+  // Keep the active cell in view when the keyboard moves it. Windowed, the
+  // cell may not exist yet, so scroll by arithmetic and let the window follow.
   useEffect(() => {
     if (!focused) return;
+    if (reveal.current.windowed) {
+      reveal.current.revealCol(active.c);
+      return;
+    }
     const el = document.getElementById(cellDomId(baseId, active.r, active.c));
     el?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
   }, [focused, active.r, active.c, baseId]);
 
+  // A selection set from outside (a host, an agent through a bridge) that is
+  // entirely out of view is scrolled to, so what was selected can be seen.
+  useEffect(() => {
+    const { windowed: w, visibleRange: vr, revealCol: rc } = reveal.current;
+    if (!w || !selection || gestureRef.current) return;
+    const [f, l] = vr();
+    let s0: number;
+    let s1: number;
+    if (selection.shape === "rectangle") {
+      s0 = selection.c1;
+      s1 = selection.c2;
+    } else if (selection.from.r === selection.to.r) {
+      s0 = selection.from.c;
+      s1 = selection.to.c;
+    } else return;
+    if (s1 < f || s0 > l) rc(s0);
+  }, [selection]);
+
   const colStep = Math.max(1, Math.floor(nCols / 6));
-  const pitchX = cellWidth + 2;
   const tipId = `${baseId}-tip`;
 
   const bodyRows = new Array(nRows);
@@ -561,7 +751,30 @@ export const TypedTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(function 
         selEnd={seg ? seg[1] : -2}
         activeCol={focused && active.r === r ? active.c : -1}
         onRowHeader={onRowHeader}
+        colStart={colStart}
+        colEnd={colEnd}
+        windowed={windowed}
       />
+    );
+  }
+
+  // Fixed for the life of the grid, windowed or not: changing the tracks on a
+  // window shift re-lays out every item, every frame of a scroll.
+  const gridTemplateColumns = `max-content repeat(${nCols}, ${pitchX}px)`;
+  const headerCols: ReactNode[] = [];
+  for (let c = colStart; c <= colEnd; c++) {
+    headerCols.push(
+      <div
+        key={c}
+        role="columnheader"
+        aria-colindex={windowed ? c + 2 : undefined}
+        style={windowed && c === colStart ? { gridColumnStart: c + 2 } : undefined}
+        data-react-fancy-timegrid-col={c}
+        onClick={toggleStripsOnHeaderClick ? () => pickStrip({ r: 0, c }, { r: nRows - 1, c }) : undefined}
+        className={toggleStripsOnHeaderClick ? `${HEADER_COL} ${HEADER_HOVER}` : HEADER_COL}
+      >
+        {sparseColLabels ? (c % colStep === 0 ? cols[c] : "") : cols[c]}
+      </div>,
     );
   }
 
@@ -570,6 +783,8 @@ export const TypedTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(function 
       ref={setOuterRef}
       data-react-fancy-timegrid=""
       data-typed=""
+      data-windowed={windowed ? "" : undefined}
+      onScroll={windowed ? onScroll : undefined}
       className={cn("relative select-none overflow-x-auto", className)}
     >
       <div
@@ -592,21 +807,17 @@ export const TypedTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(function 
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         className="inline-grid touch-none items-center outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))]/40 dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]/20"
-        style={{ gridTemplateColumns: `max-content repeat(${nCols}, ${pitchX}px)` }}
+        style={
+          {
+            gridTemplateColumns,
+            "--tg-cell-w": `${cellWidth}px`,
+            "--tg-cell-h": `${cellHeight}px`,
+          } as CSSProperties
+        }
       >
         <div role="row" className="contents">
           <div role="columnheader" />
-          {cols.map((label, c) => (
-            <div
-              key={c}
-              role="columnheader"
-              data-react-fancy-timegrid-col={c}
-              onClick={toggleStripsOnHeaderClick ? () => pickStrip({ r: 0, c }, { r: nRows - 1, c }) : undefined}
-              className={toggleStripsOnHeaderClick ? `${HEADER_COL} ${HEADER_HOVER}` : HEADER_COL}
-            >
-              {sparseColLabels ? (c % colStep === 0 ? label : "") : label}
-            </div>
-          ))}
+          {headerCols}
         </div>
         {bodyRows}
       </div>
