@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `TimeGrid`'s `windowColumns` doc comment said the hidden width was held by
+  spacers. It is held by fixed full-grid column tracks; the comment now says
+  so. Documentation only.
+
 ## [5.58.0] - 2026-10-22
 
 ### Added
