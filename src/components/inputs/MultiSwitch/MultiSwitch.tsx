@@ -7,8 +7,12 @@ import { useFieldMode } from "../mode/FieldMode.context";
 import { DisplayValue } from "../mode/DisplayValue";
 import { useInlineEdit } from "../mode/useInlineEdit";
 import { resolveOption } from "../inputs.utils";
-import type { Size } from "../../../utils/types";
+import type { Color, Size } from "../../../utils/types";
 import type { MultiSwitchProps } from "./MultiSwitch.types";
+import { multiSwitchColorClasses } from "./MultiSwitch.colors";
+
+const BORDER_DEFAULT =
+  "border-[color:var(--fancy-border-strong,var(--color-zinc-300))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))]";
 
 const sizeClasses: Record<Size, string> = {
   xs: "px-2 py-1 text-xs",
@@ -43,7 +47,10 @@ export function MultiSwitch<V = string>({
   // the label instead. Needs an id the label and the group both agree on.
   const labelId = label ? `${id ?? reactId}-label` : undefined;
 
-  const resolvedOptions = list.map(resolveOption);
+  // resolveOption hands an object option back as-is, so `color` survives it.
+  const resolvedOptions = list.map(resolveOption) as Array<
+    ReturnType<typeof resolveOption<V>> & { color?: Color }
+  >;
   const fallback = defaultValue ?? resolvedOptions[0]?.value;
   const resolvedMode = useFieldMode(mode);
   const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
@@ -58,6 +65,8 @@ export function MultiSwitch<V = string>({
   const selectedIndex = resolvedOptions.findIndex(
     (o) => o.value === value,
   );
+  const selectedColor = resolvedOptions[selectedIndex]?.color;
+  const colorClasses = selectedColor ? multiSwitchColorClasses[selectedColor] : undefined;
 
   const updateIndicator = useCallback(() => {
     const container = containerRef.current;
@@ -98,7 +107,8 @@ export function MultiSwitch<V = string>({
         if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
       }}
       className={cn(
-        "relative inline-flex rounded-lg border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
+        "relative inline-flex rounded-lg border bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
+        colorClasses ? colorClasses.border : BORDER_DEFAULT,
         dirty && "ring-2 ring-amber-400/50",
         error && "ring-2 ring-red-500/50",
         disabled && "opacity-50 cursor-not-allowed",
@@ -107,7 +117,13 @@ export function MultiSwitch<V = string>({
     >
       {indicator && (
         <span
-          className="absolute top-0 bottom-0 rounded-lg bg-blue-600 transition-all duration-200 ease-out"
+          data-react-fancy-multi-switch-thumb=""
+          data-color={selectedColor}
+          className={
+            colorClasses
+              ? `absolute top-0 bottom-0 rounded-lg ${colorClasses.thumb} transition-all duration-200 ease-out`
+              : "absolute top-0 bottom-0 rounded-lg bg-blue-600 transition-all duration-200 ease-out"
+          }
           style={{ left: indicator.left, width: indicator.width }}
         />
       )}
@@ -134,7 +150,7 @@ export function MultiSwitch<V = string>({
               "relative z-10 font-medium transition-colors duration-200",
               sizeClasses[size],
               isSelected
-                ? "text-white"
+                ? (colorClasses?.text ?? "text-white")
                 : "text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))] dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
               (disabled || option.disabled) && "cursor-not-allowed",
             )}

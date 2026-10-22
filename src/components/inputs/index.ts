@@ -26,7 +26,7 @@ export { Slider } from "./Slider";
 export type { SliderProps, SliderSingleProps, SliderRangeProps } from "./Slider";
 
 export { MultiSwitch } from "./MultiSwitch";
-export type { MultiSwitchProps } from "./MultiSwitch";
+export type { MultiSwitchProps, MultiSwitchOption } from "./MultiSwitch";
 
 export { DatePicker } from "./DatePicker";
 export type { DatePickerProps, DatePickerSingleProps, DatePickerRangeProps } from "./DatePicker";

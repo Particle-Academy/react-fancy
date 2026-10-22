@@ -60,6 +60,7 @@ export type {
   SwitchProps,
   SliderProps,
   MultiSwitchProps,
+  MultiSwitchOption,
   DatePickerProps,
   FieldMode,
   FormProps,

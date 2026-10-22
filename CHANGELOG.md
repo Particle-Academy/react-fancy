@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.58.0] - 2026-10-22
+
+### Added
+
+- **`MultiSwitch` per-option colour.** An option in `list` can carry
+  `color` (any kit `Color`, including `brand`). While that option is
+  selected, the thumb and the switch's border take its colour, e.g. a green
+  "Assign" against a red "Unassign". **Nothing to do for an existing switch:**
+  without `color` the thumb is the same blue, the border the same token, and
+  the thumb's class string is byte-identical to 5.57.0.
+  - Light hues (`amber`, `yellow`, `lime`) get dark label text so the selected
+    label stays readable; the rest get white, as before.
+  - The thumb now carries `data-react-fancy-multi-switch-thumb` and, when
+    coloured, `data-color`.
+  - A caller's own border classes in `className` still win over the colour.
+  - New exported type `MultiSwitchOption` (an `InputOption` plus `color`).
+  - Verified in Chrome in light, `.dark` and `[data-theme="dark"]`.
+
 ## [5.57.0] - 2026-10-22
 
 ### Added

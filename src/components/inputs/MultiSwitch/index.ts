@@ -1,2 +1,2 @@
 export { MultiSwitch } from "./MultiSwitch";
-export type { MultiSwitchProps } from "./MultiSwitch.types";
+export type { MultiSwitchProps, MultiSwitchOption } from "./MultiSwitch.types";
