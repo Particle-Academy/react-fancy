@@ -304,3 +304,89 @@ describe("MediaViewer forwards page-image mode", () => {
     expect(sel(host, "watermark")).not.toBeNull();
   });
 });
+
+/*
+ * A page image that fails (the server refused it: 422 incomplete, 413 too
+ * large, 404 revoked) used to leave the browser's broken-image icon in a white
+ * box. Found by a consumer serving real macOS PDFs. The viewer has to say the
+ * page could not be shown, and offer to try again.
+ */
+describe("PdfViewer page-image mode — a page that fails to load", () => {
+  beforeEach(() => {
+    FakeIO.all = [];
+  });
+
+  const fail = (img: HTMLImageElement) => act(() => img.dispatchEvent(new Event("error")));
+  const pageEl = (host: HTMLElement, n: number) => host.querySelector<HTMLElement>(`[data-react-fancy-pdf-viewer-page][data-page="${n}"]`)!;
+
+  it("replaces a failed image with a readable message at the page's size", () => {
+    const { host } = mount(<PdfViewer pages={{ count: 2, url: pageUrl }} />);
+    fail(images(host)[0]);
+    const page1 = pageEl(host, 1);
+    expect(page1.querySelector("img")).toBeNull();
+    const err = page1.querySelector<HTMLElement>("[data-react-fancy-pdf-viewer-page-error]")!;
+    expect(err).not.toBeNull();
+    expect(err.getAttribute("role")).toBe("alert");
+    expect(err.textContent).toContain("couldn't be shown");
+    expect(page1.dataset.state).toBe("error");
+    // The other page is untouched.
+    expect(pageEl(host, 2).querySelector("img")).not.toBeNull();
+    expect(pageEl(host, 2).dataset.state).toBeUndefined();
+  });
+
+  it("reports the failure with the page, scale and url", () => {
+    const onPageError = vi.fn();
+    const { host } = mount(<PdfViewer pages={{ count: 2, url: pageUrl }} onPageError={onPageError} />);
+    fail(images(host)[1]);
+    expect(onPageError).toHaveBeenCalledTimes(1);
+    expect(onPageError).toHaveBeenCalledWith(2, { scale: 1, url: "/doc/7/page/2.png?scale=1" });
+  });
+
+  it("Retry requests the same URL again, unchanged, so a signed URL still works", () => {
+    const url = vi.fn(pageUrl);
+    const { host } = mount(<PdfViewer pages={{ count: 1, url }} />);
+    fail(images(host)[0]);
+    const retry = pageEl(host, 1).querySelector<HTMLButtonElement>("[data-react-fancy-pdf-viewer-page-retry]")!;
+    expect(retry).not.toBeNull();
+    act(() => retry.click());
+    const img = images(host)[0];
+    expect(img).toBeDefined();
+    expect(img.getAttribute("src")).toBe("/doc/7/page/1.png?scale=1");
+    expect(pageEl(host, 1).dataset.state).toBeUndefined();
+  });
+
+  it("a new URL for the page (a sharper zoom bucket) tries again by itself", () => {
+    const { host } = mount(<PdfViewer pages={{ count: 1, url: pageUrl }} />);
+    fail(images(host)[0]);
+    expect(images(host)).toHaveLength(0);
+    act(() => sel(host, "zoom-in")!.click());
+    act(() => sel(host, "zoom-in")!.click());
+    expect(images(host)[0].getAttribute("src")).toBe("/doc/7/page/1.png?scale=2");
+  });
+
+  it("renderPageError replaces the default message and gets retry", () => {
+    const { host } = mount(
+      <PdfViewer
+        pages={{ count: 1, url: pageUrl }}
+        renderPageError={({ page, retry }) => (
+          <button type="button" data-custom onClick={retry}>
+            Page {page} is still being prepared
+          </button>
+        )}
+      />,
+    );
+    fail(images(host)[0]);
+    const custom = host.querySelector<HTMLButtonElement>("[data-custom]")!;
+    expect(custom.textContent).toBe("Page 1 is still being prepared");
+    // Still inside the stable error handle, so an agent finds it the same way.
+    expect(custom.closest("[data-react-fancy-pdf-viewer-page-error]")).not.toBeNull();
+    act(() => custom.click());
+    expect(images(host)).toHaveLength(1);
+  });
+
+  it("the watermark still covers a failed page", () => {
+    const { host } = mount(<PdfViewer pages={{ count: 1, url: pageUrl }} watermark={{ text: "a@b.example" }} />);
+    fail(images(host)[0]);
+    expect(pageEl(host, 1).querySelector("[data-react-fancy-pdf-viewer-watermark]")).not.toBeNull();
+  });
+});

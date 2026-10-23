@@ -1,2 +1,2 @@
 export { PdfViewer } from "./PdfViewer";
-export type { PdfViewerProps, PdfPageSource, PdfViewerPolicy, PdfViewerWatermark } from "./PdfViewer.types";
+export type { PdfViewerProps, PdfPageSource, PdfViewerPolicy, PdfViewerWatermark, PdfPageErrorContext } from "./PdfViewer.types";

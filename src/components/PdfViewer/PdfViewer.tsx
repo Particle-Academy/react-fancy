@@ -38,6 +38,8 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(
       onZoomChange,
       policy,
       watermark,
+      onPageError,
+      renderPageError,
       title = "PDF document",
       className,
       style,
@@ -61,6 +63,8 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(
           onZoomChange={onZoomChange}
           policy={policy}
           watermark={watermark}
+          onPageError={onPageError}
+          renderPageError={renderPageError}
           title={title}
           className={cn(frame && "rounded-none", className)}
           style={style}

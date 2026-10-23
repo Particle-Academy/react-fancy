@@ -2,7 +2,7 @@ import { forwardRef, useCallback, useEffect, useId, useLayoutEffect, useRef, use
 import type { CSSProperties, KeyboardEvent, ReactNode, SyntheticEvent } from "react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
-import type { PdfPageSource, PdfViewerPolicy, PdfViewerWatermark } from "./PdfViewer.types";
+import type { PdfPageErrorContext, PdfPageSource, PdfViewerPolicy, PdfViewerWatermark } from "./PdfViewer.types";
 
 /** One click of the zoom bar. Matches `FauxClient` and `ImageViewer`. */
 const ZOOM_STEP = 1.25;
@@ -41,6 +41,8 @@ export interface PdfPagesProps {
   onZoomChange?: (zoom: number) => void;
   policy?: PdfViewerPolicy;
   watermark?: PdfViewerWatermark;
+  onPageError?: (page: number, info: { scale: number; url: string }) => void;
+  renderPageError?: (ctx: PdfPageErrorContext) => ReactNode;
   title: string;
   className?: string;
   style?: CSSProperties;
@@ -62,6 +64,8 @@ export const PdfPages = forwardRef<HTMLDivElement, PdfPagesProps>(
       onZoomChange,
       policy,
       watermark,
+      onPageError,
+      renderPageError,
       title,
       className,
       style,
@@ -81,6 +85,21 @@ export const PdfPages = forwardRef<HTMLDivElement, PdfPagesProps>(
 
     const scrollerRef = useRef<HTMLDivElement>(null);
     const [ratios, setRatios] = useState<Record<number, number>>({});
+    // Per page: the URL whose image failed. Keyed on the URL, so a new one (a
+    // sharper zoom bucket, a refreshed signature) tries again by itself.
+    const [failed, setFailed] = useState<Record<number, string>>({});
+    // Per page: bumped by Retry to remount the <img> on the SAME url. The url
+    // is never altered, so a signed URL stays valid.
+    const [attempts, setAttempts] = useState<Record<number, number>>({});
+    const retryPage = useCallback((n: number) => {
+      setFailed((prev) => {
+        if (!(n in prev)) return prev;
+        const next = { ...prev };
+        delete next[n];
+        return next;
+      });
+      setAttempts((prev) => ({ ...prev, [n]: (prev[n] ?? 0) + 1 }));
+    }, []);
     const ratioOf = (n: number) => ratios[n] ?? pages.aspectRatio ?? 1 / Math.SQRT2;
 
     // ---- Which pages have an image: those near the viewport ---------------
@@ -292,18 +311,50 @@ export const PdfPages = forwardRef<HTMLDivElement, PdfPagesProps>(
           <div className="mx-auto flex flex-col" style={{ width: `${zoom * 100}%`, gap: GAP }}>
             {Array.from({ length: count }, (_, i) => {
               const n = i + 1;
+              const near = isNear(n);
+              const src = near ? pages.url(n, scale) : "";
+              const isFailed = near && failed[n] === src;
               return (
                 <div
                   key={n}
                   data-react-fancy-pdf-viewer-page=""
                   data-page={n}
+                  data-state={isFailed ? "error" : undefined}
                   className="relative w-full overflow-hidden bg-white shadow-sm"
                   style={{ aspectRatio: String(ratioOf(n)) }}
                 >
-                  {isNear(n) && (
+                  {isFailed && (
+                    <div
+                      data-react-fancy-pdf-viewer-page-error=""
+                      role="alert"
+                      className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] p-4 text-center text-sm text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]"
+                    >
+                      {renderPageError ? (
+                        renderPageError({ page: n, scale, url: src, retry: () => retryPage(n) })
+                      ) : (
+                        <>
+                          <span>{`Page ${n} couldn't be shown.`}</span>
+                          <button
+                            type="button"
+                            data-react-fancy-pdf-viewer-page-retry=""
+                            onClick={() => retryPage(n)}
+                            className="rounded-md border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] bg-[color:var(--fancy-surface,var(--color-white))] px-2.5 py-1 text-xs font-medium text-[color:var(--fancy-text,var(--color-zinc-900))] hover:bg-[color:var(--fancy-surface-hover,var(--color-zinc-50))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))]/50 dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-hover-dark,color-mix(in_oklab,var(--color-zinc-800)_50%,transparent))]"
+                          >
+                            Retry
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+                  {near && !isFailed && (
                     <img
+                      key={attempts[n] ?? 0}
                       data-react-fancy-pdf-viewer-image=""
-                      src={pages.url(n, scale)}
+                      src={src}
+                      onError={() => {
+                        setFailed((prev) => (prev[n] === src ? prev : { ...prev, [n]: src }));
+                        onPageError?.(n, { scale, url: src });
+                      }}
                       alt={`Page ${n}`}
                       decoding="async"
                       draggable={download ? undefined : false}

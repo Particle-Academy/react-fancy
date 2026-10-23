@@ -1,5 +1,5 @@
 import type { FauxClientProps } from "../FauxClient/FauxClient.types";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 /**
  * Pages the APP rendered to images, behind its own auth. With this the viewer
@@ -56,6 +56,18 @@ export interface PdfViewerWatermark {
   density?: number;
 }
 
+/** Passed to `renderPageError` for a page whose image failed to load. */
+export interface PdfPageErrorContext {
+  /** 1-based page number. */
+  page: number;
+  /** The resolution bucket that was requested. */
+  scale: number;
+  /** The URL that failed, as `pages.url` returned it. */
+  url: string;
+  /** Request the same URL again. */
+  retry: () => void;
+}
+
 export interface PdfViewerProps {
   /**
    * Show the PDF in react-fancy's `FauxClient` frame with a full-screen button,
@@ -89,6 +101,18 @@ export interface PdfViewerProps {
   policy?: PdfViewerPolicy;
   /** A tiled overlay over every page (page-image mode). Removable with devtools; burn it in server-side when it must hold. */
   watermark?: PdfViewerWatermark;
+  /**
+   * A page image failed to load (page-image mode): the server refused it or
+   * the network did. An `<img>` cannot see the HTTP status, so a 422, 413 or
+   * 404 all arrive here alike. Log it, or look the page up yourself.
+   */
+  onPageError?: (page: number, info: { scale: number; url: string }) => void;
+  /**
+   * What a failed page shows instead of the default "This page couldn't be
+   * shown" message and Retry button (page-image mode). Drawn inside the page's
+   * own box, at its size.
+   */
+  renderPageError?: (ctx: PdfPageErrorContext) => ReactNode;
   /** Accessible title for the document (default `"PDF document"`). */
   title?: string;
   /** Additional CSS classes for the container. */

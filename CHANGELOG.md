@@ -11,6 +11,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.59.0] - 2026-10-23
+
+### Added
+
+- **`PdfViewer` shows a page that failed to load (page-image mode).** Until
+  now a page whose image the server refused (a 422 incomplete render, a 413,
+  a 404 for a revoked file) left the browser's broken-image icon in a white
+  box. Found by a consumer serving real macOS PDFs. **Nothing to do:** a page
+  that loads renders exactly as before.
+  - A failed page shows "Page N couldn't be shown." and a **Retry** button, at
+    the page's own size, as `role="alert"`. The page carries
+    `data-state="error"`, the panel `data-react-fancy-pdf-viewer-page-error`,
+    the button `data-react-fancy-pdf-viewer-page-retry`. The watermark still
+    covers it.
+  - Retry requests the SAME url again; it never adds a query string, so a
+    signed URL stays valid. A new url for the page (a sharper zoom bucket)
+    tries again by itself.
+  - `onPageError(page, { scale, url })` reports each failure. An `<img>`
+    cannot see the HTTP status, so 422 / 413 / 404 all arrive alike.
+  - `renderPageError({ page, scale, url, retry })` replaces the default
+    message, inside the same handle. New exported type `PdfPageErrorContext`.
+  - Verified in Chrome in light, `.dark` and `[data-theme="dark"]` against a
+    real 404.
+
 ### Fixed
 
 - `TimeGrid`'s `windowColumns` doc comment said the hidden width was held by
