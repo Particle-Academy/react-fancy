@@ -753,6 +753,16 @@
         "default": "./dist/reason-tag.cjs"
       }
     },
+    "./resizable-panels": {
+      "import": {
+        "types": "./dist/resizable-panels.d.ts",
+        "default": "./dist/resizable-panels.js"
+      },
+      "require": {
+        "types": "./dist/resizable-panels.d.cts",
+        "default": "./dist/resizable-panels.cjs"
+      }
+    },
     "./section": {
       "import": {
         "types": "./dist/section.d.ts",

@@ -65,6 +65,9 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-breadcrumbs]` | Breadcrumbs |
 | `[data-react-fancy-breadcrumbs-item]` | Breadcrumbs.Item |
 | `[data-react-fancy-pagination]` | Pagination |
+| `[data-react-fancy-resizable-panels]` | ResizablePanels (`data-orientation`, `data-dragging`, `data-disabled`) |
+| `[data-react-fancy-resizable-panels-panel]` | ResizablePanels panel (value `first` / `second`) |
+| `[data-react-fancy-resizable-panels-separator]` | ResizablePanels separator (`role="separator"`) |
 
 #### Content & Display
 
@@ -125,6 +128,7 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-pillbox]` | Pillbox |
 | `[data-react-fancy-file-upload]` | FileUpload |
 | `[data-react-fancy-file-upload-dropzone]` | FileUpload.Dropzone |
+| `[data-react-fancy-file-upload-browse]` | FileUpload.Dropzone's browse button |
 | `[data-react-fancy-file-upload-list]` | FileUpload.List |
 | `[data-react-fancy-autocomplete]` | Autocomplete |
 

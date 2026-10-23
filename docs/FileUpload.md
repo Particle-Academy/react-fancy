@@ -39,9 +39,12 @@ Provides file state context to its children.
 
 Drag-and-drop area that also opens a file picker on click.
 
+It contains a native browse `<button type="button">` (`data-react-fancy-file-upload-browse`), so keyboard users can Tab to it and open the picker with Enter or Space. On the default zone the button wraps the icon and copy; with custom `children` it is visually hidden beside them and the zone draws the focus ring. When `disabled`, the button is disabled and the zone carries `aria-disabled="true"`.
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `ReactNode` | Default upload icon + text | Custom dropzone content |
+| `browseLabel` | `string` | The visible copy, or `"Browse files"` with custom children | Accessible name of the browse button |
 | `className` | `string` | - | Additional CSS classes |
 
 ### `FileUpload.List`

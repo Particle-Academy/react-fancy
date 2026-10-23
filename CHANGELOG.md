@@ -11,6 +11,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`ResizablePanels`: two panels with an accessible, draggable separator.**
+  Follows the W3C window-splitter pattern. Requested by a consumer (Maipa).
+  **Nothing to do:** it is a new component; import it from the barrel or from
+  `@particle-academy/react-fancy/resizable-panels`.
+  - `value` is the primary (first) panel's size as a **percentage** (0-100),
+    with `onValueChange`, or `defaultValue` (50) uncontrolled. Clamped to
+    `min` (10) / `max` (90), which are themselves clamped to 0-100.
+  - `onValueCommit` fires once per gesture (pointer release or cancel, key
+    release) and only if the value changed, so a host can persist a per-user
+    size without writing on every frame. The host owns persistence.
+  - `orientation` names the panel layout: `"horizontal"` (side by side, a
+    vertical separator moved with ArrowLeft / ArrowRight) or `"vertical"`
+    (stacked, ArrowUp / ArrowDown). `step` (5), Shift + Arrow `largeStep` (20),
+    Home / End to `min` / `max`.
+  - The separator is `role="separator"` with `aria-valuenow/min/max`,
+    `aria-orientation`, `aria-controls` (the primary panel), `aria-label`
+    (`label` prop) and a tab stop with a `--fancy-focus` ring. Pointer and touch
+    drags use pointer capture. `disabled` freezes it.
+  - Handles: `data-react-fancy-resizable-panels` (with `data-orientation`,
+    `data-dragging`, `data-disabled`), `-panel="first" | "second"`,
+    `-separator`. New exported types `ResizablePanelsProps`,
+    `ResizablePanelsOrientation`.
+
+### Fixed
+
+- **`FileUpload.Dropzone` is reachable by keyboard.** The zone was a clickable
+  div around a hidden file input with no tab stop, role or key handler, so a
+  keyboard or switch user could not open the file picker at all. Found by a
+  consumer (Maipa) on 5.59.0. **Nothing to do:** the default zone looks the
+  same, and `value` / `onChange`, `accept`, `multiple`, `maxFiles`, `maxSize`
+  and drag-and-drop are unchanged.
+  - The zone now holds a native `<button type="button">`
+    (`data-react-fancy-file-upload-browse`); Tab reaches it and Enter / Space
+    open the picker. On the default zone it wraps the icon and copy, so the
+    visible text is its name; with custom `children` it is visually hidden and
+    named "Browse files". The zone draws a `--fancy-focus` ring while it has
+    keyboard focus.
+  - New `browseLabel` prop on `FileUpload.Dropzone` overrides the button's
+    accessible name.
+  - `disabled` disables the button (not focusable, not activatable) and sets
+    `aria-disabled="true"` on the zone. The zone also carries `data-disabled`
+    and `data-drag-over`.
+  - The hidden input has an `id` the button names in `aria-controls`, an
+    `aria-label`, and `tabIndex={-1}`.
+  - The default copy is now a `<span>` inside the button rather than a `<p>`;
+    a stylesheet that targeted `[data-react-fancy-file-upload-dropzone] p`
+    should target the span instead.
+
 ## [5.59.0] - 2026-10-23
 
 ### Added

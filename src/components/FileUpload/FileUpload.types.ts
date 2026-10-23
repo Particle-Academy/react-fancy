@@ -25,6 +25,12 @@ export interface FileUploadProps {
 export interface FileUploadDropzoneProps {
   children?: ReactNode;
   className?: string;
+  /**
+   * Accessible name of the zone's browse button. Defaults to the visible copy
+   * ("Drop files here or click to browse") on the default zone, and to
+   * "Browse files" when the zone has custom children.
+   */
+  browseLabel?: string;
 }
 
 export interface FileUploadListProps {
