@@ -81,7 +81,10 @@ export function FileUploadDropzone({
       onClick={handleClick}
       className={cn(
         "flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-[color,background-color,border-color,box-shadow]",
-        "has-focus-visible:ring-2 has-focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))]/40 dark:has-focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]/40",
+        // Full opacity on purpose: a translucent 2px ring over a dashed border
+        // falls under WCAG 2.2's 3:1 for a focus indicator. The offset gap is
+        // painted with the surface token so it matches the page in dark mode.
+        "has-focus-visible:ring-2 has-focus-visible:ring-offset-2 has-focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))] has-focus-visible:ring-offset-[color:var(--fancy-surface,var(--color-white))] dark:has-focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))] dark:has-focus-visible:ring-offset-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
         dragOver
           ? "border-blue-400 bg-blue-50 dark:border-blue-500 dark:bg-blue-950"
           : "border-[color:var(--fancy-border-strong,var(--color-zinc-300))] hover:border-zinc-400 dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:hover:border-zinc-500",

@@ -48,8 +48,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     (`data-react-fancy-file-upload-browse`); Tab reaches it and Enter / Space
     open the picker. On the default zone it wraps the icon and copy, so the
     visible text is its name; with custom `children` it is visually hidden and
-    named "Browse files". The zone draws a `--fancy-focus` ring while it has
-    keyboard focus.
+    named "Browse files". While it has keyboard focus the zone draws a solid
+    2px `--fancy-focus` ring at full opacity with a 2px offset (gap painted
+    with `--fancy-surface`), so it meets WCAG 2.2's 3:1 for focus indicators
+    in light and dark. Hover is unchanged.
   - New `browseLabel` prop on `FileUpload.Dropzone` overrides the button's
     accessible name.
   - `disabled` disables the button (not focusable, not activatable) and sets

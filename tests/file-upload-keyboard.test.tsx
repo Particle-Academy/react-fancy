@@ -184,6 +184,25 @@ describe("FileUpload.Dropzone keyboard access", () => {
     unmount();
   });
 
+  it("the focus ring is the focus token at FULL opacity, with an offset", () => {
+    // Review on e45a888: `/40` rendered a 2px ring at 40% opacity on the dashed
+    // border, well under WCAG 2.2's 3:1 for a focus indicator.
+    const { host, unmount } = mount(
+      <FileUpload>
+        <FileUpload.Dropzone />
+      </FileUpload>,
+    );
+    const classes = zone(host).className.split(/\s+/);
+    expect(classes).toContain("has-focus-visible:ring-2");
+    expect(classes).toContain("has-focus-visible:ring-offset-2");
+    expect(classes).toContain("has-focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))]");
+    expect(classes).toContain("dark:has-focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]");
+    // No translucent focus ring anywhere on the zone or its trigger.
+    const all = (zone(host).className + " " + browse(host)!.className).split(/\s+/);
+    expect(all.filter((c) => /ring-\[color:var\(--fancy-focus[^\]]*\]\/\d+/.test(c))).toEqual([]);
+    unmount();
+  });
+
   it("files chosen through the picker still reach a controlled onChange", () => {
     const onChange = vi.fn();
     const { host, unmount } = mount(
