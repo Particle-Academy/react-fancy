@@ -3,11 +3,14 @@ import { marked } from "marked";
 import { cn } from "../../utils/cn";
 import { sanitizeHtml } from "../../utils/sanitize";
 import { useControllableState } from "../../hooks";
+import { useFullScreen } from "../../hooks/use-full-screen";
+import { FullScreenProvider } from "../FullScreen/FullScreen.context";
 import { EditorContext } from "./Editor.context";
 import { EditorToolbar } from "./EditorToolbar";
 import { EditorToolbarSeparator } from "./EditorToolbarSeparator";
 import { EditorSourceToggle } from "./EditorSourceToggle";
 import { EditorContent } from "./EditorContent";
+import { EditorFullScreenToggle } from "./EditorFullScreenToggle";
 import { htmlToMarkdown, detectFormat, markdownToEditorHtml, type MarkdownSource } from "./editor.utils";
 import { mergeExtensions } from "../ContentRenderer/extensions";
 import { ContentRenderer } from "../ContentRenderer/ContentRenderer";
@@ -60,6 +63,10 @@ function EditorRoot({
   showSource: showSourceProp,
   defaultShowSource = false,
   onShowSourceChange,
+  fullScreen: fullScreenProp,
+  defaultFullScreen = false,
+  onFullScreenChange,
+  fullScreenMode = "overlay",
 }: EditorProps) {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [value, setValue] = useControllableState(controlledValue, defaultValue, onChange);
@@ -68,6 +75,15 @@ function EditorRoot({
     defaultShowSource,
     onShowSourceChange,
   );
+  // Full screen is the element itself going `position: fixed`, not a portal:
+  // reparenting would remount the contentEditable and lose the caret, the
+  // browser's undo stack and the seeded HTML.
+  const fs = useFullScreen<HTMLDivElement>({
+    fullScreen: fullScreenProp,
+    defaultFullScreen,
+    onFullScreenChange,
+    mode: fullScreenMode,
+  });
   // View/edit mode — same resolution as the inputs: prop → <Form> context → "edit".
   const mode = useFieldMode(modeProp);
   const isView = mode === "view";
@@ -182,6 +198,8 @@ function EditorRoot({
     extensions,
     showSource,
     setShowSource,
+    fullScreen: fs.fullScreen,
+    setFullScreen: fs.setFullScreen,
     _initialHtml: initialHtml,
     _onInput: handleInput,
     _sourceValue: value,
@@ -193,38 +211,46 @@ function EditorRoot({
   // tree. Driven by `mode` / a `<Form mode="view">`, exactly like the inputs.
   if (isView) {
     return (
-      <div
-        data-react-fancy-editor=""
-        data-mode="view"
-        className={cn(
-          "overflow-hidden rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
-          className,
-        )}
-      >
-        <ContentRenderer
-          value={value}
-          format={valueFormat !== "auto" ? valueFormat : outputFormat}
-          lineSpacing={lineSpacing}
-          extensions={instanceExtensions}
-          unsafe={unsafe}
-          className="px-4 py-3"
-        />
-      </div>
+      <FullScreenProvider value={fs}>
+        <div
+          {...fs.targetProps}
+          data-react-fancy-editor=""
+          data-mode="view"
+          className={cn(
+            "overflow-hidden rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
+            className,
+            // Read-only content taller than the viewport must scroll in place.
+            fs.fullScreen && "overflow-auto",
+          )}
+        >
+          <ContentRenderer
+            value={value}
+            format={valueFormat !== "auto" ? valueFormat : outputFormat}
+            lineSpacing={lineSpacing}
+            extensions={instanceExtensions}
+            unsafe={unsafe}
+            className="px-4 py-3"
+          />
+        </div>
+      </FullScreenProvider>
     );
   }
 
   return (
     <EditorContext.Provider value={contextValue}>
-      <div
-        data-react-fancy-editor=""
-        data-mode="edit"
-        className={cn(
-          "flex flex-col overflow-hidden rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
-          className,
-        )}
-      >
-        {children}
-      </div>
+      <FullScreenProvider value={fs}>
+        <div
+          {...fs.targetProps}
+          data-react-fancy-editor=""
+          data-mode="edit"
+          className={cn(
+            "flex flex-col overflow-hidden rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
+            className,
+          )}
+        >
+          {children}
+        </div>
+      </FullScreenProvider>
     </EditorContext.Provider>
   );
 }
@@ -237,4 +263,5 @@ export const Editor = Object.assign(EditorRoot, {
   Toolbar: ToolbarWithSeparator,
   Content: EditorContent,
   SourceToggle: EditorSourceToggle,
+  FullScreenToggle: EditorFullScreenToggle,
 });

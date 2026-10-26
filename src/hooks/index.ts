@@ -10,4 +10,10 @@ export type { ViewportState } from "./use-pan-zoom";
 export { useNodeRegistry } from "./use-node-registry";
 export type { NodeRect } from "./use-node-registry";
 export { useTheme } from "./use-theme";
+export { useFullScreen } from "./use-full-screen";
+export type {
+  FullScreenMode,
+  UseFullScreenOptions,
+  UseFullScreenResult,
+} from "./use-full-screen";
 export type { UseThemeResult } from "./use-theme";

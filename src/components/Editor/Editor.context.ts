@@ -16,6 +16,10 @@ export interface EditorContextValue {
   showSource: boolean;
   /** Toggle/set the raw-source view. */
   setShowSource: (showSource: boolean) => void;
+  /** Whether the editor currently covers the viewport. */
+  fullScreen: boolean;
+  /** Enter/leave full screen. Goes through `onFullScreenChange` when controlled. */
+  setFullScreen: (fullScreen: boolean) => void;
   /** Initial HTML content to load into the editor on mount */
   _initialHtml: string;
   /** @internal Called by EditorContent on input events */

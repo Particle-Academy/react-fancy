@@ -1,5 +1,17 @@
 import { createPortal } from "react-dom";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+
+/**
+ * Where a `<Portal>` without an explicit `container` renders. `null` means
+ * `document.body`, which is what every Portal did before this existed.
+ *
+ * A full-screen surface provides its own element here while it is active. In the
+ * browser's Fullscreen API only the full-screen element's subtree is painted, so
+ * a menu, tooltip or dialog portalled to `<body>` from inside a full-screen
+ * editor would open invisibly. Redirecting keeps every react-fancy overlay a
+ * descendant of the surface without the components inside knowing.
+ */
+export const PortalContainerContext = createContext<HTMLElement | null>(null);
 
 export interface PortalProps {
   children: ReactNode;
@@ -14,13 +26,14 @@ export function Portal({ children, container }: PortalProps) {
   // keeps the first client render identical to the server. SSR-safe for every
   // Portal consumer (Toast, Modal, Dropdown, Tooltip, Popover, …).
   const [mounted, setMounted] = useState(false);
+  const contextContainer = useContext(PortalContainerContext);
   useEffect(() => {
     setMounted(true);
   }, []);
 
   if (!mounted || typeof document === "undefined") return null;
 
-  const target = container ?? document.body;
+  const target = container ?? contextContainer ?? document.body;
 
   return createPortal(
     <PortalDarkWrapper>{children}</PortalDarkWrapper>,

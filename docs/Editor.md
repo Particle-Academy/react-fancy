@@ -33,6 +33,10 @@ import { Editor } from "@particle-academy/react-fancy";
 | showSource | `boolean` | - | Controlled source-view flag. When `true`, the content area shows the raw `value` (in `outputFormat`) in an editable `<textarea>` |
 | defaultShowSource | `boolean` | `false` | Initial source-view flag when uncontrolled |
 | onShowSourceChange | `(showSource: boolean) => void` | - | Fired when the Source toggle (or an agent) flips source view on/off |
+| fullScreen | `boolean` | - | Controlled full-screen flag. While `true` the editor covers the viewport, the toolbar stays on top and the content fills the rest |
+| defaultFullScreen | `boolean` | `false` | Initial full-screen flag when uncontrolled |
+| onFullScreenChange | `(fullScreen: boolean) => void` | - | Fired by the toggle, Escape, an agent, or the user leaving the browser's full screen |
+| fullScreenMode | `"overlay" \| "native"` | `"overlay"` | `overlay` covers the viewport in place and always works; `native` uses the browser Fullscreen API and falls back to the overlay. See [FullScreen](./FullScreen.md) |
 | className | `string` | - | Additional CSS classes |
 
 ### Editor.Toolbar
@@ -43,6 +47,7 @@ import { Editor } from "@particle-academy/react-fancy";
 | onAction | `(command: string) => void` | - | Custom action handler |
 | children | `ReactNode` | - | Custom toolbar content |
 | showSourceToggle | `boolean` | `true` | Append a Source toggle to the default toolbar. Ignored when `children` are supplied — custom toolbars compose their own `<Editor.SourceToggle />` |
+| showFullScreenToggle | `boolean` | `false` | Append a full-screen toggle (Lucide `maximize-2` / `minimize-2`) at the right end of the default toolbar. Ignored when `children` are supplied — use `<Editor.FullScreenToggle />` |
 | className | `string` | - | Additional CSS classes |
 
 #### EditorAction
@@ -69,6 +74,25 @@ A toolbar button that reveals the raw HTML/Markdown behind the editor. It is app
 | title | `string` | `"Source"` | Accessible title in rich-text mode (click → source) |
 | activeTitle | `string` | `"Rich text"` | Accessible title in source mode (click → rich text) |
 | className | `string` | - | Additional CSS classes |
+
+### Editor.FullScreenToggle
+
+Toolbar button that takes the editor full screen and back. Carries `data-react-fancy-editor-fullscreen-toggle` and the shared `data-react-fancy-fullscreen-toggle`, `aria-pressed` and an `aria-label` of "Enter full screen" / "Exit full screen".
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| enterIcon | `string` | `"maximize-2"` | Lucide name shown while not full screen |
+| exitIcon | `string` | `"minimize-2"` | Lucide name shown while full screen |
+| className | `string` | - | Additional CSS classes |
+
+```tsx
+<Editor defaultValue={doc} onFullScreenChange={(on) => console.log(on)}>
+  <Editor.Toolbar showFullScreenToggle />
+  <Editor.Content maxHeight={240} />
+</Editor>
+```
+
+While full screen the root has `data-fullscreen="true"`, `maxHeight` is ignored so the content fills the screen, and Escape leaves. The editor is not remounted, so the caret, undo history and text survive the round trip.
 
 ### Editor.Content
 

@@ -168,6 +168,9 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-editor]` | Editor |
 | `[data-react-fancy-editor-toolbar]` | Editor.Toolbar |
 | `[data-react-fancy-editor-content]` | Editor.Content |
+| `[data-react-fancy-editor-fullscreen-toggle]` | Editor.FullScreenToggle |
+| `[data-react-fancy-fullscreen]` | FullScreen (`data-fullscreen`, `data-fullscreen-mode`) |
+| `[data-react-fancy-fullscreen-toggle]` | FullScreen.Toggle (any full-screen toggle) |
 | `[data-react-fancy-emoji]` | Emoji |
 | `[data-react-fancy-emoji-select]` | EmojiSelect |
 | `[data-react-fancy-content-renderer]` | ContentRenderer |

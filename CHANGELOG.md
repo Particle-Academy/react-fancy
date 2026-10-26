@@ -11,6 +11,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.61.0] - 2026-10-26
+
+### Added
+
+- **`Editor` can go full screen.** Requested by a consumer (MOIC) that embeds
+  editors in panels and dialogs. Add `showFullScreenToggle` to the default
+  toolbar (`<Editor.Toolbar showFullScreenToggle />`), or put
+  `<Editor.FullScreenToggle />` in a custom one. The state is controlled like
+  everything else on the Editor: `fullScreen` + `onFullScreenChange`, or
+  `defaultFullScreen` uncontrolled, and `useEditor()` now exposes
+  `fullScreen` / `setFullScreen` so an agent or a custom toolbar can drive it.
+  While full screen the editor covers the viewport, the toolbar stays at the
+  top, the content fills the rest (`<Editor.Content maxHeight>` is ignored), and
+  the root carries `data-fullscreen="true"`. Escape leaves full screen; focus
+  goes back to where it was and the page and any scrolled panel around the
+  editor return to their positions. Inside a dialog, the first Escape leaves
+  full screen and does not also close the dialog.
+- **`FullScreen` / `useFullScreen`: one full-screen primitive for every
+  surface** (new `./full-screen` subpath). `<FullScreen>` is a box with a
+  `<FullScreen.Toggle />`; `useFullScreen()` is the same behaviour for a
+  surface that owns its root, which is how Editor uses it and how DeckEditor
+  and SheetWorkbook will. `mode="overlay"` (the default) makes the element
+  `position: fixed` over the viewport in place, so it works inside iframes and
+  dialogs and never remounts what is inside. `mode="native"` uses the browser
+  Fullscreen API and falls back to the overlay if the browser refuses; leaving
+  through the browser's own UI is reported through `onFullScreenChange(false)`.
+  Body scroll is locked while active, with a reference count so two surfaces
+  release in any order. Handles: `data-react-fancy-fullscreen`,
+  `data-fullscreen`, `data-fullscreen-mode`, `data-react-fancy-fullscreen-toggle`.
+- **`PortalContainerContext`.** A `<Portal>` with no `container` now renders
+  into the nearest provided element, else `<body>` as before. Full-screen
+  surfaces provide themselves while active, so menus, tooltips and dialogs
+  opened inside stay visible (in the browser's full screen only the full-screen
+  element is painted).
+
+  **Nothing to do.** Nothing changes until you opt in: the toggle is off by
+  default and `fullScreen` defaults to `false`. Portals outside a full-screen
+  surface still render into `<body>`. One limit to know about: the overlay is
+  `position: fixed`, so an ancestor with `transform`, `filter`, `perspective`
+  or `contain: paint` confines it to that ancestor instead of the viewport.
+  react-fancy's own `Modal` has none of these.
+
 ## [5.60.2] - 2026-10-26
 
 ### Fixed

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { RenderExtension } from "../ContentRenderer/extensions";
 import type { FieldMode } from "../inputs/inputs.types";
+import type { FullScreenMode } from "../../hooks/use-full-screen";
 
 export interface EditorAction {
   icon: ReactNode;
@@ -22,6 +23,21 @@ export interface EditorToolbarProps {
    * @default true
    */
   showSourceToggle?: boolean;
+  /**
+   * Append a full-screen toggle (Lucide `maximize-2` / `minimize-2`) at the
+   * right end of the default toolbar. Ignored when `children` are supplied —
+   * custom toolbars compose `<Editor.FullScreenToggle />` themselves.
+   * @default false
+   */
+  showFullScreenToggle?: boolean;
+}
+
+export interface EditorFullScreenToggleProps {
+  className?: string;
+  /** Lucide name shown while NOT full screen. @default "maximize-2" */
+  enterIcon?: string;
+  /** Lucide name shown while full screen. @default "minimize-2" */
+  exitIcon?: string;
 }
 
 export interface EditorContentProps {
@@ -83,6 +99,24 @@ export interface EditorProps {
   defaultShowSource?: boolean;
   /** Fired when the Source toggle (or an agent) flips source view on/off. */
   onShowSourceChange?: (showSource: boolean) => void;
+  /**
+   * Controlled full-screen flag. While `true` the editor covers the viewport,
+   * the toolbar stays at the top and the content fills the rest (a
+   * `<Editor.Content maxHeight>` cap is ignored). Escape, the toolbar toggle or
+   * the browser's own UI request `false` through `onFullScreenChange`.
+   */
+  fullScreen?: boolean;
+  /** Initial full-screen flag when uncontrolled. @default false */
+  defaultFullScreen?: boolean;
+  /** Fired when the toggle, Escape, an agent or the browser changes full screen. */
+  onFullScreenChange?: (fullScreen: boolean) => void;
+  /**
+   * `"overlay"` covers the viewport in place and always works, including in
+   * iframes and dialogs. `"native"` uses the browser Fullscreen API and falls
+   * back to the overlay when the browser refuses.
+   * @default "overlay"
+   */
+  fullScreenMode?: FullScreenMode;
   /**
    * Skip HTML sanitization of the initial value. By default the initial markdown/HTML
    * is sanitized to remove `<script>`, `<iframe>`, event handlers, and `javascript:`

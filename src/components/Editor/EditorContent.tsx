@@ -5,7 +5,7 @@ import { useEditor } from "./Editor.context";
 import { proseClasses, extensionEditorClasses } from "./editor.utils";
 import type { EditorContentProps } from "./Editor.types";
 
-export function EditorContent({ className, maxHeight, sourceClassName }: EditorContentProps) {
+export function EditorContent({ className, maxHeight: maxHeightProp, sourceClassName }: EditorContentProps) {
   const {
     contentRef,
     lineSpacing,
@@ -17,7 +17,11 @@ export function EditorContent({ className, maxHeight, sourceClassName }: EditorC
     _onInput,
     _sourceValue,
     _onSourceInput,
+    fullScreen,
   } = useEditor();
+  // Full screen means "fill the viewport": a height cap would leave the bottom
+  // of the screen empty under a scrolled box.
+  const maxHeight = fullScreen ? undefined : maxHeightProp;
   // Tracks which seed HTML is currently in the contentEditable. Seeding on the
   // seed VALUE (not a one-shot boolean) re-seeds when the source view rewrites
   // `value`, while still never re-seeding on plain keystrokes — typing leaves

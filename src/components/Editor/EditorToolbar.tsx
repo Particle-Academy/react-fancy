@@ -1,6 +1,7 @@
 import { cn } from "../../utils/cn";
 import { useEditor } from "./Editor.context";
 import { EditorSourceToggle } from "./EditorSourceToggle";
+import { EditorFullScreenToggle } from "./EditorFullScreenToggle";
 import type { EditorToolbarProps } from "./Editor.types";
 
 const DEFAULT_ACTIONS = [
@@ -16,6 +17,7 @@ export function EditorToolbar({
   children,
   className,
   showSourceToggle = true,
+  showFullScreenToggle = false,
 }: EditorToolbarProps) {
   const { exec, showSource } = useEditor();
 
@@ -55,6 +57,7 @@ export function EditorToolbar({
             </button>
           ))}
           {showSourceToggle && <EditorSourceToggle className="ml-auto" />}
+          {showFullScreenToggle && <EditorFullScreenToggle className={showSourceToggle ? undefined : "ml-auto"} />}
         </>
       )}
     </div>

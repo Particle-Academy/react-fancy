@@ -104,8 +104,29 @@ export type {
 } from "./components/Table";
 
 // Phase 2: Static Display Components
-export { Portal } from "./components/Portal";
+export { Portal, PortalContainerContext } from "./components/Portal";
 export type { PortalProps } from "./components/Portal";
+
+// Full screen: one primitive for every surface that can take over the viewport
+// (Editor today; DeckEditor and SheetWorkbook adopt the same hook).
+export {
+  FullScreen,
+  FullScreenToggle,
+  FullScreenContext,
+  FullScreenProvider,
+  useFullScreen,
+  useFullScreenContext,
+} from "./components/FullScreen";
+export type {
+  FullScreenProps,
+  FullScreenToggleProps,
+  FullScreenProviderProps,
+  FullScreenMode,
+  UseFullScreenOptions,
+  UseFullScreenResult,
+  FullScreenTargetProps,
+  FullScreenToggleButtonProps,
+} from "./components/FullScreen";
 
 export { Heading } from "./components/Heading";
 export type { HeadingProps } from "./components/Heading";
@@ -383,6 +404,7 @@ export type {
   EditorToolbarProps,
   EditorContentProps,
   EditorSourceToggleProps,
+  EditorFullScreenToggleProps,
   EditorAction,
   EditorContextValue,
 } from "./components/Editor";
