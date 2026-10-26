@@ -222,6 +222,9 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-kanban]` | Kanban |
 | `[data-react-fancy-kanban-column]` | Kanban.Column |
 | `[data-react-fancy-kanban-card]` | Kanban.Card |
+| `[data-react-fancy-reorderable-grid]` | ReorderableGrid (`data-columns`, `data-state` = `idle` / `dragging` / `picked-up`, `data-drop-index`, `data-disabled`) |
+| `[data-react-fancy-reorderable-grid-item]` | ReorderableGrid cell (`data-reorderable-id`, `data-index`, `data-state`, `data-locked`, `data-drop-target`) |
+| `[data-react-fancy-reorderable-grid-live]` | ReorderableGrid `aria-live` region |
 
 #### Carousel
 

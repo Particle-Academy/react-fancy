@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "5.63.0",
+  "version": "5.64.0",
   "description": "React UI component library for Human+ UX — controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
@@ -761,6 +761,16 @@
       "require": {
         "types": "./dist/reason-tag.d.cts",
         "default": "./dist/reason-tag.cjs"
+      }
+    },
+    "./reorderable-grid": {
+      "import": {
+        "types": "./dist/reorderable-grid.d.ts",
+        "default": "./dist/reorderable-grid.js"
+      },
+      "require": {
+        "types": "./dist/reorderable-grid.d.cts",
+        "default": "./dist/reorderable-grid.cjs"
       }
     },
     "./resizable-panels": {

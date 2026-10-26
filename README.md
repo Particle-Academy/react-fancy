@@ -165,6 +165,7 @@ npx vite build                      # Build demo app (verifies imports work)
 | Editor | Toolbar chrome wrapper for contentEditable, with a Source toggle to edit raw HTML/Markdown | [docs](docs/Editor.md) |
 | CodeView | Lightweight syntax-highlighted source view (HTML highlighted; fills height) | [docs](docs/CodeView.md) |
 | Kanban | Drag-and-drop board with columns and cards | [docs](docs/Kanban.md) |
+| ReorderableGrid | Row-major grid of cells reordered in place by pointer or keyboard, with pinned cells and a pure `moveItem` for agents | [docs](docs/ReorderableGrid.md) |
 | ContentRenderer | Markdown/HTML content renderer | [docs](docs/ContentRenderer.md) |
 
 ### Media Viewers

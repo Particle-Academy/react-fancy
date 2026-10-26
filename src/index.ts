@@ -165,6 +165,15 @@ export { Grid } from "./components/Grid";
 export type { GridProps } from "./components/Grid";
 export { ResizablePanels } from "./components/ResizablePanels";
 export type { ResizablePanelsProps, ResizablePanelsOrientation } from "./components/ResizablePanels";
+export { ReorderableGrid, moveItem } from "./components/ReorderableGrid";
+export type {
+  ReorderableGridProps,
+  ReorderableGridItem,
+  ReorderableGridItemState,
+  ReorderableGridLabels,
+  ReorderableGridAnnouncementContext,
+  MoveItemOptions,
+} from "./components/ReorderableGrid";
 export { StatList } from "./components/StatList";
 export type { StatListProps, StatListItem } from "./components/StatList";
 export { Kbd } from "./components/Kbd";

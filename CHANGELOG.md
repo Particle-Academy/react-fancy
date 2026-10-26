@@ -11,6 +11,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.64.0] - 2026-10-26
+
+### Added
+
+- **`ReorderableGrid`: cells reordered in place, row-major, by pointer or
+  keyboard.** Requested by MOIC for a field-order designer. A deal's details
+  are a 2-to-4-column grid of label/value cells, and the designer has to look
+  like that grid. Until now it was faked with one `Kanban.Column`'s vertical
+  list.
+  - **Order is ids.** `value` / `defaultValue` are `string[]`, and `onReorder`
+    gets the full new order once per committed move. It is never called for
+    the live preview, a cancel or a drop back in place. The order is
+    reconciled with `items`: unknown ids are ignored and new items are
+    appended, so a stale saved order never hides a cell.
+  - **Pointer:** a 4px threshold keeps clicks working. The other cells shift
+    live and wrap across rows. Pointer capture is on the root. A release
+    outside the grid cancels. Drag handles via `data-reorderable-handle` or
+    `state.handleProps`. The nearest scroll container auto-scrolls near its
+    edge.
+  - **Keyboard:** one tab stop. Space or Enter picks up and drops, arrows move
+    in 2-D, and Escape cancels through the `useEscapeKey` layer stack, so
+    inside a Modal the pick-up cancels before the Modal closes. An
+    `aria-live` region announces each step ("Moved to position 3 of 8, row 1
+    column 3"). Every message can be overridden through `labels`.
+  - **`locked: true`** pins a cell at its absolute index. Other cells flow
+    around it, and nothing can be dropped on it.
+  - **`moveItem(ids, from, to, { locked })`** is exported: the same rule with no
+    DOM, for agent bridges.
+  - Subpath `@particle-academy/react-fancy/reorderable-grid`. Docs:
+    `docs/ReorderableGrid.md`. New component only; nothing existing changed.
+
 ## [5.63.0] - 2026-10-26
 
 ### Added
