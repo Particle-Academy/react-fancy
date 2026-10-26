@@ -42,6 +42,8 @@ const [order, setOrder] = useState(fields.map((f) => f.id));
 
 Uncontrolled: leave out `value`, optionally pass `defaultValue`, and listen to `onReorder`.
 
+**The cell is already framed.** By default every cell draws its own border, surface and padding, so `renderItem` should return bare content, as above. If you wrap it in your own bordered card you get a frame inside a frame. To draw the cell yourself, pass `unstyled` (drag, keyboard and announcements are unchanged), or adjust the default frame with `cellClassName`.
+
 ## Order: `value` is a list of ids
 
 `items` carries the data and `value` (or `defaultValue`) carries the order. The order is not taken from `items`. This follows the kit's controlled pattern (`value` / `defaultValue`, see `useControllableState`), and it suits the two consumers:
