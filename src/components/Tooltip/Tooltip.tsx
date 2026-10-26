@@ -12,6 +12,7 @@ import { cn } from "../../utils/cn";
 import { composeRefs } from "../../utils/compose-refs";
 import { Portal } from "../Portal";
 import { useFloatingPosition } from "../../hooks/use-floating-position";
+import { useEscapeKey } from "../../hooks/use-escape-key";
 import type { TooltipProps } from "./Tooltip.types";
 
 export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
@@ -38,6 +39,10 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
       clearTimeout(timeoutRef.current);
       setOpen(false);
     }, []);
+
+    // A visible tooltip is a layer: Escape dismisses it (WCAG 1.4.13) before
+    // anything under it, such as the full-screen surface it was opened in.
+    useEscapeKey(hide, open);
 
     // The trigger is the caller's element, so its own ref and handlers have to
     // survive the clone. Overwriting them broke any child that needs its ref:

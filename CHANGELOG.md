@@ -11,6 +11,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.62.0] - 2026-10-26
+
+### Fixed
+
+- **Escape closes the innermost open layer, and only that one.** Found in
+  DeckEditor on 5.61.1. In full screen, open the toolbar's Shape menu and
+  press Escape: full screen exited and the menu stayed open. The surface's key
+  handler ran before the menu's `document` listener, so the menu had not
+  claimed the key yet when the surface checked. The same race closed a Modal
+  along with a Dropdown opened inside it. Now every
+  `useEscapeKey(handler, open)` call registers a layer, and one document
+  listener hands each Escape to the innermost layer. The innermost layer is
+  the most recently opened one. Layers inside a full-screen surface count as
+  inside it whatever order they opened in. The surface yields while any of
+  them is open. Covered by tests for Dropdown, listbox Select, Popover,
+  Tooltip, a Modal opened inside the surface, and a Dropdown inside a Modal.
+  Measured in Chromium, DeckEditor in full screen inside `transform:
+  translateX(0)` with the Shape menu open:
+  - 5.61.1: Escape #1 exits full screen and leaves the menu open.
+  - Now: Escape #1 closes the menu only, with full screen still on and focus
+    on the Shape trigger. Escape #2 exits.
+- **`Tooltip` dismisses on Escape** (WCAG 1.4.13), as the innermost layer.
+- **`FullScreen.Toggle` sets its own text colour**: the kit's icon-button
+  tokens (`--fancy-text-muted` / `--fancy-text-soft`, light and dark). It
+  inherited before, so on a dark toolbar with a dark page text colour it was
+  black on black. Plain utilities, so a consumer `text-*` class replaces it.
+
+### Added
+
+- `useEscapeLayer(handler, enabled, scope?)` and `EscapeLayerContext`, for
+  surfaces in sibling packages that other layers open inside.
+  `useFullScreen()` also returns `escapeScope`, which `FullScreenProvider`
+  provides.
+
+  **What to do.** For most apps, nothing. If you used `useEscapeKey` for
+  something that should run on every Escape regardless of open layers (a
+  page-level "clear selection", for example), it now runs only while no layer
+  is open above it. That is usually what you want. If it is not, use your own
+  `keydown` listener. A full-screen surface built on `useFullScreen()` should
+  render `FullScreenProvider`; without it, a menu opened inside still closes
+  first only if it opened after the surface went full screen.
+
 ## [5.61.1] - 2026-10-26
 
 ### Fixed

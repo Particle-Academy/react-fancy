@@ -38,6 +38,10 @@ export function FullScreenToggle({
       {...fs.toggleProps}
       className={cn(
         "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm transition-colors",
+        // Its own text colour, like the kit's other icon buttons. Inheriting
+        // left it black on a dark toolbar whenever the page's colour was dark
+        // text. Plain utilities, so a consumer's `text-*` replaces them.
+        "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
         "hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-brand,var(--color-blue-500))]",
         className,

@@ -1,6 +1,7 @@
 export { useControllableState } from "./use-controllable-state";
 export { useOutsideClick } from "./use-outside-click";
-export { useEscapeKey } from "./use-escape-key";
+export { useEscapeKey, useEscapeLayer, EscapeLayerContext } from "./use-escape-key";
+export type { EscapeScope } from "./use-escape-key";
 export { useFocusTrap } from "./use-focus-trap";
 export { useFloatingPosition } from "./use-floating-position";
 export { useAnimation } from "./use-animation";

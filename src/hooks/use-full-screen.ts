@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useControllableState } from "./use-controllable-state";
 import { lockBodyScroll } from "../utils/scroll-lock";
+import { useEscapeLayer, type EscapeScope } from "./use-escape-key";
 
 /**
  * How a surface goes full screen.
@@ -93,6 +94,12 @@ export interface UseFullScreenResult<T extends HTMLElement = HTMLElement> {
    * `PortalContainerContext` so menus opened inside stay visible.
    */
   portalContainer: HTMLElement | null;
+  /**
+   * Identity of this surface for Escape routing. Provide it through
+   * `EscapeLayerContext` (FullScreenProvider does) so a menu opened inside
+   * gets Escape before the surface does.
+   */
+  escapeScope: EscapeScope;
 }
 
 const FOCUSABLE = [
@@ -105,8 +112,6 @@ const FOCUSABLE = [
   "[tabindex]:not([tabindex='-1'])",
 ].join(", ");
 
-/** Active surfaces, innermost last. Only the top one answers a stray Escape. */
-const activeStack: object[] = [];
 
 const OVERLAY_STYLE: CSSProperties = {
   position: "fixed",
@@ -298,7 +303,6 @@ export function useFullScreen<T extends HTMLElement = HTMLElement>(
     const winY = window.scrollY;
 
     const release = lockScroll ? lockBodyScroll() : null;
-    activeStack.push(token.current);
     setPortalContainer(el);
     setApplied(true);
 
@@ -310,8 +314,6 @@ export function useFullScreen<T extends HTMLElement = HTMLElement>(
     if (!native) promote(el);
 
     return () => {
-      const i = activeStack.indexOf(token.current);
-      if (i >= 0) activeStack.splice(i, 1);
       // Out of the top layer first, so the surface is back in flow before the
       // scroll offsets are put back.
       demote();
@@ -409,19 +411,13 @@ export function useFullScreen<T extends HTMLElement = HTMLElement>(
     };
   }, [fullScreen, mode, setFullScreen]);
 
-  // Escape with nothing focused never reaches the surface's own handler.
-  useEffect(() => {
-    if (!fullScreen || !closeOnEscape) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape" || e.defaultPrevented) return;
-      const t = e.target;
-      if (t !== document.body && t !== document.documentElement && t !== document) return;
-      if (activeStack[activeStack.length - 1] !== token.current) return;
-      setFullScreen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [fullScreen, closeOnEscape, setFullScreen]);
+  // The surface is an Escape LAYER while active, in the same stack as every
+  // Dropdown, Select, Popover, Modal and Tooltip. Layers opened inside it
+  // register under `token.current` (through EscapeLayerContext, which crosses
+  // portals), so the stack knows they are inside and hands them Escape first,
+  // whatever order the listeners run in. With nothing focused, or focus
+  // outside the surface, the stack's document listener delivers it here.
+  const escapeLayer = useEscapeLayer(() => setFullScreen(false), fullScreen && closeOnEscape, token.current);
 
   const onKeyDown = useCallback(
     (e: ReactKeyboardEvent<T>) => {
@@ -447,10 +443,16 @@ export function useFullScreen<T extends HTMLElement = HTMLElement>(
       }
 
       if (e.key !== "Escape" || !closeOnEscape) return;
-      // An Escape from inside a layer opened FROM this surface (a menu, a
-      // popover, a dialog) belongs to that layer. React bubbles portal events
-      // through the component tree, so check the DOM: a portal wrapper that
-      // does not contain this surface is nested inside it.
+      // A layer opened from inside this surface is open (a menu, a listbox, a
+      // popover, a tooltip, a dialog): it owns this Escape. Let the event go on
+      // to the stack's document listener, which closes that layer only. This
+      // is a lookup, not a race: in 5.61.1 the surface asked
+      // `defaultPrevented`, which a document-level menu had not set yet.
+      if (!escapeLayer.isInnermost()) return;
+      // Portal content that never registered as a layer (a consumer's own
+      // menu in a react-fancy Portal) still gets the benefit of the doubt.
+      // React bubbles portal events through the component tree, so check the
+      // DOM: a portal wrapper that does not contain this surface is inside it.
       const layer = (e.target as Element).closest?.("[data-react-fancy-portal]");
       if (layer && !layer.contains(el)) return;
       // Stop it here so an enclosing dialog's document listener does not also
@@ -459,6 +461,7 @@ export function useFullScreen<T extends HTMLElement = HTMLElement>(
       e.stopPropagation();
       setFullScreen(false);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [closeOnEscape, setFullScreen],
   );
 
@@ -474,6 +477,7 @@ export function useFullScreen<T extends HTMLElement = HTMLElement>(
     layer: activeMode ? layer : null,
     ref,
     portalContainer,
+    escapeScope: token.current,
     targetProps: {
       ref,
       "data-fullscreen": fullScreen ? "true" : "false",

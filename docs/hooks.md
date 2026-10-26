@@ -56,7 +56,7 @@ useOutsideClick(ref, handler, enabled, ignoreRef);
 
 ## useEscapeKey
 
-Calls a handler when the Escape key is pressed.
+Registers an Escape layer: while `enabled`, Escape calls `handler`, but only if this is the innermost open layer.
 
 ```tsx
 useEscapeKey(handler, enabled);
@@ -64,8 +64,14 @@ useEscapeKey(handler, enabled);
 
 | Param | Type | Default | Description |
 |-------|------|---------|-------------|
-| handler | `() => void` | - | Called on Escape keydown |
-| enabled | `boolean` | `true` | Enable/disable the listener |
+| handler | `() => void` | - | Called on Escape keydown when this layer is innermost |
+| enabled | `boolean` | `true` | Whether the layer is open |
+
+Every react-fancy layer uses it: Dropdown, Select, Popover, ContextMenu, Command, Autocomplete, Breadcrumbs dropdown, MobileMenu, Modal, Drawer, Tooltip and full-screen surfaces. One Escape closes one layer. With a menu open in a dialog, the menu closes first, and the dialog closes on the next press.
+
+"Innermost" means the most recently opened layer, with one refinement. A layer rendered inside a full-screen surface counts as inside it however the two were opened, because the surface provides `EscapeLayerContext` to everything inside it, portals included. An Escape something already handled (`event.preventDefault()`) is left alone.
+
+Use it for your own layers so they take part. `useEscapeLayer(handler, enabled, scope?)` is the same hook with a `scope`, for surfaces other layers open inside. It returns `isInnermost()` for a layer that also handles Escape in its own key handler.
 
 ---
 

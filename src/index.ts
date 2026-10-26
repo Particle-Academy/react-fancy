@@ -516,6 +516,8 @@ export {
   useControllableState,
   useOutsideClick,
   useEscapeKey,
+  useEscapeLayer,
+  EscapeLayerContext,
   useFocusTrap,
   useFloatingPosition,
   useAnimation,
@@ -523,7 +525,7 @@ export {
   usePanZoom,
   useNodeRegistry,
 } from "./hooks";
-export type { NodeRect } from "./hooks";
+export type { NodeRect, EscapeScope } from "./hooks";
 
 // Data
 export {
