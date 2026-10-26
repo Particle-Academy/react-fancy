@@ -51,6 +51,7 @@ export interface FullScreenTargetProps<T extends HTMLElement> {
   ref: RefObject<T | null>;
   "data-fullscreen": "true" | "false";
   "data-fullscreen-mode"?: FullScreenMode;
+  "data-fullscreen-layer"?: FullScreenLayer;
   style?: CSSProperties;
   onKeyDown: (event: ReactKeyboardEvent<T>) => void;
 }
@@ -71,6 +72,12 @@ export interface UseFullScreenResult<T extends HTMLElement = HTMLElement> {
   toggle: () => void;
   /** The mechanism in effect while active; `null` when not full screen. */
   activeMode: FullScreenMode | null;
+  /**
+   * `"top"` while the surface is in the browser's top layer (a manual popover,
+   * or the native full screen), `"fixed"` while it relies on `position: fixed`
+   * (no popover API, or the browser refused). `null` when not full screen.
+   */
+  layer: FullScreenLayer | null;
   /** Attach to the element that goes full screen. Also inside `targetProps`. */
   ref: RefObject<T | null>;
   /**
@@ -116,6 +123,91 @@ const OVERLAY_STYLE: CSSProperties = {
   boxSizing: "border-box",
 };
 
+/**
+ * Lift `el` into the browser's top layer with `popover="manual"`.
+ *
+ * Why: `position: fixed` is only fixed to the viewport while no ancestor has a
+ * transform, filter, perspective or paint containment. With one, the overlay
+ * is fixed to THAT box. In the showcase a surface in a Tabs panel came out
+ * 1248x95, because `.fancy-fade-in` held `transform: matrix(1,0,0,1,0,0)` via
+ * `animation-fill-mode: both`. Transform-centred dialogs do the same. A
+ * top-layer element's containing block is the viewport whatever its ancestors
+ * do, and the popover API gets it there without moving it in the DOM.
+ *
+ * `manual` because `auto` light-dismisses on an outside click and on Escape;
+ * Escape stays with the surface's own handler.
+ *
+ * Returns a release function, or `null` where the API is missing or refuses
+ * (the caller keeps the fixed overlay). `onLost` fires if something else
+ * closes the popover: a `[popover]` that is not open is `display: none`, so the
+ * attribute must go at once or the surface vanishes while still "full screen".
+ */
+/** Surfaces currently in the top layer through a popover, with a "re-show" each. */
+const promoted = new Map<HTMLElement, () => void>();
+
+function promoteToTopLayer(el: HTMLElement, onLost: () => void): (() => void) | null {
+  const p = el as HTMLElement & { showPopover?: () => void; hidePopover?: () => void };
+  if (typeof p.showPopover !== "function" || typeof p.hidePopover !== "function") return null;
+  // The consumer made it a popover themselves; do not fight over it.
+  if (el.hasAttribute("popover")) return null;
+
+  el.setAttribute("popover", "manual");
+  try {
+    p.showPopover();
+  } catch {
+    el.removeAttribute("popover");
+    return null;
+  }
+
+  let open = true;
+  let raising = false;
+  const onToggle = (e: Event) => {
+    if (raising || (e as Event & { newState?: string }).newState !== "closed" || !open) return;
+    open = false;
+    promoted.delete(el);
+    el.removeEventListener("toggle", onToggle);
+    el.removeAttribute("popover");
+    onLost();
+  };
+  el.addEventListener("toggle", onToggle);
+
+  // The top layer stacks in SHOW order. React runs a child's layout effects
+  // before its parent's, so a surface nested in another that goes full screen
+  // in the same commit is shown first and then buried by its parent. Re-show
+  // any promoted descendant so the innermost stays on top.
+  for (const [other, raise] of promoted) {
+    if (other !== el && el.contains(other)) raise();
+  }
+  promoted.set(el, () => {
+    raising = true;
+    try {
+      p.hidePopover!();
+      p.showPopover!();
+    } catch {
+      /* leave it where it is */
+    } finally {
+      raising = false;
+    }
+  });
+
+  return () => {
+    promoted.delete(el);
+    el.removeEventListener("toggle", onToggle);
+    if (open) {
+      open = false;
+      try {
+        p.hidePopover!();
+      } catch {
+        /* already hidden, e.g. removed from the document */
+      }
+    }
+    el.removeAttribute("popover");
+  };
+}
+
+/** Which mechanism keeps the surface over the page. */
+export type FullScreenLayer = "top" | "fixed";
+
 interface ScrollMemo {
   el: Element;
   top: number;
@@ -155,6 +247,23 @@ export function useFullScreen<T extends HTMLElement = HTMLElement>(
   // Initialised from `fullScreen` so a surface that starts full screen renders
   // the overlay on the server and on hydration alike.
   const [applied, setApplied] = useState(fullScreen);
+  // "fixed" until a layout effect has actually promoted the surface, so the
+  // server and the hydrating client agree, and a refused promotion reads true.
+  const [layer, setLayer] = useState<FullScreenLayer>("fixed");
+  const topRelease = useRef<(() => void) | null>(null);
+
+  const promote = (el: HTMLElement) => {
+    if (topRelease.current) return;
+    topRelease.current = promoteToTopLayer(el, () => {
+      topRelease.current = null;
+      setLayer("fixed");
+    });
+    setLayer(topRelease.current ? "top" : "fixed");
+  };
+  const demote = () => {
+    topRelease.current?.();
+    topRelease.current = null;
+  };
 
   const current = useRef(fullScreen);
   current.current = fullScreen;
@@ -193,9 +302,20 @@ export function useFullScreen<T extends HTMLElement = HTMLElement>(
     setPortalContainer(el);
     setApplied(true);
 
+    // Native mode asks the browser first: Chromium rejects requestFullscreen()
+    // on an element that is already an open popover ("already open as a
+    // Popover, and therefore cannot be opened via the fullscreen API"). The
+    // native effect promotes on refusal instead.
+    const native = mode === "native" && typeof el.requestFullscreen === "function" && document.fullscreenEnabled !== false;
+    if (!native) promote(el);
+
     return () => {
       const i = activeStack.indexOf(token.current);
       if (i >= 0) activeStack.splice(i, 1);
+      // Out of the top layer first, so the surface is back in flow before the
+      // scroll offsets are put back.
+      demote();
+      setLayer("fixed");
       release?.();
       for (const m of scrolled) {
         if (m.el.scrollTop !== m.top) m.el.scrollTop = m.top;
@@ -205,7 +325,8 @@ export function useFullScreen<T extends HTMLElement = HTMLElement>(
       setPortalContainer(null);
       setApplied(false);
     };
-  }, [fullScreen, lockScroll]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fullScreen, lockScroll, mode]);
 
   // Focus in and back out. A PASSIVE effect on purpose: React re-focuses
   // whatever had focus before a commit once the commit's mutations finish, so a
@@ -248,12 +369,15 @@ export function useFullScreen<T extends HTMLElement = HTMLElement>(
       if (document.fullscreenElement === el) {
         entered = true;
         setNativeActive(true);
+        // The browser's full screen is the top layer too.
+        setLayer("top");
       } else if (entered) {
         // The user left through the browser's own UI (Esc, F11, the close
         // pill). Keep the controlled state honest rather than leaving an
         // overlay up that they believe they dismissed.
         entered = false;
         setNativeActive(false);
+        setLayer("fixed");
         if (!cancelled) setFullScreen(false);
       }
     };
@@ -261,11 +385,14 @@ export function useFullScreen<T extends HTMLElement = HTMLElement>(
 
     // Blocked requests (iframe without allow="fullscreen", no user gesture, a
     // permissions policy) reject, and some engines throw instead. Either way
-    // the overlay is already up, so the user stays full screen in it.
+    // the user stays full screen in the overlay, lifted into the top layer.
+    const refused = () => {
+      if (!cancelled && current.current && ref.current === el) promote(el);
+    };
     try {
-      Promise.resolve(el.requestFullscreen()).then(onChange, () => {});
+      Promise.resolve(el.requestFullscreen()).then(onChange, refused);
     } catch {
-      /* stay in the overlay */
+      refused();
     }
 
     return () => {
@@ -344,12 +471,13 @@ export function useFullScreen<T extends HTMLElement = HTMLElement>(
     setFullScreen,
     toggle,
     activeMode,
+    layer: activeMode ? layer : null,
     ref,
     portalContainer,
     targetProps: {
       ref,
       "data-fullscreen": fullScreen ? "true" : "false",
-      ...(activeMode ? { "data-fullscreen-mode": activeMode } : {}),
+      ...(activeMode ? { "data-fullscreen-mode": activeMode, "data-fullscreen-layer": layer } : {}),
       ...(fullScreen && applied ? { style: { ...OVERLAY_STYLE, zIndex } } : {}),
       onKeyDown,
     },

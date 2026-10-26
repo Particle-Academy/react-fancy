@@ -11,6 +11,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.61.1] - 2026-10-26
+
+### Fixed
+
+- **A full-screen surface now covers the viewport even when an ancestor has a
+  `transform`, `filter`, `perspective` or `contain: paint`.** Found while
+  dogfooding 5.61.0 in the showcase. A `FullScreen` inside a `Tabs` panel came
+  out as a 1248x95 box instead of the screen, because the panel's
+  `fancy-fade-in` animation, run with `animation-fill-mode: both`, kept
+  `transform: matrix(1, 0, 0, 1, 0, 0)` on the panel. That makes the panel the
+  box `position: fixed` is measured against. Transform-centred dialogs, the
+  usual way MOIC embeds editors, did the same. The overlay is now lifted into
+  the browser's top layer with `popover="manual"` + `showPopover()`, whose
+  containing block is always the viewport. It falls back to `position: fixed`
+  where the popover API does not exist. Measured in Chromium:
+  - Tabs panel: [300,359,1320,32] before, [0,0,1920,945] after.
+  - `translateX(0)`, `blur(0)` and `contain: paint` parents: confined to their
+    parent before, the viewport after.
+  - An Editor in a `Modal`, inside a transformed wrapper: 622x2 before, the
+    viewport after. A `Dropdown` opened from inside it is now visible.
+
+  Details:
+  - `manual`, so no light dismiss.
+  - Escape, focus restore and scroll restore are unchanged.
+  - `styles.css` resets the UA popover padding, border, background, colour and
+    overflow in a zero-specificity rule in the `base` layer, so your own
+    classes still win.
+  - In `native` mode the browser's full screen is requested first, because
+    Chromium refuses `requestFullscreen()` on an open popover. The popover is
+    used only if that request is refused.
+  - New handle `data-fullscreen-layer="top" | "fixed"` and `layer` on
+    `useFullScreen()`'s result.
+
+  **Nothing to do.** If you style the full-screen surface without importing
+  `styles.css`, the UA popover padding and border show while it is active. Add
+  your own padding, border and background classes, or import the stylesheet.
+  Overlays rendered from outside the surface while it is active, such as an
+  app-level toast, now sit under it.
+
 ## [5.61.0] - 2026-10-26
 
 ### Added

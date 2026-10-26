@@ -7,6 +7,7 @@ export type { FullScreenProviderProps } from "./FullScreen.context";
 export { useFullScreen } from "../../hooks/use-full-screen";
 export type {
   FullScreenMode,
+  FullScreenLayer,
   UseFullScreenOptions,
   UseFullScreenResult,
   FullScreenTargetProps,

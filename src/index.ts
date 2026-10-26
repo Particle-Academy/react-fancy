@@ -122,6 +122,7 @@ export type {
   FullScreenToggleProps,
   FullScreenProviderProps,
   FullScreenMode,
+  FullScreenLayer,
   UseFullScreenOptions,
   UseFullScreenResult,
   FullScreenTargetProps,

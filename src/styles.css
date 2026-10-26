@@ -88,6 +88,25 @@
   --color-secondary-950: var(--color-zinc-950);
 }
 
+/* ─── Full screen in the top layer — neutralise the UA popover box ───────────
+   An overlay-mode FullScreen is promoted with popover="manual" so ancestor
+   transforms / filters cannot trap it, and the UA sheet then styles it as a
+   popover: padding .25em, a solid border, Canvas / CanvasText colours,
+   overflow:auto. Any author rule outranks the UA origin, so this zero-
+   specificity rule in the base layer puts those back to what a plain box has,
+   while every utility a consumer passes through className still wins. Inline
+   styles could not do that: they would beat the consumer's own classes. The
+   box geometry (inset, width, height, margin) is set inline by the hook. */
+@layer base {
+  :where([data-fullscreen-layer="top"]) {
+    padding: 0;
+    border: 0 solid;
+    background-color: transparent;
+    color: inherit;
+    overflow: visible;
+  }
+}
+
 @layer base {
 
 /* ─── Progress (circular) — named diameters ──────────────────────────────────

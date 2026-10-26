@@ -13,6 +13,7 @@ export { useTheme } from "./use-theme";
 export { useFullScreen } from "./use-full-screen";
 export type {
   FullScreenMode,
+  FullScreenLayer,
   UseFullScreenOptions,
   UseFullScreenResult,
 } from "./use-full-screen";
