@@ -11,6 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.60.1] - 2026-10-26
+
+### Fixed
+
+- **`Editor` with `outputFormat="markdown"` no longer rewrites parts of the
+  document nobody touched.** Reported by a consumer (MOIC): pressing Enter at
+  the end of the last item of a tight list and typing emitted a blank line
+  after the FIRST item, turning the whole list loose in most renderers. The
+  cause was wider than lists: markdown output was produced by rewriting the
+  HTML string, so the newlines between tags became content — every tight list
+  came back loose, nested and ordered lists were flattened to `-` items, and
+  fenced code blocks lost their fences. The markdown is now serialised from
+  the DOM, and a document opened in the Editor and edited in one place comes
+  back byte-identical everywhere else. Loose lists stay loose; tight lists
+  stay tight; nested lists, ordered lists (including their start number),
+  fenced code blocks with their language, blockquotes, headings, emphasis and
+  links round-trip. **Nothing to do:** upgrade and the emitted markdown stops
+  drifting. Spellings markdown allows several ways are written in one form
+  (`-` bullets, `*em*`, `**strong**`, `---` rules).
+
 ## [5.60.0] - 2026-10-23
 
 ### Added
