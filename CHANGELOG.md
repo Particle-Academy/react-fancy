@@ -11,6 +11,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.60.2] - 2026-10-26
+
+### Fixed
+
+- **`Editor` markdown output is now source-preserving: an edit in one place
+  leaves the rest of the document byte-identical.** Requested by a consumer
+  (MOIC) whose agents write markdown notes that people then edit by hand.
+  When the Editor loads markdown (`outputFormat="markdown"`), it remembers the
+  original text of every top-level block. On save, any block the person did
+  not change is written back exactly as it was. Only the changed blocks are
+  rebuilt. Concretely:
+  - **Tables keep their structure.** Before, saving turned any table into
+    loose text. An untouched table now comes back verbatim. Editing a cell
+    rewrites only that row as a GFM row (`|` escaped) and keeps the original
+    alignment row while the column count is unchanged. A table with no source,
+    such as one pasted in, is written as a GFM table.
+  - **The trailing newline is kept**, along with the exact blank lines between
+    blocks, leading blank lines, link reference definitions and HTML comments.
+  - **Original spellings survive on untouched blocks**: `*`/`+` bullets,
+    `_em_`, `__strong__`, backslash escapes, setext headings, `1)` lists,
+    closing `#`s, `***` rules and HTML blocks.
+  - **Lists are kept item by item.** Adding or editing one item leaves the
+    other items, and the blank lines between them, as they were. A new item
+    uses the list's own marker (`*`, `+`, `-`, or the next number with the same
+    `.`/`)`) and the separator used before it. Pressing Enter at the end of the
+    last item of a partly-loose list now adds only that item. In 5.60.1 it put
+    a blank line between every item and dropped the final newline.
+
+  **Nothing to do:** upgrade, and saving stops rewriting text nobody touched.
+  Inside an edited block the old serialiser still runs, so an edited paragraph
+  can come back with `_em_` spelled as `*em*`. Documents with `\r\n` line
+  endings, and HTML values, use the old serialiser for the whole document.
+  An item inserted in the middle of an ordered list takes the next number
+  after the one above it and later items keep theirs (`2)` twice), which
+  renders correctly because markdown numbers from the first item.
+
 ## [5.60.1] - 2026-10-26
 
 ### Fixed

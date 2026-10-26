@@ -8,33 +8,40 @@ import { EditorToolbar } from "./EditorToolbar";
 import { EditorToolbarSeparator } from "./EditorToolbarSeparator";
 import { EditorSourceToggle } from "./EditorSourceToggle";
 import { EditorContent } from "./EditorContent";
-import { htmlToMarkdown, detectFormat } from "./editor.utils";
+import { htmlToMarkdown, detectFormat, markdownToEditorHtml, type MarkdownSource } from "./editor.utils";
 import { mergeExtensions } from "../ContentRenderer/extensions";
 import { ContentRenderer } from "../ContentRenderer/ContentRenderer";
 import { useFieldMode } from "../inputs/mode/FieldMode.context";
 import type { EditorProps } from "./Editor.types";
+
+interface Seed {
+  html: string;
+  /** Source map for source-preserving markdown output; null when there is none. */
+  source: MarkdownSource | null;
+}
 
 function toHtml(
   value: string,
   outputFormat: "html" | "markdown",
   unsafe: boolean,
   valueFormat: "markdown" | "html" | "auto" = "auto",
-): string {
-  if (!value) return "";
-  const raw = (() => {
-    // An explicit valueFormat is authoritative — the sniff misclassifies
-    // markdown that merely MENTIONS HTML-ish snippets (`<code>`, `<table`),
-    // collapsing it into an innerHTML wall of text (#10).
-    const format =
-      valueFormat !== "auto"
-        ? valueFormat
-        : outputFormat === "html"
-          ? "html"
-          : detectFormat(value);
-    if (format === "html") return value;
-    return (marked.parse(value, { async: false }) as string).trim();
-  })();
-  return unsafe ? raw : sanitizeHtml(raw);
+): Seed {
+  if (!value) return { html: "", source: null };
+  const sanitize = (html: string) => (unsafe ? html : sanitizeHtml(html));
+  // An explicit valueFormat is authoritative — the sniff misclassifies
+  // markdown that merely MENTIONS HTML-ish snippets (`<code>`, `<table`),
+  // collapsing it into an innerHTML wall of text (#10).
+  const format =
+    valueFormat !== "auto"
+      ? valueFormat
+      : outputFormat === "html"
+        ? "html"
+        : detectFormat(value);
+  if (format === "html") return { html: sanitize(value), source: null };
+  // Markdown in, markdown out: tag each block with its source so untouched
+  // blocks are emitted byte-identical.
+  if (outputFormat === "markdown") return markdownToEditorHtml(value, sanitize);
+  return { html: sanitize((marked.parse(value, { async: false }) as string).trim()), source: null };
 }
 
 function EditorRoot({
@@ -80,7 +87,7 @@ function EditorRoot({
     if (value !== lastEmitted.current) setExternalSeed((n) => n + 1);
   }, [value]);
 
-  const initialHtml = useMemo(
+  const seed = useMemo(
     () => toHtml(value, outputFormat, unsafe, valueFormat),
     // Seed the contentEditable from the LIVE value when (re)entering edit mode —
     // and when returning from the raw-source view, which may have rewritten the
@@ -90,6 +97,8 @@ function EditorRoot({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [isView, outputFormat, unsafe, valueFormat, showSource, externalSeed],
   );
+  const initialHtml = seed.html;
+  const seedSource = seed.source;
 
   const extensions = useMemo(
     () => mergeExtensions(instanceExtensions),
@@ -98,9 +107,9 @@ function EditorRoot({
 
   const getOutputValue = useCallback(
     (html: string): string => {
-      return outputFormat === "markdown" ? htmlToMarkdown(html) : html;
+      return outputFormat === "markdown" ? htmlToMarkdown(html, seedSource) : html;
     },
-    [outputFormat],
+    [outputFormat, seedSource],
   );
 
   const handleInput = useCallback(() => {

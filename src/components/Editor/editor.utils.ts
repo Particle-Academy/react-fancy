@@ -1,3 +1,4 @@
+import { marked, type Token, type Tokens } from "marked";
 import type { RenderExtension } from "../ContentRenderer/extensions";
 
 /**
@@ -72,13 +73,414 @@ const STANDARD_HTML_TAGS = new Set([
  * items holds a `<p>` (marked's marker for a loose list), so loose lists stay
  * loose and tight lists stay tight. Custom extension tags are preserved as-is.
  *
+ * Given the `source` map {@link markdownToEditorHtml} produced when the
+ * document was loaded, output is source-preserving instead: every block the
+ * person did not change is emitted from its original markdown, byte for byte.
+ *
  * Without a DOM (SSR) it falls back to the older string rewrite.
  */
-export function htmlToMarkdown(html: string): string {
+export function htmlToMarkdown(html: string, source?: MarkdownSource | null): string {
   if (typeof document === "undefined") return legacyHtmlToMarkdown(html);
   const template = document.createElement("template");
   template.innerHTML = html;
+  if (source) return serializeWithSource(template.content, source);
   return serializeBlocks(template.content).replace(/^\n+/, "").replace(/\s+$/, "");
+}
+
+/* ------------------------------------------------------------------------ *
+ * Source-preserving markdown
+ *
+ * When markdown is loaded, each top-level block (paragraph, heading, list,
+ * table, code block, quote, rule, HTML block) is rendered on its own and its
+ * elements are tagged `data-md-block="<n>"`, with the block's ORIGINAL source
+ * text and a snapshot of its rendered HTML kept beside it. List items get
+ * `data-md-item`, table rows `data-md-row`, mapped the same way.
+ *
+ * On output, a block whose elements still serialise to the snapshot is
+ * emitted from its source slice, exactly. Only changed or new blocks are
+ * serialised from the DOM, and the source between two blocks that are still
+ * neighbours (blank lines, link reference definitions, HTML comments) is
+ * emitted verbatim, as is the text after the last block.
+ *
+ * Chromium clones the element it splits on Enter, attributes included, so a
+ * tag can appear twice; the FIRST copy that still matches its snapshot owns
+ * the source, and any other copy is treated as new content.
+ * ------------------------------------------------------------------------ */
+
+const BLOCK_ATTR = "data-md-block";
+const ITEM_ATTR = "data-md-item";
+const ROW_ATTR = "data-md-row";
+
+interface SourceList {
+  bullet: string;
+  delimiter: string;
+  loose: boolean;
+  /** Each item's source, trailing newlines excluded. */
+  items: string[];
+  /** itemGaps[k]: the source between item k and item k + 1. */
+  itemGaps: string[];
+  itemSnapshots: string[];
+}
+
+interface SourceTable {
+  /** The table's source lines: header, alignment row, then one per body row. */
+  lines: string[];
+  columns: number;
+  /** Snapshot per source line index (0 = header, 2.. = body rows). */
+  rowSnapshots: Map<number, string>;
+}
+
+interface SourceBlock {
+  /** The block's source, trailing newlines excluded. */
+  raw: string;
+  /** Concatenated outerHTML of the block's rendered elements, as seeded. */
+  snapshot: string;
+  elementCount: number;
+  list?: SourceList;
+  table?: SourceTable;
+}
+
+/** The original source of a markdown document, mapped to the blocks rendered from it. */
+export interface MarkdownSource {
+  /** Source before the first block. */
+  leading: string;
+  blocks: SourceBlock[];
+  /** gaps[i]: the source between block i and block i + 1, or the end of the document. */
+  gaps: string[];
+}
+
+function stripTrailingNewlines(text: string): string {
+  return text.replace(/\n+$/, "");
+}
+
+function indexAttr(el: Element, attr: string, size: number): number | undefined {
+  const value = el.getAttribute(attr);
+  if (value == null || !/^\d+$/.test(value)) return undefined;
+  const n = Number(value);
+  return n < size ? n : undefined;
+}
+
+/**
+ * Render markdown for the Editor, tagging each block with its source.
+ * Returns `source: null` (plain rendering) when the source cannot be mapped
+ * exactly: no DOM, or `\r` line endings, which the lexer normalises away.
+ */
+export function markdownToEditorHtml(
+  md: string,
+  sanitize: (html: string) => string = (html) => html,
+): { html: string; source: MarkdownSource | null } {
+  const plain = () => ({
+    html: sanitize((marked.parse(md, { async: false }) as string).trim()),
+    source: null,
+  });
+  if (typeof document === "undefined" || md.includes("\r")) return plain();
+
+  const tokens = marked.lexer(md);
+  const parts: string[] = [];
+  const spans: { start: number; end: number; token: Token }[] = [];
+  let cursor = 0;
+  for (const token of tokens) {
+    if (token.type === "space") continue;
+    const at = md.indexOf(token.raw, cursor);
+    if (at < 0) return plain();
+    cursor = at + token.raw.length;
+
+    const template = document.createElement("template");
+    template.innerHTML = marked.parser([token]);
+    let nodes = Array.from(template.content.childNodes);
+    const strayText = nodes.some((n) => n.nodeType === 3 && (n.textContent ?? "").trim() !== "");
+    if (!nodes.some(isElement) && !strayText) {
+      // Renders nothing visible (an HTML comment): its source stays in the gap.
+      parts.push(template.innerHTML.trim());
+      continue;
+    }
+    if (strayText) {
+      const wrapper = document.createElement("div");
+      wrapper.append(...nodes);
+      template.content.append(wrapper);
+      nodes = [wrapper];
+    }
+    const id = spans.length;
+    const elements = nodes.filter(isElement);
+    for (const el of elements) el.setAttribute(BLOCK_ATTR, String(id));
+    if (token.type === "list" && elements.length === 1) {
+      const items = Array.from(elements[0]!.children).filter((c) => tagOf(c) === "li");
+      if (items.length === (token as Tokens.List).items.length) {
+        items.forEach((li, k) => li.setAttribute(ITEM_ATTR, String(k)));
+      }
+    }
+    if (token.type === "table" && elements.length === 1) {
+      const rows = tableRows(elements[0]!);
+      if (rows.length === (token as Tokens.Table).rows.length + 1) {
+        rows.forEach((tr, i) => tr.setAttribute(ROW_ATTR, String(i === 0 ? 0 : i + 1)));
+      }
+    }
+    parts.push(template.innerHTML.trim());
+    spans.push({ start: at, end: at + stripTrailingNewlines(token.raw).length, token });
+  }
+
+  const html = sanitize(parts.join("\n"));
+  if (spans.length === 0) return { html, source: null };
+
+  // Snapshot what the DOM will actually hold — after sanitising.
+  const seeded = document.createElement("template");
+  seeded.innerHTML = html;
+  const byId = new Map<number, Element[]>();
+  for (const node of Array.from(seeded.content.childNodes)) {
+    if (!isElement(node)) continue;
+    const id = indexAttr(node, BLOCK_ATTR, spans.length);
+    if (id === undefined) continue;
+    byId.set(id, [...(byId.get(id) ?? []), node]);
+  }
+
+  const blocks: SourceBlock[] = spans.map((span, id) => {
+    const elements = byId.get(id) ?? [];
+    const block: SourceBlock = {
+      raw: md.slice(span.start, span.end),
+      snapshot: elements.map((el) => el.outerHTML).join(""),
+      elementCount: elements.length,
+    };
+    if (span.token.type === "list" && elements.length === 1) {
+      block.list = sourceList(md, span.start, span.token as Tokens.List, elements[0]!);
+    }
+    if (span.token.type === "table" && elements.length === 1) {
+      block.table = sourceTable(block.raw, span.token as Tokens.Table, elements[0]!);
+    }
+    return block;
+  });
+  const gaps = spans.map((span, i) => md.slice(span.end, spans[i + 1]?.start ?? md.length));
+  return { html, source: { leading: md.slice(0, spans[0]!.start), blocks, gaps } };
+}
+
+function sourceList(md: string, start: number, token: Tokens.List, list: Element): SourceList | undefined {
+  const lis = Array.from(list.children).filter((c) => tagOf(c) === "li");
+  if (lis.length !== token.items.length || lis.length === 0) return undefined;
+  const items: string[] = [];
+  const bounds: [number, number][] = [];
+  let cursor = start;
+  for (const item of token.items) {
+    const at = md.indexOf(item.raw, cursor);
+    if (at < 0) return undefined;
+    const body = stripTrailingNewlines(item.raw);
+    items.push(body);
+    bounds.push([at, at + body.length]);
+    cursor = at + item.raw.length;
+  }
+  const itemGaps = bounds.slice(0, -1).map(([, end], k) => md.slice(end, bounds[k + 1]![0]));
+  const first = items[0]!;
+  return {
+    bullet: /^\s*([*+-])/.exec(first)?.[1] ?? "-",
+    delimiter: /^\s*\d+([.)])/.exec(first)?.[1] ?? ".",
+    loose: token.loose,
+    items,
+    itemGaps,
+    itemSnapshots: lis.map((li) => li.outerHTML),
+  };
+}
+
+function sourceTable(raw: string, token: Tokens.Table, table: Element): SourceTable | undefined {
+  const lines = raw.split("\n");
+  const rows = tableRows(table);
+  if (lines.length !== rows.length + 1) return undefined;
+  const rowSnapshots = new Map<number, string>();
+  for (const tr of rows) {
+    const r = indexAttr(tr, ROW_ATTR, lines.length);
+    if (r !== undefined) rowSnapshots.set(r, tr.outerHTML);
+  }
+  return { lines, columns: token.header.length, rowSnapshots };
+}
+
+type Piece = { text: string; id?: number; kind: Block["kind"] };
+
+function outerHtmlOf(nodes: readonly Node[]): string {
+  return nodes.filter(isElement).map((el) => el.outerHTML).join("");
+}
+
+function serializeWithSource(root: Node, src: MarkdownSource): string {
+  // 1. Group the top-level nodes: runs sharing one block tag, and runs of untagged content.
+  type Segment = { id?: number; nodes: Node[] };
+  const segments: Segment[] = [];
+  for (const node of Array.from(root.childNodes)) {
+    const last = segments[segments.length - 1];
+    if (node.nodeType === 3 && (node.textContent ?? "").trim() === "") {
+      if (last && last.id === undefined) last.nodes.push(node);
+      continue;
+    }
+    const id = isElement(node) ? indexAttr(node, BLOCK_ATTR, src.blocks.length) : undefined;
+    if (last && last.id === id) last.nodes.push(node);
+    else segments.push({ id, nodes: [node] });
+  }
+
+  // 2. The first segment per block that still matches its snapshot owns the source.
+  const verbatim = new Map<number, number>();
+  segments.forEach((seg, i) => {
+    if (seg.id === undefined || verbatim.has(seg.id)) return;
+    if (outerHtmlOf(seg.nodes) === src.blocks[seg.id]!.snapshot) verbatim.set(seg.id, i);
+  });
+
+  // 3. One piece per output block.
+  const pieces: Piece[] = [];
+  const owned = new Set<number>(verbatim.keys());
+  const fresh = (nodes: readonly Node[]) => {
+    for (const b of collectBlocks(nodes)) pieces.push({ text: b.text, kind: b.kind });
+  };
+  segments.forEach((seg, i) => {
+    if (seg.id === undefined) return fresh(seg.nodes);
+    const id = seg.id;
+    const block = src.blocks[id]!;
+    if (verbatim.get(id) === i) return void pieces.push({ text: block.raw, id, kind: "block" });
+    if (owned.has(id)) return fresh(seg.nodes);
+    owned.add(id);
+    if (block.elementCount === 1) {
+      // Enter at the edge of a block: the original survives whole beside its clone.
+      const j = seg.nodes.findIndex((n) => isElement(n) && n.outerHTML === block.snapshot);
+      if (j >= 0) {
+        fresh(seg.nodes.slice(0, j));
+        pieces.push({ text: block.raw, id, kind: "block" });
+        fresh(seg.nodes.slice(j + 1));
+        return;
+      }
+    }
+    pieces.push({ text: serializeChangedBlock(seg.nodes, block), id, kind: "block" });
+  });
+  if (pieces.length === 0) return "";
+
+  // 4. Join, reusing the original source between blocks that are still neighbours.
+  const used = new Set<number>();
+  const hasContent = (gap: string) => gap.trim() !== "";
+  const separator = (a: Piece, b: Piece): string => {
+    if (a.id !== undefined && b.id === a.id + 1) {
+      used.add(a.id);
+      return src.gaps[a.id]!;
+    }
+    const fallback = a.kind === "div" || b.kind === "div" ? "\n" : "\n\n";
+    if (a.id === undefined || used.has(a.id)) return fallback;
+    // Blocks between a and b were deleted: keep any definitions or comments they sat beside.
+    const upto = b.id !== undefined && b.id > a.id ? b.id : a.id + 1;
+    const range: number[] = [];
+    for (let g = a.id; g < upto; g++) if (!used.has(g)) range.push(g);
+    for (const g of range) used.add(g);
+    const kept = range.map((g) => src.gaps[g]!).filter(hasContent).map((g) => g.trim());
+    if (kept.length > 0) return `\n\n${kept.join("\n\n")}\n\n`;
+    const own = src.gaps[a.id]!;
+    return (own.match(/\n/g)?.length ?? 0) >= 2 ? own : fallback;
+  };
+
+  let out = src.leading;
+  pieces.forEach((piece, i) => {
+    if (i > 0) out += separator(pieces[i - 1]!, piece);
+    out += piece.text;
+  });
+
+  const lastId = src.blocks.length - 1;
+  const trailing = src.gaps[lastId]!;
+  if (pieces[pieces.length - 1]!.id === lastId && !used.has(lastId)) {
+    used.add(lastId);
+    out += trailing;
+  } else {
+    const orphans = src.gaps
+      .filter((gap, g) => !used.has(g) && hasContent(gap))
+      .map((gap) => gap.trim());
+    if (orphans.length > 0) out += `\n\n${orphans.join("\n\n")}`;
+    out += /\s*$/.exec(trailing)![0];
+  }
+  return out;
+}
+
+function serializeChangedBlock(nodes: readonly Node[], block: SourceBlock): string {
+  const elements = nodes.filter(isElement);
+  if (elements.length === 1) {
+    const el = elements[0]!;
+    const tag = tagOf(el);
+    if (block.list && (tag === "ul" || tag === "ol")) return serializeListWithSource(el, block.list);
+    if (block.table && tag === "table") return serializeTableWithSource(el, block.table);
+  }
+  return joinBlocks(collectBlocks(nodes));
+}
+
+/**
+ * A changed list: untouched items keep their source; changed and new items
+ * are serialised with the list's original marker. Between two items that are
+ * still neighbours the original separator is kept; elsewhere the separator
+ * last used in the list is repeated.
+ */
+function serializeListWithSource(list: Element, info: SourceList): string {
+  const ordered = tagOf(list) === "ol";
+  const children = Array.from(list.children);
+  const verbatim = new Map<number, Element>();
+  for (const li of children) {
+    if (tagOf(li) !== "li") continue;
+    const k = indexAttr(li, ITEM_ATTR, info.items.length);
+    if (k !== undefined && !verbatim.has(k) && li.outerHTML === info.itemSnapshots[k]) verbatim.set(k, li);
+  }
+  const owned = new Set<number>(verbatim.keys());
+  const out: { text: string; k?: number }[] = [];
+  let num = ordered ? (Number.parseInt(list.getAttribute("start") ?? "1", 10) || 1) - 1 : 0;
+  const numberOf = (k: number) => Number(/^\s*(\d+)/.exec(info.items[k]!)?.[1] ?? Number.NaN);
+  for (const child of children) {
+    const tag = tagOf(child);
+    if (tag === "ul" || tag === "ol") {
+      const nested = indent(serializeList(child), ordered ? 3 : 2);
+      if (out.length > 0) out[out.length - 1]!.text += `\n${nested}`;
+      else out.push({ text: nested });
+      continue;
+    }
+    if (tag !== "li") continue;
+    const k = indexAttr(child, ITEM_ATTR, info.items.length);
+    if (k !== undefined && verbatim.get(k) === child) {
+      if (ordered && !Number.isNaN(numberOf(k))) num = numberOf(k);
+      out.push({ text: info.items[k]!, k });
+      continue;
+    }
+    const mine = k !== undefined && !owned.has(k) ? k : undefined;
+    if (mine !== undefined) owned.add(mine);
+    num = ordered && mine !== undefined && !Number.isNaN(numberOf(mine)) ? numberOf(mine) : num + 1;
+    const marker = ordered ? `${num}${info.delimiter} ` : `${info.bullet} `;
+    out.push({
+      text: `${marker}${indent(serializeListItem(child), marker.length, true)}`.replace(/[ \t]+$/, ""),
+      k: mine,
+    });
+  }
+  let last: string | undefined;
+  let text = "";
+  out.forEach((item, i) => {
+    if (i > 0) {
+      const prev = out[i - 1]!;
+      const sep =
+        prev.k !== undefined && item.k === prev.k + 1
+          ? info.itemGaps[prev.k]!
+          : (last ?? info.itemGaps[0] ?? (info.loose ? "\n\n" : "\n"));
+      last = sep;
+      text += sep;
+    }
+    text += item.text;
+  });
+  return text;
+}
+
+/**
+ * A changed table: untouched rows keep their source line, the alignment row
+ * is kept while the column count is unchanged, edited and new rows are
+ * serialised as GFM rows.
+ */
+function serializeTableWithSource(table: Element, info: SourceTable): string {
+  const rows = tableRows(table);
+  if (rows.length === 0) return "";
+  const claimed = new Set<number>();
+  const lines: string[] = [];
+  rows.forEach((tr, i) => {
+    const r = indexAttr(tr, ROW_ATTR, info.lines.length);
+    if (r !== undefined && r !== 1 && !claimed.has(r) && tr.outerHTML === info.rowSnapshots.get(r)) {
+      claimed.add(r);
+      lines.push(info.lines[r]!);
+    } else {
+      lines.push(serializeTableRow(tr));
+    }
+    if (i === 0) {
+      lines.push(tableCells(tr).length === info.columns ? info.lines[1]! : tableDelimiterRow(tr));
+    }
+  });
+  return lines.join("\n");
 }
 
 type Block = { kind: "block" | "div" | "inline"; text: string; tag?: string };
@@ -106,8 +508,8 @@ function isBlockNode(node: Node): boolean {
   return isElement(node) && BLOCK_TAGS.has(tagOf(node));
 }
 
-/** Split a node's children into blocks, serialising each. */
-function collectBlocks(parent: Node): Block[] {
+/** Split a node's children (or a list of sibling nodes) into blocks, serialising each. */
+function collectBlocks(parent: Node | readonly Node[]): Block[] {
   const blocks: Block[] = [];
   let run: Node[] = [];
   const flush = () => {
@@ -116,7 +518,8 @@ function collectBlocks(parent: Node): Block[] {
     run = [];
     if (text.trim() !== "") blocks.push({ kind: "inline", text });
   };
-  for (const child of Array.from(parent.childNodes)) {
+  const nodes = Array.isArray(parent) ? parent : Array.from((parent as Node).childNodes);
+  for (const child of nodes) {
     if (isBlockNode(child)) {
       flush();
       const el = child as Element;
@@ -176,9 +579,60 @@ function serializeBlock(el: Element): string {
         .join("\n");
     case "hr":
       return "---";
+    case "table":
+      return serializeTable(el);
     default:
       return serializeBlocks(el);
   }
+}
+
+/** The rows of a table, in document order, excluding rows of nested tables. */
+function tableRows(table: Element): Element[] {
+  return Array.from(table.querySelectorAll("tr")).filter((tr) => tr.closest("table") === table);
+}
+
+function tableCells(tr: Element): Element[] {
+  return Array.from(tr.children).filter((c) => tagOf(c) === "td" || tagOf(c) === "th");
+}
+
+/**
+ * A cell's inline content on one line. GFM cells cannot hold a line break, so
+ * a typed one becomes a literal `<br>`; every `|` is escaped, including inside
+ * code spans, which is how GFM spells a pipe in a cell.
+ */
+function serializeTableCell(cell: Element): string {
+  const children = Array.from(cell.childNodes);
+  while (children.length > 0 && tagOf(children[children.length - 1]!) === "br") children.pop();
+  return children
+    .map((n) => (tagOf(n) === "br" ? "<br>" : serializeInlineNode(n)))
+    .join("")
+    .replace(/\n/g, " ")
+    .replace(/\|/g, "\\|")
+    .trim();
+}
+
+function serializeTableRow(tr: Element): string {
+  return `| ${tableCells(tr).map(serializeTableCell).join(" | ")} |`;
+}
+
+function tableDelimiterRow(header: Element): string {
+  const marks = tableCells(header).map((cell) => {
+    const align = cell.getAttribute("align") || (cell as HTMLElement).style?.textAlign || "";
+    if (align === "left") return ":---";
+    if (align === "center") return ":---:";
+    if (align === "right") return "---:";
+    return "---";
+  });
+  return `| ${marks.join(" | ")} |`;
+}
+
+/** A GFM table: header row, alignment row, body rows. */
+function serializeTable(table: Element): string {
+  const rows = tableRows(table);
+  if (rows.length === 0) return "";
+  const lines = rows.map(serializeTableRow);
+  lines.splice(1, 0, tableDelimiterRow(rows[0]!));
+  return lines.join("\n");
 }
 
 function serializePre(el: Element): string {
