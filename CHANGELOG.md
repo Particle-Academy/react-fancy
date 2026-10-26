@@ -11,6 +11,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.63.0] - 2026-10-26
+
+### Added
+
+- **`Editor.Toolbar toolbarExtra` — a host slot inside the default toolbar.**
+  Requested by MOIC. With `<Editor.Toolbar showFullScreenToggle />` a host had
+  nowhere to put its own Save / Cancel: passing `children` replaces the whole
+  default toolbar, so in full screen the host's Save was unreachable until
+  Escape. `toolbarExtra` renders at the toolbar's trailing end, after the
+  Source toggle and before the full-screen toggle, which keeps the trailing
+  edge. Same name and placement as fancy-sheets' `SheetWorkbook toolbarExtra`.
+  It lives inside the editor surface, so it stays visible and clickable in
+  full screen. The slot is wrapped in `[data-react-fancy-editor-toolbar-extra]`.
+  It is ignored when `children` are supplied, like the other default-toolbar
+  props. Unused (or `null` / `false`), the toolbar renders byte-identically to
+  before; nothing to do for existing consumers. Escape and focus behaviour are
+  unchanged.
+
+### Fixed
+
+- **`Kanban.Column` no longer shrinks in a narrow board.** Columns had `w-72`
+  but the flex default `flex-shrink: 1`, so inside the board's
+  `overflow-x-auto` row they were squeezed (to about 130px in a 400px
+  container) instead of the board scrolling. Columns now default to
+  `shrink-0`. It is a default merged under `className`, so `w-60` or `shrink`
+  passed by a consumer still wins. If you were passing `shrink-0` yourself to
+  work around this, you can drop it. `unstyled` columns are unchanged.
+
 ## [5.62.0] - 2026-10-26
 
 ### Fixed

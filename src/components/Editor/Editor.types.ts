@@ -30,6 +30,16 @@ export interface EditorToolbarProps {
    * @default false
    */
   showFullScreenToggle?: boolean;
+  /**
+   * Host content rendered INSIDE the default toolbar, at its trailing end:
+   * after the Source toggle and before the full-screen toggle, which keeps the
+   * trailing edge. Use it for a host's own Save / Cancel, which then stays
+   * reachable while the editor is full screen. Wrapped in
+   * `[data-react-fancy-editor-toolbar-extra]`. Same name and placement as
+   * fancy-sheets' `SheetWorkbook toolbarExtra`. Ignored when `children` are
+   * supplied — a custom toolbar places host content itself.
+   */
+  toolbarExtra?: ReactNode;
 }
 
 export interface EditorFullScreenToggleProps {

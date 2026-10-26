@@ -58,8 +58,10 @@ The board ships with a drop-position indicator (a thin blue line that appears wh
 | `title` | `string` | - | Column header text. When set, the column renders a built-in header with a count chip (and `count / wipLimit` if `wipLimit` is set). |
 | `wipLimit` | `number` | - | Soft work-in-progress limit. The header pill turns red when `cardCount > wipLimit`. Drops are not refused — enforce hard via `onCardMove`. *Since v2.8.0.* |
 | `hideWhenEmpty` | `boolean` | `false` | Render nothing when the column has zero card children. The column still re-mounts to receive drops while a card is being dragged elsewhere. *Since v2.8.0.* |
-| `unstyled` | `boolean` | `false` | Skip the default visuals (background, padding, min-height, fixed `w-72`) so you can render your own surface around the children. The drop target, drag-over ring, and column id wiring are kept. *Since v2.7.0.* |
-| `className` | `string` | - | Additional CSS classes |
+| `unstyled` | `boolean` | `false` | Skip the default visuals (background, padding, min-height, fixed `w-72 shrink-0`) so you can render your own surface around the children. The drop target, drag-over ring, and column id wiring are kept. *Since v2.7.0.* |
+| `className` | `string` | - | Additional CSS classes. Merged over the defaults, so `w-60` replaces `w-72` and `shrink` replaces `shrink-0` |
+
+Columns default to `w-72 shrink-0`, and the board root is a flex row with `overflow-x-auto`, so a board wider than its container scrolls horizontally instead of squeezing its columns.
 
 ### Kanban.Card
 

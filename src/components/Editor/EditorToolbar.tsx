@@ -18,8 +18,12 @@ export function EditorToolbar({
   className,
   showSourceToggle = true,
   showFullScreenToggle = false,
+  toolbarExtra,
 }: EditorToolbarProps) {
   const { exec, showSource } = useEditor();
+  // `null` / `false` / `undefined` render nothing, so they must not add a
+  // wrapper either: an unused slot leaves the toolbar byte-identical.
+  const hasExtra = toolbarExtra !== undefined && toolbarExtra !== null && toolbarExtra !== false;
 
   return (
     <div
@@ -57,7 +61,17 @@ export function EditorToolbar({
             </button>
           ))}
           {showSourceToggle && <EditorSourceToggle className="ml-auto" />}
-          {showFullScreenToggle && <EditorFullScreenToggle className={showSourceToggle ? undefined : "ml-auto"} />}
+          {hasExtra && (
+            <div
+              data-react-fancy-editor-toolbar-extra=""
+              className={cn("flex items-center gap-0.5", !showSourceToggle && "ml-auto")}
+            >
+              {toolbarExtra}
+            </div>
+          )}
+          {showFullScreenToggle && (
+            <EditorFullScreenToggle className={showSourceToggle || hasExtra ? undefined : "ml-auto"} />
+          )}
         </>
       )}
     </div>

@@ -48,6 +48,7 @@ import { Editor } from "@particle-academy/react-fancy";
 | children | `ReactNode` | - | Custom toolbar content |
 | showSourceToggle | `boolean` | `true` | Append a Source toggle to the default toolbar. Ignored when `children` are supplied — custom toolbars compose their own `<Editor.SourceToggle />` |
 | showFullScreenToggle | `boolean` | `false` | Append a full-screen toggle (Lucide `maximize-2` / `minimize-2`) at the right end of the default toolbar. Ignored when `children` are supplied — use `<Editor.FullScreenToggle />` |
+| toolbarExtra | `ReactNode` | - | Host content (e.g. Save / Cancel) rendered inside the default toolbar at its trailing end: after the Source toggle, before the full-screen toggle. Wrapped in `[data-react-fancy-editor-toolbar-extra]`. Stays reachable in full screen. Same name and placement as fancy-sheets' `SheetWorkbook toolbarExtra`. Ignored when `children` are supplied |
 | className | `string` | - | Additional CSS classes |
 
 #### EditorAction
@@ -93,6 +94,23 @@ Toolbar button that takes the editor full screen and back. Carries `data-react-f
 ```
 
 While full screen the root has `data-fullscreen="true"`, `maxHeight` is ignored so the content fills the screen, and Escape leaves. The editor is not remounted, so the caret, undo history and text survive the round trip.
+
+A host's own actions belong in `toolbarExtra`, not in `children`: children replace the whole default toolbar, while `toolbarExtra` adds to it, so Save stays on screen while the editor is full screen.
+
+```tsx
+<Editor value={doc} onChange={setDoc}>
+  <Editor.Toolbar
+    showFullScreenToggle
+    toolbarExtra={
+      <>
+        <Button size="sm" variant="ghost" onClick={cancel}>Cancel</Button>
+        <Button size="sm" onClick={save}>Save</Button>
+      </>
+    }
+  />
+  <Editor.Content />
+</Editor>
+```
 
 ### Editor.Content
 

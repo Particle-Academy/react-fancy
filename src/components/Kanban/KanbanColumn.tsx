@@ -4,8 +4,11 @@ import { KanbanCard } from "./KanbanCard";
 import { useKanban, KanbanColumnContext } from "./Kanban.context";
 import type { KanbanColumnProps } from "./Kanban.types";
 
+// `shrink-0`: the board is a flex row with `overflow-x-auto`, and without it
+// the flex default `flex-shrink: 1` squeezes `w-72` columns instead of letting
+// the row scroll. A default, so a consumer `className` (e.g. `shrink`) wins.
 const DEFAULT_COLUMN_CLASSES =
-  "min-h-[200px] w-72 rounded-xl bg-zinc-50 p-3 dark:bg-zinc-800/50";
+  "min-h-[200px] w-72 shrink-0 rounded-xl bg-zinc-50 p-3 dark:bg-zinc-800/50";
 
 /**
  * Deep-recurse through the children tree counting Kanban.Card descendants
