@@ -4,7 +4,7 @@ import { proseClasses, detectFormat } from "../Editor/editor.utils";
 import { mergeExtensions } from "./extensions";
 import { ContentBody } from "./RenderedContent";
 import { CopyContext, useCopyPipeline, type CopyContextValue } from "./copy";
-import { streamingCut } from "./markdown-blocks";
+import { streamingCut, streamingProgressive } from "./markdown-blocks";
 import type { ContentRendererProps } from "./ContentRenderer.types";
 
 export function ContentRenderer({
@@ -30,15 +30,14 @@ export function ContentRenderer({
   const safe = value ?? "";
   const resolvedFormat = format === "auto" ? detectFormat(safe) : format;
 
-  const source = useMemo(() => {
-    if (!streaming) return safe;
-    const cut = streamingCut(
-      safe,
-      extensions.map((e) => e.tag),
-      resolvedFormat === "markdown",
-    );
-    return safe.slice(0, cut);
-  }, [safe, streaming, extensions, resolvedFormat]);
+  const progressive = streaming === "progressive";
+  const { source, openFence } = useMemo(() => {
+    if (!streaming) return { source: safe, openFence: false };
+    const tags = extensions.map((e) => e.tag);
+    const markdown = resolvedFormat === "markdown";
+    if (progressive) return streamingProgressive(safe, tags, markdown);
+    return { source: safe.slice(0, streamingCut(safe, tags, markdown)), openFence: false };
+  }, [safe, streaming, progressive, extensions, resolvedFormat]);
 
   const codeOn = copyButtons === true || (typeof copyButtons === "object" && copyButtons.code !== false);
   const tableOn = copyButtons === true || (typeof copyButtons === "object" && copyButtons.table !== false);
@@ -53,8 +52,8 @@ export function ContentRenderer({
   }, []);
   const copy = useCopyPipeline({ writer: clipboardWriter, onCopy, rootRef, announce });
   const copyContext = useMemo<CopyContextValue>(
-    () => ({ code: codeOn, table: tableOn, copy }),
-    [codeOn, tableOn, copy],
+    () => ({ code: codeOn, table: tableOn, copy, holdTailCode: openFence }),
+    [codeOn, tableOn, copy, openFence],
   );
 
   return (
@@ -62,6 +61,7 @@ export function ContentRenderer({
       ref={rootRef}
       data-react-fancy-content-renderer=""
       data-streaming={streaming ? "true" : undefined}
+      data-streaming-mode={progressive ? "progressive" : undefined}
       style={{ lineHeight: lineSpacing }}
       className={cn("text-sm", proseClasses, className)}
     >
@@ -71,6 +71,7 @@ export function ContentRenderer({
           format={resolvedFormat}
           extensions={extensions}
           unsafe={unsafe}
+          tail
         />
       </CopyContext.Provider>
       {copyOn && (

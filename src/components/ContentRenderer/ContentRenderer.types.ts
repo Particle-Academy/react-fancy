@@ -63,11 +63,18 @@ export interface ContentRendererProps {
    */
   clipboardWriter?: ContentClipboardWriter;
   /**
-   * The value is still arriving. Holds back an unfinished trailing custom tag
-   * (of a registered extension) or code fence, so a partial `<result` or
-   * half a code block never flashes as raw text. Set it back to `false` when
-   * the stream ends and everything renders.
+   * The value is still arriving. Set it back to `false` when the stream ends
+   * and everything renders.
+   *
+   * - `true` holds back an unfinished trailing custom tag (of a registered
+   *   extension) or code fence until it closes, so a partial `<result` or half
+   *   a code block never flashes as raw text.
+   * - `"progressive"` shows an open block as it fills: an open registered tag
+   *   whose opening tag is complete renders its component with the body so
+   *   far, and an open code fence renders as a code block of what has arrived
+   *   (with no copy button until it closes). A partial opening tag
+   *   (`<result title="Do`) is still held back.
    * @default false
    */
-  streaming?: boolean;
+  streaming?: boolean | "progressive";
 }

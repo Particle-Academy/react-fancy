@@ -28,6 +28,11 @@ export interface CopyContextValue {
   table: boolean;
   /** Write, announce, and report one copy. Resolves to whether it worked. */
   copy: (payload: ContentClipboardPayload, button: HTMLElement) => Promise<boolean>;
+  /**
+   * Progressive streaming closed an open code fence: the last code block of
+   * the tail chunk is still arriving and gets no copy button until it closes.
+   */
+  holdTailCode?: boolean;
 }
 
 export const CopyContext = createContext<CopyContextValue | null>(null);
@@ -118,12 +123,22 @@ interface Target {
  * the button lives beside the block, never inside it, so the button's own text
  * can never end up in what is copied.
  */
-export function HtmlChunk({ html, fromMarkdown }: { html: string; fromMarkdown: boolean }) {
+export function HtmlChunk({
+  html,
+  fromMarkdown,
+  tail = false,
+}: {
+  html: string;
+  fromMarkdown: boolean;
+  /** This chunk is the last thing rendered, so it holds any block still arriving. */
+  tail?: boolean;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const ctx = useContext(CopyContext);
   const [targets, setTargets] = useState<Target[]>([]);
   const code = ctx?.code ?? false;
   const table = ctx?.table ?? false;
+  const holdLastCode = tail && (ctx?.holdTailCode ?? false);
   // React 19 re-assigns innerHTML whenever this prop is a NEW object, even
   // with the same string, which would wipe the wrappers on every re-render
   // (including the one that mounts the buttons). One object per string.
@@ -137,7 +152,9 @@ export function HtmlChunk({ html, fromMarkdown }: { html: string; fromMarkdown: 
     }
     const found: Target[] = [];
     const selector = [code && "pre", table && "table"].filter(Boolean).join(",");
+    const inProgress = holdLastCode ? Array.from(root.querySelectorAll("pre")).pop() : undefined;
     for (const el of Array.from(root.querySelectorAll<HTMLElement>(selector))) {
+      if (el === inProgress) continue;
       const kind: ContentCopyKind = el.tagName === "PRE" ? "code" : "table";
       const wrapper = document.createElement("div");
       wrapper.setAttribute("data-react-fancy-content-copy-block", kind);
@@ -158,7 +175,7 @@ export function HtmlChunk({ html, fromMarkdown }: { html: string; fromMarkdown: 
         if (wrapper?.parentNode) wrapper.replaceWith(t.el);
       }
     };
-  }, [html, code, table]);
+  }, [html, code, table, holdLastCode]);
 
   return (
     <>

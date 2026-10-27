@@ -29,6 +29,7 @@ import { Editor } from "@particle-academy/react-fancy";
 | outputFormat | `"html" \| "markdown"` | `"html"` | Output format for the onChange value |
 | lineSpacing | `number` | `1.6` | Line height for content area |
 | placeholder | `string` | - | Placeholder text |
+| mode | `"edit" \| "view"` | `"edit"` | `"view"` renders the value read-only through `ContentRenderer`. Resolution: this prop, then the nearest `<Form>` context, then `"edit"`. See **View mode** |
 | extensions | `RenderExtension[]` | - | Per-instance render extensions (merged with global) |
 | showSource | `boolean` | - | Controlled source-view flag. When `true`, the content area shows the raw `value` (in `outputFormat`) in an editable `<textarea>` |
 | defaultShowSource | `boolean` | `false` | Initial source-view flag when uncontrolled |
@@ -37,6 +38,9 @@ import { Editor } from "@particle-academy/react-fancy";
 | defaultFullScreen | `boolean` | `false` | Initial full-screen flag when uncontrolled |
 | onFullScreenChange | `(fullScreen: boolean) => void` | - | Fired by the toggle, Escape, an agent, or the user leaving the browser's full screen |
 | fullScreenMode | `"overlay" \| "native"` | `"overlay"` | `overlay` covers the viewport in place and always works; `native` uses the browser Fullscreen API and falls back to the overlay. See [FullScreen](./FullScreen.md) |
+| copyButtons | `boolean \| { code?: boolean; table?: boolean }` | `true` | View mode only. Copy buttons on code blocks and tables, forwarded to `ContentRenderer`. `false` turns them off; `{ table: false }` keeps code only. See **View mode** |
+| clipboardWriter | `ContentClipboardWriter` | - | View mode only. Host-supplied clipboard writer, forwarded to `ContentRenderer` (e.g. Electron's `clipboard` in a sandboxed window) |
+| onCopy | `(event: ContentCopyEvent) => void` | - | View mode only. Called after every copy attempt, successful or not, forwarded to `ContentRenderer` |
 | className | `string` | - | Additional CSS classes |
 
 ### Editor.Toolbar
@@ -125,6 +129,40 @@ A host's own actions belong in `toolbarExtra`, not in `children`: children repla
 ```tsx
 <Editor outputFormat="markdown" onChange={(md) => console.log(md)}>
   <Editor.Toolbar />
+  <Editor.Content />
+</Editor>
+```
+
+## View mode
+
+`mode="view"` (or a `<Form mode="view">` around the editor) renders the value
+read-only through [`ContentRenderer`](./ContentRenderer.md) instead of the
+toolbar and editable surface. `extensions`, `unsafe` and `lineSpacing` reach the
+renderer, and so do the copy props:
+
+| Editor prop | ContentRenderer prop | Default |
+|-------------|----------------------|---------|
+| `copyButtons` | `copyButtons` | `true`: a copy button on every code block and table |
+| `clipboardWriter` | `clipboardWriter` | text/html + text/plain via `ClipboardItem`, falling back to `writeText` |
+| `onCopy` | `onCopy` | - |
+
+Same types and same defaults as on `ContentRenderer`; leaving them out changes
+nothing. They have no effect in edit mode.
+
+```tsx
+import { clipboard } from "electron";
+
+<Editor
+  value={doc}
+  mode="view"
+  outputFormat="markdown"
+  clipboardWriter={({ text, html }) => clipboard.write({ text, html })}
+  onCopy={(e) => activity.push({ type: "copy", kind: e.kind, ok: e.ok })}
+>
+  <Editor.Content />
+</Editor>
+
+<Editor value={doc} mode="view" copyButtons={false}>  {/* no buttons */}
   <Editor.Content />
 </Editor>
 ```

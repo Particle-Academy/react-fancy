@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { RenderExtension } from "../ContentRenderer/extensions";
+import type { ContentRendererProps } from "../ContentRenderer/ContentRenderer.types";
 import type { FieldMode } from "../inputs/inputs.types";
 import type { FullScreenMode } from "../../hooks/use-full-screen";
 
@@ -135,4 +136,21 @@ export interface EditorProps {
    * @default false
    */
   unsafe?: boolean;
+  /**
+   * View mode only: copy buttons on code blocks and tables, forwarded to the
+   * `<ContentRenderer>` that renders the value. `false` turns them all off; an
+   * object turns kinds off individually (`{ table: false }`). Same type and
+   * default as ContentRenderer's `copyButtons`.
+   * @default true
+   */
+  copyButtons?: ContentRendererProps["copyButtons"];
+  /**
+   * View mode only: host-supplied clipboard writer, forwarded to
+   * `<ContentRenderer>`. Use it where `navigator.clipboard` is unreliable (a
+   * sandboxed Electron window). The default writes text/html + text/plain via
+   * `ClipboardItem`, falling back to `writeText`.
+   */
+  clipboardWriter?: ContentRendererProps["clipboardWriter"];
+  /** View mode only: called after every copy attempt, forwarded to `<ContentRenderer>`. */
+  onCopy?: ContentRendererProps["onCopy"];
 }

@@ -19,6 +19,17 @@ interface ContentBodyProps {
   extensions: RenderExtension[];
   unsafe: boolean;
   depth?: number;
+  /**
+   * This body is the last thing the renderer shows, so under progressive
+   * streaming it holds any block still arriving. Passed only to the last piece.
+   */
+  tail?: boolean;
+}
+
+/** Index of the last piece that renders anything, or -1. */
+function lastIndexWith<T>(items: T[], renders: (item: T) => boolean): number {
+  for (let i = items.length - 1; i >= 0; i--) if (renders(items[i])) return i;
+  return -1;
 }
 
 /**
@@ -27,7 +38,7 @@ interface ContentBodyProps {
  * other piece is converted, sanitised, and then searched for the remaining
  * extension tags as before.
  */
-export function ContentBody({ source, format, extensions, unsafe, depth = 0 }: ContentBodyProps) {
+export function ContentBody({ source, format, extensions, unsafe, depth = 0, tail = false }: ContentBodyProps) {
   const active = depth >= MAX_DEPTH ? [] : extensions;
   const blocks = useMemo(() => {
     if (format !== "markdown") return null;
@@ -38,9 +49,20 @@ export function ContentBody({ source, format, extensions, unsafe, depth = 0 }: C
   if (!blocks) {
     const html = unsafe ? source : sanitizeHtml(source);
     return (
-      <RenderedContent html={html} extensions={active} unsafe={unsafe} fromMarkdown={false} depth={depth} />
+      <RenderedContent
+        html={html}
+        extensions={active}
+        unsafe={unsafe}
+        fromMarkdown={false}
+        depth={depth}
+        tail={tail}
+      />
     );
   }
+
+  const last = tail
+    ? lastIndexWith(blocks, (b) => b.type === "tag" || b.source.trim() !== "")
+    : -1;
 
   return (
     <>
@@ -56,6 +78,7 @@ export function ContentBody({ source, format, extensions, unsafe, depth = 0 }: C
               unsafe={unsafe}
               fromMarkdown
               depth={depth}
+              tail={i === last}
             />
           );
         }
@@ -72,6 +95,7 @@ export function ContentBody({ source, format, extensions, unsafe, depth = 0 }: C
                 extensions={active}
                 unsafe={unsafe}
                 depth={depth + 1}
+                tail={i === last}
               />
             </Component>
           </Wrapper>
@@ -93,6 +117,8 @@ interface RenderedContentProps {
   /** The HTML came from marked, so a code block's text ends in an added newline. */
   fromMarkdown: boolean;
   depth: number;
+  /** See `ContentBodyProps.tail`. */
+  tail?: boolean;
 }
 
 /**
@@ -100,7 +126,14 @@ interface RenderedContentProps {
  * injected (with copy buttons); custom-tag segments are rendered via their
  * registered React component.
  */
-export function RenderedContent({ html, extensions, unsafe, fromMarkdown, depth }: RenderedContentProps) {
+export function RenderedContent({
+  html,
+  extensions,
+  unsafe,
+  fromMarkdown,
+  depth,
+  tail = false,
+}: RenderedContentProps) {
   const segments = useMemo(() => parseSegments(html, extensions), [html, extensions]);
 
   const renderHtml = (content: string): string => (unsafe ? content : sanitizeHtml(content));
@@ -109,15 +142,24 @@ export function RenderedContent({ html, extensions, unsafe, fromMarkdown, depth 
 
   // Fast path: no extensions matched.
   if (segments.length === 1 && segments[0].type === "html") {
-    return <HtmlChunk html={renderHtml(segments[0].content)} fromMarkdown={fromMarkdown} />;
+    return <HtmlChunk html={renderHtml(segments[0].content)} fromMarkdown={fromMarkdown} tail={tail} />;
   }
+
+  const last = tail
+    ? lastIndexWith(segments, (s) => s.type === "extension" || s.content.trim() !== "")
+    : -1;
 
   return (
     <>
       {segments.map((segment, i) => {
         if (segment.type === "html") {
           return segment.content ? (
-            <HtmlChunk key={i} html={renderHtml(segment.content)} fromMarkdown={fromMarkdown} />
+            <HtmlChunk
+              key={i}
+              html={renderHtml(segment.content)}
+              fromMarkdown={fromMarkdown}
+              tail={i === last}
+            />
           ) : null;
         }
 
@@ -135,6 +177,7 @@ export function RenderedContent({ html, extensions, unsafe, fromMarkdown, depth 
             extensions={extensions}
             unsafe={unsafe}
             depth={depth + 1}
+            tail={i === last}
           />
         ) : undefined;
 

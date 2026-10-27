@@ -67,6 +67,9 @@ function EditorRoot({
   defaultFullScreen = false,
   onFullScreenChange,
   fullScreenMode = "overlay",
+  copyButtons,
+  clipboardWriter,
+  onCopy,
 }: EditorProps) {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [value, setValue] = useControllableState(controlledValue, defaultValue, onChange);
@@ -229,6 +232,9 @@ function EditorRoot({
             lineSpacing={lineSpacing}
             extensions={instanceExtensions}
             unsafe={unsafe}
+            copyButtons={copyButtons}
+            clipboardWriter={clipboardWriter}
+            onCopy={onCopy}
             className="px-4 py-3"
           />
         </div>

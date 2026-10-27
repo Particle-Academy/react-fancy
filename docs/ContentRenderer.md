@@ -27,7 +27,7 @@ import { ContentRenderer } from "@particle-academy/react-fancy";
 | copyButtons | `boolean \| { code?: boolean; table?: boolean }` | `true` | Copy buttons on code blocks and tables. See **Copy buttons**. |
 | onCopy | `(event: ContentCopyEvent) => void` | - | Called after every copy attempt, successful or not |
 | clipboardWriter | `ContentClipboardWriter` | - | Host-supplied clipboard writer. See **Clipboard writer**. |
-| streaming | `boolean` | `false` | The value is still arriving: hold back an unfinished trailing tag or fence. See **Streaming**. |
+| streaming | `boolean \| "progressive"` | `false` | The value is still arriving. `true` holds back an unfinished trailing tag or fence; `"progressive"` shows it as it fills. See **Streaming**. |
 
 ## Copy buttons
 
@@ -89,7 +89,8 @@ than state. Copy follows that:
 | `data-copy-state="idle" \| "copied" \| "failed"` | the copy button |
 | `data-react-fancy-content-copy-block="code" \| "table"` | the wrapper around the block |
 | `data-react-fancy-content-renderer-live` | the live region |
-| `data-streaming="true"` | the root, while `streaming` |
+| `data-streaming="true"` | the root, while `streaming` (either mode) |
+| `data-streaming-mode="progressive"` | the root, while `streaming="progressive"` |
 
 `onCopy` receives `{ kind, index, text, html, ok }`, where `index` is the
 button's position among this renderer's copy buttons in document order. Wire it
@@ -116,6 +117,50 @@ A `<` that cannot become a registered tag is prose and always renders
 (`a < b`, `a<b`, `3 <= 4`), as do unknown tags and anything in inline code.
 A lone `<` at the very end is held for one chunk, because it may be the start of
 a tag. When `streaming` goes back to `false`, everything renders.
+
+### Progressive streaming
+
+`streaming={true}` hides an open block until it closes. Pass
+`streaming="progressive"` to show it as it fills instead:
+
+```tsx
+<ContentRenderer
+  value={partial}
+  streaming={done ? false : "progressive"}
+  extensions={[resultTag]}
+/>
+```
+
+- An open tag of a registered extension whose **opening tag is complete**
+  renders its component straight away, with the body that has arrived so far.
+  A `markdown` extension gets that body as `content` and rendered as
+  `children`, through the same pipeline as the final render: converted,
+  sanitised, nested extensions, copy buttons on finished blocks.
+- An open code fence renders as a code block of what has arrived, in its
+  language. It gets **no copy button until it closes**; copying half a block
+  is never what anyone means, and a disabled button would still invite the
+  click. Finished code blocks and tables before it keep theirs.
+- Still held back, exactly as in `streaming={true}`: a **partial opening tag**
+  (`<`, `<res`, `<result title="Do`), so it never flashes raw; a partial
+  closing tag (`</res`), with the body above it still showing; a fence marker
+  still arriving (` `` `). Also held: a fence opener line with no newline yet
+  (` ```ja `), because its language may be cut off.
+- Inside an open fence, `<` is code and is never held.
+
+It works by closing what is open: the open fence gets its own closing marker
+and every open registered tag gets its closing tag, innermost first, and the
+result renders normally. So the rendered body is the same one the final render
+produces once the real closing tags arrive; only what is still to come is
+missing.
+
+The lifting rules below do not change in this mode. A `markdown` tag whose
+opening tag is mid-line is not lifted while streaming, any more than it is once
+it closes: it is matched in the HTML, as the final render will match it.
+
+**Why a value of `streaming` rather than a second prop:** progressive is a way
+of streaming, not something separate, and a separate boolean would add a
+combination that means nothing (progressive while not streaming). A host that
+already writes `streaming={!done}` changes one expression.
 
 ## Sanitization
 
@@ -208,11 +253,20 @@ const resultTag: RenderExtension = {
 - `content` is the raw markdown body; `children` is that body rendered through
   the same pipeline as everything else: sanitised, with nested extensions and
   copy buttons. **Render `children`, not `content`.**
-- A tag is lifted when its opening tag starts a line and it has a matching
-  closing tag. Same-name nesting is balanced, other markdown tags nest inside
-  it, and a tag inside a code fence or inline code is left alone.
+- A tag is lifted **only** when its opening tag starts a line (after at most
+  three spaces) **and** it has a matching closing tag. Same-name nesting is
+  balanced, other markdown tags nest inside it, and a tag inside a code fence
+  or inline code is left alone.
 - Anywhere else (mid-line, unclosed, or in HTML content) it is matched in the
   HTML as before, and `children` renders that HTML body.
+- **Both conditions are deliberate and will stay.** A tag that starts a line
+  and closes is an unambiguous block. A mid-line `<result>` is text that
+  happens to contain a tag name, and an unclosed one has no end to its body, so
+  lifting either would turn prose (or a model quoting the tag) into a
+  component. To get a block, put the opening tag on its own line and close it.
+  `streaming="progressive"` renders an open block early, but it does so by
+  supplying the close the final render will see; it does not relax either
+  rule.
 - Nesting stops at depth 8: deeper bodies render as plain sanitised content.
 
 Sanitisation is unchanged by lifting. Every piece of markdown, including each

@@ -24,6 +24,8 @@ interface ScanResult {
   tokens: TagToken[];
   /** Start of the line that opened a fence which never closed, or -1. */
   openFenceStart: number;
+  /** The fence that never closed (its marker character and length), or null. */
+  openFence: { char: string; len: number } | null;
 }
 
 /** A piece of markdown source: plain markdown, or a lifted tag + its body. */
@@ -78,7 +80,7 @@ function maskInlineCode(line: string): string {
 function scan(src: string, names: string[], trackFences: boolean): ScanResult {
   const tokens: TagToken[] = [];
   let openFenceStart = -1;
-  if (names.length === 0 && !trackFences) return { tokens, openFenceStart };
+  if (names.length === 0 && !trackFences) return { tokens, openFenceStart, openFence: null };
 
   const tagRe = names.length
     ? new RegExp(`<(\\/?)(${names.map(escapeRegExp).join("|")})(?=[\\s>/])([^>]*)>`, "gi")
@@ -137,7 +139,47 @@ function scan(src: string, names: string[], trackFences: boolean): ScanResult {
     pos = lineEnd + 1;
   }
 
-  return { tokens, openFenceStart };
+  return { tokens, openFenceStart, openFence: fence };
+}
+
+/**
+ * Where a partial tag that could still become a registered one starts on the
+ * last line (`<`, `</res`, `<result title="x`), or -1. A `<` that cannot
+ * become a known tag (`a < b`, `a<b`) is prose and is never held back.
+ */
+function partialTagAt(lastLine: string, names: string[], markdown: boolean): number {
+  if (!names.length) return -1;
+  const masked = markdown ? maskInlineCode(lastLine) : lastLine;
+  const lt = masked.lastIndexOf("<");
+  if (lt < 0) return -1;
+  const m = /^<(\/?)([A-Za-z][\w-]*)?([^>]*)$/.exec(masked.slice(lt));
+  if (!m) return -1;
+  const name = (m[2] ?? "").toLowerCase();
+  const rest = m[3];
+  let partial = false;
+  if (!name) partial = rest === "";
+  else if (names.includes(name)) partial = rest === "" || /^\s/.test(rest);
+  else partial = rest === "" && names.some((n) => n.startsWith(name));
+  return partial ? lt : -1;
+}
+
+/** Registered tags opened before `cut` and not yet closed, outermost first. */
+function openTagsBefore(tokens: TagToken[], cut: number): TagToken[] {
+  const stack: TagToken[] = [];
+  for (const t of tokens) {
+    if (t.start >= cut) break;
+    if (t.kind === "open") {
+      stack.push(t);
+      continue;
+    }
+    for (let k = stack.length - 1; k >= 0; k--) {
+      if (stack[k].name === t.name) {
+        stack.length = k;
+        break;
+      }
+    }
+  }
+  return stack;
 }
 
 /**
@@ -203,20 +245,7 @@ export function streamingCut(src: string, tags: string[], markdown: boolean): nu
 
   if (openFenceStart >= 0) cut = Math.min(cut, openFenceStart);
 
-  const stack: TagToken[] = [];
-  for (const t of tokens) {
-    if (t.start >= cut) break;
-    if (t.kind === "open") {
-      stack.push(t);
-      continue;
-    }
-    for (let k = stack.length - 1; k >= 0; k--) {
-      if (stack[k].name === t.name) {
-        stack.length = k;
-        break;
-      }
-    }
-  }
+  const stack = openTagsBefore(tokens, cut);
   if (stack.length) cut = Math.min(cut, stack[0].start);
 
   // Only the last line can hold something still arriving.
@@ -227,22 +256,71 @@ export function streamingCut(src: string, tags: string[], markdown: boolean): nu
     return Math.min(cut, lastLineStart);
   }
 
-  if (names.length) {
-    const masked = markdown ? maskInlineCode(lastLine) : lastLine;
-    const lt = masked.lastIndexOf("<");
-    if (lt >= 0) {
-      const m = /^<(\/?)([A-Za-z][\w-]*)?([^>]*)$/.exec(masked.slice(lt));
-      if (m) {
-        const name = (m[2] ?? "").toLowerCase();
-        const rest = m[3];
-        let partial = false;
-        if (!name) partial = rest === "";
-        else if (names.includes(name)) partial = rest === "" || /^\s/.test(rest);
-        else partial = rest === "" && names.some((n) => n.startsWith(name));
-        if (partial) cut = Math.min(cut, lastLineStart + lt);
-      }
-    }
-  }
+  const lt = partialTagAt(lastLine, names, markdown);
+  if (lt >= 0) cut = Math.min(cut, lastLineStart + lt);
 
   return cut;
+}
+
+/** A still-streaming source made renderable as it fills (`streaming="progressive"`). */
+export interface ProgressiveSource {
+  /** The source with partial trailing markers held back and open blocks closed. */
+  source: string;
+  /**
+   * A code fence was still open and has been closed here, so the LAST code
+   * block in the rendered output is the one still arriving.
+   */
+  openFence: boolean;
+}
+
+/**
+ * Progressive streaming: show an open block as it fills instead of holding it
+ * back. What is still held back is only what cannot be rendered honestly yet:
+ *
+ * - a partial tag at the very end that could still become a registered one
+ *   (`<`, `<result title="Do`, `</res`), exactly as `streamingCut` holds it;
+ * - a fence opener line with no newline yet (its info string may be partial);
+ * - a fence marker still arriving (a run of backticks or tildes shorter than a
+ *   fence), whether it would open or close one.
+ *
+ * Then an open code fence is closed with its own marker, and every registered
+ * tag still open is closed innermost first, so the normal pipeline renders the
+ * body-so-far: lifted, converted, sanitised, with nested extensions, exactly
+ * as the final render will once the real closing tags arrive.
+ */
+export function streamingProgressive(src: string, tags: string[], markdown: boolean): ProgressiveSource {
+  const names = tags.map((t) => t.toLowerCase());
+  const { tokens, openFenceStart, openFence } = scan(src, names, markdown);
+  let cut = src.length;
+  let fence = openFenceStart >= 0 ? openFence : null;
+
+  const lastLineStart = src.lastIndexOf("\n", cut - 1) + 1;
+  const lastLine = src.slice(lastLineStart);
+
+  if (fence) {
+    if (openFenceStart === lastLineStart) {
+      // The opener itself is still arriving: hold it, there is no code yet.
+      cut = openFenceStart;
+      fence = null;
+    } else {
+      // Inside code `<` is just code, so no partial-tag check; only a closing
+      // marker still arriving is held.
+      const m = /^ {0,3}(`+|~+)$/.exec(lastLine);
+      if (m && m[1][0] === fence.char && m[1].length < fence.len) cut = lastLineStart;
+    }
+  } else if (markdown && /^ {0,3}(`{1,2}|~{1,2})$/.test(lastLine)) {
+    cut = lastLineStart;
+  } else {
+    const lt = partialTagAt(lastLine, names, markdown);
+    if (lt >= 0) cut = lastLineStart + lt;
+  }
+
+  let out = src.slice(0, cut);
+  if (fence) {
+    out += (out.endsWith("\n") ? "" : "\n") + fence.char.repeat(fence.len) + "\n";
+  }
+  const stack = openTagsBefore(tokens, fence ? openFenceStart : cut);
+  for (let k = stack.length - 1; k >= 0; k--) out += `</${stack[k].name}>`;
+
+  return { source: out, openFence: fence !== null };
 }

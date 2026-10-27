@@ -11,6 +11,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`Editor` forwards `copyButtons`, `clipboardWriter` and `onCopy` to the
+  `ContentRenderer` its view mode renders through.** 5.67.0 turned copy buttons
+  on in view mode but gave a host no way to route those copies (a sandboxed
+  Electron window), observe them, or turn them off from `Editor`. Same types and
+  same defaults as on `ContentRenderer`; with the props absent nothing changes.
+  They have no effect in edit mode. Editor's docs now also document `mode`.
+- **`ContentRenderer streaming="progressive"`: an open block shows as it
+  fills.** `streaming={true}` still hides an open block until it closes. In the
+  new mode:
+  - an open tag of a registered extension whose opening tag is complete renders
+    its component with the body so far (a `markdown` extension gets it as
+    `content` and rendered, sanitised, as `children`);
+  - an open code fence renders as a code block of what has arrived, with **no
+    copy button until it closes** (hidden rather than disabled: half a block is
+    never what a copy means). Finished blocks before it keep theirs;
+  - a partial opening tag (`<result title="Do`), a partial closing tag, a fence
+    marker still arriving and a fence opener line with no newline yet are still
+    held back, so none of it flashes raw. Inside an open fence `<` is code;
+  - it closes the open fence and open tags itself and renders normally, so the
+    body is the one the final render shows once the real closes arrive.
+  - The root carries `data-streaming-mode="progressive"` as well as
+    `data-streaming="true"`.
+
+  It is a value of `streaming` rather than a new prop because it is a way of
+  streaming: a separate flag would add a combination that means nothing.
+  `streaming` is now typed `boolean | "progressive"`. Code that passes a
+  boolean is unaffected; code that READS the prop's type and assumes `boolean`
+  needs to allow the string.
+
+### Changed
+
+- **Docs: `markdown` tags are lifted only at line start and only when closed,
+  and that is now stated as deliberate.** The behaviour is unchanged.
+  Progressive streaming does not relax either rule.
+
 ## [5.67.0] - 2026-10-27
 
 ### Added
