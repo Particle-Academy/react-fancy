@@ -428,7 +428,12 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
   }, []);
 
   const heldPastes = useMemo<HeldPaste[]>(
-    () => model.pills.flatMap((p) => (p.kind === "text" ? [{ id: p.id, text: p.text }] : [])),
+    () =>
+      model.pills.flatMap((p) =>
+        p.kind === "text"
+          ? [p.label !== undefined ? { id: p.id, text: p.text, label: p.label } : { id: p.id, text: p.text }]
+          : [],
+      ),
     [model.pills],
   );
   const heldImages = useMemo<HeldImage[]>(
@@ -447,14 +452,25 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
         const current = m.pills.filter((p) => p.kind === "text");
         if (
           current.length === next.length &&
-          current.every((p, i) => p.id === next[i]!.id && p.kind === "text" && p.text === next[i]!.text)
+          current.every(
+            (p, i) =>
+              p.id === next[i]!.id &&
+              p.kind === "text" &&
+              p.text === next[i]!.text &&
+              p.label === next[i]!.label,
+          )
         ) {
           return m;
         }
         return {
           ...m,
           pills: [
-            ...next.map((p): PromptDraftPill => ({ kind: "text", id: p.id, text: p.text })),
+            ...next.map(
+              (p): PromptDraftPill =>
+                p.label !== undefined
+                  ? { kind: "text", id: p.id, text: p.text, label: p.label }
+                  : { kind: "text", id: p.id, text: p.text },
+            ),
             ...m.pills.filter((p) => p.kind === "image"),
           ],
         };

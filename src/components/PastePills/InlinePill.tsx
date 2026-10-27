@@ -22,6 +22,44 @@ export function endsOf(text: string, chars: number): string {
   return `${text.slice(0, chars)} … ${text.slice(-chars)}`;
 }
 
+/** The most a text pill's label shows, counted in code points, ellipsis included. */
+export const TEXT_PILL_LABEL_MAX = 80;
+
+/**
+ * A host-supplied text pill label as it may be drawn: one line of plain text.
+ *
+ * Whitespace, C0/C1 control characters and U+FFFC (the pill marker character)
+ * each become a space, runs collapse to one, the ends are trimmed, and anything
+ * past `TEXT_PILL_LABEL_MAX` is cut with an ellipsis, so a label cannot reflow the
+ * message, smuggle a marker, or swallow the composer. It is rendered as a React
+ * text node, never as HTML. `null` when there is nothing left to show, which
+ * means the generic `Pasted text · N characters` is drawn instead.
+ *
+ * Checked by code point rather than with a regex so the source carries no
+ * escape sequences (see the envelope rule on escapes).
+ */
+export function textPillLabel(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  let out = "";
+  let pendingSpace = false;
+  for (const ch of raw) {
+    const c = ch.codePointAt(0)!;
+    const blank = c < 0x20 || (c >= 0x7f && c <= 0x9f) || c === 0xfffc || ch.trim() === "";
+    if (blank) {
+      pendingSpace = out.length > 0;
+      continue;
+    }
+    if (pendingSpace) out += " ";
+    pendingSpace = false;
+    out += ch;
+  }
+  if (out === "") return null;
+  const points = Array.from(out);
+  return points.length > TEXT_PILL_LABEL_MAX
+    ? `${points.slice(0, TEXT_PILL_LABEL_MAX - 1).join("").trimEnd()}…`
+    : out;
+}
+
 const PILL_BASE =
   "inline-flex select-none items-center rounded-md px-2 py-0.5 text-xs leading-5 transition-colors";
 const TEXT_PILL =
@@ -105,6 +143,10 @@ export function InlinePill({
     onBlur: () => setOpen(false),
   };
 
+  const textLabel = preview.kind === "text" ? textPillLabel(preview.paste.label) : null;
+  const textSize =
+    preview.kind === "text" ? `${withSeparators(preview.paste.text.length)} characters` : "";
+
   const pill =
     preview.kind === "image" ? (
       <span
@@ -123,11 +165,15 @@ export function InlinePill({
         data-react-fancy-composer-paste-pill={id}
         onClick={() => onExpand(id)}
         disabled={disabled}
-        aria-label={`Insert this pasted text, ${withSeparators(preview.paste.text.length)} characters`}
+        aria-label={
+          textLabel === null
+            ? `Insert this pasted text, ${textSize}`
+            : `Insert this pasted text: ${textLabel}, ${textSize}`
+        }
         {...focusOpen}
         className={cn(PILL_BASE, TEXT_PILL, classNames?.pill, classNames?.textPill)}
       >
-        Pasted text · {withSeparators(preview.paste.text.length)} characters
+        {textLabel ?? `Pasted text · ${textSize}`}
       </button>
     );
 

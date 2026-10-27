@@ -31,7 +31,17 @@ export interface PromptDraftFile {
 
 /** A paste held as a pill inside the message. Its marker sits in `text`. */
 export type PromptDraftPill =
-  | { kind: "text"; id: string; text: string }
+  | {
+      kind: "text";
+      id: string;
+      text: string;
+      /**
+       * Shown on the pill in place of `Pasted text · N characters`. Display only:
+       * sending still expands the pill to the full `text`. Plain text, flattened
+       * to one line and capped at 80 characters when drawn. Optional.
+       */
+      label?: string;
+    }
   | { kind: "image"; id: string; label: string; file: PromptDraftFile };
 
 /**
@@ -94,7 +104,9 @@ function readPill(raw: unknown): PromptDraftPill | null {
   const p = raw as Record<string, unknown>;
   if (typeof p.id !== "string") return null;
   if (p.kind === "text" && typeof p.text === "string") {
-    return { kind: "text", id: p.id, text: p.text };
+    return typeof p.label === "string"
+      ? { kind: "text", id: p.id, text: p.text, label: p.label }
+      : { kind: "text", id: p.id, text: p.text };
   }
   if (p.kind === "image" && typeof p.label === "string") {
     const file = readFile(p.file, p.id);

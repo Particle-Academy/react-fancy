@@ -86,6 +86,29 @@ if (saved) composer.current!.setDraft(JSON.parse(saved));
 - `setDraft` does not call `onChange` / `onDraftChange`. You set the draft yourself, so you already have it.
 - A draft with an unknown `v` is refused with a console warning.
 
+### Labelled text pills
+
+A text pill normally reads `Pasted text · N characters`. Give it a `label` and
+the pill shows that instead. Use this when the host puts the pill there itself,
+for example a plan step sent into the chat:
+
+```tsx
+composer.current!.setDraft({
+  v: 1,
+  text: `Do this next: ${pasteMarker("step-3")}`,
+  pills: [{ kind: "text", id: "step-3", text: fullStep, label: "Step 3: migrate the billing tables" }],
+  attachments: [],
+});
+```
+
+- The label is for display only. Sending still expands the pill to the full `text`.
+- Its accessible name is `Insert this pasted text: <label>, N characters`.
+- It is plain text and is never parsed as HTML. Line breaks, control characters
+  and U+FFFC become single spaces, and anything past 80 characters is cut with
+  `…`. If the label is blank or not a string, the generic text is shown.
+- `label` round-trips through `getDraft`, `setDraft`, `defaultDraft`, `draft`
+  and `onDraftChange`.
+
 ### Attachments: where the bytes go
 
 A `File` cannot be stored as JSON, and by default a draft does not carry the
@@ -122,7 +145,7 @@ type PromptAttachment = { id: string; name: string; bytes: number; file?: File; 
 
 interface PromptDraftFile { id: string; name: string; type: string; bytes: number; ref?: string }
 type PromptDraftPill =
-  | { kind: "text"; id: string; text: string }
+  | { kind: "text"; id: string; text: string; label?: string }
   | { kind: "image"; id: string; label: string; file: PromptDraftFile };
 interface PromptDraft { v: 1; text: string; pills: PromptDraftPill[]; attachments: PromptDraftFile[] }
 

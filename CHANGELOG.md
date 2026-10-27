@@ -11,6 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`PromptInput`: text paste pills take an optional `label`** (genie#1280).
+  A text pill (`{ kind: "text", id, text, label? }` in `PromptDraft`) shows its
+  `label` in place of `Pasted text · N characters`. This mirrors the label image
+  pills already have. It lets a host that inserts a pill itself, such as Genie
+  sending a plan step into the chat, show which step it is.
+  - The label is display only. The submitted value still expands the pill to
+    the full `text`.
+  - The accessible name becomes `Insert this pasted text: <label>, N characters`,
+    so it still says the pill is pasted text.
+  - The label is drawn as plain text, never HTML. Whitespace, control characters
+    and U+FFFC are flattened to single spaces, and the label is capped at 80
+    characters with `…`. If it is blank or not a string, the generic text is
+    shown. A non-string `label` is dropped when a draft is read.
+  - It round-trips through `getDraft` / `setDraft`, `defaultDraft`, a controlled
+    `draft` and `onDraftChange`. `HeldPaste` (the `Composer` / `usePastePills`
+    shape) gains the same optional `label`.
+  - Additive. With no `label` the markup is unchanged, so you need do nothing.
+
 ## [5.65.0] - 2026-10-27
 
 ### Added

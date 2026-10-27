@@ -12,6 +12,8 @@ import { useControllableState } from "../../hooks/use-controllable-state";
 export interface HeldPaste {
   id: string;
   text: string;
+  /** Shown on the pill instead of `Pasted text · N characters`. Display only. */
+  label?: string;
 }
 
 /**
