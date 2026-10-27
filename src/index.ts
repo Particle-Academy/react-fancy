@@ -425,6 +425,10 @@ export type { CodeViewProps } from "./components/CodeView";
 export { ContentRenderer, registerExtension, registerExtensions } from "./components/ContentRenderer";
 export type {
   ContentRendererProps,
+  ContentCopyKind,
+  ContentCopyEvent,
+  ContentClipboardPayload,
+  ContentClipboardWriter,
   RenderExtension,
   RenderExtensionProps,
 } from "./components/ContentRenderer";

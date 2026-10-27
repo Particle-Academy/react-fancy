@@ -1,5 +1,11 @@
 export { ContentRenderer } from "./ContentRenderer";
-export type { ContentRendererProps } from "./ContentRenderer.types";
+export type {
+  ContentRendererProps,
+  ContentCopyKind,
+  ContentCopyEvent,
+  ContentClipboardPayload,
+  ContentClipboardWriter,
+} from "./ContentRenderer.types";
 export { registerExtension, registerExtensions } from "./extensions";
 export type {
   RenderExtension,

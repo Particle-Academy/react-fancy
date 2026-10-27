@@ -1,11 +1,27 @@
-import type { ComponentType } from "react";
+import type { ComponentType, ReactNode } from "react";
+import { sanitizeHref } from "../../utils/sanitize";
 
 /** Props passed to every render-extension component. */
 export interface RenderExtensionProps {
-  /** The inner content of the custom tag (raw string). */
+  /**
+   * The inner content of the custom tag (raw string). For an extension with
+   * `markdown: true` in markdown content this is the raw MARKDOWN body, before
+   * conversion. Either way it is untrusted: render `children` rather than
+   * injecting it.
+   */
   content: string;
-  /** Parsed HTML attributes from the opening tag. */
+  /**
+   * Parsed attributes from the opening tag. Event handlers (`on*`), `srcdoc`,
+   * and URL attributes with an unsafe scheme are removed (unless the renderer
+   * is `unsafe`).
+   */
   attributes: Record<string, string>;
+  /**
+   * Only for extensions with `markdown: true`: the body, rendered by the same
+   * pipeline as the rest of the content (sanitised, nested extensions, copy
+   * buttons).
+   */
+  children?: ReactNode;
 }
 
 /** Registers a custom tag with a React component for rendering. */
@@ -20,6 +36,42 @@ export interface RenderExtension {
    * @default true
    */
   block?: boolean;
+  /**
+   * The tag's body is MARKDOWN. In markdown content, a tag that starts a line
+   * is lifted out of the source before conversion, so the component gets the
+   * raw markdown as `content` and the rendered, sanitised body as `children`.
+   * In HTML content the body is HTML and `children` renders it.
+   * @default false
+   */
+  markdown?: boolean;
+}
+
+const URL_ATTRS = new Set(["href", "src", "action", "formaction", "xlink:href"]);
+
+/**
+ * Drop attributes that could run code if a component spread them onto the
+ * DOM — the same rules the HTML sanitiser applies to an element.
+ */
+export function safeAttributes(attrs: Record<string, string>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [name, value] of Object.entries(attrs)) {
+    const lower = name.toLowerCase();
+    if (lower.startsWith("on") || lower === "srcdoc") continue;
+    if (URL_ATTRS.has(lower)) {
+      const safe = sanitizeHref(value);
+      if (safe === undefined) continue;
+      out[name] = safe;
+      continue;
+    }
+    out[name] = value;
+  }
+  return out;
+}
+
+/** Parse, and unless `unsafe`, clean the attribute text of an opening tag. */
+export function tagAttributes(raw: string, unsafe: boolean): Record<string, string> {
+  const attrs = raw ? parseAttributes(raw) : {};
+  return unsafe ? attrs : safeAttributes(attrs);
 }
 
 /** A parsed segment — either raw HTML or a matched extension tag. */

@@ -11,6 +11,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`ContentRenderer`: copy buttons, markdown-body tags, streaming, and a
+  clipboard writer** (genie#1263). Genie and MOIC render chat markup with this.
+  Until now Genie split replies into blocks itself, because custom tags were
+  only found after the markdown had become HTML.
+  - **Copy buttons** on every code block and table. They are react-fancy
+    `Button`s with `copy`/`check` icons and the handle
+    `data-react-fancy-content-copy="code" | "table"`, plus `data-copy-state`.
+    Code copies exactly what is between the fences: no language label and no
+    added trailing newline. A table copies as TSV. Every copy is announced as
+    `Copied` or `Copy failed` in a polite live region
+    (`[data-react-fancy-content-renderer-live]`). Opt out with
+    `copyButtons={false}`, or per kind with `copyButtons={{ table: false }}`.
+    `onCopy` reports `{ kind, index, text, html, ok }`.
+  - **`markdown: true` on a `RenderExtension`.** A tag that starts a line is
+    lifted out of the markdown source before conversion. The component gets
+    the raw markdown body as `content`, and the body rendered as `children`.
+    The rendered body is sanitised, and it gets nested extensions and copy
+    buttons. Same-name nesting is balanced. Tags inside code are left alone.
+    Nesting stops at depth 8.
+  - **`streaming`** holds back an unfinished trailing tag of a registered
+    extension (`<res`, `<result title="x`, an opened tag with no close yet,
+    `</res`) and an open code fence, so none of it flashes as raw text. A `<`
+    that cannot become a registered tag still renders (`a < b`). When
+    `streaming` turns off, everything renders. While streaming, the root
+    carries `data-streaming="true"`.
+  - **`clipboardWriter`** lets a host supply its own clipboard write, for a
+    sandboxed Electron window where `navigator.clipboard` can fail silently.
+    The default writes text/html plus text/plain through `ClipboardItem`. If
+    that is missing or refused, it falls back to `writeText`. A writer fails if
+    it throws, rejects, returns `false`, or has not settled after 5 s. A failure
+    is never silent.
+  - New types: `ContentCopyKind`, `ContentCopyEvent`, `ContentClipboardPayload`,
+    `ContentClipboardWriter`. `RenderExtensionProps` gains an optional
+    `children`.
+
+### Changed
+
+- **`ContentRenderer` (and `Editor`'s view mode, which renders through it) now
+  shows copy buttons by default.** Each `<pre>` and `<table>` is wrapped in a
+  `div[data-react-fancy-content-copy-block]`. A live-region `<span>` sits at
+  the end of the root. Pass `copyButtons={false}` to get the old markup back.
+  If you style or select `pre`/`table` by direct-child position, check it. If
+  you do not, do nothing.
+- **Attributes of a lifted `markdown` tag are cleaned before the component sees
+  them.** `on*`, `srcdoc` and unsafe URLs are removed. This matches what the
+  HTML sanitiser already did to tags matched in HTML, so nothing an existing
+  extension received changes.
+
 ## [5.66.0] - 2026-10-27
 
 ### Added
