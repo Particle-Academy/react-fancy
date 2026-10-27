@@ -9,7 +9,7 @@ export function DropdownItem({
   danger = false,
   className,
 }: DropdownItemProps) {
-  const { setOpen } = useDropdown();
+  const { setOpen, focusTrigger } = useDropdown();
 
   return (
     <button
@@ -26,10 +26,14 @@ export function DropdownItem({
         disabled && "cursor-not-allowed opacity-50",
         className,
       )}
-      onClick={() => {
+      onClick={(e) => {
         if (disabled) return;
+        const hadFocus = document.activeElement === e.currentTarget;
         onClick?.();
         setOpen(false);
+        // The item is about to unmount; without this, focus falls to <body>.
+        // Only when the item held focus, and only if onClick did not move it.
+        if (hadFocus && document.activeElement === e.currentTarget) focusTrigger();
       }}
     >
       {children}

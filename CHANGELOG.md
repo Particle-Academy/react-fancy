@@ -11,6 +11,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.64.1] - 2026-10-27
+
+### Fixed
+
+- **`Dropdown`: the menu can be driven from the keyboard again.** Its
+  arrow-key listener was attached in an effect keyed on `open` that returned
+  early while the menu element was still null (the menu mounts a render later,
+  behind `useAnimation`, and `Portal` takes one more), and nothing in its
+  dependencies changed once the element appeared, so it never re-ran.
+  ArrowDown did nothing and no item of any Dropdown was reachable by keyboard.
+  Found building the showcase's Features menu. Keys are now handled on the menu
+  element itself, and the element is tracked as state, so the timing cannot
+  recur. The menu now follows the WAI-ARIA menu button pattern:
+  - On the trigger, Enter, Space or ArrowDown opens the menu on its first
+    enabled item and ArrowUp on its last. A non-button trigger (an avatar
+    `span` with `tabIndex`) opens on Enter / Space too.
+  - In the menu, ArrowDown / ArrowUp move and wrap, Home / End jump, a typed
+    character jumps to the next item starting with it, and disabled items are
+    skipped.
+  - Escape closes the menu (still through the `useEscapeKey` layer stack, so
+    only the innermost layer closes) and returns focus to the trigger. Tab
+    closes it and continues from the trigger's place in the tab order.
+    Activating an item returns focus to the trigger unless its `onClick`
+    moved focus somewhere else.
+
+  Nothing to do as a consumer: the props are unchanged, and opening by mouse
+  still leaves focus on the trigger. If you worked around this with your own
+  arrow-key handler, you can delete it. `DropdownContextValue` gains
+  `focusTrigger`, plus two `@internal` refs.
+
 ## [5.64.0] - 2026-10-26
 
 ### Added
