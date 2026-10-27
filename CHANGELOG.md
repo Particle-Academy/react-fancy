@@ -11,6 +11,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`ChatThread` and `ChatMessage`**: a controlled message list for agent and
+  support conversations, built for charlotte-ui's side panel and
+  fancy-support's admin chat and ticket thread. Messages are JSON
+  (`ChatMessageData`: `id`, `role`, `author`, markdown `content`, `createdAt`,
+  `status`, `visibility`, `attachments`, `proposal`, `meta`). Content renders
+  through `ContentRenderer`, always sanitised (there is no `unsafe` prop), and a
+  `streaming` message uses its `streaming` / `"progressive"` mode and is
+  `aria-busy`. The log follows new messages only while the reader is at the
+  bottom; a reader who scrolled up stays put and gets an "N new messages" jump
+  control, and prepended history keeps their place. Only the log's own
+  `scrollTop` is set and focus uses `preventScroll`, so nothing outside the log
+  scrolls. `visibility: "internal"` is labelled and styled, never filtered: the
+  host passes only what the viewer may see. A message with a `proposal` is an
+  approval card (`data-chat-proposal`) with accept / reject callbacks; it never
+  acts on its own, and a returned Promise disables both decisions until it
+  settles. Also: `onLoadEarlier`, day separators, consecutive grouping, a
+  per-message actions slot, a composer slot (for `Composer` / `PromptInput`;
+  no new input), `onActivity` for every interaction, `role="log"` with polite
+  updates, and a `ref` handle with `scrollToLatest` / `scrollToMessage`. New
+  subpath `@particle-academy/react-fancy/chat-thread`. Nothing to do on upgrade.
+
 ## [5.70.1] - 2026-10-27
 
 ### Fixed

@@ -173,6 +173,16 @@
         "default": "./dist/chat-drawer.cjs"
       }
     },
+    "./chat-thread": {
+      "import": {
+        "types": "./dist/chat-thread.d.ts",
+        "default": "./dist/chat-thread.js"
+      },
+      "require": {
+        "types": "./dist/chat-thread.d.cts",
+        "default": "./dist/chat-thread.cjs"
+      }
+    },
     "./checkbox": {
       "import": {
         "types": "./dist/checkbox.d.ts",

@@ -161,6 +161,7 @@ npx vite build                      # Build demo app (verifies imports work)
 | Component | Description | Docs |
 |-----------|-------------|------|
 | Composer | Chat-style message input composing textarea + actions | [docs](docs/Composer.md) |
+| ChatThread | Controlled message list for agent and support chat: sanitised markdown, streaming, internal notes, approval cards, stick-to-bottom without yanking | [docs](docs/ChatThread.md) |
 | Chart | SVG-based Bar, Line, Area, Pie, Donut, and Sparkline charts | [docs](docs/Chart.md) |
 | Editor | Toolbar chrome wrapper for contentEditable, with a Source toggle to edit raw HTML/Markdown | [docs](docs/Editor.md) |
 | CodeView | Lightweight syntax-highlighted source view (HTML highlighted; fills height) | [docs](docs/CodeView.md) |

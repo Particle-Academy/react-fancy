@@ -162,6 +162,14 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | Selector | Component |
 |----------|-----------|
 | `[data-react-fancy-composer]` | Composer |
+| `[data-react-fancy-chat-thread]` | ChatThread (root) |
+| `[data-react-fancy-chat-thread-log]` | ChatThread scrolling `role="log"` |
+| `[data-react-fancy-chat-thread-composer]` | ChatThread composer slot |
+| `[data-react-fancy-chat-thread-jump]` | ChatThread "N new messages" control (`data-unseen`) |
+| `[data-react-fancy-chat-thread-load-earlier]` | ChatThread load-earlier control |
+| `[data-chat-message]` | ChatMessage (VALUE is the message id; also `data-chat-role`, `data-chat-status`, `data-chat-visibility`, `data-chat-own`, `data-chat-grouped`) |
+| `[data-chat-proposal]` | ChatMessage approval card (VALUE is the proposal id; `data-chat-proposal-state`) |
+| `[data-chat-day-separator]` | ChatThread day separator (VALUE is `YYYY-MM-DD`) |
 | `[data-react-fancy-prompt-input]` | PromptInput (the root surface) |
 | `[data-react-fancy-prompt-input-drag]` | PromptInput drop state (`over` / `idle`) |
 | `[data-react-fancy-prompt-input-hint]` | PromptInput keyboard hint (VALUE is the platform: `apple` / `generic`) |

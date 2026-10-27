@@ -581,6 +581,28 @@ export type {
 export { ChatDrawer } from "./components/ChatDrawer";
 export type { ChatDrawerProps, ChatDrawerTab } from "./components/ChatDrawer";
 
+export { ChatThread, ChatMessage } from "./components/ChatThread";
+export type {
+  ChatThreadProps,
+  ChatThreadHandle,
+  ChatThreadActivity,
+  ChatThreadActionContext,
+  ChatThreadLabels,
+  ChatThreadClassNames,
+  ChatMessageProps,
+  ChatMessageDisplayProps,
+  ChatMessageClassNames,
+  ChatMessageData,
+  ChatMessageStatus,
+  ChatMessageVisibility,
+  ChatRole,
+  ChatAuthor,
+  ChatAttachment,
+  ChatProposal,
+  ChatAction,
+  ChatContentOptions,
+} from "./components/ChatThread";
+
 export {
   InputTag,
   textareaAdapter,
