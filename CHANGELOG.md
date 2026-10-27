@@ -11,6 +11,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`PromptInput`'s `focus()` and `setDraft(draft, { focus: true })` no longer
+  scroll the page** (genie#1290). They called the element's `focus()` with no
+  options, so the browser scrolled every scrollable ancestor, up to the
+  document, to reveal the composer. In Genie's Electron window that scrolled the
+  whole window. Both now pass `{ preventScroll: true }`. To get the old
+  behaviour, pass `{ preventScroll: false }` to `focus()` or `setDraft`. The new
+  `PromptFocusOptions` type is exported. Focus that follows the person's own
+  keypress (choosing from the `/` or `@` picker) is unchanged.
+  `InlinePasteEditorHandle.focus()` now accepts optional `FocusOptions` and
+  passes them through. With no argument it behaves as before.
+- **`ContentRenderer`'s copy status region can no longer stretch the
+  document** (genie#1290, from 5.67.0). The `aria-live` region relied on the
+  host's Tailwind generating `sr-only`, and nothing around it was positioned.
+  Inside an unpositioned scroll container it escaped the scroller's clip and
+  extended the document. When the host's Tailwind never generated `sr-only`,
+  it rendered as visible text. The region now carries the sr-only clip pattern
+  inline. The root is `position: relative` while copy buttons are on, unless
+  the host's `className` already sets a position. Each copy-block wrapper is
+  `position: relative` inline as well. Nothing to do on upgrade.
+
 ## [5.68.0] - 2026-10-27
 
 ### Added

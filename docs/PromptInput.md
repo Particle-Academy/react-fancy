@@ -83,6 +83,7 @@ if (saved) composer.current!.setDraft(JSON.parse(saved));
 ```
 
 - `setDraft(draft, { focus?: false })` does **not** focus unless you pass `{ focus: true }`. It never moves the caret of whatever does have focus.
+- Focus from `focus()` or `setDraft(draft, { focus: true })` never scrolls the page or any ancestor (it passes `{ preventScroll: true }`). To let the browser scroll the composer into view, pass `{ preventScroll: false }` to either.
 - `setDraft` does not call `onChange` / `onDraftChange`. You set the draft yourself, so you already have it.
 - A draft with an unknown `v` is refused with a console warning.
 
@@ -151,8 +152,8 @@ interface PromptDraft { v: 1; text: string; pills: PromptDraftPill[]; attachment
 
 interface PromptInputHandle {
   getDraft(): PromptDraft;
-  setDraft(draft: PromptDraft, options?: { focus?: boolean }): void;
-  focus(): void;
+  setDraft(draft: PromptDraft, options?: { focus?: boolean; preventScroll?: boolean }): void;
+  focus(options?: { preventScroll?: boolean }): void; // preventScroll defaults to true
 }
 ```
 

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
+import { visuallyHidden } from "../../utils/visually-hidden";
 import { proseClasses, detectFormat } from "../Editor/editor.utils";
 import { mergeExtensions } from "./extensions";
 import { ContentBody } from "./RenderedContent";
@@ -56,13 +57,21 @@ export function ContentRenderer({
     [codeOn, tableOn, copy, openFence],
   );
 
+  // The live region is `position: absolute`. With nothing positioned around it,
+  // it escapes to an ancestor outside an unpositioned scroll container and
+  // stretches the document (genie#1290). So the root contains it, unless the
+  // host's className already positions the root (twMerge drops our `relative`
+  // when it does): sticky / absolute / fixed contain it too, and an explicit
+  // `static` is the host's call.
+  const contain = copyOn && cn("relative", className).split(" ").includes("relative");
+
   return (
     <div
       ref={rootRef}
       data-react-fancy-content-renderer=""
       data-streaming={streaming ? "true" : undefined}
       data-streaming-mode={progressive ? "progressive" : undefined}
-      style={{ lineHeight: lineSpacing }}
+      style={contain ? { lineHeight: lineSpacing, position: "relative" } : { lineHeight: lineSpacing }}
       className={cn("text-sm", proseClasses, className)}
     >
       <CopyContext.Provider value={copyContext}>
@@ -81,6 +90,7 @@ export function ContentRenderer({
           aria-atomic="true"
           data-react-fancy-content-renderer-live=""
           className="sr-only"
+          style={visuallyHidden}
         >
           {announcement}
         </span>

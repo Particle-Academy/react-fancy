@@ -573,6 +573,7 @@ export type {
   PromptDraftPill,
   PromptInputHandle,
   PromptSetDraftOptions,
+  PromptFocusOptions,
 } from "./components/PromptInput";
 
 export { ChatDrawer } from "./components/ChatDrawer";

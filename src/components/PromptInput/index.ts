@@ -9,4 +9,5 @@ export type {
   PromptDraftPill,
   PromptInputHandle,
   PromptSetDraftOptions,
+  PromptFocusOptions,
 } from "./PromptInput";

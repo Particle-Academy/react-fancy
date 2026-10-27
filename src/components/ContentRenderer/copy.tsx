@@ -159,6 +159,9 @@ export function HtmlChunk({
       const wrapper = document.createElement("div");
       wrapper.setAttribute("data-react-fancy-content-copy-block", kind);
       wrapper.className = kind === "code" ? "group relative" : "group relative flex flex-col";
+      // Inline too: the code button is absolute, and a host whose Tailwind
+      // never generated `relative` would let it escape the block (genie#1290).
+      wrapper.style.position = "relative";
       const host = document.createElement("div");
       host.setAttribute("data-react-fancy-content-copy-host", "");
       host.className =

@@ -66,6 +66,22 @@ export interface PromptSetDraftOptions {
    * (genie#1235 was exactly that).
    */
   focus?: boolean;
+  /**
+   * With `focus: true`: whether the browser may scroll to reveal the composer.
+   * Default `true` (no scrolling): a bare `el.focus()` scrolls EVERY scrollable
+   * ancestor up to the document, which scrolled a whole host window
+   * (genie#1290). Pass `false` to let it scroll.
+   */
+  preventScroll?: boolean;
+}
+
+/** Options for `PromptInputHandle.focus()`. Mirrors the DOM's `FocusOptions`. */
+export interface PromptFocusOptions {
+  /**
+   * Default `true`: focusing never scrolls the page or any ancestor
+   * (genie#1290). Pass `false` to let the browser scroll the composer into view.
+   */
+  preventScroll?: boolean;
 }
 
 /** The imperative handle a `ref` on `PromptInput` receives. */
@@ -78,8 +94,11 @@ export interface PromptInputHandle {
    * A draft whose `v` this release does not know is refused with a warning.
    */
   setDraft(draft: PromptDraft, options?: PromptSetDraftOptions): void;
-  /** Focus the composer, caret at the end. */
-  focus(): void;
+  /**
+   * Focus the composer, caret at the end. Does not scroll anything unless
+   * `{ preventScroll: false }`.
+   */
+  focus(options?: PromptFocusOptions): void;
 }
 
 export const EMPTY_DRAFT: PromptDraft = { v: 1, text: "", pills: [], attachments: [] };

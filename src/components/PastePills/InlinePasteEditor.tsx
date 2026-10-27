@@ -18,7 +18,8 @@ export interface PillToInsert {
 }
 
 export interface InlinePasteEditorHandle {
-  focus(): void;
+  /** Focus, caret at the end. `options` go to the element's `focus()` as given. */
+  focus(options?: FocusOptions): void;
   /** Swap a pill for plain text, where it sits. */
   replacePill(id: string, text: string): void;
   /**
@@ -380,10 +381,11 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
     useImperativeHandle(
       ref,
       () => ({
-        focus() {
+        focus(options) {
           const root = rootRef.current;
           if (!root) return;
-          root.focus();
+          if (options) root.focus(options);
+          else root.focus();
           const range = caret();
           const selection = window.getSelection();
           selection?.removeAllRanges();

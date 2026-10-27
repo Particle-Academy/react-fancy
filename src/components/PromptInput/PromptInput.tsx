@@ -35,6 +35,7 @@ import {
   type PromptDraftPill,
   type PromptInputHandle,
   type PromptSetDraftOptions,
+  type PromptFocusOptions,
 } from "./prompt-draft";
 
 export {
@@ -47,6 +48,7 @@ export type {
   PromptDraftPill,
   PromptInputHandle,
   PromptSetDraftOptions,
+  PromptFocusOptions,
 } from "./prompt-draft";
 import {
   browserPlatformHints,
@@ -757,21 +759,32 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
    * would discard a caret placed before it. Children's layout effects run first,
    * so by the time this one runs the editor already holds the draft.
    */
-  const pendingFocus = useRef(false);
-  const focusInput = useCallback(() => {
-    if (inline) {
-      editorRef.current?.focus();
-      return;
-    }
-    const ta = taRef.current;
-    if (!ta) return;
-    ta.focus();
-    ta.setSelectionRange(ta.value.length, ta.value.length);
-  }, [inline]);
+  const pendingFocus = useRef<PromptFocusOptions | null>(null);
+  /**
+   * Focus on the HOST's behalf: never scrolls unless asked. A bare `focus()`
+   * scrolls every scrollable ancestor up to the document to reveal the input,
+   * which scrolled Genie's whole window (genie#1290). Focus that answers the
+   * person's own keypress (the picker) keeps the browser's default.
+   */
+  const focusInput = useCallback(
+    (options?: PromptFocusOptions) => {
+      const opts: FocusOptions = { preventScroll: options?.preventScroll ?? true };
+      if (inline) {
+        editorRef.current?.focus(opts);
+        return;
+      }
+      const ta = taRef.current;
+      if (!ta) return;
+      ta.focus(opts);
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+    },
+    [inline],
+  );
   useLayoutEffect(() => {
-    if (!pendingFocus.current) return;
-    pendingFocus.current = false;
-    focusInput();
+    const pending = pendingFocus.current;
+    if (!pending) return;
+    pendingFocus.current = null;
+    focusInput(pending);
   });
 
   useImperativeHandle(
@@ -795,9 +808,9 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
         commit(() => read, false);
         // `commit` always sets state here (`read` is a new object), so a render
         // follows and the layout effect below picks the focus up.
-        if (options?.focus) pendingFocus.current = true;
+        if (options?.focus) pendingFocus.current = { preventScroll: options.preventScroll };
       },
-      focus: focusInput,
+      focus: (options?: PromptFocusOptions) => focusInput(options),
     }),
     [inline, commit, focusInput],
   );

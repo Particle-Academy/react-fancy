@@ -43,7 +43,10 @@ Every code block and table gets a react-fancy `Button` (icon `copy`, then
   survives a paste into a spreadsheet.
 
 Each copy is announced as `Copied` or `Copy failed` through a polite
-`aria-live` region (`[data-react-fancy-content-renderer-live]`).
+`aria-live` region (`[data-react-fancy-content-renderer-live]`). The region is
+visually hidden with inline sr-only styles, so it needs nothing from your
+Tailwind build. It is `position: absolute`, so the root is `position: relative`
+unless your `className` already positions it.
 
 ```tsx
 <ContentRenderer value={reply} copyButtons={false} />          // none
