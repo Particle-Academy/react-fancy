@@ -387,6 +387,8 @@ export type {
   ComposerPasteClassNames,
   ComposerPastePreview,
   ComposerSubmitExtras,
+  SubmitRejection,
+  SubmitResult,
   HeldImage,
   HeldPaste,
 } from "./components/Composer";

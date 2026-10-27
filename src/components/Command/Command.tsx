@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { cn } from "../../utils/cn";
+import { isImeComposing } from "../../utils/ime";
 import { Portal } from "../Portal";
 import { CommandContext } from "./Command.context";
 import { CommandInput } from "./CommandInput";
@@ -80,6 +81,7 @@ function CommandRoot({
         e.preventDefault();
         setActiveIndex(activeIndex > 0 ? activeIndex - 1 : items.length - 1);
       } else if (e.key === "Enter") {
+        if (isImeComposing(e)) return;
         // A focused item takes Enter natively, as a click; picking here as well
         // would select it twice.
         if ((e.target as HTMLElement | null)?.getAttribute("role") === "option") return;

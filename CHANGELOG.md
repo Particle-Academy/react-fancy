@@ -11,6 +11,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Acknowledged send for `Composer` and `PromptInput`.** `onSubmit` may now
+  return `Promise<void | { ok: false; error?: string }>` (exported as
+  `SubmitResult` / `SubmitRejection`). While the Promise is pending, the text,
+  held pastes, pills and attachments all stay, the send button is disabled and
+  `aria-busy`, and a second send is refused. The text stays editable. If it
+  resolves, the draft clears as before. If the person edited it in flight,
+  their newer draft is kept. If it rejects or resolves `{ ok: false }`,
+  everything is kept, the new `onSubmitError(error)` is called and a visually
+  hidden `role="alert"` announces it. The root carries
+  `data-submit-state="submitting" | "error"` while not idle. **A void
+  `onSubmit` behaves exactly as before; nothing to do on upgrade.** One
+  behaviour does move: an `onSubmit` that ALREADY returned a Promise (an
+  `async` handler) used to clear at once. It now clears when the Promise
+  resolves and keeps the draft if it rejects. If you relied on the instant
+  clear, return nothing (`onSubmit={(t) => { void send(t); }}`).
+- **`sendDisabled`** on both: disables the send while the text stays editable
+  (for example, while an agent is still answering).
+- **`PromptInput` `disabled`**, matching `Composer`'s: disables the text, the
+  inline editor, attaching, dropping and the send.
+- **`name` and `inputId`** on both, for the text field. `name` sits on the
+  textarea, or with inline pills on a hidden input carrying the expanded text.
+  `inputId` is the field's `id` in either mode. `PromptInput`'s `id` still
+  names the root.
+- **Stable handles**: `data-react-fancy-composer-send`,
+  `data-react-fancy-composer-textarea`,
+  `data-react-fancy-prompt-input-textarea`, and
+  `data-react-fancy-composer-error` / `data-react-fancy-prompt-input-error`.
+  `PromptInput`'s default textarea markup gains its one new attribute. The
+  inline editor keeps `data-react-fancy-composer-input`. It was not reused on
+  the textareas, because hosts already test for it to mean "the contenteditable
+  is on".
+
+### Fixed
+
+- **Confirming an IME composition with Enter no longer sends, adds or picks.**
+  A Japanese, Chinese or Korean typist presses Enter to accept a candidate, and
+  these fields treated it as their commit key: `Composer` (textarea, and the
+  inline editor on Safari), `PromptInput` (⌘/Ctrl+Enter send and the `/` / `@`
+  picker), `Pillbox`, `Command`, `Autocomplete`, `Select` (search and
+  create), `InputTag`, `FileBrowser`'s new-folder and path inputs, and
+  `JsonEditor`'s commit-on-blur value and key fields. They now ignore an Enter
+  with `isComposing`, or with `keyCode` 229. Safari sends that confirming
+  keydown after `compositionend`, with `isComposing` already false. Nothing
+  to do on upgrade.
+
 ## [5.69.0] - 2026-10-27
 
 ### Fixed

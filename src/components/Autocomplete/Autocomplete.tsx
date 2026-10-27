@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
+import { isImeComposing } from "../../utils/ime";
 import { Portal } from "../Portal";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import { useFloatingPosition } from "../../hooks/use-floating-position";
@@ -88,7 +89,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setActiveIndex((i) => Math.max(i - 1, 0));
-      } else if (e.key === "Enter" && activeIndex >= 0) {
+      } else if (e.key === "Enter" && activeIndex >= 0 && !isImeComposing(e)) {
         e.preventDefault();
         const item = filtered[activeIndex];
         if (item && !item.disabled) select(item.value);

@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { isImeComposing } from "../../utils/ime";
 
 /**
  * InputTag — attach a `/`-style or `@`-style autocomplete picker to *any*
@@ -254,6 +255,8 @@ export function InputTag({
         case "Enter":
         case "Tab": {
           if (visible.length === 0) return false;
+          // Confirming an IME composition is not a pick; let the editor have it.
+          if (e.key === "Enter" && isImeComposing(e)) return false;
           const idx = Math.min(cursorRef.current, visible.length - 1);
           pickItem(visible[idx]);
           return true;

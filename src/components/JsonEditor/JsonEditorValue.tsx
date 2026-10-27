@@ -9,6 +9,7 @@ import { useInlineEdit } from "../inputs/mode/useInlineEdit";
 import { resolveOption } from "../inputs/inputs.utils";
 import type { FieldMode } from "../inputs/inputs.types";
 import type { Size } from "../../utils/types";
+import { isImeComposing } from "../../utils/ime";
 import type { JsonEditorNode, JsonFieldType, JsonValue } from "./JsonEditor.types";
 
 export interface JsonEditorValueProps {
@@ -298,7 +299,7 @@ function RawValueEditor({
       spellCheck={false}
       autoFocus={interactive}
       onKeyDown={(event) => {
-        if (event.key === "Enter") event.currentTarget.blur();
+        if (event.key === "Enter" && !isImeComposing(event)) event.currentTarget.blur();
       }}
       onBlur={(event) => {
         commit(event.currentTarget.value);

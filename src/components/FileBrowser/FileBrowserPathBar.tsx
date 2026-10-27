@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import { ChevronRight, Pencil } from "lucide-react";
 import { cn } from "../../utils/cn";
+import { isImeComposing } from "../../utils/ime";
 import { useFileBrowser } from "./FileBrowser.context";
 import { normalizePath, pathSegments } from "./FileBrowser.utils";
 import type { FileBrowserPathBarProps } from "./FileBrowser.types";
@@ -55,6 +56,7 @@ export function FileBrowserPathBar({
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
+              if (isImeComposing(e)) return;
               e.preventDefault();
               commit();
             } else if (e.key === "Escape") {

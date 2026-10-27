@@ -11,7 +11,10 @@ import type {
   HeldPaste,
 } from "../PastePills/PastePills.types";
 
+import type { SubmitRejection, SubmitResult } from "../../hooks/use-acknowledged-submit";
+
 export type { ComposerPasteClassNames, ComposerPastePreview, HeldImage, HeldPaste };
+export type { SubmitRejection, SubmitResult };
 
 export interface ComposerSubmitExtras {
   /**
@@ -29,11 +32,54 @@ export interface ComposerProps {
   /**
    * The second argument only ever carries anything with `pasteImages` on. A
    * one-argument handler stays valid.
+   *
+   * **Return nothing and the message clears at once, as it always has.**
+   *
+   * Return a Promise to make the send acknowledged: the text and held pastes
+   * stay, the send button is disabled and `aria-busy`, and a second send is
+   * refused until it settles. The text stays editable meanwhile.
+   *
+   * - Resolves (to anything but `{ ok: false }`) → the message clears, unless the
+   *   person edited it while it was in flight; their newer text is kept.
+   * - Rejects, or resolves `{ ok: false, error? }` → everything is kept,
+   *   `onSubmitError` is called and the failure is announced to screen readers.
+   *
+   * With a controlled `value` the clear is an `onChange("")` like any other; the
+   * host decides whether to apply it.
    */
-  onSubmit?: (value: string, extras: ComposerSubmitExtras) => void;
+  onSubmit?: (
+    value: string,
+    extras: ComposerSubmitExtras,
+  ) => void | Promise<SubmitResult>;
+  /**
+   * Called when a Promise from `onSubmit` rejects (with the reason) or resolves
+   * `{ ok: false }` (with its `error`, or `undefined`). The message is kept.
+   */
+  onSubmitError?: (error: unknown) => void;
   placeholder?: string;
   actions?: ReactNode;
+  /** Disables the text, the pills and the send. */
   disabled?: boolean;
+  /**
+   * Disables only the send: the text stays editable, Enter does not send. For
+   * "the agent is still answering, but you can write the next message".
+   */
+  sendDisabled?: boolean;
+  /**
+   * Form field name for the text. On the textarea itself; with
+   * `pastePlacement="inline"` on a hidden input carrying the expanded text,
+   * since a contenteditable is not a form field. With the default placement,
+   * held pastes are NOT in the textarea's value — read `onSubmit` for those.
+   */
+  name?: string;
+  /**
+   * `id` of the text field (textarea or inline editor), for a `<label htmlFor>`
+   * or an agent. In either mode it is the one handle that does not change with
+   * `pastePlacement`. Without it the field is found by
+   * `data-react-fancy-composer-textarea` (default placement) or
+   * `data-react-fancy-composer-input` (inline).
+   */
+  inputId?: string;
   className?: string;
   /**
    * Hold a paste of at least this many characters as a pill, instead of inserting

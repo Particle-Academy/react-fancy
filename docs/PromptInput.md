@@ -34,8 +34,11 @@ import { PromptInput } from "@particle-academy/react-fancy";
 - `/` opens a filtered command palette. ↑/↓ navigate, Enter inserts.
 - `@` opens a mention picker filtered against `mentions`.
 - Drop files anywhere on the input to attach. Chip bar shows attachments.
-- ⌘+Enter (or Ctrl+Enter) submits. Plain Enter inserts a newline.
+- ⌘+Enter (or Ctrl+Enter) submits. Plain Enter inserts a newline. An Enter
+  that confirms an IME composition neither submits nor picks from a menu.
 - Token-budget meter colours green → amber → red as headroom drops.
+- `onSubmit` may return a Promise: the draft is held until the send is
+  acknowledged (see [Acknowledged send](#acknowledged-send)).
 
 ## Props
 
@@ -44,13 +47,64 @@ import { PromptInput } from "@particle-academy/react-fancy";
 | budgetTokens | `number` | — | Token budget for the meter. |
 | commands | `PromptCmd[]` | `[]` | Slash commands. Names must start with `/`. |
 | mentions | `PromptMention[]` | `[]` | `{ id, name, kind }`. `kind` is free-form (`"agent"`, `"file"`, `"person"`, …). |
-| onSubmit | `(text, attachments) => void` | — | Called on ⌘/Ctrl+Enter or send button. |
+| onSubmit | `(text, attachments) => void \| Promise<SubmitResult>` | — | Called on ⌘/Ctrl+Enter or send button. Return a Promise to hold the draft until the send is acknowledged. |
+| onSubmitError | `(error: unknown) => void` | — | Called when a Promise from `onSubmit` rejects (with the reason) or resolves `{ ok: false }` (with its `error`). The draft is kept. |
+| disabled | `boolean` | `false` | Disables the text, attaching, dropping and the send. |
+| sendDisabled | `boolean` | `false` | Disables only the send. The text stays editable and attachable; ⌘/Ctrl+Enter does not send. |
+| name | `string` | — | Form field name for the text. On the textarea; with inline pills on, on a hidden input carrying the expanded text. |
+| inputId | `string` | — | `id` of the text field (textarea or inline editor). `id` still names the root. |
 | showHint | `boolean` | `true` | Show the "⌘ + Enter to send" hint. |
 | placeholder | `string` | `"Ask anything…"` | Placeholder text. |
 | charsPerToken | `number` | `4` | Rough estimator for the token meter. |
 | mentionColor | `Record<string, string>` | sensible defaults | Override the chip colour per mention kind. |
 | maxHeight | `number` | `280` | Max textarea height in pixels. |
 | aboveInput | `ReactNode` | — | Rendered inside the rounded shell, above the textarea. Use this for a drawer of tools/files/prompts/etc. so the drawer and composer share one visual panel — see [ChatDrawer](./ChatDrawer.md). Added in `3.2.0`. |
+
+## Acknowledged send
+
+Return a Promise from `onSubmit` and the draft (text, pills and attachments)
+stays until the send is acknowledged. While it is pending the send button is
+disabled, shows its spinner and is `aria-busy`, a second send is refused, and
+the root carries `data-submit-state="submitting"`. The text stays editable.
+
+- **Resolves** (to anything but `{ ok: false }`): the draft empties in one
+  commit, exactly as a void `onSubmit` empties it. If the person changed the
+  draft while the send was in flight, their newer draft is kept.
+- **Rejects, or resolves `{ ok: false, error? }`**: the draft is kept,
+  `onSubmitError` is called, the root carries `data-submit-state="error"`, and
+  a visually hidden `role="alert"` (`[data-react-fancy-prompt-input-error]`)
+  announces the failure. The next send clears it.
+
+```tsx
+<PromptInput
+  budgetTokens={32000}
+  name="prompt"
+  inputId="agent-prompt"
+  sendDisabled={agentIsAnswering}
+  onSubmit={async (text, attachments) => {
+    const form = new FormData();
+    form.append("text", text);
+    for (const a of attachments) if (a.file) form.append("files[]", a.file);
+    const res = await fetch("/api/prompt", { method: "POST", body: form });
+    if (!res.ok) return { ok: false, error: "The agent is busy. Try again." };
+  }}
+  onSubmitError={(error) => console.warn("prompt not sent", error)}
+/>
+```
+
+A void `onSubmit` behaves exactly as it always has: the draft empties at once.
+An `onSubmit` that was ALREADY `async` now waits for its Promise before
+emptying, and keeps the draft if it rejects.
+
+**Controlled `value` or `draft`:** the reset reaches the host as
+`onChange("")` and `onDraftChange({ v: 1, text: "", pills: [], attachments: [] })`
+once the send is acknowledged, like any other change; the host decides whether
+to apply it.
+
+**Why the text stays editable while sending:** the person can start the next
+message and nothing they type is lost, since only the draft that was sent is
+cleared. Locking the field would buy nothing: what was sent is already in
+flight.
 
 ### Controlled state and drafts
 
@@ -155,11 +209,17 @@ interface PromptInputHandle {
   setDraft(draft: PromptDraft, options?: { focus?: boolean; preventScroll?: boolean }): void;
   focus(options?: { preventScroll?: boolean }): void; // preventScroll defaults to true
 }
+
+type SubmitRejection = { ok: false; error?: string };
+type SubmitResult = void | SubmitRejection;
 ```
 
-Data handles: the root `[data-react-fancy-prompt-input]`, each attachment chip
+Data handles: the root `[data-react-fancy-prompt-input]` (with
+`data-submit-state="submitting" | "error"` when not idle), each attachment chip
 `[data-react-fancy-prompt-input-attachment="<id>"]`, plus `-attach`, `-send`,
-`-meter` and `-hint`.
+`-meter`, `-hint` and `-error`. The text field is
+`[data-react-fancy-prompt-input-textarea]`, or `[data-react-fancy-composer-input]`
+with inline pills on; `inputId` gives it one id in both modes.
 
 ## Defaults
 

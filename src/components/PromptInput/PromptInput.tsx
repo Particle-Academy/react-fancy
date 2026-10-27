@@ -12,6 +12,12 @@ import {
   type ReactNode,
 } from "react";
 import { cn } from "../../utils/cn";
+import { isImeComposing } from "../../utils/ime";
+import { visuallyHidden } from "../../utils/visually-hidden";
+import {
+  useAcknowledgedSubmit,
+  type SubmitResult,
+} from "../../hooks/use-acknowledged-submit";
 import { Button } from "../Button";
 import { Icon } from "../Icon";
 import { Tooltip } from "../Tooltip";
@@ -42,6 +48,7 @@ export {
   promptDataUrlToFile,
   promptFileToDataUrl,
 } from "./prompt-draft";
+export type { SubmitRejection, SubmitResult } from "../../hooks/use-acknowledged-submit";
 export type {
   PromptDraft,
   PromptDraftFile,
@@ -189,8 +196,56 @@ export interface PromptInputProps
    * true key gets named.
    */
   platform?: FancyPlatform;
-  /** Called on ⌘/Ctrl+Enter or send button. */
-  onSubmit: (text: string, attachments: PromptAttachment[]) => void;
+  /**
+   * Called on ⌘/Ctrl+Enter or send button.
+   *
+   * **Return nothing and the draft empties at once, as it always has.**
+   *
+   * Return a Promise to make the send acknowledged: the text, pills and
+   * attachments stay, the send button is disabled and `aria-busy`, and a second
+   * send is refused until it settles. The text stays editable meanwhile.
+   *
+   * - Resolves (to anything but `{ ok: false }`) → the draft empties in one
+   *   commit, unless the person changed it while the send was in flight; their
+   *   newer draft is kept.
+   * - Rejects, or resolves `{ ok: false, error? }` → the draft is kept,
+   *   `onSubmitError` is called and the failure is announced to screen readers.
+   *
+   * With a controlled `value` or `draft` the reset reaches the host through
+   * `onChange("")` / `onDraftChange(empty)` like any other change, and the host
+   * decides whether to apply it.
+   */
+  onSubmit: (
+    text: string,
+    attachments: PromptAttachment[],
+  ) => void | Promise<SubmitResult>;
+  /**
+   * Called when a Promise from `onSubmit` rejects (with the reason) or resolves
+   * `{ ok: false }` (with its `error`, or `undefined`). The draft is kept.
+   */
+  onSubmitError?: (error: unknown) => void;
+  /** Disables the text, attaching, dropping and the send. */
+  disabled?: boolean;
+  /**
+   * Disables only the send: the text stays editable and attachable, and
+   * ⌘/Ctrl+Enter does not send. For "the agent is still answering, but you can
+   * write the next message".
+   */
+  sendDisabled?: boolean;
+  /**
+   * Form field name for the text. On the textarea itself; with inline pills on
+   * (`pasteThreshold` / `pasteImages`), on a hidden input carrying the expanded
+   * text, since a contenteditable is not a form field.
+   */
+  name?: string;
+  /**
+   * `id` of the text field (textarea or inline editor). `id` itself names the
+   * root, as it always has. It is the one handle that does not change when inline
+   * pills switch the field type. Without it the field is found by
+   * `data-react-fancy-prompt-input-textarea` or, with inline pills,
+   * `data-react-fancy-composer-input`.
+   */
+  inputId?: string;
   /**
    * Placeholder text. Defaults to a hint naming the modifier THIS platform
    * actually has, so leaving it unset is the better option — a hardcoded
@@ -282,6 +337,11 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
   showHint = true,
   platform,
   onSubmit,
+  onSubmitError,
+  disabled = false,
+  sendDisabled = false,
+  name,
+  inputId,
   placeholder,
   charsPerToken = 4,
   mentionColor,
@@ -513,7 +573,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
     previewChars,
     renderPastePreview,
     classNames: pasteClassNames,
-    disabled: false,
+    disabled,
     heldPastes,
     onHeldPastesChange,
     heldImages,
@@ -719,10 +779,15 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
     });
   };
 
+  const ack = useAcknowledgedSubmit(onSubmitError);
+  const submitting = ack.status === "submitting";
+
   const submit = () => {
+    if (disabled || sendDisabled || ack.busy()) return;
     // A message that is only a paste counts: its marker is in `text`.
     if (!text.trim() && attachments.length === 0) return;
 
+    let result: ReturnType<typeof onSubmit>;
     if (inline) {
       // Every pill goes out where it sits; pasted images join the attachments
       // in message order, with their Files, so a host sends them like any other.
@@ -740,17 +805,28 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
           ...(meta.ref !== undefined ? { ref: meta.ref } : {}),
         };
       });
-      onSubmit(paste.expand(text), [...attachments, ...pastedImages]);
+      result = onSubmit(paste.expand(text), [...attachments, ...pastedImages]);
     } else {
-      onSubmit(text, attachments);
+      result = onSubmit(text, attachments);
     }
-    // One commit for the whole reset, so a host saving on change sees one empty
-    // draft rather than three half-empty ones.
-    commit(() => EMPTY_DRAFT);
-    filesRef.current.clear();
-    placeholdersRef.current.clear();
-    requestedRef.current.clear();
     setPicker(null);
+    const sent = draftKey(modelRef.current);
+    ack.track(result, () => {
+      /*
+       * A void `onSubmit` reaches here synchronously, so this is the reset it
+       * always was. An async one reaches here when it resolves: if the person
+       * changed the draft while it was in flight, that draft is newer than the
+       * send and is theirs to keep — discarding it is the one outcome they
+       * cannot undo.
+       */
+      if (draftKey(modelRef.current) !== sent) return;
+      // One commit for the whole reset, so a host saving on change sees one empty
+      // draft rather than three half-empty ones.
+      commit(() => EMPTY_DRAFT);
+      filesRef.current.clear();
+      placeholdersRef.current.clear();
+      requestedRef.current.clear();
+    });
   };
 
   /**
@@ -816,6 +892,9 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
   );
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    // Enter that confirms an IME composition finishes a word: it neither picks
+    // from a menu nor sends.
+    if (e.key === "Enter" && isImeComposing(e)) return;
     if (picker) {
       if (e.key === "ArrowDown") {
         e.preventDefault();
@@ -858,7 +937,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
    */
   const attach = (list: FileList | File[] | null) => {
     const files = Array.from(list ?? []);
-    if (files.length === 0) return;
+    if (files.length === 0 || disabled) return;
 
     const added = files.map((f) => {
       const id = crypto.randomUUID();
@@ -911,9 +990,12 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
       // it from Tailwind colours.
       data-react-fancy-prompt-input=""
       data-react-fancy-prompt-input-drag={dragOver ? "over" : "idle"}
+      // Absent while idle; "submitting" while an onSubmit Promise is pending;
+      // "error" after one was refused, until the next send.
+      data-submit-state={ack.status === "idle" ? undefined : ack.status}
       onDragOver={(e) => {
         e.preventDefault();
-        setDragOver(true);
+        if (!disabled) setDragOver(true);
       }}
       onDragLeave={() => setDragOver(false)}
       onDrop={onDrop}
@@ -922,6 +1004,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
         dragOver
           ? "border-violet-400 bg-violet-50/50 dark:border-violet-600 dark:bg-violet-950/30"
           : "border-zinc-200 dark:border-zinc-800",
+        disabled && "opacity-50",
         className,
       )}
     >
@@ -950,6 +1033,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
                     attachments: m.attachments.filter((x) => x.id !== a.id),
                   }))
                 }
+                disabled={disabled || undefined}
                 className="opacity-50 hover:opacity-100"
                 aria-label="Remove attachment"
               >
@@ -977,7 +1061,8 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
               onPaste={paste.decidePaste}
               onHostsChange={paste.onHostsChange}
               placeholder={resolvedPlaceholder}
-              disabled={false}
+              disabled={disabled}
+              id={inputId}
               maxHeight={maxHeight}
               placeholderClassName="left-3 top-2.5 text-[14px] leading-relaxed"
               className={cn(
@@ -986,6 +1071,9 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
               )}
             />
             {paste.portals}
+            {/* A contenteditable is no form field, so `name` rides on a hidden
+                one carrying what a send would carry: the expanded text. */}
+            {name && <input type="hidden" name={name} value={paste.expand(text)} />}
             {pasteImages && pasteFilesName && (
               <PastedFilesInput
                 name={pasteFilesName}
@@ -998,6 +1086,13 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
         ) : (
           <textarea
             ref={taRef}
+            // Its own handle, NOT the inline editor's `data-react-fancy-composer-input`:
+            // that one already means "the contenteditable is on", and a host that
+            // tests for it to pick a write path must not be handed a textarea.
+            data-react-fancy-prompt-input-textarea=""
+            id={inputId}
+            name={name}
+            disabled={disabled}
             value={text}
             onChange={(e) => updateText(e.target.value, e.target.selectionStart)}
             onKeyDown={onKeyDown}
@@ -1085,6 +1180,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
             data-react-fancy-prompt-input-attach=""
             // An icon alone has no name; the tooltip is not one a screen reader reads.
             aria-label={attachButton === "icon" ? "Attach files" : undefined}
+            disabled={disabled}
             onClick={() => fileRef.current?.click()}
           >
             {attachButton === "icon" ? null : "attach"}
@@ -1106,6 +1202,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
           ref={fileRef}
           type="file"
           multiple
+          disabled={disabled}
           className="hidden"
           onChange={(e) => {
             attach(e.target.files);
@@ -1156,6 +1253,9 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
                 className="shrink-0"
                 data-react-fancy-prompt-input-send=""
                 aria-label="Send"
+                disabled={disabled || sendDisabled}
+                loading={submitting}
+                aria-busy={submitting || undefined}
                 onClick={submit}
               />
             </Tooltip>
@@ -1166,16 +1266,44 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
               iconTrailing="arrow-right"
               className="shrink-0"
               data-react-fancy-prompt-input-send=""
+              disabled={disabled || sendDisabled}
+              loading={submitting}
+              aria-busy={submitting || undefined}
               onClick={submit}
             >
               send
             </Button>
+          )}
+          {ack.status === "error" && (
+            // Mounted with its text, as `role="alert"` is announced on insertion.
+            // The root is positioned, so the clipped box stays inside it.
+            <div
+              role="alert"
+              data-react-fancy-prompt-input-error=""
+              className="sr-only"
+              style={visuallyHidden}
+            >
+              {ack.message}
+            </div>
           )}
         </div>
       </div>
     </div>
   );
 });
+
+/**
+ * What a draft says, for "is this still the draft that was sent?". Ids rather
+ * than whole entries, so a `ref` arriving from `persistAttachment` mid-send does
+ * not read as the person changing their message.
+ */
+function draftKey(draft: PromptDraft): string {
+  return JSON.stringify([
+    draft.text,
+    draft.pills.map((p) => p.id),
+    draft.attachments.map((a) => a.id),
+  ]);
+}
 
 function fmtTokens(n: number): string {
   if (n < 1000) return `${n}`;

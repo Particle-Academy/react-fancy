@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { cn } from "../../utils/cn";
+import { isImeComposing } from "../../utils/ime";
 import { Badge } from "../Badge/Badge";
 import { Button } from "../Button/Button";
 import { Text } from "../Text/Text";
@@ -87,7 +88,7 @@ export function JsonEditorRow({ node }: JsonEditorRowProps) {
               spellCheck={false}
               aria-label={`Key of ${dotted}`}
               onKeyDown={(event) => {
-                if (event.key === "Enter") event.currentTarget.blur();
+                if (event.key === "Enter" && !isImeComposing(event)) event.currentTarget.blur();
               }}
               onBlur={(event) => {
                 const next = event.currentTarget.value;

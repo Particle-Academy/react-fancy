@@ -1,5 +1,8 @@
 import { forwardRef, useCallback, useMemo, useRef } from "react";
 import { cn } from "../../utils/cn";
+import { isImeComposing } from "../../utils/ime";
+import { visuallyHidden } from "../../utils/visually-hidden";
+import { useAcknowledgedSubmit } from "../../hooks/use-acknowledged-submit";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import {
   endsOf,
@@ -22,9 +25,13 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       defaultValue = "",
       onChange,
       onSubmit,
+      onSubmitError,
       placeholder = "Type a message...",
       actions,
       disabled = false,
+      sendDisabled = false,
+      name,
+      inputId,
       className,
       pasteThreshold,
       pastePlacement = "above",
@@ -105,8 +112,16 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       else textareaRef.current?.focus();
     }, [inline]);
 
+    const ack = useAcknowledgedSubmit(onSubmitError);
+    const submitting = ack.status === "submitting";
+
+    /** What a send would carry right now — read when an async send settles, never from a stale closure. */
+    const draftKey = JSON.stringify([value, heldPastes.map((p) => p.id)]);
+    const draftKeyRef = useRef(draftKey);
+    draftKeyRef.current = draftKey;
+
     const handleSubmit = useCallback(() => {
-      if (!hasContent || disabled) return;
+      if (!hasContent || disabled || sendDisabled || ack.busy()) return;
 
       /*
        * THE DANGEROUS STATE, and the reason this feature needed a spec rather than
@@ -121,14 +136,30 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
        */
       const images = inline ? paste.imagesIn(value) : [];
 
-      onSubmit?.(composeOutgoing(), { images });
-      setValue("");
-      paste.clear();
+      const result = onSubmit?.(composeOutgoing(), { images });
+      const sent = draftKeyRef.current;
+      ack.track(result, () => {
+        /*
+         * A void `onSubmit` reaches here synchronously, so `sent` is still the
+         * current draft and this clears exactly as it always has. An async one
+         * reaches here when it resolves: if the person edited the message while
+         * it was in flight, what they typed is newer than the send, and throwing
+         * it away is the one outcome they cannot undo. So only the draft that was
+         * sent is cleared.
+         */
+        if (draftKeyRef.current !== sent) return;
+        setValue("");
+        paste.clear();
+      });
+      // Focus goes back to the text at once, as before: it stays editable while
+      // a send is in flight, and the send button the person may have clicked is
+      // about to be disabled.
       focusInput();
-    }, [hasContent, disabled, value, inline, paste, onSubmit, composeOutgoing, setValue, focusInput]);
+    }, [hasContent, disabled, sendDisabled, ack, value, inline, paste, onSubmit, composeOutgoing, setValue, focusInput]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === "Enter" && !e.shiftKey) {
+      // Enter that confirms an IME composition finishes a word; it is not a send.
+      if (e.key === "Enter" && !e.shiftKey && !isImeComposing(e)) {
         e.preventDefault();
         handleSubmit();
       }
@@ -152,6 +183,9 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
     return (
       <div
         data-react-fancy-composer=""
+        // Absent while idle; "submitting" while an onSubmit Promise is pending;
+        // "error" after one was refused, until the next send.
+        data-submit-state={ack.status === "idle" ? undefined : ack.status}
         ref={ref}
         className={cn(
           "rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
@@ -238,9 +272,13 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
               onHostsChange={paste.onHostsChange}
               placeholder={placeholder}
               disabled={disabled}
+              id={inputId}
               className={classNames?.input}
             />
             {paste.portals}
+            {/* A contenteditable is no form field, so `name` rides on a hidden
+                one carrying what a send would carry: the expanded text. */}
+            {name && <input type="hidden" name={name} value={composeOutgoing()} />}
             {pasteImages && pasteFilesName && (
               <PastedFilesInput name={pasteFilesName} files={pastedFiles} />
             )}
@@ -248,6 +286,12 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
         ) : (
           <textarea
             ref={textareaRef}
+            // Its own handle, NOT the inline editor's `data-react-fancy-composer-input`:
+            // that one already means "the contenteditable is on", and a host that
+            // tests for it to pick a write path must not be handed a textarea.
+            data-react-fancy-composer-textarea=""
+            id={inputId}
+            name={name}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -261,12 +305,25 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
             )}
           />
         )}
-        <div className="flex items-center justify-between border-t border-zinc-100 px-3 py-2 dark:border-zinc-800">
+        <div className="relative flex items-center justify-between border-t border-zinc-100 px-3 py-2 dark:border-zinc-800">
           <div className="flex items-center gap-1">{actions}</div>
+          {ack.status === "error" && (
+            // Mounted with its text, as `role="alert"` is announced on insertion.
+            <div
+              role="alert"
+              data-react-fancy-composer-error=""
+              className="sr-only"
+              style={visuallyHidden}
+            >
+              {ack.message}
+            </div>
+          )}
           <button
             type="button"
+            data-react-fancy-composer-send=""
             onClick={handleSubmit}
-            disabled={disabled || !hasContent}
+            disabled={disabled || sendDisabled || submitting || !hasContent}
+            aria-busy={submitting || undefined}
             className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
           >
             Send

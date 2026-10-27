@@ -1,6 +1,7 @@
 import { forwardRef, useCallback, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { cn } from "../../utils/cn";
+import { isImeComposing } from "../../utils/ime";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import type { PillboxProps } from "./Pillbox.types";
 
@@ -45,6 +46,7 @@ export const Pillbox = forwardRef<HTMLDivElement, PillboxProps>(
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter") {
+        if (isImeComposing(e)) return;
         e.preventDefault();
         addItem(input);
       } else if (e.key === "Backspace" && !input && items.length > 0) {

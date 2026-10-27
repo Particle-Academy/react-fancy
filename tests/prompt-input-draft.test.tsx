@@ -464,7 +464,9 @@ describe("PromptInput — a programmatic restore is not an edit", () => {
 
 /**
  * The snapshots were WRITTEN BY 5.64.1, before any of this existed, so a diff is
- * a change to what every existing consumer renders. Icon SVGs are stripped: the
+ * a change to what every existing consumer renders. One deliberate change since:
+ * the textarea gained `data-react-fancy-prompt-input-textarea` (the contract's
+ * stable handle; it had none), and nothing else moved. Icon SVGs are stripped: the
  * icon set loads asynchronously, so whether one has arrived depends on test
  * order, not on this component.
  */

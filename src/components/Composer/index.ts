@@ -4,6 +4,8 @@ export type {
   ComposerPasteClassNames,
   ComposerPastePreview,
   ComposerSubmitExtras,
+  SubmitRejection,
+  SubmitResult,
   HeldImage,
   HeldPaste,
 } from "./Composer.types";

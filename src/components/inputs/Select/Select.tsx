@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { cn } from "../../../utils/cn";
+import { isImeComposing } from "../../../utils/ime";
 import { Field } from "../Field";
 import { InputWrapper } from "../InputWrapper";
 import { Portal } from "../../Portal";
@@ -402,6 +403,8 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
         e.preventDefault();
         setActiveIndex((i) => Math.max(i - 1, 0));
       } else if (e.key === "Enter") {
+        // Confirming an IME composition in the search box is not a pick.
+        if (isImeComposing(e)) return;
         if (activeIndex >= 0) {
           e.preventDefault();
           const item = filtered[activeIndex];

@@ -10,4 +10,6 @@ export type {
   PromptInputHandle,
   PromptSetDraftOptions,
   PromptFocusOptions,
+  SubmitRejection,
+  SubmitResult,
 } from "./PromptInput";

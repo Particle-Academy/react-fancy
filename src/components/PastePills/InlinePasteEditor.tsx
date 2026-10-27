@@ -6,6 +6,7 @@ import {
   useRef,
 } from "react";
 import { cn } from "../../utils/cn";
+import { isImeComposing } from "../../utils/ime";
 import { PILL_MARK, pasteMarker, segmentValue } from "./paste-markers";
 
 /** The attribute on the placeholder span a pill is portalled into. */
@@ -463,7 +464,7 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       onKeyDown?.(e);
       if (e.defaultPrevented) return;
-      if (e.key !== "Enter" || e.nativeEvent.isComposing) return;
+      if (e.key !== "Enter" || isImeComposing(e)) return;
 
       e.preventDefault();
       const sends =

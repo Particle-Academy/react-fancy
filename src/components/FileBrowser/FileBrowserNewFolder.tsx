@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FolderPlus } from "lucide-react";
 import { cn } from "../../utils/cn";
+import { isImeComposing } from "../../utils/ime";
 import { useFileBrowser } from "./FileBrowser.context";
 import { validateFolderName } from "./FileBrowser.utils";
 
@@ -139,6 +140,7 @@ export function FileBrowserNewFolder({ className }: { className?: string }) {
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
+              if (isImeComposing(e)) return;
               e.preventDefault();
               void submit();
             } else if (e.key === "Escape") {
