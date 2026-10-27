@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.66.0] - 2026-10-27
+
 ### Added
 
 - **`PromptInput`: text paste pills take an optional `label`** (genie#1280).
