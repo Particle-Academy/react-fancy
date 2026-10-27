@@ -1,6 +1,11 @@
 import {
+  forwardRef,
+  useCallback,
   useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
   type HTMLAttributes,
@@ -17,7 +22,32 @@ import {
   type ComposerPasteClassNames,
   type ComposerPastePreview,
   type InlinePasteEditorHandle,
+  type HeldImage,
+  type HeldPaste,
 } from "../PastePills";
+import {
+  EMPTY_DRAFT,
+  clonePromptDraft,
+  promptDraftFiles,
+  readPromptDraft,
+  type PromptDraft,
+  type PromptDraftFile,
+  type PromptDraftPill,
+  type PromptInputHandle,
+  type PromptSetDraftOptions,
+} from "./prompt-draft";
+
+export {
+  promptDataUrlToFile,
+  promptFileToDataUrl,
+} from "./prompt-draft";
+export type {
+  PromptDraft,
+  PromptDraftFile,
+  PromptDraftPill,
+  PromptInputHandle,
+  PromptSetDraftOptions,
+} from "./prompt-draft";
 import {
   browserPlatformHints,
   detectPlatform,
@@ -66,6 +96,12 @@ export type PromptAttachment = {
   file?: File;
   /** MIME type. Hosts branch on this to decide whether a file can be sent as-is. */
   type?: string;
+  /**
+   * The host's handle for the stored bytes, from `persistAttachment`. On an
+   * attachment restored from a draft WITHOUT a File, this is how the host finds
+   * the bytes to send.
+   */
+  ref?: string;
 };
 
 /**
@@ -78,9 +114,58 @@ export type PromptAttachment = {
  * guess DOM."
  */
 export interface PromptInputProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, "onSubmit" | "className"> {
+  extends Omit<
+    HTMLAttributes<HTMLDivElement>,
+    "onSubmit" | "className" | "onChange" | "defaultValue"
+  > {
   /** Extra classes on the root surface. MERGED, never replaced. */
   className?: string;
+  /**
+   * The text, controlled. With paste pills on it carries a marker per pill
+   * (`pasteMarker(id)`), exactly as `Composer`'s `value` does. Pills and
+   * attachments stay internal; use `draft` to control those too.
+   */
+  value?: string;
+  /** The starting text, uncontrolled. Ignored when `value` or `draft` is given. */
+  defaultValue?: string;
+  /**
+   * Called with the new text when the PERSON edits it, and with `""` after a
+   * send. Not called by `setDraft` or a prop change: the host made those.
+   */
+  onChange?: (value: string) => void;
+  /**
+   * The whole draft, controlled: text, paste pills and attachments, as JSON.
+   * Wins over `value`. Pair with `onDraftChange`.
+   */
+  draft?: PromptDraft;
+  /** The starting draft, uncontrolled. Wins over `defaultValue`. */
+  defaultDraft?: PromptDraft;
+  /**
+   * Called with the whole draft whenever the person changes any part of it —
+   * typing, a paste, an attach, a removal, a send (which empties it) — and when
+   * `persistAttachment` resolves a `ref`. Not called by `setDraft`.
+   */
+  onDraftChange?: (draft: PromptDraft) => void;
+  /**
+   * Keep an attached file somewhere and return a handle for it (a storage key, an
+   * upload URL — or a `data:` URL via `promptFileToDataUrl`). Called once per
+   * attached or pasted file; the result becomes the file's `ref` in the draft.
+   * May return a Promise; the draft is updated (and `onDraftChange` fires) when it
+   * resolves. Omit it and a draft carries file metadata only.
+   */
+  persistAttachment?: (
+    file: File,
+    entry: PromptDraftFile,
+  ) => string | undefined | Promise<string | undefined>;
+  /**
+   * Get a File back for a draft entry restored without one (from `setDraft`,
+   * `defaultDraft` or a controlled `draft`). May return a Promise. Return
+   * `undefined` when there is none: the chip or pill still shows, and the
+   * attachment reaches `onSubmit` with its `ref` and no `file`.
+   */
+  restoreAttachment?: (
+    entry: PromptDraftFile,
+  ) => File | undefined | Promise<File | undefined>;
   /** Token budget for the meter. */
   budgetTokens: number;
   /** Slash-commands. Names must start with `/`. */
@@ -180,7 +265,15 @@ const DEFAULT_MENTION_COLOR: Record<string, string> = {
   person: "#3b82f6",
 };
 
-export function PromptInput({
+export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(function PromptInput({
+  value: controlledValue,
+  defaultValue,
+  onChange,
+  draft: controlledDraft,
+  defaultDraft,
+  onDraftChange,
+  persistAttachment,
+  restoreAttachment,
   budgetTokens,
   commands = [],
   mentions = [],
@@ -206,10 +299,195 @@ export function PromptInput({
   meterShowAt = 0.75,
   meterWarnAt = 0.9,
   ...rest
-}: PromptInputProps) {
-  const [text, setText] = useState("");
+}: PromptInputProps, ref) {
   /** Inline pills need an editor that can hold them; a textarea cannot. */
   const inline = pasteThreshold !== undefined || pasteImages;
+
+  /*
+   * ONE model for everything a draft is — text, pills, attachments — so a draft
+   * read back is never a text from one moment and a list from another. Pills used
+   * to live in `useInlinePaste` and attachments in their own state, which is why
+   * nothing outside could read or restore them. They are now owned here and handed
+   * to `useInlinePaste` controlled.
+   *
+   * Files cannot be JSON, so they live beside the model in `filesRef`, keyed by the
+   * model's ids. `filesVersion` re-renders when a restored File arrives; that is
+   * not a draft change, so nobody is told about it.
+   */
+  const draftControlled = controlledDraft !== undefined;
+  const [innerDraft, setInnerDraft] = useState<PromptDraft>(
+    () =>
+      (defaultDraft && readPromptDraft(defaultDraft, inline)) || {
+        ...EMPTY_DRAFT,
+        text: defaultValue ?? "",
+      },
+  );
+  const baseDraft = draftControlled ? controlledDraft : innerDraft;
+  const model: PromptDraft =
+    !draftControlled && controlledValue !== undefined && controlledValue !== baseDraft.text
+      ? { ...baseDraft, text: controlledValue }
+      : baseDraft;
+  const modelRef = useRef(model);
+  modelRef.current = model;
+  const text = model.text;
+
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  const onDraftChangeRef = useRef(onDraftChange);
+  onDraftChangeRef.current = onDraftChange;
+  const persistRef = useRef(persistAttachment);
+  persistRef.current = persistAttachment;
+
+  /**
+   * Apply a change to the draft. `notify` is false only for `setDraft`: a host
+   * restoring a draft already knows what it set, and telling it would make every
+   * restore look like the person typed — a "dirty" flag, a typing indicator, a
+   * save that overwrites what was just loaded.
+   */
+  const commit = useCallback(
+    (update: (current: PromptDraft) => PromptDraft, notify = true) => {
+      const prev = modelRef.current;
+      const next = update(prev);
+      if (next === prev) return;
+      modelRef.current = next;
+      setInnerDraft(next);
+      if (!notify) return;
+      if (next.text !== prev.text) onChangeRef.current?.(next.text);
+      onDraftChangeRef.current?.(next);
+    },
+    [],
+  );
+
+  const filesRef = useRef(new Map<string, File>());
+  const placeholdersRef = useRef(new Map<string, File>());
+  const requestedRef = useRef(new Set<string>());
+  const [filesVersion, bumpFiles] = useReducer((n: number) => n + 1, 0);
+
+  /** Record a ref from `persistAttachment` against whichever entry has `id`. */
+  const setFileRef = useCallback(
+    (id: string, fileRef: string) =>
+      commit((m) => {
+        const withRef = (f: PromptDraftFile) => (f.id === id ? { ...f, ref: fileRef } : f);
+        if (!promptDraftFiles(m).some((f) => f.id === id)) return m;
+        return {
+          ...m,
+          attachments: m.attachments.map(withRef),
+          pills: m.pills.map((p) => (p.kind === "image" ? { ...p, file: withRef(p.file) } : p)),
+        };
+      }),
+    [commit],
+  );
+
+  /**
+   * Hand a newly attached file to the host's store. A synchronous handle is
+   * returned so it lands in the same draft as the file; an async one updates the
+   * draft when it arrives. A failing store loses the handle, never the attachment.
+   */
+  const persist = useCallback(
+    (file: File, entry: PromptDraftFile): string | undefined => {
+      const store = persistRef.current;
+      if (!store) return undefined;
+      let out: ReturnType<typeof store>;
+      try {
+        out = store(file, entry);
+      } catch (error) {
+        console.error("PromptInput: persistAttachment threw", error);
+        return undefined;
+      }
+      if (typeof out === "string") return out;
+      if (out && typeof (out as Promise<unknown>).then === "function") {
+        (out as Promise<string | undefined>).then(
+          (fileRef) => {
+            if (typeof fileRef === "string") setFileRef(entry.id, fileRef);
+          },
+          (error) => console.error("PromptInput: persistAttachment rejected", error),
+        );
+      }
+      return undefined;
+    },
+    [setFileRef],
+  );
+
+  const fileMeta = (id: string, file: File): PromptDraftFile => ({
+    id,
+    name: file.name,
+    type: file.type,
+    bytes: file.size,
+  });
+
+  /** A held image needs a File to show; a restored one without its bytes gets an empty stand-in. */
+  const fileFor = useCallback((entry: PromptDraftFile): File => {
+    const real = filesRef.current.get(entry.id);
+    if (real) return real;
+    let stand = placeholdersRef.current.get(entry.id);
+    if (!stand) {
+      stand = new File([], entry.name, { type: entry.type });
+      placeholdersRef.current.set(entry.id, stand);
+    }
+    return stand;
+  }, []);
+
+  const heldPastes = useMemo<HeldPaste[]>(
+    () => model.pills.flatMap((p) => (p.kind === "text" ? [{ id: p.id, text: p.text }] : [])),
+    [model.pills],
+  );
+  const heldImages = useMemo<HeldImage[]>(
+    () =>
+      model.pills.flatMap((p) =>
+        p.kind === "image" ? [{ id: p.id, label: p.label, file: fileFor(p.file) }] : [],
+      ),
+    // filesVersion: a restored File arrived, so the stand-in can be swapped out.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [model.pills, fileFor, filesVersion],
+  );
+
+  const onHeldPastesChange = useCallback(
+    (next: HeldPaste[]) =>
+      commit((m) => {
+        const current = m.pills.filter((p) => p.kind === "text");
+        if (
+          current.length === next.length &&
+          current.every((p, i) => p.id === next[i]!.id && p.kind === "text" && p.text === next[i]!.text)
+        ) {
+          return m;
+        }
+        return {
+          ...m,
+          pills: [
+            ...next.map((p): PromptDraftPill => ({ kind: "text", id: p.id, text: p.text })),
+            ...m.pills.filter((p) => p.kind === "image"),
+          ],
+        };
+      }),
+    [commit],
+  );
+
+  const onHeldImagesChange = useCallback(
+    (next: HeldImage[]) =>
+      commit((m) => {
+        const before = new Map(
+          m.pills.flatMap((p) => (p.kind === "image" ? [[p.id, p] as const] : [])),
+        );
+        if (before.size === next.length && next.every((i) => before.has(i.id))) return m;
+        const images = next.map((image): PromptDraftPill => {
+          const known = before.get(image.id);
+          if (known && known.kind === "image") return known;
+          // A new paste: its File is real, so keep it and offer it to the host.
+          filesRef.current.set(image.id, image.file);
+          const entry = fileMeta(image.id, image.file);
+          const fileRef = persist(image.file, entry);
+          return {
+            kind: "image",
+            id: image.id,
+            label: image.label,
+            file: fileRef === undefined ? entry : { ...entry, ref: fileRef },
+          };
+        });
+        return { ...m, pills: [...m.pills.filter((p) => p.kind === "text"), ...images] };
+      }),
+    [commit, persist],
+  );
+
   const editorRef = useRef<InlinePasteEditorHandle>(null);
   const paste = useInlinePaste({
     pasteThreshold,
@@ -218,9 +496,62 @@ export function PromptInput({
     renderPastePreview,
     classNames: pasteClassNames,
     disabled: false,
+    heldPastes,
+    onHeldPastesChange,
+    heldImages,
+    onHeldImagesChange,
     editorRef,
   });
-  const [attachments, setAttachments] = useState<PromptAttachment[]>([]);
+
+  const attachments = useMemo<PromptAttachment[]>(
+    () =>
+      model.attachments.map((a) => ({
+        id: a.id,
+        name: a.name,
+        bytes: a.bytes,
+        file: filesRef.current.get(a.id),
+        type: a.type,
+        ...(a.ref !== undefined ? { ref: a.ref } : {}),
+      })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [model.attachments, filesVersion],
+  );
+
+  /*
+   * Get Files back for entries that arrived without one — a restored draft, a
+   * default draft, a controlled draft from storage. Each id is asked for once.
+   */
+  const restoreRef = useRef(restoreAttachment);
+  restoreRef.current = restoreAttachment;
+  useEffect(() => {
+    const restore = restoreRef.current;
+    if (!restore) return;
+    for (const entry of promptDraftFiles(model)) {
+      if (filesRef.current.has(entry.id) || requestedRef.current.has(entry.id)) continue;
+      requestedRef.current.add(entry.id);
+      const accept = (file: File | undefined) => {
+        if (!(file instanceof Blob)) return;
+        filesRef.current.set(entry.id, file as File);
+        bumpFiles();
+      };
+      let out: ReturnType<typeof restore>;
+      try {
+        out = restore(entry);
+      } catch (error) {
+        console.error("PromptInput: restoreAttachment threw", error);
+        continue;
+      }
+      if (out && typeof (out as Promise<unknown>).then === "function") {
+        (out as Promise<File | undefined>).then(accept, (error) =>
+          console.error("PromptInput: restoreAttachment rejected", error),
+        );
+      } else {
+        accept(out as File | undefined);
+      }
+    }
+  }, [model]);
+
+  const setText = (next: string) => commit((m) => (m.text === next ? m : { ...m, text: next }));
   const [picker, setPicker] = useState<null | {
     kind: "cmd" | "mention";
     start: number;
@@ -377,22 +708,83 @@ export function PromptInput({
     if (inline) {
       // Every pill goes out where it sits; pasted images join the attachments
       // in message order, with their Files, so a host sends them like any other.
-      const pastedImages: PromptAttachment[] = paste.imagesIn(text).map((image) => ({
-        id: image.id,
-        name: image.file.name,
-        bytes: image.file.size,
-        file: image.file,
-        type: image.file.type,
-      }));
+      // A restored image without its bytes goes out with its `ref` and no `file`,
+      // never with the empty stand-in that only exists so the pill can render.
+      const pastedImages: PromptAttachment[] = paste.imagesIn(text).map((image) => {
+        const entry = model.pills.find((p) => p.id === image.id);
+        const meta = entry?.kind === "image" ? entry.file : fileMeta(image.id, image.file);
+        return {
+          id: image.id,
+          name: meta.name,
+          bytes: meta.bytes,
+          file: filesRef.current.get(image.id),
+          type: meta.type,
+          ...(meta.ref !== undefined ? { ref: meta.ref } : {}),
+        };
+      });
       onSubmit(paste.expand(text), [...attachments, ...pastedImages]);
-      paste.clear();
     } else {
       onSubmit(text, attachments);
     }
-    setText("");
-    setAttachments([]);
+    // One commit for the whole reset, so a host saving on change sees one empty
+    // draft rather than three half-empty ones.
+    commit(() => EMPTY_DRAFT);
+    filesRef.current.clear();
+    placeholdersRef.current.clear();
+    requestedRef.current.clear();
     setPicker(null);
   };
+
+  /**
+   * Focus requested by `setDraft(..., { focus: true })` waits for the render that
+   * shows the draft: the inline editor rebuilds its DOM from the new value, which
+   * would discard a caret placed before it. Children's layout effects run first,
+   * so by the time this one runs the editor already holds the draft.
+   */
+  const pendingFocus = useRef(false);
+  const focusInput = useCallback(() => {
+    if (inline) {
+      editorRef.current?.focus();
+      return;
+    }
+    const ta = taRef.current;
+    if (!ta) return;
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+  }, [inline]);
+  useLayoutEffect(() => {
+    if (!pendingFocus.current) return;
+    pendingFocus.current = false;
+    focusInput();
+  });
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getDraft: () => clonePromptDraft(modelRef.current),
+      setDraft(next: PromptDraft, options?: PromptSetDraftOptions) {
+        const read = readPromptDraft(next, inline);
+        if (!read) {
+          console.warn(
+            "PromptInput: setDraft ignored a draft it does not recognise (expected { v: 1, ... }).",
+            next,
+          );
+          return;
+        }
+        // Ask again for any File this draft needs that is not already held.
+        for (const entry of promptDraftFiles(read)) {
+          if (!filesRef.current.has(entry.id)) requestedRef.current.delete(entry.id);
+        }
+        setPicker(null);
+        commit(() => read, false);
+        // `commit` always sets state here (`read` is a new object), so a render
+        // follows and the layout effect below picks the focus up.
+        if (options?.focus) pendingFocus.current = true;
+      },
+      focus: focusInput,
+    }),
+    [inline, commit, focusInput],
+  );
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
     if (picker) {
@@ -439,16 +831,14 @@ export function PromptInput({
     const files = Array.from(list ?? []);
     if (files.length === 0) return;
 
-    setAttachments((cur) => [
-      ...cur,
-      ...files.map((f) => ({
-        id: crypto.randomUUID(),
-        name: f.name,
-        bytes: f.size,
-        file: f,
-        type: f.type,
-      })),
-    ]);
+    const added = files.map((f) => {
+      const id = crypto.randomUUID();
+      filesRef.current.set(id, f);
+      const entry = fileMeta(id, f);
+      const fileRef = persist(f, entry);
+      return fileRef === undefined ? entry : { ...entry, ref: fileRef };
+    });
+    commit((m) => ({ ...m, attachments: [...m.attachments, ...added] }));
   };
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -516,6 +906,9 @@ export function PromptInput({
           {attachments.map((a) => (
             <span
               key={a.id}
+              // Stable handle per chip, so a host or agent can address one
+              // attachment without guessing at markup.
+              data-react-fancy-prompt-input-attachment={a.id}
               className="inline-flex items-center gap-1.5 rounded-md bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] px-2 py-0.5 text-[11px] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             >
               <Icon name="paperclip" size="xs" className="text-zinc-400" />
@@ -523,7 +916,10 @@ export function PromptInput({
               <span className="text-zinc-400">{fmtSize(a.bytes)}</span>
               <button
                 onClick={() =>
-                  setAttachments((cur) => cur.filter((x) => x.id !== a.id))
+                  commit((m) => ({
+                    ...m,
+                    attachments: m.attachments.filter((x) => x.id !== a.id),
+                  }))
                 }
                 className="opacity-50 hover:opacity-100"
                 aria-label="Remove attachment"
@@ -564,7 +960,9 @@ export function PromptInput({
             {pasteImages && pasteFilesName && (
               <PastedFilesInput
                 name={pasteFilesName}
-                files={paste.imagesIn(text).map((i) => i.file)}
+                files={paste
+                  .imagesIn(text)
+                  .flatMap((i) => (filesRef.current.has(i.id) ? [i.file] : []))}
               />
             )}
           </>
@@ -748,7 +1146,7 @@ export function PromptInput({
       </div>
     </div>
   );
-}
+});
 
 function fmtTokens(n: number): string {
   if (n < 1000) return `${n}`;

@@ -558,8 +558,18 @@ export type { ReasonTagProps, ReasonTagSource, ReasonTagTheme } from "./componen
 export { MoodMeter } from "./components/MoodMeter";
 export type { MoodMeterProps } from "./components/MoodMeter";
 
-export { PromptInput } from "./components/PromptInput";
-export type { PromptInputProps, PromptCmd, PromptMention, PromptAttachment } from "./components/PromptInput";
+export { PromptInput, promptFileToDataUrl, promptDataUrlToFile } from "./components/PromptInput";
+export type {
+  PromptInputProps,
+  PromptCmd,
+  PromptMention,
+  PromptAttachment,
+  PromptDraft,
+  PromptDraftFile,
+  PromptDraftPill,
+  PromptInputHandle,
+  PromptSetDraftOptions,
+} from "./components/PromptInput";
 
 export { ChatDrawer } from "./components/ChatDrawer";
 export type { ChatDrawerProps, ChatDrawerTab } from "./components/ChatDrawer";

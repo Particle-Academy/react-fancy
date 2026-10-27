@@ -11,6 +11,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.65.0] - 2026-10-27
+
+### Added
+
+- **`PromptInput`: controlled state and draft save/restore** (genie#1261).
+  Before this, nothing outside the composer could read or set what had been
+  typed, so a host could not keep a draft across a restart. That also broke the
+  component contract, which requires controlled state.
+  - `value` / `defaultValue` / `onChange(text)` cover the simple case. With
+    paste pills on, `value` carries a `pasteMarker(id)` for each pill, the same
+    as `Composer`'s `value`.
+  - `draft` / `defaultDraft` / `onDraftChange(draft)` cover the whole draft.
+    A `PromptDraft` is plain JSON:
+    `{ v: 1, text, pills: [{ kind: "text", id, text } | { kind: "image", id, label, file }], attachments: [{ id, name, type, bytes, ref? }] }`.
+  - A `ref` now resolves to a `PromptInputHandle`: `getDraft()`,
+    `setDraft(draft, { focus?: false })` and `focus()`.
+  - **Restoring a draft never moves focus or a caret** (genie#1235). This holds
+    when nothing is focused and when another input is. Pass `{ focus: true }`
+    to focus the composer.
+  - `setDraft` does **not** call `onChange` / `onDraftChange`. The host set the
+    draft and already has it, and firing the callbacks would make a restore
+    look like typing (a dirty flag, a typing indicator, a save over what was
+    just loaded). This is the same as assigning `input.value` in the DOM.
+  - The file bytes are not in the draft. `persistAttachment(file, entry)`
+    stores each attached or pasted file wherever the host chooses and returns
+    a handle, which becomes the entry's `ref`. It can be sync or async.
+    `restoreAttachment(entry)` gets the File back on restore. To keep the bytes
+    inline, use the new `promptFileToDataUrl` / `promptDataUrlToFile` helpers.
+    A restored entry with no File still shows its chip or pill, and reaches
+    `onSubmit` with its `ref` and `file: undefined`.
+  - `PromptAttachment` gains an optional `ref`. Each attachment chip gets a
+    stable `data-react-fancy-prompt-input-attachment="<id>"` handle.
+  - A draft whose `v` is unknown is refused with a console warning rather than
+    guessed at. Pills restored into a composer with no pills turned on are
+    expanded in place, and image pills become attachments, so no raw markers
+    show.
+
+  **What you must do: nothing, unless you opt in.** Existing usage renders the
+  same markup as 5.64.1, checked against a snapshot written by 5.64.1 itself.
+  Two edge cases. `ref`, `onChange` and `defaultValue` used to fall through
+  `...rest` to the root `<div>`, but none of them was in the props type, so a
+  TypeScript consumer could not have passed them. If you passed one anyway
+  (an untyped `onChange` that listened for DOM change events bubbling to the
+  root), it now means the new prop.
+
 ## [5.64.1] - 2026-10-27
 
 ### Fixed
