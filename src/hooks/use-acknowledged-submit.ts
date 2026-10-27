@@ -69,9 +69,21 @@ export function useAcknowledgedSubmit(onSubmitError?: (error: unknown) => void) 
     onErrorRef.current?.(error);
   }, []);
 
+  /*
+   * Each send has an identity. Only the NEWEST may acknowledge: an older send
+   * settling after a newer one started neither runs its `accept` nor ends the
+   * newer send's "submitting". The components refuse a second send while one is
+   * pending, so this is the backstop for anything that ever bypasses that guard.
+   * An older send that FAILS still reaches `onSubmitError`: the host is owed
+   * every failure, even one the UI has moved past.
+   */
+  const latest = useRef(0);
+
   const track = useCallback(
     (result: unknown, accept: () => void) => {
+      const id = ++latest.current;
       if (!isThenable(result)) {
+        inFlight.current = false;
         accept();
         setStatus("idle");
         setMessage("");
@@ -83,17 +95,23 @@ export function useAcknowledgedSubmit(onSubmitError?: (error: unknown) => void) 
       setMessage("");
       result.then(
         (value) => {
-          inFlight.current = false;
+          const current = id === latest.current;
+          if (current) inFlight.current = false;
           if (isRejection(value)) {
-            fail(value.error, value.error);
+            if (current) fail(value.error, value.error);
+            else onErrorRef.current?.(value.error);
             return;
           }
-          if (alive.current) {
+          if (current && alive.current) {
             setStatus("idle");
             accept();
           }
         },
         (reason: unknown) => {
+          if (id !== latest.current) {
+            onErrorRef.current?.(reason);
+            return;
+          }
           inFlight.current = false;
           fail(reason, undefined);
         },

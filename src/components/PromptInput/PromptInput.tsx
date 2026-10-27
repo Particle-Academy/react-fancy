@@ -206,8 +206,9 @@ export interface PromptInputProps
    * send is refused until it settles. The text stays editable meanwhile.
    *
    * - Resolves (to anything but `{ ok: false }`) → the draft empties in one
-   *   commit, unless the person changed it while the send was in flight; their
-   *   newer draft is kept.
+   *   commit, unless anything changed it while the send was in flight (the
+   *   person, `setDraft`, a controlled prop), even to an identical draft; the
+   *   newer draft is kept whole.
    * - Rejects, or resolves `{ ok: false, error? }` → the draft is kept,
    *   `onSubmitError` is called and the failure is announced to screen readers.
    *
@@ -393,6 +394,26 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
   modelRef.current = model;
   const text = model.text;
 
+  /*
+   * The draft's REVISION: bumped by every change to what the draft says — the
+   * person typing, pasting, attaching or removing; the host's `setDraft`; a
+   * controlled `draft` / `value` prop that now says something different. NOT by
+   * a `ref` arriving from `persistAttachment`, which is storage catching up,
+   * not anybody changing the message.
+   *
+   * An acknowledged send clears only if the revision is still the one it sent.
+   * Comparing CONTENT instead (5.70.0) threw away newer drafts that happened to
+   * compare equal: an edit typed and undone, a host restoring the same draft, a
+   * pill or attachment changed under the same id.
+   */
+  const revisionRef = useRef(0);
+  const seenRef = useRef(model);
+  if (seenRef.current !== model) {
+    // A model this component did not commit itself: a controlled prop moved.
+    if (!sameDraftContent(seenRef.current, model)) revisionRef.current += 1;
+    seenRef.current = model;
+  }
+
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
   const onDraftChangeRef = useRef(onDraftChange);
@@ -407,11 +428,13 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
    * save that overwrites what was just loaded.
    */
   const commit = useCallback(
-    (update: (current: PromptDraft) => PromptDraft, notify = true) => {
+    (update: (current: PromptDraft) => PromptDraft, notify = true, revise = true) => {
       const prev = modelRef.current;
       const next = update(prev);
       if (next === prev) return;
+      if (revise) revisionRef.current += 1;
       modelRef.current = next;
+      seenRef.current = next;
       setInnerDraft(next);
       if (!notify) return;
       if (next.text !== prev.text) onChangeRef.current?.(next.text);
@@ -425,18 +448,25 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
   const requestedRef = useRef(new Set<string>());
   const [filesVersion, bumpFiles] = useReducer((n: number) => n + 1, 0);
 
-  /** Record a ref from `persistAttachment` against whichever entry has `id`. */
+  /**
+   * Record a ref from `persistAttachment` against whichever entry has `id`. Not
+   * a new revision: a send in flight that carried this file may still clear it.
+   */
   const setFileRef = useCallback(
     (id: string, fileRef: string) =>
-      commit((m) => {
-        const withRef = (f: PromptDraftFile) => (f.id === id ? { ...f, ref: fileRef } : f);
-        if (!promptDraftFiles(m).some((f) => f.id === id)) return m;
-        return {
-          ...m,
-          attachments: m.attachments.map(withRef),
-          pills: m.pills.map((p) => (p.kind === "image" ? { ...p, file: withRef(p.file) } : p)),
-        };
-      }),
+      commit(
+        (m) => {
+          const withRef = (f: PromptDraftFile) => (f.id === id ? { ...f, ref: fileRef } : f);
+          if (!promptDraftFiles(m).some((f) => f.id === id)) return m;
+          return {
+            ...m,
+            attachments: m.attachments.map(withRef),
+            pills: m.pills.map((p) => (p.kind === "image" ? { ...p, file: withRef(p.file) } : p)),
+          };
+        },
+        true,
+        false,
+      ),
     [commit],
   );
 
@@ -810,16 +840,17 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
       result = onSubmit(text, attachments);
     }
     setPicker(null);
-    const sent = draftKey(modelRef.current);
+    const sent = revisionRef.current;
     ack.track(result, () => {
       /*
        * A void `onSubmit` reaches here synchronously, so this is the reset it
-       * always was. An async one reaches here when it resolves: if the person
-       * changed the draft while it was in flight, that draft is newer than the
-       * send and is theirs to keep — discarding it is the one outcome they
-       * cannot undo.
+       * always was. An async one reaches here when it resolves: if anything
+       * changed the draft while it was in flight — the person, the host's
+       * `setDraft`, a controlled prop — that draft is newer than the send and is
+       * kept, even if it reads the same. Discarding it is the one outcome
+       * nobody can undo.
        */
-      if (draftKey(modelRef.current) !== sent) return;
+      if (revisionRef.current !== sent) return;
       // One commit for the whole reset, so a host saving on change sees one empty
       // draft rather than three half-empty ones.
       commit(() => EMPTY_DRAFT);
@@ -1293,16 +1324,27 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
 });
 
 /**
- * What a draft says, for "is this still the draft that was sent?". Ids rather
- * than whole entries, so a `ref` arriving from `persistAttachment` mid-send does
- * not read as the person changing their message.
+ * Whether two drafts SAY the same thing, for a controlled prop that arrives as
+ * a new object: the host echoing what it was told (a spread, a clone) is not a
+ * new revision. Every field counts except a file's `ref`, which is where the
+ * bytes are stored rather than what the message is. Cheap in the common case:
+ * an echo shares its arrays, so the full comparison only runs when they differ.
  */
-function draftKey(draft: PromptDraft): string {
-  return JSON.stringify([
-    draft.text,
-    draft.pills.map((p) => p.id),
-    draft.attachments.map((a) => a.id),
-  ]);
+function sameDraftContent(a: PromptDraft, b: PromptDraft): boolean {
+  if (a.text !== b.text) return false;
+  if (a.pills === b.pills && a.attachments === b.attachments) return true;
+  const key = (d: PromptDraft) =>
+    JSON.stringify([
+      d.pills.map((p) =>
+        p.kind === "text" ? [p.kind, p.id, p.text, p.label] : [p.kind, p.id, p.label, fileKey(p.file)],
+      ),
+      d.attachments.map(fileKey),
+    ]);
+  return key(a) === key(b);
+}
+
+function fileKey(f: PromptDraftFile): unknown[] {
+  return [f.id, f.name, f.type, f.bytes];
 }
 
 function fmtTokens(n: number): string {

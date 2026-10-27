@@ -10,6 +10,7 @@ import {
   PastedFilesInput,
   useInlinePaste,
   withSeparators,
+  type HeldImage,
   type HeldPaste,
   type InlinePasteEditorHandle,
 } from "../PastePills";
@@ -115,10 +116,29 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
     const ack = useAcknowledgedSubmit(onSubmitError);
     const submitting = ack.status === "submitting";
 
-    /** What a send would carry right now — read when an async send settles, never from a stale closure. */
-    const draftKey = JSON.stringify([value, heldPastes.map((p) => p.id)]);
-    const draftKeyRef = useRef(draftKey);
-    draftKeyRef.current = draftKey;
+    /*
+     * The draft's REVISION: bumped by every render in which the text, a held
+     * paste or a held image differs from the last one seen — the person typing
+     * or pasting, or a host moving a controlled `value` / `heldPastes` /
+     * `heldImages`. An acknowledged send clears only if the revision is still
+     * the one it sent. Comparing content instead (5.70.0) threw away newer
+     * drafts that happened to compare equal: an edit typed and undone, a pill
+     * whose text the host changed under the same id.
+     */
+    const heldImages = paste.heldImages;
+    const revisionRef = useRef(0);
+    const seenRef = useRef({ value, heldPastes, heldImages });
+    const seen = seenRef.current;
+    if (seen.value !== value || seen.heldPastes !== heldPastes || seen.heldImages !== heldImages) {
+      if (
+        seen.value !== value ||
+        !samePastes(seen.heldPastes, heldPastes) ||
+        !sameImages(seen.heldImages, heldImages)
+      ) {
+        revisionRef.current += 1;
+      }
+      seenRef.current = { value, heldPastes, heldImages };
+    }
 
     const handleSubmit = useCallback(() => {
       if (!hasContent || disabled || sendDisabled || ack.busy()) return;
@@ -137,17 +157,17 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       const images = inline ? paste.imagesIn(value) : [];
 
       const result = onSubmit?.(composeOutgoing(), { images });
-      const sent = draftKeyRef.current;
+      const sent = revisionRef.current;
       ack.track(result, () => {
         /*
          * A void `onSubmit` reaches here synchronously, so `sent` is still the
-         * current draft and this clears exactly as it always has. An async one
-         * reaches here when it resolves: if the person edited the message while
-         * it was in flight, what they typed is newer than the send, and throwing
-         * it away is the one outcome they cannot undo. So only the draft that was
-         * sent is cleared.
+         * current revision and this clears exactly as it always has. An async one
+         * reaches here when it resolves: if anything changed the message while it
+         * was in flight, that message is newer than the send, even if it reads the
+         * same, and throwing it away is the one outcome nobody can undo. So only
+         * the revision that was sent is cleared.
          */
-        if (draftKeyRef.current !== sent) return;
+        if (revisionRef.current !== sent) return;
         setValue("");
         paste.clear();
       });
@@ -335,3 +355,18 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
 );
 
 Composer.displayName = "Composer";
+
+/** Same pills, same content: a host echoing a copy of what it was told is not a new revision. */
+function samePastes(a: HeldPaste[], b: HeldPaste[]): boolean {
+  return (
+    a.length === b.length &&
+    a.every((p, i) => p.id === b[i]!.id && p.text === b[i]!.text && p.label === b[i]!.label)
+  );
+}
+
+function sameImages(a: HeldImage[], b: HeldImage[]): boolean {
+  return (
+    a.length === b.length &&
+    a.every((img, i) => img.id === b[i]!.id && img.label === b[i]!.label && img.file === b[i]!.file)
+  );
+}

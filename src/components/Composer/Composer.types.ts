@@ -39,8 +39,9 @@ export interface ComposerProps {
    * stay, the send button is disabled and `aria-busy`, and a second send is
    * refused until it settles. The text stays editable meanwhile.
    *
-   * - Resolves (to anything but `{ ok: false }`) → the message clears, unless the
-   *   person edited it while it was in flight; their newer text is kept.
+   * - Resolves (to anything but `{ ok: false }`) → the message clears, unless
+   *   anything changed it while it was in flight (the person, or a controlled
+   *   prop), even back to the same text; the newer message is kept.
    * - Rejects, or resolves `{ ok: false, error? }` → everything is kept,
    *   `onSubmitError` is called and the failure is announced to screen readers.
    *

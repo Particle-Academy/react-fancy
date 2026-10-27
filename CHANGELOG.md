@@ -11,6 +11,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **An acknowledged send no longer clears a newer draft that happens to read
+  the same** (`Composer`, `PromptInput`, from 5.70.0). When an async `onSubmit`
+  resolved, the draft was cleared if its text and the ids of its pills and
+  attachments still matched what was sent. A newer draft that compared equal was
+  therefore thrown away: an edit typed and then deleted during the send, a host
+  `setDraft` that restored the same draft, or a pill's text or an attachment
+  changed under the same id. The clear is now tied to the draft revision that
+  was sent. Anything that changes the draft after the send (the person, the
+  host's `setDraft`, a controlled `draft` / `value` / `heldPastes` /
+  `heldImages` that now says something different) makes it newer, and a newer
+  draft is kept whole. A `ref` arriving from `persistAttachment` mid-send is not
+  a change, so it does not block the clear. A controlled host that echoes a
+  copy of each draft is still cleared, because an echo that says the same thing
+  is not a new revision. Nothing to do on upgrade.
+- **Only the newest send can acknowledge.** Both components refuse a second
+  send while one is pending, and nothing turns that off. If two ever overlapped,
+  the older one settling would have cleared the draft and ended the newer one's
+  `submitting` state. It is now ignored, except that its failure still reaches
+  `onSubmitError`.
+
 ## [5.70.0] - 2026-10-27
 
 ### Added

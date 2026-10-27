@@ -42,8 +42,11 @@ acknowledged. While it is pending the send button is disabled and
 `data-submit-state="submitting"`. The text stays editable.
 
 - **Resolves** (to anything but `{ ok: false }`): the message clears, exactly
-  as a void `onSubmit` clears it. If the person edited the message while the
-  send was in flight, their newer text is kept rather than discarded.
+  as a void `onSubmit` clears it, but only if the message is still the revision
+  that was sent. If the text, a held paste or a held image changed while the
+  send was in flight (the person typing, even typing and then deleting; a
+  paste; a host moving a controlled `value` / `heldPastes` / `heldImages`), the
+  newer message is kept whole rather than discarded.
 - **Rejects, or resolves `{ ok: false, error? }`**: the text and held pastes
   are kept, `onSubmitError` is called, the root carries
   `data-submit-state="error"`, and a visually hidden `role="alert"`

@@ -68,8 +68,14 @@ disabled, shows its spinner and is `aria-busy`, a second send is refused, and
 the root carries `data-submit-state="submitting"`. The text stays editable.
 
 - **Resolves** (to anything but `{ ok: false }`): the draft empties in one
-  commit, exactly as a void `onSubmit` empties it. If the person changed the
-  draft while the send was in flight, their newer draft is kept.
+  commit, exactly as a void `onSubmit` empties it, but only if the draft is
+  still the revision that was sent. Anything that changed it while the send was
+  in flight makes it newer, and a newer draft is kept whole, even if it now
+  reads the same: the person typing (including typing and then deleting),
+  pasting a pill, attaching or removing a file; the host calling `setDraft`
+  (even with the same draft); or a controlled `draft` / `value` that now says
+  something different. A `ref` arriving from `persistAttachment` does not count:
+  that is storage catching up, not a change to the message.
 - **Rejects, or resolves `{ ok: false, error? }`**: the draft is kept,
   `onSubmitError` is called, the root carries `data-submit-state="error"`, and
   a visually hidden `role="alert"` (`[data-react-fancy-prompt-input-error]`)
