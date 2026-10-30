@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.71.2] - 2026-10-30
+
 ### Fixed
 
 - **`VirtualList` performance: following the tail no longer reads `scrollTop`
