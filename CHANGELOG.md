@@ -11,6 +11,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`VirtualList` performance: a row is measured once, not on every render**
+  (genie#1340). The measuring layout effect ran on every render and called
+  `getBoundingClientRect()` on every visible row and re-`observe`d each one
+  with the ResizeObserver, and every one of those reads forces a synchronous
+  layout after the commit. Genie measured it with 11 agents streaming: 27.8
+  measure passes/s, 472 row measurements/s, about 3 to 5 s of renderer self
+  time per 120 s, which showed up as typing lag. Now a row is measured only
+  when its element first appears and its height is not yet known; after that
+  the ResizeObserver reports size changes from the entry (`borderBoxSize`,
+  falling back to `contentRect`), with no forced layout. Each row element is
+  observed once and unobserved when it leaves the window or the list unmounts,
+  and the viewport's own height also arrives through the observer. Result: an
+  append costs one measurement instead of one per visible row, and a render
+  where nothing changed costs none. In a real browser (Chromium, 16 visible
+  rows, tail-following) row measurements per append went from 52.4 to 1.
+  Without a ResizeObserver (old runtimes, jsdom) the list keeps the previous
+  behaviour of re-measuring every visible row on every render, since nothing
+  else would notice a reflow. **Consumer action: none.** No prop, type, data
+  attribute or behaviour changed.
+
 ## [5.71.0] - 2026-10-27
 
 ### Added

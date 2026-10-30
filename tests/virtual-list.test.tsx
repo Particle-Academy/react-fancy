@@ -611,4 +611,327 @@ describe("handles and semantics", () => {
 
         expect(renderedIds(host).length).toBeGreaterThan(0);
     });
+
+    it("without a ResizeObserver, still re-measures a row that reflowed on the next render", () => {
+        // The fallback path keeps the pre-5.71.1 behaviour exactly: with no
+        // observer to report a reflow, every render re-measures what is on
+        // screen, because nothing else ever would.
+        const items: Row[] = [
+            { id: "r-0", text: "a" },
+            { id: "r-1", text: "b" },
+        ];
+        const host = mount(
+            <VirtualList items={items} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} />,
+        );
+        const sizer = host.querySelector<HTMLElement>("[data-react-fancy-virtual-list-sizer]")!;
+        expect(parseFloat(sizer.style.height)).toBeCloseTo(2 * ROW_SHORT, 0);
+
+        vi.mocked(HTMLElement.prototype.getBoundingClientRect).mockImplementation(function (this: HTMLElement) {
+            const rowId = this.getAttribute("data-react-fancy-virtual-row-id");
+            const height = rowId === null ? 0 : rowId === "r-1" ? 55 : ROW_SHORT;
+
+            return { width: 400, height, top: 0, left: 0, right: 400, bottom: height, x: 0, y: 0, toJSON: () => ({}) } as DOMRect;
+        });
+        rerender(
+            <VirtualList items={items} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} className="x" />,
+        );
+
+        expect(parseFloat(sizer.style.height)).toBeCloseTo(ROW_SHORT + 55, 0);
+    });
+});
+
+/**
+ * A stand-in for the browser's ResizeObserver. jsdom has none, and the real one
+ * would never fire here anyway because jsdom does no layout. What matters is
+ * the contract: which elements are observed, how often, and what the list does
+ * with an entry the browser delivers.
+ */
+class FakeResizeObserver {
+    static instances: FakeResizeObserver[] = [];
+
+    readonly observed = new Set<Element>();
+    readonly observe = vi.fn((el: Element) => {
+        this.observed.add(el);
+    });
+    readonly unobserve = vi.fn((el: Element) => {
+        this.observed.delete(el);
+    });
+    readonly disconnect = vi.fn(() => {
+        this.observed.clear();
+    });
+
+    constructor(private readonly callback: ResizeObserverCallback) {
+        FakeResizeObserver.instances.push(this);
+    }
+
+    /** Deliver entries the way the browser does: one batch, one callback. */
+    fire(entries: Partial<ResizeObserverEntry>[]) {
+        act(() => {
+            this.callback(entries as ResizeObserverEntry[], this as unknown as ResizeObserver);
+        });
+    }
+}
+
+function liveObserver(): FakeResizeObserver {
+    const live = FakeResizeObserver.instances.filter((ro) => ro.disconnect.mock.calls.length === 0);
+    expect(live).toHaveLength(1);
+
+    return live[0];
+}
+
+/** Every `observe()` call, on every observer this list has created. */
+function observeCalls(): number {
+    return FakeResizeObserver.instances.reduce((n, ro) => n + ro.observe.mock.calls.length, 0);
+}
+
+/** Every `getBoundingClientRect()` call, on any element: each one can force a layout. */
+function measureCalls(): number {
+    return vi.mocked(HTMLElement.prototype.getBoundingClientRect).mock.calls.length;
+}
+
+function rowEl(host: HTMLElement, id: string): HTMLElement {
+    return host.querySelector<HTMLElement>(`[data-react-fancy-virtual-row-id="${id}"]`)!;
+}
+
+function sizerHeight(host: HTMLElement): number {
+    return parseFloat(host.querySelector<HTMLElement>("[data-react-fancy-virtual-list-sizer]")!.style.height);
+}
+
+function borderBoxEntry(target: Element, blockSize: number): Partial<ResizeObserverEntry> {
+    return {
+        target,
+        borderBoxSize: [{ blockSize, inlineSize: 400 }],
+        contentBoxSize: [{ blockSize, inlineSize: 400 }],
+        contentRect: { height: blockSize, width: 400 } as DOMRectReadOnly,
+    };
+}
+
+describe("measurement cost, with a ResizeObserver (genie#1340)", () => {
+    // Genie measured 27.8 measure passes/s and 472 row measurements/s with 11
+    // agents streaming, because every render re-measured every visible row and
+    // each getBoundingClientRect() after a commit forces a synchronous layout.
+    // A row's height is now measured ONCE, when it first appears; after that,
+    // the ResizeObserver reports when it changes.
+
+    beforeEach(() => {
+        FakeResizeObserver.instances = [];
+        (globalThis as { ResizeObserver?: unknown }).ResizeObserver = FakeResizeObserver;
+    });
+
+    it("a re-render where nothing changed measures nothing and re-observes nothing", () => {
+        const host = mount(
+            <VirtualList items={rows(50)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} className="a" />,
+        );
+        stubViewportHeight(viewportOf(host), VIEWPORT);
+        expect(renderedIds(host).length).toBeGreaterThan(0);
+
+        const measuredBefore = measureCalls();
+        const observedBefore = observeCalls();
+
+        rerender(
+            <VirtualList items={rows(50)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} className="b" />,
+        );
+        rerender(
+            <VirtualList items={rows(50)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} className="c" />,
+        );
+
+        expect(measureCalls() - measuredBefore).toBe(0);
+        expect(observeCalls() - observedBefore).toBe(0);
+    });
+
+    it("appending one row measures that row and only that row", () => {
+        // Five 20px rows in a 200px viewport: all on screen, and so is the sixth.
+        const host = mount(
+            <VirtualList items={rows(5)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} />,
+        );
+        stubViewportHeight(viewportOf(host), VIEWPORT);
+
+        const measuredBefore = measureCalls();
+        const observedBefore = observeCalls();
+
+        rerender(
+            <VirtualList items={rows(6)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} />,
+        );
+
+        expect(renderedIds(host)).toContain("r-5");
+        expect(measureCalls() - measuredBefore).toBe(1);
+        expect(observeCalls() - observedBefore).toBe(1);
+    });
+
+    it("appending one row while following the tail measures one row", () => {
+        // The streaming case Genie measured: a long list, pinned to the bottom,
+        // one row arriving at a time.
+        const host = mount(
+            <VirtualList items={rows(50)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail />,
+        );
+        const viewport = viewportOf(host);
+        stubViewportHeight(viewport, VIEWPORT);
+        rerender(
+            <VirtualList items={rows(50)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail />,
+        );
+
+        for (const count of [51, 52, 53]) {
+            const measuredBefore = measureCalls();
+
+            rerender(
+                <VirtualList items={rows(count)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail />,
+            );
+
+            expect(measureCalls() - measuredBefore).toBe(1);
+            expect(viewport.scrollTop).toBeCloseTo(count * ROW_SHORT - VIEWPORT, 0);
+            expect(renderedIds(host)).toContain(`r-${count - 1}`);
+        }
+    });
+
+    it("picks up a row that resizes later from the ResizeObserver entry", () => {
+        const items: Row[] = [
+            { id: "r-0", text: "a" },
+            { id: "r-1", text: "b" },
+            { id: "r-2", text: "c" },
+        ];
+        const host = mount(
+            <VirtualList items={items} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} />,
+        );
+        expect(sizerHeight(host)).toBeCloseTo(3 * ROW_SHORT, 0);
+
+        // getBoundingClientRect still says 20: the new height can only have
+        // come from the entry, which is the whole point — no forced layout.
+        const measuredBefore = measureCalls();
+        liveObserver().fire([borderBoxEntry(rowEl(host, "r-1"), 75)]);
+
+        expect(sizerHeight(host)).toBeCloseTo(ROW_SHORT + 75 + ROW_SHORT, 0);
+        expect(measureCalls() - measuredBefore).toBe(0);
+    });
+
+    it("falls back to contentRect when the entry has no borderBoxSize", () => {
+        const items: Row[] = [
+            { id: "r-0", text: "a" },
+            { id: "r-1", text: "b" },
+        ];
+        const host = mount(
+            <VirtualList items={items} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} />,
+        );
+
+        liveObserver().fire([
+            { target: rowEl(host, "r-0"), contentRect: { height: 50, width: 400 } as DOMRectReadOnly },
+        ]);
+
+        expect(sizerHeight(host)).toBeCloseTo(50 + ROW_SHORT, 0);
+    });
+
+    it("ignores a zero-height entry, which means 'not laid out', not a 0px row", () => {
+        const items: Row[] = [
+            { id: "r-0", text: "a" },
+            { id: "tall-1", text: "b" },
+        ];
+        const host = mount(
+            <VirtualList items={items} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} />,
+        );
+
+        liveObserver().fire([borderBoxEntry(rowEl(host, "tall-1"), 0)]);
+
+        expect(sizerHeight(host)).toBeCloseTo(ROW_SHORT + ROW_TALL, 0);
+    });
+
+    it("observes each row once and lets go of rows that leave the window", () => {
+        const host = mount(
+            <VirtualList items={rows(1_000)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} />,
+        );
+        const viewport = viewportOf(host);
+        stubViewportHeight(viewport, VIEWPORT);
+        const firstRow = rowEl(host, "r-0");
+
+        scrollTo(viewport, 100 * ROW_SHORT);
+        scrollTo(viewport, 101 * ROW_SHORT);
+
+        const ro = liveObserver();
+        expect(ro.unobserve).toHaveBeenCalledWith(firstRow);
+
+        // What is observed is exactly what is rendered (plus the viewport, whose
+        // own resizes change how many rows fit) — no detached rows held alive.
+        const rendered = new Set(Array.from(host.querySelectorAll("[data-react-fancy-virtual-row-id]")));
+        const observedRows = Array.from(ro.observed).filter((el) => el !== viewport);
+        expect(new Set(observedRows)).toEqual(rendered);
+
+        // And no element was ever observed twice.
+        const targets = ro.observe.mock.calls.map(([el]) => el);
+        expect(new Set(targets).size).toBe(targets.length);
+    });
+
+    it("disconnects the observer on unmount", () => {
+        mount(<VirtualList items={rows(20)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} />);
+        const ro = liveObserver();
+
+        roots.splice(0).forEach((r) => act(() => r.unmount()));
+
+        expect(ro.disconnect).toHaveBeenCalled();
+    });
+
+    it("widens the window when the observer reports the viewport grew", () => {
+        const host = mount(
+            <VirtualList items={rows(1_000)} renderRow={renderRow} height="100%" estimateRowHeight={ROW_SHORT} />,
+        );
+        const viewport = viewportOf(host);
+        stubViewportHeight(viewport, VIEWPORT);
+        liveObserver().fire([borderBoxEntry(viewport, VIEWPORT)]);
+        expect(renderedIds(host)).not.toContain("r-30");
+
+        stubViewportHeight(viewport, 1_000);
+        liveObserver().fire([borderBoxEntry(viewport, 1_000)]);
+
+        // 1000px / 20px = 50 rows on screen now.
+        expect(renderedIds(host)).toContain("r-30");
+    });
+
+    // ------------------------------------------- behaviour is unchanged
+
+    it("still offsets later rows by what tall rows measured", () => {
+        const items: Row[] = [
+            { id: "r-0", text: "short" },
+            { id: "tall-1", text: "a wrapped message" },
+            { id: "r-2", text: "short" },
+        ];
+        const host = mount(
+            <VirtualList items={items} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} />,
+        );
+
+        expect(sizerHeight(host)).toBeCloseTo(ROW_SHORT + ROW_TALL + ROW_SHORT, 0);
+    });
+
+    it("still re-anchors scrollToId after the rows above the target are measured", () => {
+        const items = [...rows(5, "tall"), ...rows(100)];
+        const onResolved = vi.fn();
+        const host = mount(
+            <VirtualList
+                items={items}
+                renderRow={renderRow}
+                height={VIEWPORT}
+                estimateRowHeight={ROW_SHORT}
+                scrollToId="r-2"
+                onScrollToIdResolved={onResolved}
+            />,
+        );
+        const viewport = viewportOf(host);
+
+        expect(viewport.scrollTop).toBeGreaterThan(7 * ROW_SHORT);
+        expect(topOfRow(host, "r-2")).toBeCloseTo(viewport.scrollTop, 0);
+        expect(onResolved).toHaveBeenCalledWith("r-2", true);
+    });
+
+    it("still renders the rows the scroll position reaches", () => {
+        const host = mount(
+            <VirtualList items={rows(1_000)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} overscan={2} />,
+        );
+        const viewport = viewportOf(host);
+        stubViewportHeight(viewport, VIEWPORT);
+
+        scrollTo(viewport, 100 * ROW_SHORT);
+
+        const ids = renderedIds(host);
+        expect(ids).toContain("r-100");
+        expect(ids).not.toContain("r-0");
+        // overscan=2: rows 98..112 at most.
+        expect(ids).toContain("r-98");
+        expect(ids).not.toContain("r-97");
+    });
 });

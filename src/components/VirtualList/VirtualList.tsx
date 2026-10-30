@@ -136,37 +136,99 @@ export function VirtualList<T extends VirtualListRow>({
 
   // ---------------------------------------------------------------- measuring
 
-  const observer = useRef<ResizeObserver | null>(null);
+  //
+  // Every getBoundingClientRect() / clientHeight read after a commit forces a
+  // synchronous layout, and this list re-renders on every appended row. So a
+  // row is measured ONCE, when its element first appears, and from then on the
+  // ResizeObserver reports when it changes, with the size in the entry: no read
+  // that forces layout. An append costs one measurement; a render where nothing
+  // changed costs none. (Measured in genie#1340: re-measuring every visible row
+  // on every render was 472 forced row measurements/s with 11 agents streaming.)
 
-  useEffect(() => {
-    // Absent in jsdom and in older runtimes. Without it the list still measures
-    // on every render; it just does not notice a row reflowing in place.
+  const observer = useRef<ResizeObserver | null>(null);
+  /** Row elements currently observed, so each is observed once and released. */
+  const observed = useRef(new Set<Element>());
+
+  // A layout effect, declared before the measuring one, so the observer exists
+  // by the time the first window is measured and the first rows are observed.
+  useLayoutEffect(() => {
+    // Absent in jsdom and in older runtimes. Without it the list measures every
+    // visible row on every render instead, which is the only way it can notice
+    // a row reflowing in place.
     if (typeof ResizeObserver === "undefined") return;
 
-    const ro = new ResizeObserver(() => setMeasured((v) => v + 1));
+    const ro = new ResizeObserver((entries) => {
+      let changed = false;
+      for (const entry of entries) {
+        const el = entry.target as HTMLElement;
+
+        if (el === viewportRef.current) {
+          // The viewport's own resize changes how many rows fit. Reading
+          // clientHeight here is free: the browser has just done layout.
+          const ch = el.clientHeight;
+          if (ch > 0) setClientHeight(ch);
+          continue;
+        }
+
+        const id = el.getAttribute(ROW_ID_ATTR);
+        if (id === null) continue;
+
+        const h = entryHeight(entry);
+        if (h > 0 && heights.current.get(id) !== h) {
+          heights.current.set(id, h);
+          changed = true;
+        }
+      }
+
+      if (changed) setMeasured((v) => v + 1);
+    });
     observer.current = ro;
+
+    const vp = viewportRef.current;
+    if (vp) ro.observe(vp);
+
+    const tracked = observed.current;
 
     return () => {
       ro.disconnect();
       observer.current = null;
+      tracked.clear();
     };
   }, []);
 
-  // No dependency array on purpose: every render re-measures what is on screen,
-  // and the `changed` guard is what stops it looping. A render that learns
-  // nothing new sets no state.
+  // No dependency array on purpose: every render looks at what is on screen.
+  // That LOOK is cheap — walking the window's children reads no layout. Only a
+  // row seen for the first time is measured (or, with no ResizeObserver, every
+  // row, as nothing else would notice a reflow). A render that learns nothing
+  // new sets no state, which is what stops it looping.
   useLayoutEffect(() => {
     const win = windowRef.current;
     if (!win) return;
 
+    const ro = observer.current;
+    const tracked = observed.current;
+    const present = ro ? new Set<Element>() : null;
+
     let changed = false;
+    let measuredAny = false;
     for (const el of Array.from(win.children) as HTMLElement[]) {
       const id = el.getAttribute(ROW_ID_ATTR);
       if (id === null) continue;
 
-      observer.current?.observe(el);
+      if (ro && present) {
+        present.add(el);
+        // Already observed: the observer reports its resizes.
+        if (tracked.has(el)) continue;
+
+        ro.observe(el);
+        tracked.add(el);
+        // A row scrolling back into view: its height is known, and the
+        // observer's first report for the new element corrects it if it moved.
+        if (heights.current.has(id)) continue;
+      }
 
       const h = el.getBoundingClientRect().height;
+      measuredAny = true;
       // A zero height is "not laid out yet", not a 0px row. Recording it would
       // collapse the list and make every offset after it wrong.
       if (h > 0 && heights.current.get(id) !== h) {
@@ -175,8 +237,21 @@ export function VirtualList<T extends VirtualListRow>({
       }
     }
 
+    if (ro && present) {
+      for (const el of tracked) {
+        if (!present.has(el)) {
+          ro.unobserve(el);
+          tracked.delete(el);
+        }
+      }
+    }
+
+    // With an observer, the viewport's resizes arrive through it; read it here
+    // only when this pass has already paid for a layout, so it is free.
     const vp = viewportRef.current;
-    if (vp && vp.clientHeight > 0 && vp.clientHeight !== clientHeight) setClientHeight(vp.clientHeight);
+    if (vp && (!ro || measuredAny) && vp.clientHeight > 0 && vp.clientHeight !== clientHeight) {
+      setClientHeight(vp.clientHeight);
+    }
 
     if (changed) setMeasured((v) => v + 1);
   });
@@ -377,6 +452,20 @@ export function VirtualList<T extends VirtualListRow>({
 }
 
 const ROW_ID_ATTR = "data-react-fancy-virtual-row-id";
+
+/**
+ * A row's border-box height from a ResizeObserver entry. `borderBoxSize` is
+ * what getBoundingClientRect() would report; older engines lack it (and early
+ * Firefox gave a single object, not an array), so fall back to `contentRect`,
+ * which equals it for the row wrapper, as that carries no padding or border.
+ */
+function entryHeight(entry: ResizeObserverEntry): number {
+  const box = entry.borderBoxSize as ReadonlyArray<ResizeObserverSize> | ResizeObserverSize | undefined;
+  const first = Array.isArray(box) ? box[0] : (box as ResizeObserverSize | undefined);
+  if (first && typeof first.blockSize === "number") return first.blockSize;
+
+  return entry.contentRect?.height ?? 0;
+}
 /** Within this many px of the bottom counts as "at the bottom". */
 const BOTTOM_SLACK = 4;
 /** Ignore a touch jitter smaller than this before calling it an upward drag. */
