@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, type ReactElement } from "react";
+import { act, useState, type ReactElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { VirtualList } from "../src/components/VirtualList";
 
@@ -933,5 +933,276 @@ describe("measurement cost, with a ResizeObserver (genie#1340)", () => {
         // overscan=2: rows 98..112 at most.
         expect(ids).toContain("r-98");
         expect(ids).not.toContain("r-97");
+    });
+});
+
+/**
+ * Count every read of the viewport's `scrollTop`, while keeping the jsdom
+ * value readable and writable. Defined on the element itself so it sees
+ * exactly the reads the component makes and nothing else in the document.
+ */
+function countScrollTopReads(el: HTMLElement): { reads: () => number; peek: () => number } {
+    const proto = Object.getOwnPropertyDescriptor(Element.prototype, "scrollTop")!;
+    let reads = 0;
+    Object.defineProperty(el, "scrollTop", {
+        configurable: true,
+        get() {
+            reads += 1;
+            return proto.get!.call(this);
+        },
+        set(v: number) {
+            proto.set!.call(this, v);
+        },
+    });
+
+    return { reads: () => reads, peek: () => proto.get!.call(el) as number };
+}
+
+/**
+ * A consumer that does what the docs say: adopts `onFollowChange` as its
+ * state. Tests that need follow to actually break and resume use this, since
+ * the prop is the only thing that stops the list following.
+ */
+function Following(props: { items: Row[]; scrollToId?: string | null; onResolved?: (id: string, ok: boolean) => void }) {
+    const [following, setFollowing] = useState(true);
+
+    return (
+        <VirtualList
+            items={props.items}
+            renderRow={renderRow}
+            height={VIEWPORT}
+            estimateRowHeight={ROW_SHORT}
+            followTail={following}
+            onFollowChange={setFollowing}
+            scrollToId={props.scrollToId ?? null}
+            onScrollToIdResolved={props.onResolved}
+        />
+    );
+}
+
+describe("tail-follow cost, with a ResizeObserver (genie#1340 follow-up)", () => {
+    // After 5.71.1 stopped re-measuring every row, the follow-tail layout effect
+    // became the first layout read after every commit, and so paid the forced
+    // synchronous layout: 1,521 / 1,826 ms per 120 s in Genie's profile, against
+    // about 10 ms for the same line on 5.70.0. The list already knows where it
+    // is scrolled (onScroll, plus every scroll it makes itself), so it compares
+    // against that and never reads `scrollTop` in the commit.
+
+    beforeEach(() => {
+        FakeResizeObserver.instances = [];
+        (globalThis as { ResizeObserver?: unknown }).ResizeObserver = FakeResizeObserver;
+    });
+
+    it("reads scrollTop ZERO times per append while following the tail", () => {
+        const host = mount(
+            <VirtualList items={rows(50)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail />,
+        );
+        const viewport = viewportOf(host);
+        stubViewportHeight(viewport, VIEWPORT);
+        const counter = countScrollTopReads(viewport);
+
+        for (const count of [51, 52, 53, 54, 55]) {
+            const before = counter.reads();
+
+            rerender(
+                <VirtualList items={rows(count)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail />,
+            );
+
+            expect(counter.reads() - before).toBe(0);
+            expect(counter.peek()).toBeCloseTo(count * ROW_SHORT - VIEWPORT, 0);
+        }
+    });
+
+    it("reads nothing and writes nothing on a re-render where the bottom did not move", () => {
+        const host = mount(
+            <VirtualList items={rows(50)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail className="a" />,
+        );
+        const viewport = viewportOf(host);
+        const counter = countScrollTopReads(viewport);
+        const setter = vi.spyOn(viewport, "scrollTop", "set");
+
+        rerender(
+            <VirtualList items={rows(50)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail className="b" />,
+        );
+
+        expect(counter.reads()).toBe(0);
+        expect(setter).not.toHaveBeenCalled();
+    });
+
+    it("lands at the bottom on mount", () => {
+        const host = mount(
+            <VirtualList items={rows(50)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail />,
+        );
+
+        expect(viewportOf(host).scrollTop).toBeCloseTo(50 * ROW_SHORT - VIEWPORT, 0);
+    });
+
+    it("lands at the bottom when an empty list fills", () => {
+        const host = mount(
+            <VirtualList items={[]} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail />,
+        );
+        expect(viewportOf(host).scrollTop).toBe(0);
+
+        rerender(
+            <VirtualList items={rows(40)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail />,
+        );
+
+        expect(viewportOf(host).scrollTop).toBeCloseTo(40 * ROW_SHORT - VIEWPORT, 0);
+        expect(renderedIds(host)).toContain("r-39");
+    });
+
+    it("keeps the tail pinned when the observer reports the viewport resized", () => {
+        const host = mount(
+            <VirtualList items={rows(50)} renderRow={renderRow} height="100%" estimateRowHeight={ROW_SHORT} followTail />,
+        );
+        const viewport = viewportOf(host);
+        stubViewportHeight(viewport, VIEWPORT);
+        liveObserver().fire([borderBoxEntry(viewport, VIEWPORT)]);
+        expect(viewport.scrollTop).toBeCloseTo(50 * ROW_SHORT - VIEWPORT, 0);
+
+        // The panel got shorter: the bottom moves DOWN by the difference.
+        stubViewportHeight(viewport, 120);
+        liveObserver().fire([borderBoxEntry(viewport, 120)]);
+        expect(viewport.scrollTop).toBeCloseTo(50 * ROW_SHORT - 120, 0);
+
+        // And taller again.
+        stubViewportHeight(viewport, 300);
+        liveObserver().fire([borderBoxEntry(viewport, 300)]);
+        expect(viewport.scrollTop).toBeCloseTo(50 * ROW_SHORT - 300, 0);
+    });
+
+    it("keeps the tail pinned when the last row grows after it was measured", () => {
+        // A streaming message row that wraps onto more lines as tokens arrive.
+        const host = mount(
+            <VirtualList items={rows(50)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail />,
+        );
+        const viewport = viewportOf(host);
+
+        liveObserver().fire([borderBoxEntry(rowEl(host, "r-49"), 90)]);
+
+        expect(viewport.scrollTop).toBeCloseTo(49 * ROW_SHORT + 90 - VIEWPORT, 0);
+    });
+
+    it("stops following when the human scrolls away, and resumes when they come back", () => {
+        const host = mount(<Following items={rows(50)} />);
+        const viewport = viewportOf(host);
+        stubViewportHeight(viewport, VIEWPORT);
+        const bottom50 = 50 * ROW_SHORT - VIEWPORT;
+        expect(viewport.scrollTop).toBeCloseTo(bottom50, 0);
+        // Let the list see the scroll event its own pin produced, as a browser
+        // would deliver it.
+        scrollTo(viewport, bottom50);
+
+        // Scroll away (a scrollbar drag: no wheel, no key, only the position).
+        scrollTo(viewport, 300);
+        expect(viewport.getAttribute("data-react-fancy-virtual-list-following")).toBe("false");
+
+        rerender(<Following items={rows(60)} />);
+        expect(viewport.scrollTop).toBe(300);
+
+        // Back to the bottom, inside the slack: following again...
+        const bottom60 = 60 * ROW_SHORT - VIEWPORT;
+        scrollTo(viewport, bottom60 - 2);
+        expect(viewport.getAttribute("data-react-fancy-virtual-list-following")).toBe("true");
+
+        // ...and the next append is pinned, even though the list was 2px short.
+        rerender(<Following items={rows(61)} />);
+        expect(viewport.scrollTop).toBeCloseTo(61 * ROW_SHORT - VIEWPORT, 0);
+    });
+
+    it("a human scroll is tracked, so a consumer that keeps following re-pins without an append", () => {
+        // The consumer declines `onFollowChange(false)` (followTail stays true).
+        // Nothing about the bottom moved, so only the scroll event can tell the
+        // list it is no longer there; it must go back, as 5.71.1 did.
+        const onFollowChange = vi.fn();
+        const host = mount(
+            <VirtualList
+                items={rows(50)}
+                renderRow={renderRow}
+                height={VIEWPORT}
+                estimateRowHeight={ROW_SHORT}
+                followTail
+                onFollowChange={onFollowChange}
+            />,
+        );
+        const viewport = viewportOf(host);
+        stubViewportHeight(viewport, VIEWPORT);
+        // The scroll event the mount pin raised, which jsdom never delivers.
+        scrollTo(viewport, 50 * ROW_SHORT - VIEWPORT);
+
+        scrollTo(viewport, 300);
+
+        expect(onFollowChange).toHaveBeenCalledWith(false);
+        expect(viewport.scrollTop).toBeCloseTo(50 * ROW_SHORT - VIEWPORT, 0);
+    });
+
+    it("a deep link's scroll is tracked, so following afterwards still re-pins to the bottom", () => {
+        // The list was pinned at the bottom and knows it. A deep link then moves
+        // it, programmatically, with no scroll event yet. If the deep link did not
+        // update the tracked position, the list would still believe it sits at the
+        // bottom, see that the bottom has not moved, and never re-pin: following,
+        // but stranded mid-list. (Same outcome as 5.71.1, which read scrollTop.)
+        const onResolved = vi.fn();
+        const host = mount(<Following items={rows(50)} onResolved={onResolved} />);
+        const viewport = viewportOf(host);
+        const bottom = 50 * ROW_SHORT - VIEWPORT;
+        expect(viewport.scrollTop).toBeCloseTo(bottom, 0);
+
+        rerender(<Following items={rows(50)} scrollToId="r-10" onResolved={onResolved} />);
+
+        expect(onResolved).toHaveBeenCalledWith("r-10", true);
+        expect(viewport.scrollTop).toBeCloseTo(bottom, 0);
+    });
+
+    it("a deep link wins while it resolves, and holds when not following", () => {
+        const onResolved = vi.fn();
+        const host = mount(
+            <VirtualList
+                items={rows(100)}
+                renderRow={renderRow}
+                height={VIEWPORT}
+                estimateRowHeight={ROW_SHORT}
+                followTail={false}
+                scrollToId="r-40"
+                onScrollToIdResolved={onResolved}
+            />,
+        );
+        const viewport = viewportOf(host);
+
+        expect(onResolved).toHaveBeenCalledWith("r-40", true);
+        expect(viewport.scrollTop).toBeCloseTo(40 * ROW_SHORT, 0);
+
+        rerender(
+            <VirtualList
+                items={rows(120)}
+                renderRow={renderRow}
+                height={VIEWPORT}
+                estimateRowHeight={ROW_SHORT}
+                followTail={false}
+                scrollToId="r-40"
+                onScrollToIdResolved={onResolved}
+            />,
+        );
+        expect(viewport.scrollTop).toBeCloseTo(40 * ROW_SHORT, 0);
+    });
+});
+
+describe("tail-follow without a ResizeObserver", () => {
+    it("re-pins even when the position moved without a scroll event reaching the list", () => {
+        // The fallback still reads scrollTop. It already pays a layout per render
+        // to re-measure every row, so the read is free there, and it keeps the
+        // pre-5.71.2 behaviour exactly.
+        const host = mount(
+            <VirtualList items={rows(50)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail className="a" />,
+        );
+        const viewport = viewportOf(host);
+        stubViewportHeight(viewport, VIEWPORT);
+        viewport.scrollTop = 123;
+
+        rerender(
+            <VirtualList items={rows(50)} renderRow={renderRow} height={VIEWPORT} estimateRowHeight={ROW_SHORT} followTail className="b" />,
+        );
+
+        expect(viewport.scrollTop).toBeCloseTo(50 * ROW_SHORT - VIEWPORT, 0);
     });
 });

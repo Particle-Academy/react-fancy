@@ -11,6 +11,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`VirtualList` performance: following the tail no longer reads `scrollTop`
+  in every commit** (genie#1340 follow-up). With 5.71.1 measuring each row
+  once, the follow-tail layout effect became the first layout read after each
+  commit, so its `vp.scrollTop` read paid the forced synchronous layout the
+  measuring loop used to absorb. Genie profiled it in its real window (11
+  agents streaming, a list following the tail, two 120 s windows): the
+  measuring effect fell to 292 / 791 ms, and the follow-tail line rose to
+  1,521 / 1,826 ms per 120 s, against about 10 ms on 5.70.0. The effect now
+  compares against the position the list already tracks (the last `scroll`
+  event, plus every scroll it sets itself, including `scrollToId`), so it only
+  writes `scrollTop` when the bottom actually moved (rows, row heights or the
+  viewport changed) or someone scrolled, and never reads it. In a real browser
+  (Chromium, tail-following, 60 appends) `scrollTop` reads inside a commit
+  went from 3 per append to 0, and a re-render that moves nothing went from
+  1 read to 0; the one read per append left is in the `scroll` handler, which
+  is where the position comes from. Follow, stop-on-scroll-away, resume at the
+  bottom, deep links, mount, empty-to-filled and viewport resize behave as
+  before. Without a ResizeObserver (old runtimes, jsdom) the effect still
+  reads `scrollTop`, as that path already pays for a layout every render.
+  **Consumer action: none.** No prop, type, data attribute or behaviour
+  changed.
+
 ## [5.71.1] - 2026-10-30
 
 ### Fixed

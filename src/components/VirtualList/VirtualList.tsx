@@ -84,6 +84,15 @@ export function VirtualList<T extends VirtualListRow>({
   const [scrollTop, setScrollTop] = useState(0);
   const [clientHeight, setClientHeight] = useState(0);
 
+  /**
+   * Where the viewport is scrolled, as far as this list knows: the value from
+   * the last `scroll` event, or the last position it set itself. Every change
+   * to scrollTop raises a scroll event, so this is never wrong for longer than
+   * one frame — and reading it, unlike reading `vp.scrollTop` inside a commit,
+   * never forces a synchronous layout.
+   */
+  const knownTop = useRef(0);
+
   const attachViewport = useCallback(
     (el: HTMLDivElement | null) => {
       viewportRef.current = el;
@@ -293,6 +302,7 @@ export function VirtualList<T extends VirtualListRow>({
     if (anchored.current !== target) {
       anchored.current = target;
       vp.scrollTop = target;
+      knownTop.current = target;
       setScrollTop(target);
 
       return;
@@ -336,10 +346,21 @@ export function VirtualList<T extends VirtualListRow>({
     const vp = viewportRef.current;
     if (!vp) return;
 
+    // This is the first layout read after most commits, so reading
+    // `vp.scrollTop` here paid the forced synchronous layout on every append
+    // (genie#1340 follow-up: 1.5 to 1.8 s per 120 s with 11 agents streaming).
+    // Compare against the position the list already tracks instead, which only
+    // differs from `bottom` when the bottom moved (rows, measurements or the
+    // viewport changed) or someone scrolled — so a commit that moved nothing
+    // neither reads nor writes. Without a ResizeObserver the measuring pass has
+    // already paid for a layout this commit, so reading is free and keeps the
+    // fallback exactly as it was.
+    const current = observer.current ? knownTop.current : vp.scrollTop;
     const bottom = Math.max(0, total - viewport);
-    if (Math.abs(vp.scrollTop - bottom) > 0.5) {
+    if (Math.abs(current - bottom) > 0.5) {
       programmatic.current = true;
       vp.scrollTop = bottom;
+      knownTop.current = bottom;
       setScrollTop(bottom);
     }
   });
@@ -349,6 +370,7 @@ export function VirtualList<T extends VirtualListRow>({
     if (!vp) return;
 
     const next = vp.scrollTop;
+    knownTop.current = next;
     const previous = scrollTop;
     setScrollTop(next);
 
