@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.71.1] - 2026-10-30
+
 ### Fixed
 
 - **`VirtualList` performance: a row is measured once, not on every render**
