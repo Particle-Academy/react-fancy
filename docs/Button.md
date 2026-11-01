@@ -44,6 +44,7 @@ import { Button } from "@particle-academy/react-fancy";
 | sort | `string` | `"eiab"` | Sort order of decorative elements: `e`=emoji, `i`=icon, `a`=avatar, `b`=badge |
 | loading | `boolean` | `false` | Show loading spinner (disables the button) |
 | disabled | `boolean` | - | Disable the button |
+| type | `"button" \| "submit" \| "reset"` | `"button"` | Native button type. **Defaults to `"button"` since 6.0.0** (it was the HTML default, `submit`, before), so a Button inside a `<form>` does not submit it unless you pass `type="submit"`. Not applied in anchor mode. |
 | href | `string` | - | Render as an anchor tag instead of a button. Sanitized to a safe-protocol allow-list (since v2.5.0) — `javascript:`, `data:`, `vbscript:` are silently dropped and the component renders a `<button>` instead of an `<a>`. |
 
 Also extends all native `<button>` HTML attributes (except `color`).
@@ -73,6 +74,18 @@ Also extends all native `<button>` HTML attributes (except `color`).
 <Button loading badge="3" badgeTrailing>
   Messages
 </Button>
+```
+
+### In a form
+
+A Button is `type="button"` unless you say otherwise, so only the one that
+should submit says so:
+
+```tsx
+<form onSubmit={save}>
+  <Button type="button" variant="ghost" onClick={cancel}>Cancel</Button>
+  <Button type="submit" color="blue">Save</Button>
+</form>
 ```
 
 ### Link button with trailing icon

@@ -1058,6 +1058,9 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
               <span className="font-mono">{a.name}</span>
               <span className="text-zinc-400">{fmtSize(a.bytes)}</span>
               <button
+                // A bare <button> is `submit`: inside a host's <form> this chip
+                // submitted the form instead of only removing the attachment.
+                type="button"
                 onClick={() =>
                   commit((m) => ({
                     ...m,

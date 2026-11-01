@@ -506,6 +506,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         // props so a consumer-passed aria-busy still wins.
         aria-busy={loading || undefined}
         {...props}
+        // 6.0.0: `type="button"` unless the caller says otherwise. A bare
+        // <button> is `submit` by HTML default, so through 5.x every Button in
+        // a <form> (a Cancel, a toolbar toggle, the kit's own internal buttons)
+        // submitted it. AFTER the spread, read with `??`, so an explicit
+        // `submit` / `reset` / `button` wins and `type={undefined}` still gets
+        // the default rather than silently reverting to submit.
+        type={props.type ?? "button"}
       >
         {content}
       </button>

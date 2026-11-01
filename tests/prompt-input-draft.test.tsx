@@ -468,7 +468,9 @@ describe("PromptInput — a programmatic restore is not an edit", () => {
  * the textarea gained `data-react-fancy-prompt-input-textarea` (the contract's
  * stable handle; it had none), and nothing else moved. A second, in 5.71.3: the
  * attach / send Buttons gained `cursor-pointer` (Button's own fix, not
- * PromptInput's). Icon SVGs are stripped: the
+ * PromptInput's). A third, in 6.0.0: the attach / send Buttons gained
+ * `type="button"` (Button's new default; it was `submit` by HTML default, so
+ * both submitted an enclosing form). Icon SVGs are stripped: the
  * icon set loads asynchronously, so whether one has arrived depends on test
  * order, not on this component.
  */

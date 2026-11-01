@@ -11,6 +11,82 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.0] - 2026-11-01
+
+### Changed
+
+- **BREAKING: `Button` defaults to `type="button"`.** A `<Button>` with no
+  `type` used to render a bare `<button>`, and the HTML default for a bare
+  `<button>` is `submit`. Every Button inside a `<form>` therefore submitted it
+  on click, including a Cancel, a toolbar toggle, and the kit's own internal
+  buttons (listed below). An explicit `type` still wins: `type="submit"`,
+  `type="reset"` and `type="button"` render exactly as written.
+  (`type={undefined}`, which a wrapper forwarding an optional prop passes, gets
+  the default too.)
+
+  **What a consumer must DO:** add `type="submit"` to every `<Button>` (or the
+  deprecated `<Action>`) that is meant to submit a form. To find candidates,
+  list the Buttons in every file that renders a form:
+
+  ```bash
+  grep -rlE '<(form|Form)\b' --include='*.tsx' --include='*.jsx' src resources/js \
+    | xargs grep -nE '<(Button|Action)\b'
+  ```
+
+  Any hit without a `type` that is the form's Save / Submit / Send / Sign in is
+  one to change. Also check Buttons that submit a form from OUTSIDE it with the
+  `form="<id>"` attribute (`grep -rnE '\bform="' --include='*.tsx' --include='*.jsx' .`):
+  those need `type="submit"` as well. One more effect of the same cause: per the
+  HTML spec, pressing Enter in a field submits through the form's first submit
+  button, so a form with several fields whose only submit was an untyped Button
+  also stops submitting on Enter. Adding `type="submit"` restores both.
+
+  **What needs no action:**
+  - Buttons outside any `<form>` (the large majority). `button` and `submit`
+    behave identically there.
+  - Buttons that already pass a `type`.
+  - Anchor-mode Buttons (`href`, not disabled): they render an `<a>`, which has
+    no submit behaviour, and still get no `type` attribute. A disabled Button
+    with an `href` falls back to a `<button>` and gets the default like any
+    other.
+  - Forms submitted from code (`form.requestSubmit()`, a fetch in `onClick`).
+
+  **Internal components whose effective button type changed** (`submit` to
+  `button`; none of them was meant to submit a host's form, and each one now
+  stops doing so):
+  - **`PromptInput`**: the attach button, the send button (both
+    `sendButton="label"` and `"icon"`), and the attachment chip's remove button
+    (a native `<button>` with no type; fixed directly). Sending still calls
+    `onSubmit` exactly as before. **If you wrapped `PromptInput` in your own
+    `<form>` and relied on clicking send to ALSO submit that form natively**
+    (for its `name` / `pasteFilesName` fields), call `form.requestSubmit()` from
+    your `onSubmit`. ⌘/Ctrl+Enter never submitted the enclosing form, so until
+    now the click did and the keyboard did not.
+  - **`JsonEditor`**: the pending-strip accept / reject, the add (`+`) button,
+    and every row button: expand toggle, add, move up / move down, remove,
+    pending accept / reject, and the add form's Add / Cancel.
+  - **`MagicWand`**: every action in the floating / pill toolbar.
+  - **`ReasonTag`**: the "ask follow-up" button in its popover.
+
+  Already explicit, so unchanged: `ChatThread` (load earlier, jump to latest),
+  `ChatMessage` proposal accept / reject, and the `ContentRenderer` copy button.
+  Components that render their own native `<button>` (Dropdown triggers, Modal
+  close, Tabs, Accordion, Pagination, Calendar navigation, ColorPicker,
+  Sidebar, FullScreen toggle and the rest) do not go through `Button` and
+  already set `type="button"`; nothing about them changed. The one exception
+  was the `PromptInput` attachment chip above.
+
+  Raised with the Change Council as a MAJOR change (ref: _to be added_).
+  **A `^5` range will not receive this release**, by design: npm will not cross
+  a major on its own. Upgrading is a deliberate `npm install
+  @particle-academy/react-fancy@^6`. Sibling packages that declare a peer range
+  capped at `<6` must widen it before a consumer can install them alongside 6.
+
+- `docs/Button.md` documents the `type` prop and its default, with a form
+  example.
+- The `PromptInput` markup snapshots (`tests/__snapshots__/prompt-input-draft.test.tsx.snap`)
+  gained `type="button"` on the attach and send buttons, and nothing else.
+
 ## [5.72.0] - 2026-11-01
 
 ### Added
