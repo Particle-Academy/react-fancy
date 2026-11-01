@@ -11,6 +11,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.72.0] - 2026-11-01
+
+### Added
+
+- **`blob:` hrefs are accepted** (reported by Genie). A `URL.createObjectURL`
+  URL for an in-memory file was refused by `sanitizeHref` without a word, so
+  `<Button href="blob:...">` rendered a plain `<button>` and the link was
+  dead. `blob:` is accepted in the form a browser mints it,
+  `blob:<origin>/<id>` with an `http(s)://`, `null` or `file://` origin;
+  `blob:javascript:...`, `blob:data:...` and other wrappers stay refused. The
+  allow-list is shared, so this reaches every caller of it:
+  - `Button` (`href`, anchor mode)
+  - `ChatThread` / `ChatMessage` attachment links (`attachment.url`)
+  - `ContentRenderer` extension-tag attributes (`href`, `src`, `action`,
+    `formaction`, `xlink:href`)
+  - `sanitizeHtml` in its default (blocklist) mode, and so `ContentRenderer`,
+    `Editor` and `renderMarkdown` without `sanitize` options. Allowlist mode
+    (`sanitizeHtml(html, options)`) is unchanged: it keeps only the schemes
+    you list.
+  - the exported `sanitizeHref` itself
+- **A development warning when a component drops an href.** `Button` and
+  `ChatMessage` now `console.warn` once per distinct href when a non-empty
+  href is refused, naming the component and the scheme and showing only a
+  short prefix of the URL. Nothing is logged in production
+  (`NODE_ENV === "production"`), for an empty or missing href, or when
+  sanitising content (markdown, HTML, extension tags), where refusing hostile
+  markup is the job rather than a mistake.
+
+### Security
+
+- **`data:` remains refused, by decision**, for every media type and with or
+  without `download`: a navigable `data:text/html` is the risky case. Now
+  pinned by tests, together with `javascript:`, `vbscript:`, `file:` and the
+  obfuscated spellings (leading control characters, mixed case, whitespace
+  inside the scheme, entity and percent-encoded colons).
+
+**Consumer action: none.** An href that was silently dropped now works if it
+is `blob:`, and otherwise warns in development.
+
 ## [5.71.3] - 2026-11-01
 
 ### Fixed

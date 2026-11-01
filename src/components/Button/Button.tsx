@@ -1,6 +1,6 @@
 import { forwardRef, type AnchorHTMLAttributes, type ElementType, type ForwardedRef, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
-import { sanitizeHref } from "../../utils/sanitize";
+import { sanitizeComponentHref } from "../../utils/sanitize";
 import { resolve } from "../../data/emoji-utils";
 import { Icon } from "../Icon/Icon";
 import type { ButtonProps } from "./Button.types";
@@ -473,7 +473,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // -----------------------------------------------------------------------
     // Build the button element
     // -----------------------------------------------------------------------
-    const safeHref = sanitizeHref(href);
+    const safeHref = sanitizeComponentHref("Button", href);
     // Anchor mode renders `as` when provided (e.g. a router's <Link> for
     // client-side navigation — Inertia, React Router, Next). Previously `as`
     // fell through ...props onto the <a> where React silently DROPS a

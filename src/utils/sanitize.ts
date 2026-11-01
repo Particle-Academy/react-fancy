@@ -27,19 +27,97 @@ const DANGEROUS_TAGS = new Set([
 
 const URL_ATTRS = new Set(["href", "src", "action", "formaction", "xlink:href"]);
 
-const SAFE_PROTOCOL = /^(?:https?:|mailto:|tel:|sms:|ftp:|#|\/|\.\/|\.\.\/|[^:]*$)/i;
+/*
+ * The href allow-list. Anything not matched here is refused.
+ *
+ * `blob:` (5.72.0) is allowed, and only in the form a browser mints it:
+ * `blob:<origin>/<id>`, where the origin is `http(s)://host`, `null` (an
+ * opaque-origin document such as a sandboxed iframe) or `file://`. Why it is
+ * safe to allow, so nobody strips it as an oversight:
+ *   - A blob URL is bound to the origin that created it. A same-origin blob
+ *     was created by the app's own script; a cross-origin
+ *     `blob:https://other.example/...` opens that other origin's content,
+ *     which is no different from an `https:` link to it.
+ *   - It does not run script in OUR origin the way `javascript:` does.
+ *   - The inner part must be a real origin, so `blob:javascript:...` and
+ *     `blob:data:...` are refused. Browsers would not navigate them anyway
+ *     (no such blob exists), but they are never what an app meant.
+ *
+ * `data:` is REFUSED, every media type, with or without `download`: a
+ * navigable `data:text/html` is the risky case, and allowing some media types
+ * would turn this regex into a MIME parser. Decided in 5.72.0; pinned by
+ * tests/sanitize-href.test.tsx.
+ *
+ * Normalisation is `trim()` only. That fails closed: a URL with a control
+ * character or whitespace hidden inside its scheme (`java<TAB>script:`,
+ * `<U+0001>javascript:`) still contains a colon but matches no prefix, so it is
+ * refused. The `[^:]*$` branch (a relative URL) can only match a string with
+ * no colon at all, so it can never carry a scheme.
+ */
+const SAFE_PROTOCOL =
+  /^(?:https?:|mailto:|tel:|sms:|ftp:|blob:(?:https?:\/\/|null\/|file:\/\/)|#|\/|\.\/|\.\.\/|[^:]*$)/i;
 
 /**
  * Validate a URL/href against an allow-list of safe protocols. Returns the
- * input if safe, or `undefined` if it begins with a dangerous scheme like
- * `javascript:`, `data:`, or `vbscript:`. Relative URLs and fragment links
- * are allowed.
+ * (trimmed) input if safe, or `undefined` if it is empty or begins with any
+ * scheme not on the list, including `javascript:`, `data:`, `vbscript:` and
+ * `file:`. Allowed: `http:`, `https:`, `mailto:`, `tel:`, `sms:`, `ftp:`,
+ * `blob:` (as minted by `URL.createObjectURL`), and relative URLs and
+ * fragment links.
  */
 export function sanitizeHref(href: string | undefined | null): string | undefined {
   if (href == null) return undefined;
   const trimmed = href.trim();
   if (!trimmed) return undefined;
   return SAFE_PROTOCOL.test(trimmed) ? trimmed : undefined;
+}
+
+// Bundlers replace `process.env.NODE_ENV` textually; without one, the
+// reference throws and we read that as production.
+declare const process: { env: Record<string, string | undefined> };
+
+function isDev(): boolean {
+  try {
+    return process.env.NODE_ENV !== "production";
+  } catch {
+    return false;
+  }
+}
+
+const warnedHrefs = new Set<string>();
+
+/** How much of a refused href a warning shows. It may be long or carry a secret. */
+const WARN_PREFIX = 24;
+
+/**
+ * {@link sanitizeHref} for an href a CONSUMER handed to a component as a prop.
+ * In development, a non-empty href that is refused logs one `console.warn`
+ * per distinct component + href, naming the component and the scheme, so a
+ * dead link is not silent. Not used when sanitising content (markdown, HTML,
+ * extension tags): refusing hostile markup is that code's job, not a mistake
+ * to report, and its URLs are not the developer's.
+ *
+ * @internal Not exported from the package root.
+ */
+export function sanitizeComponentHref(
+  component: string,
+  href: string | undefined | null,
+): string | undefined {
+  const safe = sanitizeHref(href);
+  if (safe !== undefined || href == null || !href.trim() || !isDev()) return safe;
+  const key = `${component}\u0000${href}`;
+  if (warnedHrefs.has(key)) return safe;
+  warnedHrefs.add(key);
+  const visible = stripControlAndSpace(href);
+  const scheme = SCHEME.exec(visible)?.[1].toLowerCase();
+  const prefix = visible.length > WARN_PREFIX ? `${visible.slice(0, WARN_PREFIX)}...` : visible;
+  console.warn(
+    `${component}: refused href ${JSON.stringify(prefix)}` +
+      (scheme ? ` (scheme "${scheme}")` : "") +
+      ". Allowed: http:, https:, mailto:, tel:, sms:, ftp:, blob: and relative URLs; " +
+      "data: is refused by design. Rendering without a link.",
+  );
+  return safe;
 }
 
 function stripDangerousAttrs(el: Element): void {

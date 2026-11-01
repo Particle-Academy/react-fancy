@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
-import { sanitizeHref } from "../../utils/sanitize";
+import { sanitizeComponentHref } from "../../utils/sanitize";
 import { Avatar } from "../Avatar";
 import { Badge } from "../Badge";
 import { Button } from "../Button";
@@ -92,7 +92,7 @@ function AttachmentItem({
   if (renderAttachment) {
     body = renderAttachment(attachment, message);
   } else {
-    const href = sanitizeHref(attachment.url);
+    const href = sanitizeComponentHref("ChatMessage", attachment.url);
     const size = typeof attachment.size === "number" ? (
       <span className={cn("ml-1", TEXT_MUTED)}>({formatBytes(attachment.size)})</span>
     ) : null;
