@@ -406,7 +406,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       // twMerge lets a `text-center` / `text-right` in `className` win.
       "inline-flex items-center justify-center text-left font-medium transition-all duration-200",
       "focus:outline-none focus:ring-2 focus:ring-offset-1",
-      "disabled:opacity-50 disabled:cursor-not-allowed",
+      // Tailwind v4 preflight gives <button> `cursor: default`, so an enabled
+      // Button showed the arrow. Disabled / loading keep not-allowed via the
+      // `disabled:` variant; a consumer cursor class in `className` wins.
+      "cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
       isCircle ? "rounded-full" : "rounded-lg",
       sizeClass,
       getColorClasses(color, active, checked, warn, isGhost),
@@ -487,6 +490,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={classes}
         data-react-fancy-button=""
         data-react-fancy-action=""
+        aria-busy={loading || undefined}
         {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)}
       >
         {content}
@@ -498,6 +502,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         data-react-fancy-button=""
         data-react-fancy-action=""
+        // Present only while loading (never aria-busy="false"); spread before
+        // props so a consumer-passed aria-busy still wins.
+        aria-busy={loading || undefined}
         {...props}
       >
         {content}

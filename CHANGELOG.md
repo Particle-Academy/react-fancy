@@ -11,6 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.71.3] - 2026-11-01
+
+### Fixed
+
+- **`Button` shows a pointer cursor when enabled.** Tailwind v4's preflight
+  sets `cursor: default` on `<button>`, and Button added no cursor of its own,
+  so every enabled Button showed the arrow (reported by Genie). Button now
+  carries `cursor-pointer`; `disabled:cursor-not-allowed` is unchanged, so a
+  disabled or `loading` Button still shows not-allowed. A cursor class in
+  `className` (e.g. `cursor-wait`) still wins via twMerge. Anchor mode gets the
+  same class, matching what the `<a>` already did.
+- **`Button` sets `aria-busy="true"` while `loading`**, on both the `<button>`
+  and anchor (`href`) modes. The attribute is omitted entirely when not loading
+  (never `aria-busy="false"`), and an `aria-busy` you pass yourself still wins.
+
+**Consumer action: none.** If you added your own
+`[data-react-fancy-button] { cursor: pointer }` rule to work around the arrow,
+you can remove it.
+
 ## [5.71.2] - 2026-10-30
 
 ### Fixed
