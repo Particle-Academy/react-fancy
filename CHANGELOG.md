@@ -76,7 +76,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   already set `type="button"`; nothing about them changed. The one exception
   was the `PromptInput` attachment chip above.
 
-  Raised with the Change Council as a MAJOR change (ref: _to be added_).
+  Raised with the Change Council as a MAJOR change: **CC-fancy-0003**, approved
+  by the owner on 2026-11-01 ("consumers need to adopt and adapt").
   **A `^5` range will not receive this release**, by design: npm will not cross
   a major on its own. Upgrading is a deliberate `npm install
   @particle-academy/react-fancy@^6`. Sibling packages that declare a peer range
