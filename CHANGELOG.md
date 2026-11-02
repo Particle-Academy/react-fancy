@@ -27,6 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   selected option and the container are now watched with a `ResizeObserver`
   and the thumb re-measures. Where `ResizeObserver` does not exist (SSR, older
   jsdom) it measures on selection only, as before. No consumer action needed.
+- **`Tabs`: no tab was keyboard-reachable when the controlled value matched
+  none.** `Tabs.Tab` set `tabIndex` to 0 only on the active tab, so an
+  `activeTab` naming no tab (a route showing a view with no tab) left every tab
+  at -1. The first enabled tab in the tablist now takes the tab stop in that
+  case; when a tab is active it alone holds the stop, as before. `Tabs.Tab` now
+  also forwards a caller's `ref` alongside its own. No consumer action needed.
 
 ## [6.1.0] - 2026-11-01
 

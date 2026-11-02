@@ -1,11 +1,34 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
-import { useTabs } from "./Tabs.context";
+import { TabsListContext, useTabs } from "./Tabs.context";
 import type { TabsListProps } from "./Tabs.types";
 
 export function TabsList({ children, className }: TabsListProps) {
-  const { variant } = useTabs();
+  const { variant, activeTab } = useTabs();
   const listRef = useRef<HTMLDivElement>(null);
+  const [fallback, setFallback] = useState<HTMLElement | null>(null);
+
+  // Which tab holds the stop when none is active. Read from the rendered
+  // tablist, the same source the arrow keys use, so "first" means first in
+  // the DOM whatever wraps the tabs. Tabs of a nested tablist are skipped.
+  const refresh = useCallback(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const own = Array.from(list.querySelectorAll<HTMLElement>('[role="tab"]')).filter(
+      (el) => el.closest('[role="tablist"]') === list,
+    );
+    const anyActive = own.some((el) => el.getAttribute("aria-selected") === "true");
+    const next = anyActive
+      ? null
+      : (own.find((el) => !(el as HTMLButtonElement).disabled) ?? null);
+    setFallback((prev) => (prev === next ? prev : next));
+  }, []);
+
+  useLayoutEffect(() => {
+    refresh();
+  }, [refresh, activeTab, children]);
+
+  const listCtx = useMemo(() => ({ fallback, refresh }), [fallback, refresh]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     const buttons = listRef.current?.querySelectorAll<HTMLButtonElement>(
@@ -44,7 +67,7 @@ export function TabsList({ children, className }: TabsListProps) {
         className,
       )}
     >
-      {children}
+      <TabsListContext.Provider value={listCtx}>{children}</TabsListContext.Provider>
     </div>
   );
 }

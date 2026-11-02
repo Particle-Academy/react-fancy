@@ -1,5 +1,7 @@
+import { useContext, useLayoutEffect, useMemo, useState, type Ref } from "react";
 import { cn } from "../../utils/cn";
-import { useTabs } from "./Tabs.context";
+import { composeRefs } from "../../utils/compose-refs";
+import { TabsListContext, useTabs } from "./Tabs.context";
 import type { TabsTabProps } from "./Tabs.types";
 
 export function TabsTab({
@@ -11,7 +13,26 @@ export function TabsTab({
   ...rest
 }: TabsTabProps) {
   const { activeTab, setActiveTab, variant } = useTabs();
+  const list = useContext(TabsListContext);
   const isActive = activeTab === value;
+
+  // The node lives in state, not a ref, so comparing it to the list's
+  // fallback during render is a pure read.
+  const [node, setNode] = useState<HTMLButtonElement | null>(null);
+  const externalRef = (rest as { ref?: Ref<HTMLButtonElement> }).ref;
+  const setRef = useMemo(() => composeRefs(externalRef, setNode), [externalRef]);
+
+  // Re-derive the fallback when this tab changes in a way the list may not
+  // have rendered for, and when it leaves.
+  const refresh = list?.refresh;
+  useLayoutEffect(() => {
+    refresh?.();
+    return () => refresh?.();
+  }, [refresh, disabled, value]);
+
+  // Roving tabindex: the active tab holds the stop. When no tab is active the
+  // list names the first enabled one, so the tablist is never unreachable.
+  const isStop = isActive || (node !== null && list?.fallback === node);
 
   return (
     <button
@@ -20,9 +41,10 @@ export function TabsTab({
       role="tab"
       disabled={disabled}
       aria-selected={isActive}
-      tabIndex={isActive ? 0 : -1}
+      tabIndex={isStop ? 0 : -1}
       onClick={(e) => { if (!disabled) setActiveTab(value); onClick?.(e); }}
       {...rest}
+      ref={setRef}
       className={cn(
         "text-sm font-medium transition-colors",
         disabled && "cursor-not-allowed opacity-50",
