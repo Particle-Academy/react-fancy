@@ -42,6 +42,9 @@ describe("default Button fill follows the theme tokens", () => {
 
   it("leaves a coloured Button alone", () => {
     const violet = classesOf(renderToStaticMarkup(<Button color="violet">Save</Button>));
-    expect(violet.some((c) => c.includes("--fancy-surface"))).toBe(false);
+    // The FILL. Since 6.1.0 every Button's focus ring is offset against the
+    // surface token (so dark mode has no white gap); that is not the fill.
+    const fill = violet.filter((c) => !c.includes("focus-visible:"));
+    expect(fill.some((c) => c.includes("--fancy-surface"))).toBe(false);
   });
 });
