@@ -10,6 +10,13 @@ import { Sidebar } from "../src/components/Sidebar";
  * any of that existed, so a diff here is a change to what every existing
  * Sidebar consumer renders. Keep them byte-identical unless the change is
  * deliberate, and say so here when it is.
+ *
+ * DELIBERATE CHANGE, 6.2.0: the "expanded" snapshot gained ONE element,
+ * `<span class="sr-only"> </span>`, between the label and the badge of the
+ * item WITH a badge (Inbox). It is visually hidden text only, no visual
+ * change: without it the label and badge concatenated in the accessible name
+ * ("Inbox3"). Items without a badge, and both collapsed snapshots, are
+ * byte-identical to 6.0.0. Nothing else may change here.
  */
 
 const icon = <svg data-icon="" />;

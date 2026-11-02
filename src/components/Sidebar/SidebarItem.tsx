@@ -25,6 +25,7 @@ export function SidebarItem({
   active = false,
   disabled = false,
   badge,
+  badgeLabel,
   collapsedBadge = false,
   dot,
   dotLabel,
@@ -55,13 +56,26 @@ export function SidebarItem({
   const dotColor: SidebarDotColor | null = dot === true ? "red" : dot || null;
   const showCollapsedBadge = collapsed && collapsedBadge && Boolean(badge);
   const hasMarks = dotColor !== null || showCollapsedBadge;
+  // `badgeLabel` (6.2.0) is read in place of the visible badge, so it only
+  // exists while the badge is actually rendered: always expanded, and
+  // collapsed only with `collapsedBadge`.
+  const badgeShown = Boolean(badge) && (!collapsed || showCollapsedBadge);
+  const badgeLabelEl =
+    badgeShown && badgeLabel ? (
+      // The comma is the separator, so whatever renders before this must not
+      // end in a space ("tynn , 2 agents"); see the two trailing spaces below.
+      <span className="sr-only" data-react-fancy-sidebar-badge-label="">
+        {`, ${badgeLabel}`}
+      </span>
+    ) : null;
   const dotLabelEl =
     dotColor && dotLabel ? (
       // The spaces are load-bearing: adjacent inline elements concatenate in
       // the accessible name, so without them it reads "Inbox3 unread".
       <span className="sr-only" data-react-fancy-sidebar-dot-label="">
         {" "}
-        {dotLabel}{" "}
+        {dotLabel}
+        {badgeLabelEl ? null : " "}
       </span>
     ) : null;
   // Collapsed, the item's visible content is only an icon (or an
@@ -76,6 +90,7 @@ export function SidebarItem({
       {showCollapsedBadge && (
         <span
           data-react-fancy-sidebar-badge=""
+          aria-hidden={badgeLabelEl ? "true" : undefined}
           className="pointer-events-none absolute -right-3 -top-2.5 whitespace-nowrap"
         >
           {badge}
@@ -140,10 +155,12 @@ export function SidebarItem({
     >
       {needsHiddenLabel && (
         <span className="sr-only" data-react-fancy-sidebar-label="">
-          {children}{" "}
+          {children}
+          {badgeLabelEl && !dotLabelEl ? null : " "}
         </span>
       )}
       {collapsed && dotLabelEl}
+      {collapsed && badgeLabelEl}
       {showIconOnly && (
         <span className={iconClass}>
           {icon}
@@ -182,7 +199,18 @@ export function SidebarItem({
           */}
           <span className="min-w-0 flex-1 truncate text-left">{children}</span>
           {dotLabelEl}
-          {badge && <span className="shrink-0">{badge}</span>}
+          {/*
+            Label and badge are adjacent elements, and adjacent elements
+            concatenate in a layout-unaware accessible name: "tynn2". A visually
+            hidden space separates them (6.2.0); with `badgeLabel`, the label is
+            read instead and the badge itself is hidden from assistive tech.
+          */}
+          {badge && (badgeLabelEl ?? <span className="sr-only"> </span>)}
+          {badge && (
+            <span className="shrink-0" aria-hidden={badgeLabelEl ? "true" : undefined}>
+              {badge}
+            </span>
+          )}
         </>
       )}
     </Tag>

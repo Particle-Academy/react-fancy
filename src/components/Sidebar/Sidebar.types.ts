@@ -63,6 +63,15 @@ export interface SidebarItemProps extends NavigableProps {
   disabled?: boolean;
   badge?: ReactNode;
   /**
+   * What the badge means, for screen readers ("2 agents"). When set, the
+   * visible badge is hidden from assistive tech and this is added to the
+   * item's accessible name after a comma: "tynn, 2 agents". Without it the
+   * badge's own text is read, after a visually hidden space ("tynn 2").
+   * Ignored while the badge is not rendered (collapsed without
+   * `collapsedBadge`). Handle: `data-react-fancy-sidebar-badge-label`.
+   */
+  badgeLabel?: string;
+  /**
    * Also render `badge` when the sidebar is collapsed, as an overlay at the
    * corner of the icon (or of the letters). Off by default: a collapsed rail
    * has never shown badges, and a wide badge ("Beta") over a 20px icon is not

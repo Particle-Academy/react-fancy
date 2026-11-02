@@ -49,6 +49,7 @@ import { Sidebar, Icon } from "@particle-academy/react-fancy";
 | active | `boolean` | - | Active state highlight |
 | disabled | `boolean` | - | Disable the item |
 | badge | `ReactNode` | - | Trailing badge element (expanded only, unless `collapsedBadge`) |
+| badgeLabel | `string` | - | What the badge means for screen readers ("2 agents"). The visible badge is hidden from assistive tech and the name reads "tynn, 2 agents". See [Badges and the accessible name](#badges-and-the-accessible-name) |
 | collapsedBadge | `boolean` | `false` | Also show `badge` on a collapsed rail, as an overlay at the icon's corner. Best for short counts |
 | dot | `boolean \| Color` | - | Attention dot at the icon's corner, shown expanded and collapsed. `true` is red; any Badge colour otherwise |
 | dotLabel | `string` | - | Screen-reader text for the dot ("3 unread"), visually hidden and added to the item's accessible name |
@@ -133,6 +134,31 @@ readers.
 - Handles: `data-react-fancy-sidebar-dot` (with `data-color` and
   `data-position`), `data-react-fancy-sidebar-dot-label`,
   `data-react-fancy-sidebar-badge` for the collapsed badge overlay.
+
+## Badges and the accessible name
+
+A badge's text is part of the item's accessible name. A visually hidden space
+separates it from the label, so a bare count reads "tynn 2". When the count
+needs words to make sense, pass `badgeLabel`: the visible badge is hidden from
+assistive tech and the label is read instead, after a comma.
+
+```tsx
+<Sidebar.Item
+  icon={<Icon name="bot" size="sm" />}
+  badge={<Badge size="sm">2</Badge>}
+  badgeLabel="2 agents"
+>
+  tynn
+</Sidebar.Item>
+// accessible name: "tynn, 2 agents"
+```
+
+- It composes with `dotLabel` ("tynn needs you, 2 agents") and with
+  `collapsedBadge` on a collapsed rail, where the item is still named by its
+  label first.
+- Collapsed without `collapsedBadge` the badge is not rendered, so
+  `badgeLabel` is not read either.
+- Handle: `data-react-fancy-sidebar-badge-label`.
 
 ## Navigation landmark
 

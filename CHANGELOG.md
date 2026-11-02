@@ -11,6 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`Sidebar.Item` `badgeLabel`: words for the badge.** A bare count ("2")
+  means nothing on its own to a screen reader. With `badgeLabel="2 agents"` the
+  visible badge gets `aria-hidden` and the label is added to the item's
+  accessible name as visually hidden text after a comma: "tynn, 2 agents". It
+  works expanded and on a collapsed rail with `collapsedBadge`, and composes
+  with `dotLabel` ("tynn needs you, 2 agents"). It is ignored while the badge is
+  not rendered. Handle: `data-react-fancy-sidebar-badge-label`.
+
+### Fixed
+
+- **`Sidebar.Item`: an expanded item's label and badge ran together in the
+  accessible name ("tynn2").** A visually hidden space now separates them
+  ("tynn 2"). This adds one `<span class="sr-only"> </span>` before the badge
+  of an expanded item that has a `badge`; nothing changes visually, and items
+  without a badge render byte-identical markup. No consumer action needed,
+  unless you snapshot Sidebar markup, in which case expect that one element.
+
 ## [6.1.1] - 2026-11-01
 
 ### Fixed
