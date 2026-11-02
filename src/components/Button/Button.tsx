@@ -405,7 +405,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       // width-constrained multi-word label stacks left-aligned. Overridable —
       // twMerge lets a `text-center` / `text-right` in `className` win.
       "inline-flex items-center justify-center text-left font-medium transition-all duration-200",
-      "focus:outline-none focus:ring-2 focus:ring-offset-1",
+      // `focus-visible:`, not `focus:` — `:focus` also matches a MOUSE-clicked
+      // button, so a clicked Button kept its ring until focus moved, and with no
+      // ring colour the ring fell back to currentColor (a thick near-black
+      // outline on a highlighted row). The colour + offset come from the same
+      // focus / surface tokens FileUpload's dropzone uses, so dark mode gets a
+      // blue-400 ring and no white offset gap.
+      "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
+      "focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))] focus-visible:ring-offset-[color:var(--fancy-surface,var(--color-white))]",
+      "dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))] dark:focus-visible:ring-offset-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
       // Tailwind v4 preflight gives <button> `cursor: default`, so an enabled
       // Button showed the arrow. Disabled / loading keep not-allowed via the
       // `disabled:` variant; a consumer cursor class in `className` wins.

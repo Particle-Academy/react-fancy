@@ -102,3 +102,11 @@ should submit says so:
 <Button variant="ghost" color="red" icon="trash-2">Delete</Button>
 <Button variant="ghost" icon="download">Export</Button>
 ```
+
+## Focus ring
+
+The ring shows on `:focus-visible` only, so it appears when someone reaches the
+Button by keyboard and not after a mouse click. It uses the focus token
+(`--fancy-focus`, blue-500 by default; `--fancy-focus-dark`, blue-400, in dark
+mode) and is offset against the surface token, so dark mode gets no white gap.
+Override it with `focus-visible:ring-*` classes in `className`.

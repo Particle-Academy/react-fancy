@@ -40,7 +40,7 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(
             type="button"
             onClick={onDismiss}
             className={cn(
-              "shrink-0 rounded p-0.5 opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-current",
+              "shrink-0 rounded p-0.5 opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-current",
             )}
             aria-label="Dismiss"
           >

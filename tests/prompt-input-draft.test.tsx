@@ -470,7 +470,10 @@ describe("PromptInput — a programmatic restore is not an edit", () => {
  * attach / send Buttons gained `cursor-pointer` (Button's own fix, not
  * PromptInput's). A third, in 6.0.0: the attach / send Buttons gained
  * `type="button"` (Button's new default; it was `submit` by HTML default, so
- * both submitted an enclosing form). Icon SVGs are stripped: the
+ * both submitted an enclosing form). A fourth, in 6.1.0: the attach / send
+ * Buttons' focus ring moved from `focus:` to `focus-visible:` and gained a
+ * colour (Button's own fix; a mouse click no longer leaves a currentColor
+ * ring). Icon SVGs are stripped: the
  * icon set loads asynchronously, so whether one has arrived depends on test
  * order, not on this component.
  */

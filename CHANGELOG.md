@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`Button` no longer keeps a focus ring after a mouse click.** The ring was
+  on `:focus`, which a click also triggers, and it had no colour, so it fell
+  back to `currentColor`: a highlighted row showed a thick near-black outline
+  after every click. It is now on `:focus-visible` (keyboard focus) and uses the
+  focus token (`--fancy-focus`, blue-500; `--fancy-focus-dark`, blue-400 in
+  dark mode), offset against the surface token so dark mode has no white gap.
+  `Callout`'s dismiss button had the same `:focus` ring and gets the same
+  change (its `currentColor` ring is kept: there it is the callout's own hue).
+  A visual fix: **no consumer action needed.** If you overrode the ring with
+  `focus:ring-*` classes in `className`, switch them to `focus-visible:ring-*`
+  to keep the override.
+
 ## [6.0.0] - 2026-11-01
 
 ### Changed
