@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.6.0] - 2026-11-02
+
 ### Fixed
 
 - **`CodeBlock` and `CodeView` no longer flash light on a dark site.** They picked one palette with a client-only hook, so server-rendered HTML always carried the light colours until hydration. Now the root carries BOTH palettes as CSS variables (`--fc-<slot>-l` / `--fc-<slot>-d`), every colour reads `var(--fc-<slot>, var(--fc-<slot>-l))`, and CSS switches to dark: the root's `dark:[--fc-<slot>:var(--fc-<slot>-d)]` classes (compiled by your Tailwind from the `@source`d dist, so they follow your `dark` variant, class or media) and a zero-specificity `styles.css` rule under `.dark` / `[data-theme="dark"]` for hosts that do not scan the package. Server and client markup are now identical in both themes. Verified in a real browser: dark under `.dark`, under `[data-theme="dark"]`, with only the Tailwind CSS, and with only `styles.css`; light with no CSS at all.
