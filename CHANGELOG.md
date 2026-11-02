@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Token spans read CSS variables instead of carrying hex colours** (`style="color:var(--fc-keyword,var(--fc-keyword-l))"`), and the root's `background-color` / `color` / `border-color` are `var()` references too. **Consumer action:** none for rendering. If a test asserted a literal colour on a `CodeBlock` / `CodeView` element (e.g. `style.backgroundColor === "rgb(24, 24, 27)"` under `.dark`), assert the `--fc-*` variables instead; jsdom does not resolve `var()`. To recolour a slot, set its variables on the component: `style={{ "--fc-keyword-l": "...", "--fc-keyword-d": "..." }}`.
 - **The internal `useIsDark` hook is removed.** It was never exported. Nothing in either component reads `matchMedia` or the document's class any more.
-- **Requires `@particle-academy/fancy-file-commons` `>=0.5`** (still `<2.0`), the first release with `highlightCodeWithVariables`, `themeVariables` and `tokenize`'s `snippet` option. npm installs it for you. **Consumer action:** none. *(Release step, not yet applied: raise the `dependencies` range from `>=0.4` together with the lockfile once 0.5.0 is on the registry.)*
+- **Requires `@particle-academy/fancy-file-commons` `>=0.5`** (still `<2.0`), the first release with `highlightCodeWithVariables`, `themeVariables` and `tokenize`'s `snippet` option. npm installs it for you. **Consumer action:** none.
 
 ## [6.5.0] - 2026-11-02
 
