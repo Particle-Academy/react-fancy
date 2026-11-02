@@ -195,3 +195,74 @@ describe("Breadcrumbs collapsed dropdown", () => {
     expect(item.getAttribute("href")).toBe("/projects");
   });
 });
+
+/**
+ * `title` and other element attributes reach the crumb.
+ *
+ * `BreadcrumbsItemProps` was widened to the element's HTML attributes so a
+ * consumer can title a crumb it truncates (Genie). The type is only worth
+ * widening if the attribute lands on the element in EVERY branch the crumb can
+ * render as, so each branch is asserted here.
+ */
+describe("Breadcrumbs.Item forwards element attributes", () => {
+  it("puts title, id and aria-* on a link, an `as` link, a button and a span", () => {
+    const RouterLink = ({ href, ...rest }: { href?: string; [k: string]: unknown }) => (
+      <a data-router-link="" href={href} {...rest} />
+    );
+
+    mount(
+      <Breadcrumbs>
+        <Breadcrumbs.Item href="/a" title="Link title" id="c-link" aria-describedby="h">
+          link
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item as={RouterLink} href="/b" title="As title">
+          as
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item onClick={vi.fn()} title="Button title">
+          button
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item active title="Span title">
+          span
+        </Breadcrumbs.Item>
+      </Breadcrumbs>,
+    );
+
+    expect(crumb("link")!.tagName).toBe("A");
+    expect(crumb("link")!.getAttribute("title")).toBe("Link title");
+    expect(crumb("link")!.id).toBe("c-link");
+    expect(crumb("link")!.getAttribute("aria-describedby")).toBe("h");
+
+    expect(crumb("as")!.hasAttribute("data-router-link")).toBe(true);
+    expect(crumb("as")!.getAttribute("title")).toBe("As title");
+
+    expect(crumb("button")!.tagName).toBe("BUTTON");
+    expect(crumb("button")!.getAttribute("title")).toBe("Button title");
+
+    expect(crumb("span")!.tagName).toBe("SPAN");
+    expect(crumb("span")!.getAttribute("title")).toBe("Span title");
+  });
+
+  it("carries title into the collapsed dropdown entry, and nothing else", () => {
+    // The dropdown rebuilds each crumb as a new element. `title` is carried
+    // because it is the truncated crumb's full text, and the narrow menu is
+    // exactly where a label gets cut. `id` is deliberately NOT carried: both
+    // trails are in the DOM at once (CSS hides one), so it would be duplicated.
+    mount(
+      <Breadcrumbs>
+        <Breadcrumbs.Item href="/projects" title="All projects" id="crumb-projects">
+          Projects
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item active>Settings</Breadcrumbs.Item>
+      </Breadcrumbs>,
+    );
+
+    const dropdown = document.querySelector("[data-react-fancy-breadcrumbs-dropdown]")!;
+    act(() => {
+      (dropdown.querySelector("button") as HTMLButtonElement).click();
+    });
+
+    const entry = Array.from(dropdown.querySelectorAll("a")).find((el) => el.textContent === "Projects")!;
+    expect(entry.getAttribute("title")).toBe("All projects");
+    expect(document.querySelectorAll("#crumb-projects")).toHaveLength(1);
+  });
+});

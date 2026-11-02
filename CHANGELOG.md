@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`BreadcrumbsItemProps` now accepts the element's HTML attributes.**
+  `Breadcrumbs.Item` always forwarded `title`, `id`, `aria-*`, `style` and
+  handlers to the element it renders, but the type listed its keys by hand and
+  rejected them, so a consumer titling a truncated crumb had to cast. It now
+  extends `HTMLAttributes<HTMLElement>` (the attributes valid on every element a
+  crumb can be: `<a>`, the `as` component, `<button>`, `<span>`), with
+  `onClick` kept at its existing `() => void` signature. The collapsed (below
+  `md`) dropdown now carries a crumb's `title` onto its menu entry; other
+  attributes stay on the trail, because both trails are in the DOM at once and
+  an `id` or `data-*` handle would be duplicated. **No action needed:** this
+  only adds accepted props, and every existing usage type-checks unchanged.
+
 ## [6.2.0] - 2026-11-01
 
 ### Added

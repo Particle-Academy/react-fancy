@@ -29,6 +29,11 @@ function BreadcrumbsRoot({
       as: el.props?.as,
       onClick: el.props?.onClick,
       active: el.props?.active,
+      // Only `title` crosses into the menu. It is the full text of a crumb the
+      // consumer truncated, and the narrow menu is where labels get cut. Other
+      // attributes stay on the trail: both trails are in the DOM at once (CSS
+      // hides one), so an `id` or a `data-*` handle would be duplicated.
+      title: el.props?.title,
     };
   });
 

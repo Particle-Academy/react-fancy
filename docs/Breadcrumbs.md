@@ -34,8 +34,17 @@ import { Breadcrumbs } from "@particle-academy/react-fancy";
 |------|------|---------|-------------|
 | children | `ReactNode` | - | Item label |
 | href | `string` | - | Link URL (renders an anchor when provided) |
-| active | `boolean` | - | Mark as the current page (no link) |
+| as | `ElementType` | - | Link component to render instead of `<a>`, e.g. a router's `<Link>` |
+| onClick | `() => void` | - | Navigate by callback; renders a `<button>` when there is no `href` |
+| active | `boolean` | - | Mark as the current page (no link, `aria-current="page"`) |
 | className | `string` | - | Additional CSS classes |
+| ...HTML attributes | `HTMLAttributes<HTMLElement>` | - | `title`, `id`, `aria-*`, `style`, handlers: forwarded to the crumb's element. Only `title` is also carried into the mobile dropdown |
+
+```tsx
+<Breadcrumbs.Item href="/projects/42" title="Quarterly planning for the platform team">
+  Quarterly planning…
+</Breadcrumbs.Item>
+```
 
 ## Shrinkable Breadcrumbs
 

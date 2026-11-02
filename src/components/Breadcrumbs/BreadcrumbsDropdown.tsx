@@ -10,6 +10,7 @@ interface BreadcrumbsDropdownItem {
   as?: ElementType;
   onClick?: () => void;
   active?: boolean;
+  title?: string;
 }
 
 interface BreadcrumbsDropdownProps {
@@ -52,6 +53,7 @@ export function BreadcrumbsDropdown({ items, activeLabel }: BreadcrumbsDropdownP
                 <Link
                   key={i}
                   {...(item.href ? { href: item.href } : {})}
+                  title={item.title}
                   className={cls}
                   onClick={() => {
                     item.onClick?.();
@@ -69,6 +71,7 @@ export function BreadcrumbsDropdown({ items, activeLabel }: BreadcrumbsDropdownP
                 <button
                   key={i}
                   type="button"
+                  title={item.title}
                   className={cn(cls, "cursor-pointer border-0 bg-transparent")}
                   onClick={() => {
                     onClick();
@@ -81,7 +84,7 @@ export function BreadcrumbsDropdown({ items, activeLabel }: BreadcrumbsDropdownP
             }
 
             return (
-              <span key={i} className={cls}>
+              <span key={i} title={item.title} className={cls}>
                 {item.label}
               </span>
             );
