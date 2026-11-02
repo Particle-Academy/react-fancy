@@ -35,7 +35,24 @@ With `title`, the copy button sits in the header with a visible "Copy" label. Wi
 
 ## Highlighting
 
-Only **HTML** is highlighted (`language` of `"html"`, `"htm"`, `"xml"` or `"xhtml"`). It is the one grammar `@particle-academy/fancy-file-commons` ships. **Every other language, including `bash`, `json`, `env`, `php`, `typescript` and `python`, renders as plain, un-highlighted text** in the same font, size and palette. Unknown languages fall back the same way, and nothing throws. `language` is still reflected as `data-language`, so a page can style or target blocks by language today.
+Every grammar `@particle-academy/fancy-file-commons` ships is highlighted, through its `tokenize(code, language)` lookup. `language` is case-insensitive:
+
+| Language | `language` values |
+|---|---|
+| TypeScript | `typescript`, `ts`, `tsx` |
+| JavaScript | `javascript`, `js`, `jsx` |
+| JSON | `json` (highlighted by the JavaScript grammar) |
+| PHP | `php` |
+| Python | `python`, `py` |
+| Go | `go` |
+| Markdown | `markdown`, `md` |
+| Shell | `shell`, `sh`, `bash`, `zsh` |
+| dotenv | `dotenv`, `env` |
+| HTML / XML | `html`, `htm`, `xml`, `xhtml` |
+
+**Any other language renders as plain, un-highlighted text** in the same font, size and palette, and nothing throws. `language` is reflected as `data-language` either way.
+
+The colours are `CodeView`'s palette; the shell and dotenv grammars reuse its existing slots rather than adding new ones: shell flags (`-x`, `--flag`) and dotenv keys use the `attribute` colour, the command word uses `function`, and `$VAR` / `${VAR}` use `variable`.
 
 ## Props
 
@@ -44,7 +61,7 @@ Also accepts every `<div>` attribute (`id`, `aria-label`, `style`, `data-*`, ...
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | code | `string` | - | The source to show. Rendered as text, never parsed as HTML |
-| language | `string` | `"plaintext"` | Language id. Only HTML aliases are highlighted; everything else is plain text |
+| language | `CodeLanguage` (any string) | `"plaintext"` | Language id or alias, case-insensitive (see Highlighting). Unknown values are plain text |
 | copyable | `boolean` | `true` | Show the copy button |
 | title | `ReactNode` | - | Header above the code (a filename, or a label like "Terminal") |
 | showLineNumbers | `boolean` | `false` | Number each line in a gutter that is not part of the code text |

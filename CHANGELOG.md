@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`CodeBlock` and `CodeView` highlight ten languages, not just HTML.** TypeScript (`ts`, `tsx`), JavaScript (`js`, `jsx`), JSON (`json`), PHP (`php`), Python (`py`), Go (`go`), Markdown (`md`), shell (`sh`, `bash`, `zsh`, `shell`), dotenv (`env`, `dotenv`) and HTML (`html`, `htm`, `xml`, `xhtml`), case-insensitively, through `@particle-academy/fancy-file-commons`' new `tokenize(code, language)` lookup. The grammars are the ones `fancy-code`'s `CodeEditor` uses, now shared from commons, so a snippet highlights the same way in both. Unknown languages still render as plain text. A new `CodeLanguage` type lists the known ids and still accepts any string.
+- **No new colours.** Both components keep the existing light/dark palette; shell flags and dotenv keys use the `attribute` colour, shell command words `function`, and `$VAR` / `${VAR}` `variable`.
+
+### Changed
+
+- **A `CodeBlock` or `CodeView` whose `language` is now recognised gains colour spans** where it used to render plain text: `bash`, `json`, `env`, `typescript`, `markdown` and the rest above. The text, its escaping and the copy behaviour are unchanged; only `<span style="color:...">` wrappers are added. **Consumer action:** none, unless a test asserted that such a block had no spans. The `Editor`'s Source view is unchanged: it passes `"html"` or `"plaintext"`.
+- **The `@particle-academy/fancy-file-commons` range floor rose from `>=0.2` to `>=0.4`** (still `<2.0`): 0.4 is the first release with these grammars and `tokenize`. npm installs it for you. **Consumer action:** none.
+
+### Security
+
+- **The escaping guarantee is now tested in every language.** The `<script>` / `<img onerror>` payload test runs across all ten grammars plus plain text, in `CodeBlock` with and without line numbers and in `CodeView`; the code always renders as text and nothing executes.
+
 ## [6.4.0] - 2026-11-01
 
 ### Added

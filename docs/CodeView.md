@@ -6,10 +6,26 @@ primitives in [`@particle-academy/fancy-file-commons`](https://www.npmjs.com/pac
 (no CodeMirror, no heavy dependency). Powers the [`Editor`](./Editor.md)'s Source
 view, and is usable standalone.
 
-Only **HTML** is highlighted (the one grammar commons ships — it's what the
-Editor's source view needs). Everything else — including Markdown — renders as
-plain text. For a full multi-language IDE (JS/TS/PHP/Python/Go/Markdown, line
-numbers, diff gutter), use [`@particle-academy/fancy-code`](https://www.npmjs.com/package/@particle-academy/fancy-code)'s
+It highlights every grammar commons ships, case-insensitively — the same set as
+[`CodeBlock`](./CodeBlock.md):
+
+| Language | `language` values |
+|---|---|
+| TypeScript | `typescript`, `ts`, `tsx` |
+| JavaScript | `javascript`, `js`, `jsx` |
+| JSON | `json` (highlighted by the JavaScript grammar) |
+| PHP | `php` |
+| Python | `python`, `py` |
+| Go | `go` |
+| Markdown | `markdown`, `md` |
+| Shell | `shell`, `sh`, `bash`, `zsh` |
+| dotenv | `dotenv`, `env` |
+| HTML / XML | `html`, `htm`, `xml`, `xhtml` |
+
+Anything else, including `"plaintext"`, renders as plain text. The `Editor`'s
+Source view passes `"html"` for HTML output and `"plaintext"` otherwise, so it is
+unchanged. For a full IDE (line numbers, diff gutter), use
+[`@particle-academy/fancy-code`](https://www.npmjs.com/package/@particle-academy/fancy-code)'s
 `CodeEditor`.
 
 ## Import
@@ -50,7 +66,7 @@ Read-only (omit `onChange` or pass `readOnly`):
 |------|------|---------|-------------|
 | value | `string` | — | Source text (controlled). |
 | onChange | `(value: string) => void` | — | Called on edit. Omit for a read-only view. |
-| language | `"html" \| "markdown" \| "plaintext" \| string` | `"plaintext"` | Only `"html"` is highlighted; everything else renders plain. |
+| language | `CodeLanguage` (any string) | `"plaintext"` | Language id or alias, case-insensitive (table above). Unknown values render plain. |
 | readOnly | `boolean` | `false` | Read-only even if `onChange` is passed. |
 | placeholder | `string` | — | Shown when empty. |
 | minHeight | `number` | `120` | Min height (px) before growing with content. |

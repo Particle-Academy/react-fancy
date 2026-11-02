@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import {
   highlightCode,
-  tokenizeHtml,
+  tokenize,
   LIGHT_COLORS,
   DARK_COLORS,
   type ThemeColors,
@@ -20,7 +20,8 @@ const TEXT_METRICS = "m-0 p-3 font-mono text-xs leading-relaxed";
  * primitives in `@particle-academy/fancy-file-commons` — a highlight overlay
  * with a transparent, auto-growing textarea on top; the container scrolls both
  * together. Fills its parent's height (`h-full`) and grows with content down to
- * `minHeight`. Only HTML is highlighted; other languages render as plain text.
+ * `minHeight`. Highlights every language fancy-file-commons ships (see
+ * `CodeViewProps.language`); anything else renders as plain text.
  */
 export function CodeView({
   value,
@@ -37,7 +38,7 @@ export function CodeView({
   const colors: ThemeColors = isDark ? DARK_COLORS : LIGHT_COLORS;
 
   const highlighted = useMemo(() => {
-    const tokens = language === "html" ? tokenizeHtml(value) : [];
+    const tokens = tokenize(value, language) ?? [];
     return highlightCode(value, tokens, colors);
   }, [value, language, colors]);
 

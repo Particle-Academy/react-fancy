@@ -1054,7 +1054,7 @@
     "tailwindcss": "^4.0.0"
   },
   "dependencies": {
-    "@particle-academy/fancy-file-commons": ">=0.2 <2.0",
+    "@particle-academy/fancy-file-commons": ">=0.4 <2.0",
     "lucide-react": "^0.511.0",
     "marked": "^15.0.0",
     "tailwind-merge": "^3.0.0"

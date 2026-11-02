@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   highlightCode,
-  tokenizeHtml,
+  tokenize,
   LIGHT_COLORS,
   DARK_COLORS,
   type ThemeColors,
@@ -17,11 +17,14 @@ import type { CodeBlockProps } from "./CodeBlock.types";
 /** How long "Copied" / "Copy failed" stays before the button resets. */
 const FEEDBACK_MS = 2000;
 
-/** Language ids that map to the one grammar fancy-file-commons ships. */
-const HTML_ALIASES = new Set(["html", "htm", "xml", "xhtml"]);
-
+/**
+ * Tokens for any language fancy-file-commons can highlight (aliases included,
+ * case-insensitive); none for anything else, which renders as plain text.
+ * `tokenize` returns sorted, non-overlapping, in-bounds tokens, which
+ * `highlightLines` relies on.
+ */
 function tokensFor(code: string, language: string): Token[] {
-  return HTML_ALIASES.has(language.toLowerCase()) ? tokenizeHtml(code) : [];
+  return tokenize(code, language) ?? [];
 }
 
 /**

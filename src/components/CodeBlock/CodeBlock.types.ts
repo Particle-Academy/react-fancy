@@ -1,5 +1,23 @@
 import type { HTMLAttributes, ReactNode } from "react";
 
+/**
+ * Language ids `CodeBlock` and `CodeView` highlight (aliases included). Any
+ * other string is accepted and renders as plain text.
+ */
+export type CodeLanguage =
+  | "typescript" | "ts" | "tsx"
+  | "javascript" | "js" | "jsx"
+  | "json"
+  | "php"
+  | "python" | "py"
+  | "go"
+  | "markdown" | "md"
+  | "shell" | "sh" | "bash" | "zsh"
+  | "dotenv" | "env"
+  | "html" | "htm" | "xml" | "xhtml"
+  | "plaintext"
+  | (string & {});
+
 /** Words on the copy button, for translation. */
 export interface CodeBlockCopyLabels {
   /** Idle label (aria-label and tooltip). @default "Copy code" */
@@ -23,13 +41,15 @@ export interface CodeBlockProps
   /** The source to show. Rendered as text; never parsed as HTML. */
   code: string;
   /**
-   * Language id. Only `"html"` (and its aliases `"htm"`, `"xml"`, `"xhtml"`)
-   * is highlighted today: it is the one grammar `fancy-file-commons` ships.
-   * Every other value, known or not, renders as plain text. Reflected as
-   * `data-language` either way.
+   * Language id or alias, case-insensitive. Highlighted: TypeScript (`ts`,
+   * `tsx`), JavaScript (`js`, `jsx`), JSON (`json`), PHP (`php`), Python
+   * (`py`), Go (`go`), Markdown (`md`), shell (`sh`, `bash`, `zsh`, `shell`),
+   * dotenv (`env`, `dotenv`) and HTML (`html`, `htm`, `xml`, `xhtml`), via
+   * `fancy-file-commons`' `tokenize`. Any other value renders as plain text.
+   * Reflected as `data-language` either way.
    * @default "plaintext"
    */
-  language?: "html" | "xml" | "plaintext" | (string & {});
+  language?: CodeLanguage;
   /** Show a copy button. It copies `code` exactly. @default true */
   copyable?: boolean;
   /** Header above the code: a filename, or a short label like "Terminal". */

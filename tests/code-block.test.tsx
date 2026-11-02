@@ -99,8 +99,10 @@ describe("CodeBlock", () => {
     expect(host.querySelector("[data-react-fancy-code-block]")!.getAttribute("data-language")).toBe("html");
   });
 
-  it("renders languages with no highlighter, and unknown ones, as plain text", () => {
-    for (const language of ["typescript", "bash", "json", "klingon", undefined]) {
+  // TypeScript, bash and JSON used to be in this list; since fancy-file-commons
+  // 0.4 they highlight (see code-highlight-languages.test.tsx).
+  it("renders languages with no highlighter as plain text", () => {
+    for (const language of ["plaintext", "klingon", "sql", undefined]) {
       const { host } = mount(<CodeBlock code={"const a = 1;"} language={language} />);
       const code = host.querySelector("pre code")!;
       expect(code.querySelectorAll("span").length).toBe(0);

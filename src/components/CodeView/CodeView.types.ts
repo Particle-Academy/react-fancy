@@ -1,3 +1,5 @@
+import type { CodeLanguage } from "../CodeBlock/CodeBlock.types";
+
 export interface CodeViewProps {
   /** Source text to display / edit. Controlled. */
   value: string;
@@ -8,13 +10,14 @@ export interface CodeViewProps {
    */
   onChange?: (value: string) => void;
   /**
-   * Language id for syntax highlighting. Only `"html"` is highlighted (the one
-   * grammar shipped by `fancy-file-commons`); everything else — including
-   * `"markdown"` and `"plaintext"` — renders un-highlighted. For richer language
-   * highlighting use `@particle-academy/fancy-code`'s `CodeEditor`.
+   * Language id or alias for syntax highlighting, case-insensitive — the same
+   * set as `CodeBlock`: TypeScript, JavaScript, JSON, PHP, Python, Go,
+   * Markdown, shell, dotenv and HTML/XML, via `fancy-file-commons`'
+   * `tokenize`. Anything else, including `"plaintext"`, renders un-highlighted.
+   * For a full editor use `@particle-academy/fancy-code`'s `CodeEditor`.
    * @default "plaintext"
    */
-  language?: "html" | "markdown" | "plaintext" | (string & {});
+  language?: CodeLanguage;
   /** Read-only mode (no editing even if `onChange` is passed). @default false */
   readOnly?: boolean;
   /** Placeholder shown when empty. */
