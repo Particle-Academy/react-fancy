@@ -226,6 +226,9 @@ export type { StickyNoteProps, StickyNoteColor } from "./components/StickyNote";
 export { Timeline } from "./components/Timeline";
 export type { TimelineProps, TimelineItemProps, TimelineBlockProps, TimelineEvent, TimelineVariant, TimelineOrientation } from "./components/Timeline";
 
+export { Stepper } from "./components/Stepper";
+export type { StepperProps, StepperStep, StepperStepProps, StepperStepState, StepperOrientation } from "./components/Stepper";
+
 export { TimeGrid } from "./components/TimeGrid";
 export type { TimeGridProps, TimeGridTone, TimeGridCell, TimeGridStateDef, TimeGridMarkDef, TimeGridCoord, TimeGridSelection, TimeGridSelectionShape, TimeGridDisabledRange, TimeGridBlockedCell } from "./components/TimeGrid";
 

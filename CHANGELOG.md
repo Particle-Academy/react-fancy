@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`Stepper`: ordered steps with states (requested by Prism).** An `<ol>` of
+  steps, each with a title, optional description and rich content, in one of
+  `upcoming` / `current` / `complete` / `error`. Data-driven through a JSON-
+  friendly `steps` array, or compound with `Stepper.Step` (read as data, so both
+  forms render identically). Controlled (`current` + `onChange`) or
+  uncontrolled (`defaultCurrent`); a step's own `state` overrides the derived
+  one, which is how `error` is shown. **Pure content by default: no button,
+  input or form element at all.** `clickable` opts in to step buttons, with
+  arrow-key / Home / End focus movement. `aria-current="step"` on the current
+  step; each state is in visually hidden text and in the indicator's glyph,
+  never colour alone; `stateLabels` translates the words. Vertical by default,
+  `orientation="horizontal"` for short content; `showContent="current"` shows
+  only the current step's body. Server-renders without DOM globals. Handles:
+  `data-react-fancy-stepper`, `data-react-fancy-stepper-step` with `data-state`,
+  `data-index` and `data-step-id`. Subpath: `@particle-academy/react-fancy/stepper`.
+
 ### Changed
 
 - **`BreadcrumbsItemProps` now accepts the element's HTML attributes.**

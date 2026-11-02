@@ -873,6 +873,16 @@
         "default": "./dist/stat-list.cjs"
       }
     },
+    "./stepper": {
+      "import": {
+        "types": "./dist/stepper.d.ts",
+        "default": "./dist/stepper.js"
+      },
+      "require": {
+        "types": "./dist/stepper.d.cts",
+        "default": "./dist/stepper.cjs"
+      }
+    },
     "./sticky-note": {
       "import": {
         "types": "./dist/sticky-note.d.ts",
