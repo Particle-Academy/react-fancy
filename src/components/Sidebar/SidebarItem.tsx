@@ -1,6 +1,7 @@
 import type { ElementType, ReactNode } from "react";
 import { cn } from "../../utils/cn";
 import { badgeDot } from "../Badge/Badge.colors";
+import { Tooltip } from "../Tooltip";
 import { useSidebar } from "./Sidebar.context";
 import type { SidebarDotColor, SidebarItemProps } from "./Sidebar.types";
 
@@ -29,6 +30,7 @@ export function SidebarItem({
   collapsedBadge = false,
   dot,
   dotLabel,
+  dotTooltip = false,
   onClick,
   className,
   ...rest
@@ -124,7 +126,11 @@ export function SidebarItem({
     hasMarks && "relative",
   );
 
-  return (
+  // `dotTooltip` (6.2.0) shows the dot's words to sighted users too. It needs
+  // words to show, so it is inert without both `dot` and `dotLabel`.
+  const showDotTooltip = dotTooltip && dotLabelEl !== null;
+
+  const node = (
     <Tag
       {...tagProps}
       {...rest}
@@ -132,7 +138,11 @@ export function SidebarItem({
       data-active={active || undefined}
       aria-current={active ? "page" : undefined}
       aria-disabled={disabled || undefined}
-      title={collapsed ? title : undefined}
+      // With a dot tooltip the native `title` would be a second bubble over
+      // the first, so the tooltip takes over and carries the label itself.
+      // The name does not depend on it: a collapsed item with a dot label
+      // already has the visually hidden label copy.
+      title={collapsed && !showDotTooltip ? title : undefined}
       className={cn(
         // `w-full` matters when the Tag is a <button>: form controls size to
         // FIT-CONTENT, not to their parent, so a long label made the item wider
@@ -214,6 +224,29 @@ export function SidebarItem({
         </>
       )}
     </Tag>
+  );
+
+  if (!showDotTooltip) return node;
+
+  return (
+    <Tooltip
+      placement="right"
+      content={
+        // aria-hidden, and deliberately NOT linked with aria-describedby:
+        // the same words are already in the item's accessible name via
+        // `dotLabel`, so exposing the bubble would read them twice.
+        <span aria-hidden="true" data-react-fancy-sidebar-tooltip="">
+          {collapsed && (
+            <span className="block font-medium" data-react-fancy-sidebar-tooltip-label="">
+              {children}
+            </span>
+          )}
+          {dotLabel}
+        </span>
+      }
+    >
+      {node}
+    </Tooltip>
   );
 }
 

@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`Sidebar.Item` `dotTooltip`: the dot's words for sighted users.**
+  `dotLabel` reached screen readers only, and the item sets its own collapsed
+  `title`, so a consumer could not show those words. `dotTooltip` shows
+  `dotLabel` in a Fancy `Tooltip` to the right of the item on hover and
+  keyboard focus. It reuses `dotLabel` rather than taking separate text, so the
+  two audiences cannot be told different things. On a collapsed item it
+  replaces the native `title` (one bubble, not two) and shows the label above
+  the words. The bubble is `aria-hidden` and not wired as a description, since
+  the words are already in the accessible name. Inert without `dot` and
+  `dotLabel`. Handle: `data-react-fancy-sidebar-tooltip`.
 - **`Sidebar.Item` `badgeLabel`: words for the badge.** A bare count ("2")
   means nothing on its own to a screen reader. With `badgeLabel="2 agents"` the
   visible badge gets `aria-hidden` and the label is added to the item's

@@ -53,6 +53,7 @@ import { Sidebar, Icon } from "@particle-academy/react-fancy";
 | collapsedBadge | `boolean` | `false` | Also show `badge` on a collapsed rail, as an overlay at the icon's corner. Best for short counts |
 | dot | `boolean \| Color` | - | Attention dot at the icon's corner, shown expanded and collapsed. `true` is red; any Badge colour otherwise |
 | dotLabel | `string` | - | Screen-reader text for the dot ("3 unread"), visually hidden and added to the item's accessible name |
+| dotTooltip | `boolean` | `false` | Also show `dotLabel` to sighted users, in a `Tooltip` beside the item on hover and keyboard focus. Needs `dot` and `dotLabel`. See [Showing the dot's words](#showing-the-dots-words) |
 | onClick | `() => void` | - | Click handler |
 | className | `string` | - | Additional CSS classes |
 
@@ -134,6 +135,33 @@ readers.
 - Handles: `data-react-fancy-sidebar-dot` (with `data-color` and
   `data-position`), `data-react-fancy-sidebar-dot-label`,
   `data-react-fancy-sidebar-badge` for the collapsed badge overlay.
+
+### Showing the dot's words
+
+`dotLabel` reaches screen readers only. When the words matter to everyone
+("Phone paired, expires 3 Nov"), add `dotTooltip`: the item shows them in a
+Fancy `Tooltip` to its right on hover and on keyboard focus.
+
+```tsx
+<Sidebar.Item
+  icon={<Icon name="settings" size="sm" />}
+  dot="amber"
+  dotLabel="Phone paired, expires 3 Nov"
+  dotTooltip
+>
+  Settings
+</Sidebar.Item>
+```
+
+- It reuses `dotLabel` rather than taking its own text, so what a sighted user
+  sees and what a screen reader hears cannot drift apart.
+- On a collapsed item the tooltip replaces the native `title`, so there is one
+  bubble rather than two, and it shows the label ("Settings") above the dot's
+  words. Expanded, the label is already visible and only the words show.
+- Screen readers hear the words once, in the item's name. The bubble is
+  `aria-hidden` and is not linked with `aria-describedby`.
+- Without `dot` and `dotLabel` it does nothing. Handle:
+  `data-react-fancy-sidebar-tooltip` (the bubble's content).
 
 ## Badges and the accessible name
 

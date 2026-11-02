@@ -91,6 +91,16 @@ export interface SidebarItemProps extends NavigableProps {
    * appended to the item's accessible name. Ignored without `dot`.
    */
   dotLabel?: string;
+  /**
+   * Also show `dotLabel` to sighted users, in a Fancy `Tooltip` beside the
+   * item on hover and keyboard focus. Needs `dot` and `dotLabel`; inert
+   * otherwise. On a collapsed item the tooltip replaces the native `title`
+   * (one bubble, not two) and shows the label above the dot's words. The
+   * bubble is hidden from assistive tech, since the words are already in the
+   * accessible name. Handle: `data-react-fancy-sidebar-tooltip`.
+   * @default false
+   */
+  dotTooltip?: boolean;
   onClick?: () => void;
   className?: string;
 }
