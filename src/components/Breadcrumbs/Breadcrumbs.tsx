@@ -26,6 +26,8 @@ function BreadcrumbsRoot({
     return {
       label: el.props?.children,
       href: el.props?.href,
+      as: el.props?.as,
+      onClick: el.props?.onClick,
       active: el.props?.active,
     };
   });

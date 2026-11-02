@@ -1,4 +1,4 @@
-import { useState, useRef, type ReactNode } from "react";
+import { useState, useRef, type ElementType, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "../../utils/cn";
 import { useOutsideClick } from "../../hooks/use-outside-click";
@@ -7,6 +7,8 @@ import { useEscapeKey } from "../../hooks/use-escape-key";
 interface BreadcrumbsDropdownItem {
   label: ReactNode;
   href?: string;
+  as?: ElementType;
+  onClick?: () => void;
   active?: boolean;
 }
 
@@ -42,11 +44,39 @@ export function BreadcrumbsDropdown({ items, activeLabel }: BreadcrumbsDropdownP
                 : "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] hover:bg-zinc-50 hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:hover:bg-zinc-800 dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
             );
 
-            if (item.href && !item.active) {
+            // Mirrors BreadcrumbsItem: href / `as` wins, then onClick, and the
+            // active crumb stays inert whatever it carries.
+            if ((item.href || item.as) && !item.active) {
+              const Link = (item.as ?? "a") as ElementType;
               return (
-                <a key={i} href={item.href} className={cls} onClick={() => setOpen(false)}>
+                <Link
+                  key={i}
+                  {...(item.href ? { href: item.href } : {})}
+                  className={cls}
+                  onClick={() => {
+                    item.onClick?.();
+                    setOpen(false);
+                  }}
+                >
                   {item.label}
-                </a>
+                </Link>
+              );
+            }
+
+            if (item.onClick && !item.active) {
+              const onClick = item.onClick;
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  className={cn(cls, "cursor-pointer border-0 bg-transparent")}
+                  onClick={() => {
+                    onClick();
+                    setOpen(false);
+                  }}
+                >
+                  {item.label}
+                </button>
               );
             }
 

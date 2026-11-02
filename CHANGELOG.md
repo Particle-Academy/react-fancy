@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`Breadcrumbs`: the collapsed (below `md`) dropdown dropped `onClick`
+  crumbs.** It rebuilt each item from `href` alone, so a crumb that navigates
+  by callback, which `Breadcrumbs.Item` supports, became a dead `<span>` on a
+  narrow window. It is now a `<button type="button">` that calls the handler and
+  closes the menu. A crumb with `as` now renders through that component in the
+  dropdown too (it was a plain `<a>`, or nothing clickable without `href`), and
+  a link crumb's `onClick` now fires there as it does on the desktop trail. The
+  active crumb stays inert. No consumer action needed.
+
 ## [6.1.0] - 2026-11-01
 
 ### Added
