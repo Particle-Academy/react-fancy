@@ -11,6 +11,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`CodeBlock`: a display-only, copyable code block (requested by Prism).**
+  `<pre><code>` with an optional react-fancy `Button` that copies the raw
+  `code` prop exactly (never the highlight markup or line numbers), with visible
+  "Copied" / "Copy failed" feedback. **It contains no `textarea`, `input`,
+  `select` or `contenteditable` element**, so it is safe on pages that must not
+  accept input; `CodeView`, which overlays a textarea even when `readOnly`, is
+  unchanged. Props: `code`, `language`, `copyable` (default `true`), `title`
+  header, `showLineNumbers`, `wrap`, `copyLabels`, `onCopyCode`, plus every
+  `<div>` attribute. A missing Clipboard API (insecure context, server) reports
+  failure instead of throwing. Same light/dark palette as `CodeView`; server-
+  renders with no `window`, `document` or `navigator`. **Only HTML is
+  highlighted**: it is the one grammar `fancy-file-commons` ships, so shell,
+  JSON, env, PHP, TypeScript and Python render as plain text for now. Handles:
+  `data-react-fancy-code-block`, `-copy` with `data-copy-state`, `-title`,
+  `-line`. Subpath: `@particle-academy/react-fancy/code-block`.
+
+### Fixed
+
+- **`CodeView` no longer throws where `window.matchMedia` is missing** (jsdom,
+  so any consumer's component tests). It now falls back to the `.dark` class
+  signal alone. Nothing for you to do.
+
 ## [6.3.0] - 2026-11-01
 
 ### Added

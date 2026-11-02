@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   highlightCode,
   tokenizeHtml,
@@ -7,38 +7,8 @@ import {
   type ThemeColors,
 } from "@particle-academy/fancy-file-commons";
 import { cn } from "../../utils/cn";
+import { useIsDark } from "./use-is-dark";
 import type { CodeViewProps } from "./CodeView.types";
-
-// ── Dark-mode detection ────────────────────────────────────────────────────
-// The highlight palette is baked in as inline colors, so we resolve light/dark
-// ourselves. Follow BOTH signals so we match whatever drives the surrounding
-// `dark:` Tailwind variants: the `.dark` class (class strategy) OR the
-// prefers-color-scheme media query (media strategy).
-
-function subscribeDark(callback: () => void): () => void {
-  const mq = window.matchMedia("(prefers-color-scheme: dark)");
-  mq.addEventListener("change", callback);
-  const observer = new MutationObserver(callback);
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ["class"],
-  });
-  return () => {
-    mq.removeEventListener("change", callback);
-    observer.disconnect();
-  };
-}
-
-function darkSnapshot(): boolean {
-  return (
-    document.documentElement.classList.contains("dark") ||
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  );
-}
-
-function useIsDark(): boolean {
-  return useSyncExternalStore(subscribeDark, darkSnapshot, () => false);
-}
 
 // Shared text metrics — the overlay and the textarea MUST match exactly (font,
 // size, line-height, padding, wrapping) so the highlighted glyphs sit under the

@@ -203,6 +203,16 @@
         "default": "./dist/checkbox-group.cjs"
       }
     },
+    "./code-block": {
+      "import": {
+        "types": "./dist/code-block.d.ts",
+        "default": "./dist/code-block.js"
+      },
+      "require": {
+        "types": "./dist/code-block.d.cts",
+        "default": "./dist/code-block.cjs"
+      }
+    },
     "./code-view": {
       "import": {
         "types": "./dist/code-view.d.ts",

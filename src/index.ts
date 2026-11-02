@@ -426,6 +426,8 @@ export type {
 
 export { CodeView } from "./components/CodeView";
 export type { CodeViewProps } from "./components/CodeView";
+export { CodeBlock } from "./components/CodeBlock";
+export type { CodeBlockProps, CodeBlockCopyLabels, CodeBlockCopyEvent } from "./components/CodeBlock";
 
 export { ContentRenderer, registerExtension, registerExtensions } from "./components/ContentRenderer";
 export type {
