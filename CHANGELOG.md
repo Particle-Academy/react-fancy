@@ -21,6 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dropdown too (it was a plain `<a>`, or nothing clickable without `href`), and
   a link crumb's `onClick` now fires there as it does on the desktop trail. The
   active crumb stays inert. No consumer action needed.
+- **`MultiSwitch`: the thumb did not follow the selected option's size.** It was
+  measured only when the selection changed, so a selected label that changed
+  width ("Changed 4" to "Changed 12") left the thumb at its old width. The
+  selected option and the container are now watched with a `ResizeObserver`
+  and the thumb re-measures. Where `ResizeObserver` does not exist (SSR, older
+  jsdom) it measures on selection only, as before. No consumer action needed.
 
 ## [6.1.0] - 2026-11-01
 

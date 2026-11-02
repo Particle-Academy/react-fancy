@@ -87,6 +87,22 @@ export function MultiSwitch<V = string>({
     updateIndicator();
   }, [updateIndicator]);
 
+  // The selected option can change size without the selection changing: a
+  // label carrying a live count ("Changed 4" -> "Changed 12"), a font loading
+  // late, the container reflowing. Watch the selected option and the container
+  // and re-measure. Without ResizeObserver (SSR, older jsdom) the thumb is
+  // measured on selection only, as it always was.
+  useEffect(() => {
+    if (typeof ResizeObserver === "undefined") return;
+    const container = containerRef.current;
+    const activeItem = itemRefs.current[selectedIndex];
+    if (!container || !activeItem) return;
+    const observer = new ResizeObserver(() => updateIndicator());
+    observer.observe(container);
+    observer.observe(activeItem);
+    return () => observer.disconnect();
+  }, [updateIndicator, selectedIndex, showControl]);
+
   const control = !showControl ? (
     <DisplayValue size={size} interactive={interactive} onActivate={enterEdit}>
       {resolvedOptions.find((o) => o.value === value)?.label}
