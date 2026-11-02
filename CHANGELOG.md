@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.5.0] - 2026-11-02
+
 ### Added
 
 - **`CodeBlock` and `CodeView` highlight ten languages, not just HTML.** TypeScript (`ts`, `tsx`), JavaScript (`js`, `jsx`), JSON (`json`), PHP (`php`), Python (`py`), Go (`go`), Markdown (`md`), shell (`sh`, `bash`, `zsh`, `shell`), dotenv (`env`, `dotenv`) and HTML (`html`, `htm`, `xml`, `xhtml`), case-insensitively, through `@particle-academy/fancy-file-commons`' new `tokenize(code, language)` lookup. The grammars are the ones `fancy-code`'s `CodeEditor` uses, now shared from commons, so a snippet highlights the same way in both. Unknown languages still render as plain text. A new `CodeLanguage` type lists the known ids and still accepts any string.
