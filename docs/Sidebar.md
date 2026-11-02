@@ -34,6 +34,9 @@ import { Sidebar, Icon } from "@particle-academy/react-fancy";
 | defaultCollapsed | `boolean` | `false` | Default collapsed state (uncontrolled) |
 | onCollapsedChange | `(collapsed: boolean) => void` | - | Callback when collapsed state changes |
 | collapseMode | `"icons" \| "letters"` | `"icons"` | How items display when collapsed: icons only, or first 3 letters |
+| embedded | `boolean` | `false` | Drop the app-shell chrome (right border, background, fixed `w-60`) for a sidebar inside a card, panel or drawer |
+| navLabel | `string` | - | Wrap the children in `<nav aria-label={navLabel}>` so the items form a navigation landmark. Omitted, no `<nav>` is rendered |
+| keyboardNav | `boolean` | `false` | ArrowUp / ArrowDown / Home / End between items, with a roving tabindex (the rail becomes one tab stop). See [Keyboard navigation](#keyboard-navigation) |
 | className | `string` | - | Additional CSS classes |
 
 ### Sidebar.Item
@@ -45,7 +48,10 @@ import { Sidebar, Icon } from "@particle-academy/react-fancy";
 | icon | `ReactNode` | - | Leading icon |
 | active | `boolean` | - | Active state highlight |
 | disabled | `boolean` | - | Disable the item |
-| badge | `ReactNode` | - | Trailing badge element |
+| badge | `ReactNode` | - | Trailing badge element (expanded only, unless `collapsedBadge`) |
+| collapsedBadge | `boolean` | `false` | Also show `badge` on a collapsed rail, as an overlay at the icon's corner. Best for short counts |
+| dot | `boolean \| Color` | - | Attention dot at the icon's corner, shown expanded and collapsed. `true` is red; any Badge colour otherwise |
+| dotLabel | `string` | - | Screen-reader text for the dot ("3 unread"), visually hidden and added to the item's accessible name |
 | onClick | `() => void` | - | Click handler |
 | className | `string` | - | Additional CSS classes |
 
@@ -93,6 +99,74 @@ const [collapsed, setCollapsed] = useState(false);
 
 - `"icons"` (default) — only the icon is shown when collapsed; falls back to the first 3 letters if no icon is provided
 - `"letters"` — the first 3 letters of the label are always shown
+
+## Attention marks on a compact rail
+
+A collapsed rail shows only icons, so `badge` is hidden there by default. Use
+`dot` for an unread, warning or "needs you" mark: it renders at the icon's
+corner in both modes. A dot is only colour, so give it a `dotLabel` for screen
+readers.
+
+```tsx
+<Sidebar collapsed navLabel="Main">
+  <Sidebar.Item icon={<Icon name="inbox" size="sm" />} dot dotLabel="3 unread">
+    Inbox
+  </Sidebar.Item>
+  <Sidebar.Item icon={<Icon name="triangle-alert" size="sm" />} dot="amber" dotLabel="needs you">
+    Deploys
+  </Sidebar.Item>
+  <Sidebar.Item
+    icon={<Icon name="message-square" size="sm" />}
+    badge={<Badge size="sm" color="blue" variant="solid">12</Badge>}
+    collapsedBadge
+  >
+    Messages
+  </Sidebar.Item>
+</Sidebar>
+```
+
+- The collapsed item is still named by its label (`title` and a visually
+  hidden copy of the label), so the dot label or a badge count never replaces
+  the name: a screen reader hears "Inbox 3 unread".
+- With both `dot` and `collapsedBadge` on a collapsed item, the badge takes the
+  top corner and the dot moves to the bottom one (`data-position="bottom"`).
+- Handles: `data-react-fancy-sidebar-dot` (with `data-color` and
+  `data-position`), `data-react-fancy-sidebar-dot-label`,
+  `data-react-fancy-sidebar-badge` for the collapsed badge overlay.
+
+## Navigation landmark
+
+`Sidebar` renders an `<aside>`. Pass `navLabel` to wrap its children in a
+labelled `<nav>`, so the items appear in a screen reader's landmark list:
+
+```tsx
+<Sidebar navLabel="Main">…</Sidebar>
+```
+
+The `<nav>` (`data-react-fancy-sidebar-nav`) takes over the column layout and
+fills the rail, so a footer pushed down with `mt-auto` still reaches the
+bottom. Without `navLabel` the markup is unchanged.
+
+## Keyboard navigation
+
+`keyboardNav` turns the rail into one tab stop with a roving tabindex:
+
+- **Tab** lands on the active item (the one with `active`), or the first
+  enabled item when none is active. `Sidebar.Toggle` keeps its own tab stop.
+- **ArrowDown / ArrowUp** move to the next / previous item; **Home / End** to
+  the first / last. No wrap at the ends.
+- Disabled items are skipped. An open `Sidebar.Submenu`'s trigger and its items
+  are in the sequence; a closed submenu's items are skipped (its trigger gets
+  `aria-expanded`). Enter / Space on a trigger opens it as usual.
+- Keys pressed in an input, textarea, select or contenteditable inside the
+  sidebar are never intercepted, nor are arrows with a modifier key.
+
+It is opt-in because it changes Tab order: without it, every item is its own
+tab stop, exactly as before.
+
+```tsx
+<Sidebar keyboardNav navLabel="Main">…</Sidebar>
+```
 
 ## useSidebar Hook
 

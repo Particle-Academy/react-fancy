@@ -454,6 +454,7 @@ export type {
   SidebarToggleProps,
   SidebarCollapseMode,
   SidebarContextValue,
+  SidebarDotColor,
 } from "./components/Sidebar";
 
 export { MobileMenu, useMobileMenu } from "./components/MobileMenu";

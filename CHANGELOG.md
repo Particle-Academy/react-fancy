@@ -11,6 +11,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`Sidebar.Item` `dot` / `dotLabel`: attention marks that survive
+  collapsing.** A collapsed (`icons`) rail rendered only the icon, so it had no
+  way to show unread, warning or "needs you". `dot` is a small indicator at the
+  icon's corner (at the letters' corner on a lettered rail, at the item's
+  corner with no icon), shown expanded AND collapsed. `dot` takes `true` (red)
+  or any Badge colour. `dotLabel` ("3 unread") is visually hidden text added to
+  the item's accessible name, since a coloured dot alone says nothing to a
+  screen reader. On a collapsed item a visually hidden copy of the label keeps
+  the item named by its label rather than by the dot label. Handles:
+  `data-react-fancy-sidebar-dot` (`data-color`, `data-position`),
+  `data-react-fancy-sidebar-dot-label`. New type: `SidebarDotColor`.
+- **`Sidebar.Item` `collapsedBadge`.** Opts `badge` into the collapsed rail, as
+  an overlay at the icon's corner (`data-react-fancy-sidebar-badge`). Opt-in
+  rather than default: collapsed rails have never shown badges, and a wide one
+  ("Beta") over a 20px icon is not a change to make for every consumer. With a
+  `dot` as well, the dot moves to the bottom corner.
+- **`Sidebar` `navLabel`.** Wraps the children in `<nav aria-label>` inside the
+  `<aside>`, so the items form a navigation landmark. The `<nav>`
+  (`data-react-fancy-sidebar-nav`) takes over the column layout and fills the
+  rail.
+- **`Sidebar` `keyboardNav`.** ArrowUp / ArrowDown / Home / End between items
+  with a roving tabindex: the rail is one tab stop (the active item, else the
+  first enabled one). Skips disabled items and the items of a closed submenu,
+  includes submenu triggers (which then get `aria-expanded`), never intercepts
+  keys in an input, textarea, select or contenteditable, and leaves
+  `Sidebar.Toggle` its own tab stop. Opt-in because a roving tabindex changes
+  Tab order.
+
+All four are opt-in: a Sidebar that passes none of them renders byte-identical
+markup to 6.0.0 (pinned by a snapshot written by 6.0.0). **No consumer action
+needed.**
+
 ### Fixed
 
 - **`Button` no longer keeps a focus ring after a mouse click.** The ring was

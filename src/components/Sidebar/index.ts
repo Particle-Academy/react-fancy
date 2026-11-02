@@ -8,4 +8,5 @@ export type {
   SidebarToggleProps,
   SidebarCollapseMode,
   SidebarContextValue,
+  SidebarDotColor,
 } from "./Sidebar.types";

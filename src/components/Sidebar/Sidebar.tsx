@@ -1,6 +1,8 @@
+import { useRef } from "react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks";
 import { SidebarContext } from "./Sidebar.context";
+import { useSidebarKeyboardNav } from "./Sidebar.keyboard";
 import { SidebarItem } from "./SidebarItem";
 import { SidebarGroup } from "./SidebarGroup";
 import { SidebarSubmenu } from "./SidebarSubmenu";
@@ -14,6 +16,8 @@ function SidebarRoot({
   onCollapsedChange,
   collapseMode = "icons",
   embedded = false,
+  navLabel,
+  keyboardNav = false,
   className,
 }: SidebarProps) {
   const [collapsed, setCollapsed] = useControllableState(
@@ -21,10 +25,14 @@ function SidebarRoot({
     defaultCollapsed,
     onCollapsedChange,
   );
+  const rootRef = useRef<HTMLElement>(null);
+  const onKeyDown = useSidebarKeyboardNav(rootRef, keyboardNav);
 
   return (
-    <SidebarContext.Provider value={{ collapsed, collapseMode, setCollapsed }}>
+    <SidebarContext.Provider value={{ collapsed, collapseMode, setCollapsed, keyboardNav }}>
       <aside
+        ref={rootRef}
+        onKeyDown={onKeyDown}
         data-react-fancy-sidebar=""
         data-collapsed={collapsed || undefined}
         data-embedded={embedded || undefined}
@@ -41,7 +49,23 @@ function SidebarRoot({
           className,
         )}
       >
-        {children}
+        {navLabel ? (
+          // The <aside> is a complementary landmark, not a navigation one, so
+          // without this a screen reader's landmark list shows no navigation.
+          // Opt-in: an element between the <aside> and its children is a DOM
+          // change a consumer's CSS (`aside > a`) or tests may depend on. The
+          // <nav> takes over the column layout and fills the rail, so a footer
+          // pushed down with `mt-auto` still reaches the bottom.
+          <nav
+            data-react-fancy-sidebar-nav=""
+            aria-label={navLabel}
+            className="flex min-h-0 flex-1 flex-col gap-0.5"
+          >
+            {children}
+          </nav>
+        ) : (
+          children
+        )}
       </aside>
     </SidebarContext.Provider>
   );

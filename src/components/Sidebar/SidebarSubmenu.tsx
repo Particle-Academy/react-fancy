@@ -17,7 +17,7 @@ export function SidebarSubmenu({
   className,
 }: SidebarSubmenuProps) {
   const [open, setOpen] = useState(defaultOpen);
-  const { collapsed, collapseMode } = useSidebar();
+  const { collapsed, collapseMode, keyboardNav } = useSidebar();
 
   const showIconOnly = collapsed && collapseMode === "icons" && icon;
   const showLetters = collapsed && (collapseMode === "letters" || (collapseMode === "icons" && !icon));
@@ -49,6 +49,9 @@ export function SidebarSubmenu({
     <div data-react-fancy-sidebar-submenu="" className={className}>
       <button
         type="button"
+        // Only with `keyboardNav`, which reads it to skip a closed panel's
+        // still-mounted items; without it the markup is unchanged from 6.0.
+        aria-expanded={keyboardNav ? open : undefined}
         onClick={() => setOpen((v) => !v)}
         className={cn(
           "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
