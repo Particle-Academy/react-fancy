@@ -76,15 +76,23 @@ The button copies **exactly the `code` prop**: no highlight markup, no line numb
 
 ## Theming
 
-The same palette as `CodeView` (`LIGHT_COLORS` / `DARK_COLORS` from `fancy-file-commons`), so the two sit together. Dark is chosen when `<html>` has the `dark` class or the OS prefers dark. On the server, and during hydration, the light palette is used, then the real theme.
+The same palette as `CodeView` (`LIGHT_COLORS` / `DARK_COLORS` from `fancy-file-commons`), so the two sit together. **The markup carries both palettes and CSS picks one**, so server-rendered HTML is right in either theme and a dark site does not flash light on hydration:
+
+- the root declares `--fc-<slot>-l` and `--fc-<slot>-d` (for example `--fc-keyword-l`, `--fc-keyword-d`), and everything coloured reads `var(--fc-<slot>, var(--fc-<slot>-l))`;
+- the dark value applies under **your Tailwind `dark` variant** (the root's `dark:[--fc-<slot>:...]` classes, compiled from the `@source`d dist: class strategy, `dark-variant.css`, or Tailwind's default media query), **or** under a `.dark` / `[data-theme="dark"]` ancestor through `styles.css`, for a host that does not scan the package;
+- with neither, it renders the light palette.
+
+To change a colour, override its variable on the block: `style={{ "--fc-keyword-l": "#7c3aed", "--fc-keyword-d": "#a78bfa" }}`.
+
+PHP is read as a **snippet**: code with no `<?php` open tag (`use Foo\Bar;`) is highlighted as PHP, and a `?>` switches to HTML. Code that opens with `<?php` highlights exactly as a file does.
 
 ## Security
 
-Code is escaped before it reaches `dangerouslySetInnerHTML`: `highlightCode` escapes `&`, `<` and `>` in every slice it emits, highlighted or plain, and token colours pass an allow-list. `<script>` in `code` renders as the text `<script>`.
+Code is escaped before it reaches `dangerouslySetInnerHTML`: `highlightCodeWithVariables` escapes `&`, `<` and `>` in every slice it emits, highlighted or plain, and writes no colour value into the token markup; the palette values on the root pass `fancy-file-commons`' colour allow-list. `<script>` in `code` renders as the text `<script>`.
 
 ## Server rendering
 
-No `window`, `document` or `navigator` access during render. Tested with `renderToString` with all three undefined.
+No `window`, `document` or `navigator` access during render. Tested with `renderToString` with all three undefined. The server output is identical to the client's in both themes.
 
 ## Agent handles
 

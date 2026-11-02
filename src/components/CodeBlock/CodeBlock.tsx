@@ -1,17 +1,19 @@
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  highlightCode,
+  highlightCodeWithVariables,
   tokenize,
-  LIGHT_COLORS,
-  DARK_COLORS,
-  type ThemeColors,
   type Token,
 } from "@particle-academy/fancy-file-commons";
 import { cn } from "../../utils/cn";
 import { visuallyHidden } from "../../utils/visually-hidden";
 import { Button } from "../Button/Button";
 import { defaultClipboardWriter, runWriter } from "../ContentRenderer/copy";
-import { useIsDark } from "../CodeView/use-is-dark";
+import {
+  CODE_PALETTE_ATTR,
+  CODE_PALETTE_DARK_CLASS,
+  CODE_PALETTE_STYLE,
+  paletteColor,
+} from "../CodeView/code-palette";
 import type { CodeBlockProps } from "./CodeBlock.types";
 
 /** How long "Copied" / "Copy failed" stays before the button resets. */
@@ -20,19 +22,22 @@ const FEEDBACK_MS = 2000;
 /**
  * Tokens for any language fancy-file-commons can highlight (aliases included,
  * case-insensitive); none for anything else, which renders as plain text.
- * `tokenize` returns sorted, non-overlapping, in-bounds tokens, which
- * `highlightLines` relies on.
+ * `snippet: true` because a code block shows documentation snippets: PHP
+ * without an opening `<?php` is read as PHP, not inline HTML. `tokenize`
+ * returns sorted, non-overlapping, in-bounds tokens, which `highlightLines`
+ * relies on.
  */
 function tokensFor(code: string, language: string): Token[] {
-  return tokenize(code, language) ?? [];
+  return tokenize(code, language, { snippet: true }) ?? [];
 }
 
 /**
  * Highlight one line at a time, clipping each token to the line it falls on, so
  * a token that spans lines (an HTML comment) keeps its colour on every line.
- * `highlightCode` escapes every slice it emits, highlighted or not.
+ * `highlightCodeWithVariables` escapes every slice it emits, highlighted or not,
+ * and writes no colour value: spans read the palette variables on the root.
  */
-function highlightLines(code: string, tokens: Token[], colors: ThemeColors): string[] {
+function highlightLines(code: string, tokens: Token[]): string[] {
   const out: string[] = [];
   let start = 0;
   let ti = 0;
@@ -45,7 +50,7 @@ function highlightLines(code: string, tokens: Token[], colors: ThemeColors): str
       const e = Math.min(tokens[j].end, end) - start;
       if (e > s) clipped.push({ type: tokens[j].type, start: s, end: e });
     }
-    out.push(highlightCode(line, clipped, colors));
+    out.push(highlightCodeWithVariables(line, clipped));
     start = end + 1;
   }
   return out;
@@ -78,21 +83,18 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
   },
   ref,
 ) {
-  const isDark = useIsDark();
-  const colors: ThemeColors = isDark ? DARK_COLORS : LIGHT_COLORS;
-
   const tokens = useMemo(() => tokensFor(code, language), [code, language]);
   const html = useMemo(
-    () => (showLineNumbers ? null : highlightCode(code, tokens, colors)),
-    [code, tokens, colors, showLineNumbers],
+    () => (showLineNumbers ? null : highlightCodeWithVariables(code, tokens)),
+    [code, tokens, showLineNumbers],
   );
   const lines = useMemo(() => {
     if (!showLineNumbers) return null;
-    const all = highlightLines(code, tokens, colors);
+    const all = highlightLines(code, tokens);
     // A trailing newline ends the last line; it does not start a new one.
     if (all.length > 1 && code.endsWith("\n")) all.pop();
     return all;
-  }, [code, tokens, colors, showLineNumbers]);
+  }, [code, tokens, showLineNumbers]);
 
   const [copyState, setCopyState] = useState<CopyState>("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -137,7 +139,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
       className={cn(
         floating && "opacity-80 group-hover:opacity-100 focus-visible:opacity-100",
       )}
-      style={floating ? { backgroundColor: colors.background } : undefined}
+      style={floating ? { backgroundColor: paletteColor("background") } : undefined}
     >
       {/* Visible feedback; idle is icon-only when floating over the code. */}
       {copyState !== "idle" ? label : hasHeader ? "Copy" : undefined}
@@ -152,14 +154,19 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
       data-react-fancy-code-block=""
       data-language={language}
       data-wrap={wrap ? "true" : "false"}
+      {...{ [CODE_PALETTE_ATTR]: "" }}
       className={cn(
         "group relative overflow-hidden rounded-lg border",
+        CODE_PALETTE_DARK_CLASS,
         className,
       )}
       style={{
-        backgroundColor: colors.background,
-        color: colors.foreground,
-        borderColor: colors.gutterBorder,
+        // Both palettes; the dark one applies under the consumer's `dark`
+        // variant or a `.dark` / `[data-theme="dark"]` ancestor (code-palette).
+        ...CODE_PALETTE_STYLE,
+        backgroundColor: paletteColor("background"),
+        color: paletteColor("foreground"),
+        borderColor: paletteColor("gutterBorder"),
         // `relative` inline too: the floating button and the live region are
         // absolute, and must not escape a host whose Tailwind lacks the class.
         position: "relative",
@@ -172,9 +179,9 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
           data-react-fancy-code-block-header=""
           className="flex items-center justify-between gap-2 border-b py-1 pl-3 pr-1 text-xs"
           style={{
-            backgroundColor: colors.gutterBackground,
-            color: colors.gutterForeground,
-            borderColor: colors.gutterBorder,
+            backgroundColor: paletteColor("gutterBackground"),
+            color: paletteColor("gutterForeground"),
+            borderColor: paletteColor("gutterBorder"),
           }}
         >
           <span data-react-fancy-code-block-title="" className="min-w-0 truncate font-mono">
@@ -210,7 +217,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
                     width: gutterWidth,
                     marginRight: "1.5ch",
                     textAlign: "right",
-                    color: colors.gutterForeground,
+                    color: paletteColor("gutterForeground"),
                     userSelect: "none",
                   }}
                 >

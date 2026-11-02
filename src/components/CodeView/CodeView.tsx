@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useRef } from "react";
-import {
-  highlightCode,
-  tokenize,
-  LIGHT_COLORS,
-  DARK_COLORS,
-  type ThemeColors,
-} from "@particle-academy/fancy-file-commons";
+import { highlightCodeWithVariables, tokenize } from "@particle-academy/fancy-file-commons";
 import { cn } from "../../utils/cn";
-import { useIsDark } from "./use-is-dark";
+import {
+  CODE_PALETTE_ATTR,
+  CODE_PALETTE_DARK_CLASS,
+  CODE_PALETTE_STYLE,
+  paletteColor,
+} from "./code-palette";
 import type { CodeViewProps } from "./CodeView.types";
 
 // Shared text metrics — the overlay and the textarea MUST match exactly (font,
@@ -34,13 +33,13 @@ export function CodeView({
   className,
 }: CodeViewProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const isDark = useIsDark();
-  const colors: ThemeColors = isDark ? DARK_COLORS : LIGHT_COLORS;
-
+  // Snippet mode: PHP without an opening `<?php` is read as PHP. Colours come
+  // from the palette variables on the root, so server and client render the
+  // same markup in either theme (see code-palette).
   const highlighted = useMemo(() => {
-    const tokens = tokenize(value, language) ?? [];
-    return highlightCode(value, tokens, colors);
-  }, [value, language, colors]);
+    const tokens = tokenize(value, language, { snippet: true }) ?? [];
+    return highlightCodeWithVariables(value, tokens);
+  }, [value, language]);
 
   // Grow the textarea to its content height so it never scrolls internally —
   // the outer container owns scrolling and moves overlay + textarea in lockstep.
@@ -60,8 +59,15 @@ export function CodeView({
       // inside a flex column (the Editor source body), or `h-full` when the
       // parent has a definite height. A hard-coded `h-full` here collapses to
       // content height under a flex-computed (indefinite) parent.
-      className={cn("relative overflow-auto", className)}
-      style={{ backgroundColor: colors.background, color: colors.foreground, minHeight, maxHeight }}
+      {...{ [CODE_PALETTE_ATTR]: "" }}
+      className={cn("relative overflow-auto", CODE_PALETTE_DARK_CLASS, className)}
+      style={{
+        ...CODE_PALETTE_STYLE,
+        backgroundColor: paletteColor("background"),
+        color: paletteColor("foreground"),
+        minHeight,
+        maxHeight,
+      }}
     >
       <div className="relative min-h-full">
         {/* Highlight overlay */}
@@ -97,7 +103,7 @@ export function CodeView({
             TEXT_METRICS,
           )}
           style={{
-            caretColor: colors.cursorColor,
+            caretColor: paletteColor("cursorColor"),
             overflow: "hidden",
             whiteSpace: "pre-wrap",
             overflowWrap: "break-word",

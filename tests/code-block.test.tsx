@@ -153,21 +153,15 @@ describe("CodeBlock", () => {
     expect(b.host.querySelector("pre")!.style.whiteSpace).toBe("pre-wrap");
   });
 
-  it("uses CodeView's light palette by default and its dark palette under .dark", () => {
+  it("carries CodeView's light and dark palettes, switched by CSS rather than a hook", () => {
     // jsdom has no matchMedia: the block must still render (a consumer's tests
-    // run here too), falling back to the `.dark` class signal alone.
+    // run here too). The theme no longer changes the markup at all; the dark
+    // palette applies through CSS (see code-palette.test.tsx).
     expect(typeof window.matchMedia).not.toBe("function");
-    const light = mount(<CodeBlock code="x" />);
-    const lightRoot = light.host.querySelector<HTMLElement>("[data-react-fancy-code-block]")!;
-    expect(lightRoot.style.backgroundColor).toBe("rgb(255, 255, 255)");
-    document.documentElement.classList.add("dark");
-    try {
-      const dark = mount(<CodeBlock code="x" />);
-      const darkRoot = dark.host.querySelector<HTMLElement>("[data-react-fancy-code-block]")!;
-      expect(darkRoot.style.backgroundColor).toBe("rgb(24, 24, 27)");
-    } finally {
-      document.documentElement.classList.remove("dark");
-    }
+    const root = mount(<CodeBlock code="x" />).host.querySelector<HTMLElement>("[data-react-fancy-code-block]")!;
+    expect(root.style.getPropertyValue("--fc-background-l")).toBe("#ffffff");
+    expect(root.style.getPropertyValue("--fc-background-d")).toBe("#18181b");
+    expect(root.style.backgroundColor).toBe("var(--fc-background,var(--fc-background-l))");
   });
 
   it("forwards root attributes and merges className", () => {

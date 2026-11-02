@@ -75,6 +75,10 @@ Read-only (omit `onChange` or pass `readOnly`):
 
 ## Theme
 
-The view resolves light/dark itself (the highlight colors are inlined). It
-follows both the `.dark` class and the `prefers-color-scheme` media query, so it
-matches whatever drives your Tailwind `dark:` variants.
+The view carries both palettes as CSS variables (`--fc-<slot>-l` /
+`--fc-<slot>-d`) and CSS picks one, so server-rendered HTML is right in either
+theme with no flash. The dark palette applies under your Tailwind `dark` variant
+(its `dark:` classes compile from the `@source`d dist, so it matches whatever
+drives your other `dark:` utilities) or under a `.dark` / `[data-theme="dark"]`
+ancestor via `styles.css`. See `CodeBlock`'s Theming section for overrides. PHP
+without a `<?php` open tag is highlighted as PHP (snippet mode).

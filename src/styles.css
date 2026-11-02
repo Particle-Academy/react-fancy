@@ -145,6 +145,40 @@
   --color-secondary-950: var(--color-zinc-50);
 }
 
+/* ─── CodeBlock / CodeView palette ───────────────────────────────────────────
+   Both components declare the light AND dark syntax palette on their root
+   (`--fc-<key>-l` / `--fc-<key>-d`) and paint with
+   `var(--fc-<key>, var(--fc-<key>-l))`, so server-rendered HTML is right in
+   either theme. Their `dark:[--fc-<key>:…]` classes switch it under the
+   consumer's Tailwind `dark` variant; this rule does the same under `.dark` /
+   `[data-theme="dark"]` for a host whose Tailwind does not scan the package.
+   Keep the key list in step with CODE_PALETTE_KEYS (a test checks). */
+:where(
+  .dark [data-react-fancy-code-palette],
+  [data-theme="dark"] [data-react-fancy-code-palette],
+  .dark[data-react-fancy-code-palette],
+  [data-theme="dark"][data-react-fancy-code-palette]
+) {
+  --fc-background: var(--fc-background-d);
+  --fc-foreground: var(--fc-foreground-d);
+  --fc-gutterBackground: var(--fc-gutterBackground-d);
+  --fc-gutterForeground: var(--fc-gutterForeground-d);
+  --fc-gutterBorder: var(--fc-gutterBorder-d);
+  --fc-cursorColor: var(--fc-cursorColor-d);
+  --fc-keyword: var(--fc-keyword-d);
+  --fc-string: var(--fc-string-d);
+  --fc-comment: var(--fc-comment-d);
+  --fc-number: var(--fc-number-d);
+  --fc-operator: var(--fc-operator-d);
+  --fc-function: var(--fc-function-d);
+  --fc-type: var(--fc-type-d);
+  --fc-tag: var(--fc-tag-d);
+  --fc-attribute: var(--fc-attribute-d);
+  --fc-attributeValue: var(--fc-attributeValue-d);
+  --fc-punctuation: var(--fc-punctuation-d);
+  --fc-variable: var(--fc-variable-d);
+}
+
 /* ─── Input & Field defaults ─────────────────────────────────────────────────
    Better UX out of the box: spacing between stacked fields, smooth transitions,
    and polished dark-mode defaults. All overridable via data-attribute selectors.
