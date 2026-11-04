@@ -103,6 +103,7 @@ npx vite build                      # Build demo app (verifies imports work)
 | Checkbox / CheckboxGroup | Checkbox inputs | [docs](docs/Checkbox.md) |
 | RadioGroup | Radio button group | [docs](docs/RadioGroup.md) |
 | Switch | Toggle switch | [docs](docs/Switch.md) |
+| NumberField | Numeric input with a `number \| null` value: blank stays null, partial text never emits a wrong number, no wheel changes | [docs](docs/NumberField.md) |
 | Slider | Range slider (single and range modes) | [docs](docs/Slider.md) |
 | MultiSwitch | Segmented toggle between multiple options | [docs](docs/MultiSwitch.md) |
 | DatePicker | Date selection (single and range modes) | [docs](docs/DatePicker.md) |

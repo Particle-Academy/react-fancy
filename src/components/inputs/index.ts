@@ -25,6 +25,9 @@ export type { SwitchProps } from "./Switch";
 export { Slider } from "./Slider";
 export type { SliderProps, SliderSingleProps, SliderRangeProps } from "./Slider";
 
+export { NumberField } from "./NumberField";
+export type { NumberFieldProps, NumberFieldMessages } from "./NumberField";
+
 export { MultiSwitch } from "./MultiSwitch";
 export type { MultiSwitchProps, MultiSwitchOption } from "./MultiSwitch";
 

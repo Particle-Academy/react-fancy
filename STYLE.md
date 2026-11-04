@@ -119,6 +119,7 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-checkbox-group]` | CheckboxGroup |
 | `[data-react-fancy-radio-group]` | RadioGroup |
 | `[data-react-fancy-switch]` | Switch |
+| `[data-react-fancy-number-field]` | NumberField |
 | `[data-react-fancy-slider]` | Slider |
 | `[data-react-fancy-multi-switch]` | MultiSwitch |
 | `[data-react-fancy-date-picker]` | DatePicker |

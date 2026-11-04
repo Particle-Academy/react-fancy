@@ -643,6 +643,16 @@
         "default": "./dist/navbar.cjs"
       }
     },
+    "./number-field": {
+      "import": {
+        "types": "./dist/number-field.d.ts",
+        "default": "./dist/number-field.js"
+      },
+      "require": {
+        "types": "./dist/number-field.d.cts",
+        "default": "./dist/number-field.cjs"
+      }
+    },
     "./otp-input": {
       "import": {
         "types": "./dist/otp-input.d.ts",

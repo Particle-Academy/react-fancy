@@ -2,6 +2,8 @@
 
 Text input with built-in label, error, prefix/suffix, and leading/trailing icon support.
 
+For a value that is a number, use [`NumberField`](NumberField.md): `type="number"` here still emits a string and leaves blank as `""`.
+
 ## Import
 
 ```tsx

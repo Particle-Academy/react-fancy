@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **`FileUpload` reports what it refuses: `onReject(rejections)`.** A file failing `accept` or `maxSize`, the overflow past `maxFiles`, and the extra files of a batch dropped on a `multiple={false}` field were all dropped in silence, leaving a host nothing to tell the person with. Each entry is plain JSON (`{ name, size, type, reason }`, with `reason` one of `"accept"`, `"maxSize"`, `"maxFiles"`), one per file under the first rule it failed. It covers the picker, a drop and `useFileUpload().addFiles`, fires after `onChange`, and does not fire when nothing was refused. New types: `FileRejection`, `FileRejectionReason`. **Consumer action:** none. Nothing changes unless you pass it.
+- **`NumberField`: a numeric field whose value is `number | null`.** Blank is `null`, never `0`. Partial text (`-`, `.`, `1e`) and unreadable text (`0x10`, `1,000`) are `null`, never a wrong number. The mouse wheel does not change it. `min` and `max` stop the arrow keys and report a typed value outside them as invalid through native form validation, without rewriting it. A declared `step` moves the arrow keys and makes off-grid values invalid. Takes a unit through the existing `suffix` prop, posts the number (not the text) under `name`, and has a `./number-field` subpath. **Consumer action:** none. `<Input type="number">` is unchanged.
 
 ## [6.6.1] - 2026-11-03
 
