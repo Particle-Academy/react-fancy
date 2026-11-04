@@ -370,6 +370,8 @@ export type {
   FileUploadDropzoneProps,
   FileUploadListProps,
   FileUploadContextValue,
+  FileRejection,
+  FileRejectionReason,
 } from "./components/FileUpload";
 
 export { TimePicker } from "./components/TimePicker";

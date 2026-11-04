@@ -30,8 +30,9 @@ Provides file state context to its children.
 | `onChange` | `(files: File[]) => void` | - | Callback when files change |
 | `accept` | `string` | - | Accepted file types (e.g. `"image/*,.pdf"`) |
 | `multiple` | `boolean` | `true` | Allow multiple files |
-| `maxFiles` | `number` | - | Maximum number of files |
-| `maxSize` | `number` | - | Maximum file size in bytes (files exceeding this are silently filtered) |
+| `onReject` | `(rejections: FileRejection[]) => void` | - | Called with the files a gesture refused. See [Refused files](#refused-files) |
+| `maxFiles` | `number` | - | Maximum number of files. The overflow is refused |
+| `maxSize` | `number` | - | Maximum file size in bytes. Larger files are refused |
 | `disabled` | `boolean` | `false` | Disables upload and removal |
 | `className` | `string` | - | Additional CSS classes on the wrapper |
 
@@ -55,6 +56,35 @@ Displays the uploaded files with remove buttons.
 |------|------|---------|-------------|
 | `thumbnail` | `boolean` | `false` | Show image thumbnails in a grid instead of a file list |
 | `className` | `string` | - | Additional CSS classes |
+
+## Refused files
+
+`accept`, `maxSize` and `maxFiles` refuse files without any message of their own. `onReject` is how you tell the person, whichever way the files arrived: the picker, a drop, or `useFileUpload().addFiles`.
+
+```tsx
+<FileUpload
+  accept="image/*"
+  maxSize={5 * 1024 * 1024}
+  maxFiles={5}
+  onReject={(rejections) => setError(rejections.map((r) => `${r.name}: ${r.reason}`).join(", "))}
+>
+  <FileUpload.Dropzone />
+</FileUpload>
+```
+
+Each entry is plain JSON, one per file, under the first rule that file failed:
+
+```ts
+{ name: "scan.tiff", size: 7340032, type: "image/tiff", reason: "maxSize" }
+```
+
+| `reason` | Means |
+|---|---|
+| `accept` | The file does not match `accept` |
+| `maxSize` | The file is larger than `maxSize` |
+| `maxFiles` | The file is past `maxFiles`, or is an extra file in a batch dropped on a `multiple={false}` field |
+
+It fires after `onChange`, and not at all when nothing was refused. A file replaced on a `multiple={false}` field was not refused, so it is not reported.
 
 ## Examples
 

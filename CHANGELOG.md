@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`FileUpload` reports what it refuses: `onReject(rejections)`.** A file failing `accept` or `maxSize`, the overflow past `maxFiles`, and the extra files of a batch dropped on a `multiple={false}` field were all dropped in silence, leaving a host nothing to tell the person with. Each entry is plain JSON (`{ name, size, type, reason }`, with `reason` one of `"accept"`, `"maxSize"`, `"maxFiles"`), one per file under the first rule it failed. It covers the picker, a drop and `useFileUpload().addFiles`, fires after `onChange`, and does not fire when nothing was refused. New types: `FileRejection`, `FileRejectionReason`. **Consumer action:** none. Nothing changes unless you pass it.
+
 ## [6.6.1] - 2026-11-03
 
 ### Fixed

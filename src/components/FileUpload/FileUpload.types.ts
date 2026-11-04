@@ -10,10 +10,27 @@ export interface FileUploadContextValue {
   multiple: boolean;
 }
 
+/** Stable code for why a file was refused. */
+export type FileRejectionReason = "accept" | "maxSize" | "maxFiles";
+
+/** A refused file, as plain JSON so it can go to a log, a toast or an agent. */
+export interface FileRejection {
+  name: string;
+  size: number;
+  type: string;
+  reason: FileRejectionReason;
+}
+
 export interface FileUploadProps {
   children: ReactNode;
   value?: File[];
   onChange?: (files: File[]) => void;
+  /**
+   * Files this gesture refused, one entry per file under the first rule it
+   * failed. Not called when nothing was refused. Fires after `onChange`, for
+   * the picker, a drop, and `useFileUpload().addFiles` alike.
+   */
+  onReject?: (rejections: FileRejection[]) => void;
   accept?: string;
   multiple?: boolean;
   maxFiles?: number;

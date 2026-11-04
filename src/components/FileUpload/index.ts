@@ -5,4 +5,6 @@ export type {
   FileUploadDropzoneProps,
   FileUploadListProps,
   FileUploadContextValue,
+  FileRejection,
+  FileRejectionReason,
 } from "./FileUpload.types";

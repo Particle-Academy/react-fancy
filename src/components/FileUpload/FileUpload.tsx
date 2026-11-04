@@ -4,12 +4,21 @@ import { FileUploadContext } from "./FileUpload.context";
 import { FileUploadDropzone } from "./FileUploadDropzone";
 import { FileUploadList } from "./FileUploadList";
 import { matchesAccept } from "./matchesAccept";
-import type { FileUploadProps } from "./FileUpload.types";
+import type {
+  FileRejection,
+  FileRejectionReason,
+  FileUploadProps,
+} from "./FileUpload.types";
+
+function rejection(file: File, reason: FileRejectionReason): FileRejection {
+  return { name: file.name, size: file.size, type: file.type, reason };
+}
 
 function FileUploadRoot({
   children,
   value,
   onChange,
+  onReject,
   accept,
   multiple = true,
   maxFiles,
@@ -23,15 +32,28 @@ function FileUploadRoot({
   const addFiles = useCallback(
     (newFiles: FileList | File[]) => {
       let toAdd = Array.from(newFiles);
+      const rejections: FileRejection[] = [];
+
+      // Each file is reported once, under the first rule it failed.
+      const keepOnly = (
+        passes: (f: File) => boolean,
+        reason: FileRejectionReason,
+      ) => {
+        toAdd = toAdd.filter((f) => {
+          if (passes(f)) return true;
+          rejections.push(rejection(f, reason));
+          return false;
+        });
+      };
 
       // `accept` is enforced HERE, not only on the input: the input's attribute
       // governs the picker, and a drop never opens one.
       if (accept) {
-        toAdd = toAdd.filter((f) => matchesAccept(f, accept));
+        keepOnly((f) => matchesAccept(f, accept), "accept");
       }
 
       if (maxSize) {
-        toAdd = toAdd.filter((f) => f.size <= maxSize);
+        keepOnly((f) => f.size <= maxSize, "maxSize");
       }
 
       /*
@@ -73,8 +95,13 @@ function FileUploadRoot({
         // rather than clearing a file the user never asked to remove.
         const next = replacement.length > 0 ? replacement : files;
 
+        // The file being replaced was not refused; the rest of this batch was,
+        // by a field that holds one.
+        for (const f of toAdd.slice(1)) rejections.push(rejection(f, "maxFiles"));
+
         if (value === undefined) setInternalFiles(next);
         onChange?.(next);
+        if (rejections.length > 0) onReject?.(rejections);
 
         return;
       }
@@ -82,10 +109,13 @@ function FileUploadRoot({
       const updated = [...files, ...toAdd];
       const limited = maxFiles ? updated.slice(0, maxFiles) : updated;
 
+      for (const f of updated.slice(limited.length)) rejections.push(rejection(f, "maxFiles"));
+
       if (value === undefined) setInternalFiles(limited);
       onChange?.(limited);
+      if (rejections.length > 0) onReject?.(rejections);
     },
-    [accept, files, maxFiles, maxSize, multiple, onChange, value],
+    [accept, files, maxFiles, maxSize, multiple, onChange, onReject, value],
   );
 
   const removeFile = useCallback(
