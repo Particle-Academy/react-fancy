@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.7.2] - 2026-11-08
+
 ### Fixed
 
 - **`PromptInput`'s `/` and `@` menu keeps the highlighted row in view.** ArrowDown and ArrowUp only moved the highlight, so with more commands than the menu's height shows, the highlight went off the bottom of the list and stayed hidden. The active row is now scrolled into view (`block: "nearest"`) after every arrow key and after typing filters the list. A row the pointer hovers is not scrolled, so the list does not creep under a resting mouse. Reported by the Genie agent. **Consumer action:** none.
