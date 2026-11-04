@@ -377,7 +377,7 @@ export function VirtualList<T extends VirtualListRow>({
     // The viewport as laid out NOW, not the `viewport` of the last commit. When it
     // grows, the browser clamps scrollTop to the new maximum, and it can deliver
     // that scroll event before the ResizeObserver callback for the same frame (it
-    // does in Chromium once the page has taken any input). Against the last
+    // does in Chromium once the page has seen a pointer event). Against the last
     // commit's height the clamp looks like an upward scroll; against this height it
     // is the bottom, which is what it is. Reading it costs no layout that reading
     // scrollTop above did not already pay. Zero means not laid out.

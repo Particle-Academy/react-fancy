@@ -1189,9 +1189,10 @@ describe("tail-follow cost, with a ResizeObserver (genie#1340 follow-up)", () =>
 
 describe("tail-follow when the browser clamps a resize before the observer reports it", () => {
     // Measured in headless Chromium against the published dist: once the page has
-    // taken ANY real input, growing the viewport delivers the clamp's `scroll`
-    // event BEFORE the ResizeObserver callback for the same frame. With no prior
-    // input the order is reversed, which is why a resize test with no input passes.
+    // seen a pointer event (a bare mouse move is enough), growing the viewport
+    // delivers the clamp's `scroll` event BEFORE the ResizeObserver callback for the
+    // same frame. With none, the order is reversed, which is why a resize test with
+    // no pointer input passes. A pause and resume is not the precondition.
     //
     // jsdom does no layout and fires nothing, so these tests deliver that order by
     // hand. `grow` does what the browser did: new height, scrollTop clamped to the
@@ -1234,12 +1235,12 @@ describe("tail-follow when the browser clamps a resize before the observer repor
      * affordance is showing, so the host's layout feeds back into the list exactly
      * as it does in a browser.
      */
-    function setup(startHeight: number) {
+    function setup(startHeight: number, affordanceTakesSpace = true) {
         const log: boolean[] = [];
         const host = mount(<Host log={log} />);
         const viewport = viewportOf(host);
         let hostHeight = startHeight;
-        const height = () => hostHeight - (host.querySelector("button") ? AFFORDANCE : 0);
+        const height = () => hostHeight - (affordanceTakesSpace && host.querySelector("button") ? AFFORDANCE : 0);
         Object.defineProperty(viewport, "clientHeight", { configurable: true, get: height });
 
         const report = () => {
@@ -1307,7 +1308,7 @@ describe("tail-follow when the browser clamps a resize before the observer repor
         expect(viewport.scrollTop).toBeCloseTo(TOTAL - 330, 0);
     });
 
-    it("NEGATIVE CONTROL: the observer first, which is the order with no prior input", () => {
+    it("NEGATIVE CONTROL: the observer first, which is the order with no prior pointer input", () => {
         // Passes on the old code too. It pins down that the ORDER is the variable.
         const { viewport, log, report, deliverScroll, grow } = setup(73);
 
@@ -1384,6 +1385,24 @@ describe("tail-follow when the browser clamps a resize before the observer repor
             expect(log).toEqual([false]);
             roots.splice(0).forEach((r) => act(() => r.unmount()));
         }
+    });
+
+    it("ArrowUp at the bottom stays paused through the first small step of its smooth scroll", () => {
+        // Measured on every published version: the key asked for false, the first
+        // frame of the animation moved 2px, which is inside the bottom slack, and that
+        // scroll asked for true again. ArrowUp could not pause from the bottom at all.
+        // An overlay affordance: one taking layout space would move the bottom away
+        // from the position, and this would pass with the gate removed.
+        const { viewport, log } = setup(330, false);
+        const bottom = TOTAL - 330;
+
+        act(() => {
+            viewport.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
+        });
+        scrollTo(viewport, bottom - 2);
+        scrollTo(viewport, bottom - 40);
+
+        expect(log).toEqual([false]);
     });
 
     it("turns the browser's scroll anchoring off while following, and only then", () => {
