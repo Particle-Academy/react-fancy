@@ -374,14 +374,30 @@ export function VirtualList<T extends VirtualListRow>({
     const previous = scrollTop;
     setScrollTop(next);
 
-    const bottom = Math.max(0, total - viewport);
+    // The viewport as laid out NOW, not the `viewport` of the last commit. When it
+    // grows, the browser clamps scrollTop to the new maximum, and it can deliver
+    // that scroll event before the ResizeObserver callback for the same frame (it
+    // does in Chromium once the page has taken any input). Against the last
+    // commit's height the clamp looks like an upward scroll; against this height it
+    // is the bottom, which is what it is. Reading it costs no layout that reading
+    // scrollTop above did not already pay. Zero means not laid out.
+    //
+    // Adopt it here too rather than waiting for the observer. This handler's own
+    // setScrollTop commits first, and with the old height the follow effect would
+    // write a position past the new maximum: the browser ignores it, no scroll event
+    // comes back, and `programmatic` stays set to swallow the human's next scroll.
+    const live = vp.clientHeight;
+    if (live > 0) setClientHeight(live);
+    const bottom = Math.max(0, total - (live || viewport));
     const wasProgrammatic = programmatic.current;
     programmatic.current = false;
 
     if (next <= bottom - BOTTOM_SLACK) {
       // Moved up, and not because we moved it.
       if (!wasProgrammatic && next < previous) askFollow(false);
-    } else {
+    } else if (next > previous) {
+      // Came down to the bottom. Being dragged UP to it by a clamp is not the
+      // reader returning, so it does not resume a pause.
       askFollow(true);
     }
   }, [scrollTop, total, viewport, askFollow]);
@@ -442,7 +458,10 @@ export function VirtualList<T extends VirtualListRow>({
       role="log"
       tabIndex={0}
       className={cn("relative overflow-y-auto overflow-x-hidden outline-none", className)}
-      style={{ height }}
+      // While following, the list owns the position. Left on, scroll anchoring
+      // answers rows reflowing above it by moving scrollTop up, which reaches
+      // onScroll looking exactly like a scrollbar drag.
+      style={followTail ? { height, overflowAnchor: "none" } : { height }}
       onScroll={onScroll}
       onWheel={onWheel}
       onKeyDown={onKeyDown}

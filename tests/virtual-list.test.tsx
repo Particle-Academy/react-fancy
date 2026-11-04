@@ -1187,6 +1187,245 @@ describe("tail-follow cost, with a ResizeObserver (genie#1340 follow-up)", () =>
     });
 });
 
+describe("tail-follow when the browser clamps a resize before the observer reports it", () => {
+    // Measured in headless Chromium against the published dist: once the page has
+    // taken ANY real input, growing the viewport delivers the clamp's `scroll`
+    // event BEFORE the ResizeObserver callback for the same frame. With no prior
+    // input the order is reversed, which is why a resize test with no input passes.
+    //
+    // jsdom does no layout and fires nothing, so these tests deliver that order by
+    // hand. `grow` does what the browser did: new height, scrollTop clamped to the
+    // new maximum, and neither event delivered until the test says so.
+
+    const ROW = 100;
+    const COUNT = 20;
+    const TOTAL = ROW * COUNT;
+    const AFFORDANCE = 38;
+
+    beforeEach(() => {
+        FakeResizeObserver.instances = [];
+        (globalThis as { ResizeObserver?: unknown }).ResizeObserver = FakeResizeObserver;
+    });
+
+    /** The consumer from the docs, plus a "Back to latest" that takes layout space. */
+    function Host(props: { log: boolean[] }) {
+        const [following, setFollowing] = useState(true);
+
+        return (
+            <div>
+                <VirtualList
+                    items={rows(COUNT, "tall")}
+                    renderRow={renderRow}
+                    height="100%"
+                    estimateRowHeight={ROW}
+                    followTail={following}
+                    onFollowChange={(next) => {
+                        props.log.push(next);
+                        setFollowing(next);
+                    }}
+                />
+                {!following && <button onClick={() => setFollowing(true)}>Back to latest</button>}
+            </div>
+        );
+    }
+
+    /**
+     * Mount in a host `hostHeight` tall. The viewport loses 38px while the
+     * affordance is showing, so the host's layout feeds back into the list exactly
+     * as it does in a browser.
+     */
+    function setup(startHeight: number) {
+        const log: boolean[] = [];
+        const host = mount(<Host log={log} />);
+        const viewport = viewportOf(host);
+        let hostHeight = startHeight;
+        const height = () => hostHeight - (host.querySelector("button") ? AFFORDANCE : 0);
+        Object.defineProperty(viewport, "clientHeight", { configurable: true, get: height });
+
+        const report = () => {
+            // A real observer only reports what it was told to observe. Firing an
+            // entry by hand would otherwise pass with the viewport never observed.
+            expect(liveObserver().observed.has(viewport)).toBe(true);
+            liveObserver().fire([borderBoxEntry(viewport, height())]);
+        };
+        const deliverScroll = () =>
+            act(() => {
+                viewport.dispatchEvent(new Event("scroll"));
+            });
+        const grow = (to: number) => {
+            hostHeight = to;
+            viewport.scrollTop = Math.min(viewport.scrollTop, TOTAL - height());
+        };
+
+        report();
+        deliverScroll(); // The scroll event of the pin the mount just made.
+        expect(viewport.scrollTop).toBeCloseTo(TOTAL - startHeight, 0);
+
+        return { host, viewport, log, report, deliverScroll, grow, height };
+    }
+
+    function clickBack(host: HTMLElement) {
+        act(() => {
+            host.querySelector("button")!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        });
+    }
+
+    it("POSITIVE: a pause and resume, then the clamp's scroll arrives first: keeps following", () => {
+        // The reported sequence, in order. 73 -> 330 with 20 rows.
+        const { host, viewport, log, report, deliverScroll, grow } = setup(73);
+
+        act(() => {
+            viewport.dispatchEvent(new WheelEvent("wheel", { deltaY: -120, bubbles: true }));
+        });
+        scrollTo(viewport, 652);
+        expect(log).toEqual([false]);
+        clickBack(host);
+        report();
+        deliverScroll();
+        expect(viewport.scrollTop).toBeCloseTo(TOTAL - 73, 0);
+
+        grow(330);
+        deliverScroll();
+        report();
+
+        // No false pause, so no affordance took 38px, so no gap.
+        expect(log).toEqual([false]);
+        expect(host.querySelector("button")).toBeNull();
+        expect(viewport.clientHeight).toBe(330);
+        expect(viewport.scrollTop).toBeCloseTo(TOTAL - 330, 0);
+    });
+
+    it("POSITIVE: the same clamp with no pause before it", () => {
+        const { host, viewport, log, report, deliverScroll, grow } = setup(73);
+
+        grow(330);
+        deliverScroll();
+        report();
+
+        expect(log).toEqual([]);
+        expect(host.querySelector("button")).toBeNull();
+        expect(viewport.scrollTop).toBeCloseTo(TOTAL - 330, 0);
+    });
+
+    it("NEGATIVE CONTROL: the observer first, which is the order with no prior input", () => {
+        // Passes on the old code too. It pins down that the ORDER is the variable.
+        const { viewport, log, report, deliverScroll, grow } = setup(73);
+
+        grow(330);
+        report();
+        deliverScroll();
+
+        expect(log).toEqual([]);
+        expect(viewport.scrollTop).toBeCloseTo(TOTAL - 330, 0);
+    });
+
+    it("a scrollbar drag up, with no wheel or key, still pauses straight after a resize", () => {
+        // A position change above the true bottom cannot be a clamp. This is what
+        // stops "never pause" from passing the tests above.
+        const { host, viewport, log, report, deliverScroll, grow } = setup(73);
+        grow(330);
+        deliverScroll();
+        report();
+
+        scrollTo(viewport, 900);
+
+        expect(log).toEqual([false]);
+        expect(host.querySelector("button")).not.toBeNull();
+    });
+
+    it("a drag up that lands in the same frame as the growth still pauses", () => {
+        // Scroll first, observer not yet: the list's own height is stale, and this
+        // position is above the bottom at either height. Live geometry decides.
+        const { viewport, log, grow } = setup(73);
+
+        grow(330);
+        scrollTo(viewport, 900);
+
+        expect(log).toEqual([false]);
+    });
+
+    it("a resize while paused in history neither resumes nor moves the reader", () => {
+        const { viewport, log, report, deliverScroll, grow } = setup(330);
+        act(() => {
+            viewport.dispatchEvent(new WheelEvent("wheel", { deltaY: -120, bubbles: true }));
+        });
+        scrollTo(viewport, 500);
+        expect(log).toEqual([false]);
+
+        for (const to of [111, 330, 111, 330]) {
+            grow(to);
+            deliverScroll();
+            report();
+            expect(viewport.scrollTop).toBe(500);
+        }
+
+        expect(log).toEqual([false]);
+    });
+
+    it("paused just above the bottom, a clamp is not the human returning", () => {
+        // Growing the viewport drags the reader to the physical bottom. They did
+        // not come back, so `followTail` stays theirs: no resume, whichever event
+        // the browser delivers first.
+        for (const observerFirst of [false, true]) {
+            const { viewport, log, report, deliverScroll, grow } = setup(73);
+            act(() => {
+                viewport.dispatchEvent(new WheelEvent("wheel", { deltaY: -120, bubbles: true }));
+            });
+            scrollTo(viewport, TOTAL - 73 - 50);
+            expect(log).toEqual([false]);
+            report();
+            deliverScroll();
+
+            grow(330);
+            if (observerFirst) report();
+            deliverScroll();
+            if (!observerFirst) report();
+
+            expect(log).toEqual([false]);
+            roots.splice(0).forEach((r) => act(() => r.unmount()));
+        }
+    });
+
+    it("turns the browser's scroll anchoring off while following, and only then", () => {
+        // A width reflow shrinks the rows above the anchor, and Chromium moves
+        // scrollTop UP to hold the anchor still, to a position well above the bottom.
+        // Nothing in onScroll can tell that from a scrollbar drag (measured: 97px
+        // above the bottom at 903x527 -> 1440x1000). While following the list owns
+        // the position, so the browser must not move it. A reader in history keeps
+        // anchoring, which holds their place.
+        const { host, viewport } = setup(73);
+        expect(viewport.style.overflowAnchor).toBe("none");
+
+        act(() => {
+            viewport.dispatchEvent(new WheelEvent("wheel", { deltaY: -120, bubbles: true }));
+        });
+        expect(host.querySelector("button")).not.toBeNull();
+        expect(viewport.style.overflowAnchor).toBe("");
+    });
+
+    it("Back to latest resumes and pins, and a later return to the bottom still asks to follow", () => {
+        const { host, viewport, log, report, deliverScroll } = setup(330);
+        act(() => {
+            viewport.dispatchEvent(new WheelEvent("wheel", { deltaY: -120, bubbles: true }));
+        });
+        scrollTo(viewport, 500);
+        report();
+
+        clickBack(host);
+        report();
+        deliverScroll();
+        expect(viewport.scrollTop).toBeCloseTo(TOTAL - 330, 0);
+        expect(host.querySelector("button")).toBeNull();
+
+        // Away, then back by hand: this is the resume path, and it moves DOWN.
+        scrollTo(viewport, 500);
+        report();
+        scrollTo(viewport, TOTAL - viewport.clientHeight);
+
+        expect(log).toEqual([false, false, true]);
+    });
+});
+
 describe("tail-follow without a ResizeObserver", () => {
     it("re-pins even when the position moved without a scroll event reaching the list", () => {
         // The fallback still reads scrollTop. It already pays a layout per render
