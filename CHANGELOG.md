@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`PromptInput`'s `/` and `@` menu keeps the highlighted row in view.** ArrowDown and ArrowUp only moved the highlight, so with more commands than the menu's height shows, the highlight went off the bottom of the list and stayed hidden. The active row is now scrolled into view (`block: "nearest"`) after every arrow key and after typing filters the list. A row the pointer hovers is not scrolled, so the list does not creep under a resting mouse. Reported by the Genie agent. **Consumer action:** none.
+- **A long command name, hint or mention no longer gives the `PromptInput` menu a horizontal scrollbar.** The text did not wrap, so an unbroken token such as `/claude-code-setup:claude-automation-recommender` or a long path widened the row past the `w-72` menu. Command names and hints now wrap anywhere they must. A mention's name and kind truncate with an ellipsis and carry the whole text in `title`; the text itself is unchanged, so a screen reader still reads it in full. **Consumer action:** none.
+- **The `PromptInput` menu has stable handles.** The menu is `[data-react-fancy-prompt-input-menu="cmd" | "mention"]` with `role="listbox"`, and each row is a `role="option"` `[data-react-fancy-prompt-input-menu-item="<command name or mention id>"]` with `aria-selected`, so an agent or a test reads the menu without guessing at its markup. **Consumer action:** none.
+
 ## [6.7.1] - 2026-11-03
 
 ### Security

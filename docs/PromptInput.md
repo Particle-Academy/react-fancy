@@ -31,8 +31,12 @@ import { PromptInput } from "@particle-academy/react-fancy";
 ## Features
 
 - Auto-resizes up to `maxHeight`.
-- `/` opens a filtered command palette. ↑/↓ navigate, Enter inserts.
+- `/` opens a filtered command palette. ↑/↓ navigate, Enter inserts. The
+  highlighted row is kept scrolled into view.
 - `@` opens a mention picker filtered against `mentions`.
+- Long command names and hints wrap inside the menu; a long mention name is
+  truncated with an ellipsis and kept whole in its `title`. The menu never
+  scrolls sideways.
 - Drop files anywhere on the input to attach. Chip bar shows attachments.
 - ⌘+Enter (or Ctrl+Enter) submits. Plain Enter inserts a newline. An Enter
   that confirms an IME composition neither submits nor picks from a menu.
@@ -225,7 +229,11 @@ Data handles: the root `[data-react-fancy-prompt-input]` (with
 `[data-react-fancy-prompt-input-attachment="<id>"]`, plus `-attach`, `-send`,
 `-meter`, `-hint` and `-error`. The text field is
 `[data-react-fancy-prompt-input-textarea]`, or `[data-react-fancy-composer-input]`
-with inline pills on; `inputId` gives it one id in both modes.
+with inline pills on; `inputId` gives it one id in both modes. The open `/` or
+`@` menu is `[data-react-fancy-prompt-input-menu="cmd" | "mention"]`, a
+`role="listbox"`; each row is a `role="option"`
+`[data-react-fancy-prompt-input-menu-item="<command name or mention id>"]`, and
+the highlighted one has `aria-selected="true"`.
 
 ## Defaults
 

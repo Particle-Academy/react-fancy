@@ -750,6 +750,31 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
         ? filteredMentions
         : [];
 
+  /**
+   * Keep the picker's active row in view.
+   *
+   * The menu is a `max-h-56` scroller, so with a long list the arrow keys moved
+   * the highlight off its bottom edge and it stayed hidden. Runs after every
+   * cursor move and every filter (a filter resets the cursor to the first row,
+   * which may be scrolled out of sight). `nearest` moves the list only when the
+   * row is not already fully visible, and never scrolls the page past it.
+   *
+   * Skipped when the pointer moved the cursor: scrolling a half-visible hovered
+   * row into view slides the next row under the pointer, which hovers it in
+   * turn, and the list would crawl by itself.
+   */
+  const menuListRef = useRef<HTMLUListElement>(null);
+  const cursorFromPointer = useRef(false);
+  useLayoutEffect(() => {
+    if (cursorFromPointer.current) {
+      cursorFromPointer.current = false;
+      return;
+    }
+    if (!picker) return;
+    const active = menuListRef.current?.querySelector<HTMLElement>('[aria-selected="true"]');
+    active?.scrollIntoView?.({ block: "nearest" });
+  }, [picker, items]);
+
   useEffect(() => {
     const ta = taRef.current;
     if (!ta) return;
@@ -1139,35 +1164,50 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
         )}
 
         {picker && items.length > 0 && (
-          <div className="absolute bottom-full left-2 z-10 mb-1 w-72 overflow-hidden rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]">
+          <div
+            data-react-fancy-prompt-input-menu={picker.kind}
+            className="absolute bottom-full left-2 z-10 mb-1 w-72 overflow-hidden rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]">
             <div className="border-b border-zinc-100 bg-zinc-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950">
               {picker.kind === "cmd" ? "Commands" : "Mention"} · {items.length}
             </div>
-            <ul className="max-h-56 overflow-y-auto">
+            {/* Row text breaks or truncates long tokens rather than widening the
+                row: an unbroken name or hint (`/plugin:some-long-command`, a
+                path) otherwise gave this scroller a horizontal scrollbar. */}
+            <ul
+              ref={menuListRef}
+              role="listbox"
+              aria-label={picker.kind === "cmd" ? "Commands" : "Mentions"}
+              className="max-h-56 overflow-y-auto"
+            >
               {items.map((item, i) => {
                 const active = i === picker.cursor;
+                const hoverTo = () => {
+                  cursorFromPointer.current = true;
+                  setPicker((p) => (p ? { ...p, cursor: i } : p));
+                };
                 if (picker.kind === "cmd") {
                   const c = item as PromptCmd;
                   return (
                     <li
                       key={c.name}
+                      role="option"
+                      aria-selected={active}
+                      data-react-fancy-prompt-input-menu-item={c.name}
                       onMouseDown={(e) => {
                         e.preventDefault();
                         insertChoice(i);
                       }}
-                      onMouseEnter={() =>
-                        setPicker((p) => (p ? { ...p, cursor: i } : p))
-                      }
+                      onMouseEnter={hoverTo}
                       className={`cursor-pointer px-2 py-1.5 text-[12px] ${
                         active
                           ? "bg-violet-100 dark:bg-violet-900/30"
                           : "hover:bg-zinc-50 dark:hover:bg-zinc-800"
                       }`}
                     >
-                      <div className="font-mono font-medium text-violet-700 dark:text-violet-300">
+                      <div className="font-mono font-medium text-violet-700 [overflow-wrap:anywhere] dark:text-violet-300">
                         {c.name}
                       </div>
-                      <div className="text-[11px] text-zinc-500">{c.hint}</div>
+                      <div className="text-[11px] text-zinc-500 [overflow-wrap:anywhere]">{c.hint}</div>
                     </li>
                   );
                 }
@@ -1175,13 +1215,14 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
                 return (
                   <li
                     key={m.id}
+                    role="option"
+                    aria-selected={active}
+                    data-react-fancy-prompt-input-menu-item={m.id}
                     onMouseDown={(e) => {
                       e.preventDefault();
                       insertChoice(i);
                     }}
-                    onMouseEnter={() =>
-                      setPicker((p) => (p ? { ...p, cursor: i } : p))
-                    }
+                    onMouseEnter={hoverTo}
                     className={`flex cursor-pointer items-center gap-2 px-2 py-1.5 text-[12px] ${
                       active
                         ? "bg-violet-100 dark:bg-violet-900/30"
@@ -1189,11 +1230,18 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
                     }`}
                   >
                     <span
-                      className="h-2 w-2 rounded-full"
+                      className="h-2 w-2 shrink-0 rounded-full"
                       style={{ backgroundColor: colors[m.kind] ?? "#71717a" }}
                     />
-                    <span className="font-medium">{m.name}</span>
-                    <span className="ml-auto text-[10px] uppercase tracking-wider text-zinc-400">
+                    {/* Truncated, so `title` carries the whole name for a hover;
+                        the text itself is still whole for a screen reader. */}
+                    <span className="min-w-0 flex-1 truncate font-medium" title={m.name}>
+                      {m.name}
+                    </span>
+                    <span
+                      className="min-w-0 max-w-[40%] truncate text-[10px] uppercase tracking-wider text-zinc-400"
+                      title={m.kind}
+                    >
                       {m.kind}
                     </span>
                   </li>
