@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- **`NumberField` reads a very long run of digits in linear time.** Its number pattern could backtrack badly, so a very long pasted string could freeze the tab. Every number it accepted is still accepted. **Consumer action:** update if you use `NumberField`, which is new in 6.7.0.
+
 ## [6.7.0] - 2026-11-03
 
 ### Added

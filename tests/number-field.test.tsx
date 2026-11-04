@@ -69,6 +69,38 @@ function Harness({
 }
 
 describe("NumberField value contract", () => {
+  it("reads a very long run of digits in linear time", () => {
+    const onValue = vi.fn();
+    const h = mount(<NumberField onValueChange={onValue} />);
+    const started = performance.now();
+    type(field(h), `${"0".repeat(100_000)}x`);
+    expect(performance.now() - started).toBeLessThan(1000);
+    expect(onValue).not.toHaveBeenCalledWith(expect.any(Number));
+  });
+
+  it("still reads every shape of decimal after that change", () => {
+    const onValue = vi.fn();
+    const h = mount(<NumberField onValueChange={onValue} />);
+    for (const [text, want] of [
+      ["5", 5],
+      ["5.", 5],
+      ["5.25", 5.25],
+      [".5", 0.5],
+      ["-5.5", -5.5],
+      ["+5", 5],
+      ["1e2", 100],
+      ["1.5e-1", 0.15],
+      ["5.e2", 500],
+      [".", null],
+      ["-", null],
+      ["1.2.3", null],
+    ] as const) {
+      type(field(h), text);
+      expect(onValue, text).toHaveBeenLastCalledWith(want);
+      type(field(h), "");
+    }
+  });
+
   it("shows null as blank, never as 0", () => {
     expect(field(mount(<NumberField value={null} />)).value).toBe("");
   });

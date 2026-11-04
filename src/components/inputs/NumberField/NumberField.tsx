@@ -7,7 +7,7 @@ import type { NumberFieldProps } from "./NumberField.types";
  * Plain decimal notation only. `Number()` alone is not safe here: it reads "0x10"
  * as 16 and "Infinity" as a number, and those are wrong numbers to emit.
  */
-const NUMBER = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/;
+const NUMBER = /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/;
 const WHOLE = /^[+-]?\d+$/;
 
 /** The number the text says, or `null` if it does not say one. */
