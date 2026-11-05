@@ -1,10 +1,17 @@
 import { useCallback, useEffect, useState, type RefObject } from "react";
 import type { Placement } from "../utils/types";
+import { directionOf, type Direction } from "../utils/direction";
 
 interface FloatingPosition {
   x: number;
   y: number;
   placement: Placement;
+  /**
+   * The anchor's writing direction. Put it on the floating element as `dir`:
+   * a floating element is portalled to `<body>`, so without it a `dir` set on
+   * a wrapper (rather than on `<html>`) would not reach the popup.
+   */
+  dir: Direction;
 }
 
 interface UseFloatingPositionOptions {
@@ -18,6 +25,7 @@ function getPosition(
   floating: DOMRect,
   placement: Placement,
   offset: number,
+  dir: Direction = "ltr",
 ): FloatingPosition {
   let x = 0;
   let y = 0;
@@ -43,9 +51,14 @@ function getPosition(
       break;
   }
 
+  // `start` / `end` are LOGICAL: `bottom-start` lines the popup up with the
+  // anchor's inline-start edge, which is its RIGHT edge in RTL. The base side
+  // (`left` / `right`) stays physical, as the names say.
   if (base === "top" || base === "bottom") {
-    if (align === "start") x = anchor.left;
-    else if (align === "end") x = anchor.right - floating.width;
+    const startEdge = dir === "rtl" ? anchor.right - floating.width : anchor.left;
+    const endEdge = dir === "rtl" ? anchor.left : anchor.right - floating.width;
+    if (align === "start") x = startEdge;
+    else if (align === "end") x = endEdge;
   }
 
   if (base === "left" || base === "right") {
@@ -69,7 +82,7 @@ function getPosition(
   x = Math.max(4, Math.min(x, vw - floating.width - 4));
   y = Math.max(4, Math.min(y, vh - floating.height - 4));
 
-  return { x, y, placement: finalPlacement };
+  return { x, y, placement: finalPlacement, dir };
 }
 
 export function useFloatingPosition(
@@ -82,6 +95,7 @@ export function useFloatingPosition(
     x: -9999,
     y: -9999,
     placement,
+    dir: "ltr",
   });
 
   const update = useCallback(() => {
@@ -91,11 +105,11 @@ export function useFloatingPosition(
 
     const anchorRect = anchor.getBoundingClientRect();
     const floatingRect = floating.getBoundingClientRect();
-    const next = getPosition(anchorRect, floatingRect, placement, offset);
+    const next = getPosition(anchorRect, floatingRect, placement, offset, directionOf(anchor));
     // Bail out when nothing changed so this can run after every commit
     // (below) without causing an infinite render loop.
     setPosition((prev) =>
-      prev.x === next.x && prev.y === next.y && prev.placement === next.placement
+      prev.x === next.x && prev.y === next.y && prev.placement === next.placement && prev.dir === next.dir
         ? prev
         : next,
     );
@@ -152,7 +166,7 @@ export function useFloatingPosition(
   useEffect(() => {
     if (!enabled) {
       setPosition((prev) =>
-        prev.x === -9999 ? prev : { x: -9999, y: -9999, placement },
+        prev.x === -9999 ? prev : { x: -9999, y: -9999, placement, dir: prev.dir },
       );
     }
   }, [enabled, placement]);

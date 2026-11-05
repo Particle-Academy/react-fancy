@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`useFloatingPosition` also returns `dir`**, the anchor's resolved writing direction, for a floating element to carry as its own `dir` attribute. A popup is portalled to `<body>`, so a `dir` set on a wrapper rather than on `<html>` would otherwise not reach it. Additive. **Consumer action:** none.
+
+### Fixed
+
+- **Overlays open on the correct side under `dir="rtl"`.** A `-start` / `-end` placement is now logical: `bottom-start` lines a Popover, Dropdown, Tooltip, Select or Autocomplete list up with the trigger's RIGHT edge in RTL (its left in LTR, as before). The base sides `left` / `right` stay physical, as their names say. Each popup carries its trigger's `dir`. `ContextMenu` opens toward the inline end of the pointer (leftward in RTL) and keeps its first frame on that side with no measurement; its submenu opens toward the inline end and flips at the start edge, and the submenu chevron mirrors. Item text in Dropdown, ContextMenu, Command, Autocomplete and EmojiSelect aligns to the inline start. Measured in a real browser: LTR boxes identical to 6.8.0. **Consumer action:** none.
+
 ## [6.8.0] - 2026-11-04
 
 ### Added

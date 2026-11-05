@@ -124,6 +124,7 @@ export function DropdownItems({ children, className }: DropdownItemsProps) {
           animClass,
           className,
         )}
+        dir={position.dir}
         style={{ left: position.x, top: position.y }}
       >
         {children}

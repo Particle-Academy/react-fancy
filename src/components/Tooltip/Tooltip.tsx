@@ -79,6 +79,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
                 "fancy-fade-in pointer-events-none fixed z-50 max-w-xs rounded-lg bg-zinc-900 px-3 py-1.5 text-sm text-white shadow-lg dark:bg-zinc-700 dark:text-zinc-100",
                 className,
               )}
+              dir={position.dir}
               style={{ left: position.x, top: position.y }}
             >
               {content}

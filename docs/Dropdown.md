@@ -30,7 +30,7 @@ import { Dropdown } from "@particle-academy/react-fancy";
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| placement | `Placement` | `"bottom-start"` | Position relative to trigger |
+| placement | `Placement` | `"bottom-start"` | Position relative to trigger. `-start` / `-end` follow the trigger's writing direction, so the default lines up with the trigger's right edge under `dir="rtl"` |
 | offset | `number` | `4` | Pixel offset from the trigger |
 
 ### Dropdown.Trigger

@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
+import { isRtl } from "../../utils/direction";
 import type { ContextMenuSubProps, ContextMenuSubTriggerProps, ContextMenuSubContentProps } from "./ContextMenu.types";
 
 // ---------------------------------------------------------------------------
@@ -98,7 +99,7 @@ export function ContextMenuSubTrigger({ children, className }: ContextMenuSubTri
       aria-haspopup="menu"
       aria-expanded={open}
       className={cn(
-        "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors",
+        "flex w-full items-center justify-between rounded-lg px-3 py-2 text-start text-sm transition-colors",
         "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         open && "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         className,
@@ -110,7 +111,7 @@ export function ContextMenuSubTrigger({ children, className }: ContextMenuSubTri
       onClick={() => setOpen(!open)}
     >
       <span>{children}</span>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2 opacity-50">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ms-2 opacity-50 rtl:-scale-x-100">
         <polyline points="9 18 15 12 9 6" />
       </svg>
     </button>
@@ -131,8 +132,11 @@ export function ContextMenuSubContent({ children, className }: ContextMenuSubCon
     const pad = 8;
     const rect = ref.current.getBoundingClientRect();
 
-    // Horizontal: flip left if overflowing right
-    setFlipLeft(rect.right > window.innerWidth - pad);
+    // Horizontal: the submenu opens toward the inline END; flip it to the
+    // inline start if that edge overflows (the right in LTR, the left in RTL).
+    setFlipLeft(
+      isRtl(ref.current) ? rect.left < pad : rect.right > window.innerWidth - pad,
+    );
 
     // Vertical: shift up if overflowing bottom, cap height if still too tall
     const overflow = rect.bottom - (window.innerHeight - pad);
@@ -159,7 +163,7 @@ export function ContextMenuSubContent({ children, className }: ContextMenuSubCon
       role="menu"
       className={cn(
         "absolute z-50 min-w-[8rem] rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
-        flipLeft ? "right-full mr-1" : "left-full ml-1",
+        flipLeft ? "end-full me-1" : "start-full ms-1",
         maxH && "overflow-y-auto",
         className,
       )}

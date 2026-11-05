@@ -15,6 +15,7 @@ export function ContextMenuContent({
   const { open, setOpen, position } = useContextMenu();
   const menuRef = useRef<HTMLDivElement>(null);
   const [adjusted, setAdjusted] = useState<{ x: number; y: number }>(position);
+  const rtl = position.dir === "rtl";
 
   const close = useCallback(() => setOpen(false), [setOpen]);
   useOutsideClick(menuRef, close, open);
@@ -32,9 +33,15 @@ export function ContextMenuContent({
       const pad = 8;
       let x = position.x;
       let y = position.y;
-      if (x + rect.width > window.innerWidth - pad) x = window.innerWidth - rect.width - pad;
+      if (position.dir === "rtl") {
+        // In RTL `x` is the menu's RIGHT edge (see the translate below).
+        if (x - rect.width < pad) x = rect.width + pad;
+        if (x > window.innerWidth - pad) x = window.innerWidth - pad;
+      } else {
+        if (x + rect.width > window.innerWidth - pad) x = window.innerWidth - rect.width - pad;
+        if (x < pad) x = pad;
+      }
       if (y + rect.height > window.innerHeight - pad) y = window.innerHeight - rect.height - pad;
-      if (x < pad) x = pad;
       if (y < pad) y = pad;
       setAdjusted({ x, y });
     });
@@ -62,7 +69,12 @@ export function ContextMenuContent({
           animClass,
           className,
         )}
-        style={{ left: adjusted.x, top: adjusted.y }}
+        dir={position.dir}
+        // The menu opens toward the inline END of the pointer: rightward in
+        // LTR, leftward in RTL. Translating by its own width anchors the RIGHT
+        // edge at the pointer with no measurement, so the first frame is
+        // already on the correct side.
+        style={{ left: adjusted.x, top: adjusted.y, translate: rtl ? "-100% 0" : undefined }}
       >
         <MenuGroupProvider>
           {children}

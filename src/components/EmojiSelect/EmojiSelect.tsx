@@ -297,7 +297,7 @@ function EmojiCell({ emoji, tone, openPicker, scheduleClose, cancelClose, onPick
     >
       {displayChar}
       {tonable && (
-        <span className="absolute right-0.5 bottom-0.5 h-1 w-1 rounded-full bg-amber-400" aria-hidden />
+        <span className="absolute end-0.5 bottom-0.5 h-1 w-1 rounded-full bg-amber-400" aria-hidden />
       )}
     </button>
   );

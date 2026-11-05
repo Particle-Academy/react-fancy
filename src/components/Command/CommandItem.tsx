@@ -37,7 +37,7 @@ export function CommandItem({
         if (options) setActiveIndex(Array.from(options).indexOf(e.currentTarget));
       }}
       className={cn(
-        "flex w-full items-center rounded-lg px-3 py-2 text-left text-sm transition-colors",
+        "flex w-full items-center rounded-lg px-3 py-2 text-start text-sm transition-colors",
         "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] data-[active]:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:data-[active]:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         className,
       )}

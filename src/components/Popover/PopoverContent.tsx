@@ -40,6 +40,7 @@ export function PopoverContent({ children, className, style, ...rest }: PopoverC
           positioned ? "fancy-scale-in" : "invisible",
           className,
         )}
+        dir={rest.dir ?? position.dir}
         style={{ ...style, left: position.x, top: position.y }}
         onMouseEnter={hover ? onHoverEnter : undefined}
         onMouseLeave={hover ? onHoverLeave : undefined}

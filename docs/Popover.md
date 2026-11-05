@@ -30,7 +30,7 @@ import { Popover } from "@particle-academy/react-fancy";
 | open | `boolean` | - | Controlled open state |
 | defaultOpen | `boolean` | `false` | Default open state (uncontrolled) |
 | onOpenChange | `(open: boolean) => void` | - | Callback when open state changes |
-| placement | `Placement` | `"bottom"` | Position relative to trigger. One of: `"top"`, `"bottom"`, `"left"`, `"right"`, `"top-start"`, `"top-end"`, `"bottom-start"`, `"bottom-end"` |
+| placement | `Placement` | `"bottom"` | Position relative to trigger. One of: `"top"`, `"bottom"`, `"left"`, `"right"`, `"top-start"`, `"top-end"`, `"bottom-start"`, `"bottom-end"`. `-start` / `-end` follow the trigger's writing direction (`bottom-start` lines up with its right edge under `dir="rtl"`); `left` / `right` are physical |
 | offset | `number` | `8` | Pixel offset from the trigger |
 | hover | `boolean` | `false` | Open on hover instead of click |
 | hoverDelay | `number` | `200` | Delay in ms before opening on hover |

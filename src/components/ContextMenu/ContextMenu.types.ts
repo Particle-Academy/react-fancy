@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 export interface ContextMenuContextValue {
   open: boolean;
   setOpen: (open: boolean) => void;
-  position: { x: number; y: number };
+  /** Where the menu was opened, and the trigger's writing direction there. */
+  position: { x: number; y: number; dir?: "ltr" | "rtl" };
 }
 
 export interface ContextMenuProps {

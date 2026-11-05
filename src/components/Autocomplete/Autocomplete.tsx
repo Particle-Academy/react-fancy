@@ -170,6 +170,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
             <div
               ref={listRef}
               role="listbox"
+              dir={position.dir}
               className="fixed z-50 max-h-60 min-w-[8rem] overflow-y-auto rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:shadow-zinc-950/50 fancy-scale-in"
               style={{
                 left: position.x,
@@ -193,7 +194,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
                     disabled={option.disabled}
                     onClick={() => select(option.value)}
                     className={cn(
-                      "flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-zinc-700 transition-colors dark:text-zinc-200",
+                      "flex w-full items-center rounded-lg px-3 py-2 text-start text-sm text-zinc-700 transition-colors dark:text-zinc-200",
                       i === activeIndex
                         ? "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
                         : "hover:bg-[color:var(--fancy-surface-hover,var(--color-zinc-50))] dark:hover:bg-[color:var(--fancy-surface-hover-dark,color-mix(in_oklab,var(--color-zinc-800)_50%,transparent))]",
