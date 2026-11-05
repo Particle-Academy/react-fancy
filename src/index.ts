@@ -194,6 +194,17 @@ export type { QrCodeProps, QrErrorCorrection, QrMode } from "./components/QrCode
 // otherwise have to add a dependency to get what is already here.
 export { encodeQr, selectMode } from "./components/QrCode";
 export type { EncodeOptions, QrSymbol } from "./components/QrCode";
+export { QrCodePanel, qrCodePng, qrCodeSvg } from "./components/QrCode";
+export type {
+  QrCodeAction,
+  QrCodeActionEvent,
+  QrCodeActionOutcome,
+  QrCodeFileOptions,
+  QrCodePanelLabels,
+  QrCodePanelProps,
+  QrCodePngOptions,
+  QrCodeSvgOptions,
+} from "./components/QrCode";
 export { PullQuote } from "./components/PullQuote";
 export type { PullQuoteProps } from "./components/PullQuote";
 export { Stat, StatBand } from "./components/Stat";

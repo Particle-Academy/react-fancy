@@ -245,6 +245,19 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-carousel-panels]` | Carousel panels |
 | `[data-react-fancy-carousel-steps]` | Carousel step indicators |
 
+#### QR codes
+
+| Selector | Component |
+|----------|-----------|
+| `.fa-qr-code` | QrCode (the `<svg>`; class, not a data attribute) |
+| `[data-react-fancy-qr-code-panel]` | QrCodePanel (`role="group"`, named by `label`) |
+| `[data-react-fancy-qr-code-panel-code]` | QrCodePanel wrapper around the code |
+| `[data-react-fancy-qr-code-panel-value]` | QrCodePanel value text (only with `showValue`) |
+| `[data-react-fancy-qr-code-panel-actions]` | QrCodePanel action buttons row |
+| `[data-react-fancy-qr-code-action]` | QrCodePanel action Button (VALUE is `download-svg` / `download-png` / `share` / `print`; the share button also has `data-via` = `share` / `clipboard`) |
+| `[data-react-fancy-qr-code-panel-status]` | QrCodePanel polite `role="status"` live region |
+| `iframe[data-react-fancy-qr-code-print]` | QrCodePanel print frame, appended to `<body>` while printing |
+
 ---
 
 ## Theming Patterns

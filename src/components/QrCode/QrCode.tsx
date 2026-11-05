@@ -1,6 +1,7 @@
 import { forwardRef, useMemo } from "react";
 import { cn } from "../../utils/cn";
 import { encodeQr } from "./qr-encode";
+import { modulePath } from "./qr-path";
 import type { QrCodeProps } from "./QrCode.types";
 
 /**
@@ -82,29 +83,9 @@ export const QrCode = forwardRef<SVGSVGElement, QrCodeProps>(
 
     const extent = symbol.size + quietZone * 2;
 
-    const path = useMemo(() => {
-      const parts: string[] = [];
-      for (let row = 0; row < symbol.size; row += 1) {
-        const line = symbol.modules[row] as boolean[];
-        let col = 0;
-        while (col < symbol.size) {
-          if (!line[col]) {
-            col += 1;
-            continue;
-          }
-          // Run-length the dark modules along the row: a horizontal run
-          // becomes one rectangle rather than one per module, which roughly
-          // halves the path for a typical symbol and costs nothing to read.
-          let run = 1;
-          while (col + run < symbol.size && line[col + run]) {
-            run += 1;
-          }
-          parts.push(`M${col + quietZone} ${row + quietZone}h${run}v1h-${run}z`);
-          col += run;
-        }
-      }
-      return parts.join("");
-    }, [symbol, quietZone]);
+    // The same builder the SVG and PNG exports use, so a downloaded file is
+    // the code on screen and not a second drawing of it.
+    const path = useMemo(() => modulePath(symbol.modules, quietZone), [symbol, quietZone]);
 
     return (
       <svg

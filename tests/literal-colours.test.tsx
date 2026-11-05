@@ -122,6 +122,11 @@ const DATA_LITERALS: Record<string, { reason: string; values: string[] }> = {
   "ReasonTag/ReasonTag.tsx": { reason: "confidence scale high / medium / low", values: ["#10b981", "#f59e0b", "#ef4444"] },
   "Kanban/KanbanColumn.tsx": { reason: "drop-indicator glow, an accent not a surface", values: ["rgba(59,130,246,0.15)"] },
   "StickyNote/StickyNote.tsx": { reason: "paper shadow (black alpha)", values: ["rgba(0,0,0,0.12)", "rgba(0,0,0,0.08)"] },
+  // A QR module's colour IS its bit: dark is 1, light is 0, and scanners need
+  // dark on light. Not themeable on purpose, and a token could not reach a
+  // downloaded file or a canvas anyway, which have no CSS to resolve it.
+  "QrCode/qr-export.ts": { reason: "QR modules and quiet zone in files: dark = 1, light = 0", values: ["#ffffff", "#000000"] },
+  "QrCode/QrCodePanel.tsx": { reason: "QR tile: dark modules on a light quiet zone, in both schemes", values: ["#000000", "#ffffff"] },
 };
 
 const LITERAL = /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|(?<=(?:fill|stroke|color)=")white(?=")/g;

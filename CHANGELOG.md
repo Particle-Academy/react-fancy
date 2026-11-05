@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`QrCodePanel`: download, share and print a QR code.** It composes `<QrCode>` with four actions, each a react-fancy `Button`: download as SVG, download as PNG, share (the Web Share sheet, or a copy of the value where there is none; the button then reads "Copy link" or "Copy"), and print (a frame holding only the code, plus the value when shown). `showValue` puts the value on screen as selectable text, off by default because a value can be a password. The code tile is black on white in dark mode too, because a QR code needs a light surround to scan; that is 21:1, past WCAG AAA. Buttons default to `lg`, 44px tall, WCAG 2.5.5's AAA target size. Every action reports through `onAction` as plain JSON (`{ action, outcome, via?, fileName?, error? }`, `outcome` one of `"done"`, `"cancelled"`, `"failed"`), what each did is announced in a polite `role="status"`, and every part has a `data-react-fancy-qr-code-*` handle. In the `./qr-code` subpath. **Consumer action:** none. `<QrCode>` is unchanged.
+- **`qrCodeSvg(value, options)` and `qrCodePng(value, options)`**, the panel's file formats as plain functions. The SVG is a standalone document with a `<title>` and an accessible name. The PNG is drawn with `Path2D` from the same path data, at a whole number of pixels per module (at most 8192 pixels a side), rather than by loading the SVG into an image, which a CSP of `img-src 'self'` would block. Files are always opaque: `transparent` becomes white and `currentColor` black, since a file has no page behind it. **Consumer action:** none.
+
+### Changed
+
+- **`<QrCode>` draws its path with the same builder as the file exports**, so a downloaded file carries exactly the modules on screen. The output is unchanged, byte for byte. **Consumer action:** none.
+
 ## [6.7.2] - 2026-11-04
 
 ### Fixed
