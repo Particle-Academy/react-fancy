@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.8.0] - 2026-11-04
+
 ### Added
 
 - **`QrCodePanel`: download, share and print a QR code.** It composes `<QrCode>` with four actions, each a react-fancy `Button`: download as SVG, download as PNG, share (the Web Share sheet, or a copy of the value where there is none; the button then reads "Copy link" or "Copy"), and print (a frame holding only the code, plus the value when shown). `showValue` puts the value on screen as selectable text, off by default because a value can be a password. The code tile is black on white in dark mode too, because a QR code needs a light surround to scan; that is 21:1, past WCAG AAA. Buttons default to `lg`, 44px tall, WCAG 2.5.5's AAA target size. Every action reports through `onAction` as plain JSON (`{ action, outcome, via?, fileName?, error? }`, `outcome` one of `"done"`, `"cancelled"`, `"failed"`), what each did is announced in a polite `role="status"`, and every part has a `data-react-fancy-qr-code-*` handle. In the `./qr-code` subpath. **Consumer action:** none. `<QrCode>` is unchanged.
