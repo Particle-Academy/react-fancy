@@ -16,6 +16,8 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, "childr
 export interface ModalHeaderProps {
   children: ReactNode;
   className?: string;
+  /** Accessible name of the close button. Default `"Close"`; pass your locale's word. */
+  closeLabel?: string;
 }
 
 export interface ModalBodyProps {

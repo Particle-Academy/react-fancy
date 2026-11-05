@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`Modal.Header` and `Drawer.Header` take `closeLabel`**, the close button's accessible name, so it can be translated. Default `"Close"`, as before. **Consumer action:** none; pass your locale's word if you localise.
+- **`useFocusTrap` takes an optional third argument, `restoreTo`**, a ref to the element focus returns to on disable. Without it the hook behaves as before. **Consumer action:** none.
+
+### Fixed
+
+- **`Modal`, `Drawer` and `Command` now trap focus.** The trap ran in the commit where `open` flipped, but the panel exists two renders later (`useAnimation` mounts it, then `Portal` renders it). It found no element, returned, and never ran again. So focus never moved into the dialog, Tab and Shift+Tab walked out of it, and closing never returned focus to the trigger. This affected every one of them, opened from a trigger or rendered open, with or without motion. The trap now runs once the panel is mounted. The element to return to is recorded when `open` flips, so a dialog whose content autofocuses (Command's input) still returns focus to the trigger. A container-attached `Drawer` still does not trap. Verified in headless Chromium, with and without `prefers-reduced-motion`. **Consumer action:** none. If you worked around it by focusing inside the dialog yourself, that still works.
+- **The focus trap ignores elements with `tabindex="-1"`.** Its selector matched Command's options, which are `tabindex="-1"`, and took one for the last tab stop. Focus was never on it, so Tab never wrapped and left the palette. **Consumer action:** none.
+- **The `Modal.Header` and `Drawer.Header` close buttons are a 44px target** (WCAG 2.5.5, AAA). They were 28px and 26px. A `::before` extends the hit area. The button, the icon, the hover fill and the header's height are unchanged. **Consumer action:** none.
+
 ## [6.10.0] - 2026-11-04
 
 ### Added

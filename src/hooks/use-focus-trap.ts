@@ -9,9 +9,21 @@ const FOCUSABLE_SELECTOR = [
   "[tabindex]:not([tabindex='-1'])",
 ].join(", ");
 
+/**
+ * Moves focus into `ref`, keeps Tab inside it, and restores focus on disable.
+ *
+ * `ref.current` must already be set in the commit where `enabled` turns true:
+ * the effect does not run again until `enabled` changes. A panel that mounts
+ * later (an animation, a Portal) should key `enabled` on the node — see
+ * `useDialogFocusTrap`.
+ *
+ * `restoreTo`, when it holds an element, is where focus returns on disable
+ * instead of whatever was focused when the trap engaged.
+ */
 export function useFocusTrap(
   ref: RefObject<HTMLElement | null>,
   enabled: boolean = true,
+  restoreTo?: RefObject<HTMLElement | null>,
 ): void {
   useEffect(() => {
     if (!enabled) return;
@@ -21,8 +33,13 @@ export function useFocusTrap(
 
     const previouslyFocused = document.activeElement as HTMLElement | null;
 
+    // Tab stops only. `button` / `input` match an element with `tabindex="-1"`
+    // too (Command's options), and treating one as the last stop meant Tab never
+    // wrapped: focus was never ON it, so the browser walked out of the dialog.
     const focusables = () =>
-      Array.from(el.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+      Array.from(el.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+        (node) => node.getAttribute("tabindex") !== "-1",
+      );
 
     // Focus first focusable element
     const first = focusables()[0];
@@ -54,7 +71,7 @@ export function useFocusTrap(
 
     return () => {
       el.removeEventListener("keydown", listener);
-      previouslyFocused?.focus();
+      (restoreTo?.current ?? previouslyFocused)?.focus();
     };
-  }, [ref, enabled]);
+  }, [ref, enabled, restoreTo]);
 }

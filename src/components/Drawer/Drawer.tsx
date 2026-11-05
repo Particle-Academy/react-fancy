@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { cn } from "../../utils/cn";
 import { Portal } from "../Portal";
 import { DrawerContext } from "./Drawer.context";
@@ -6,7 +6,7 @@ import { DrawerHeader } from "./DrawerHeader";
 import { DrawerBody } from "./DrawerBody";
 import { DrawerFooter } from "./DrawerFooter";
 import { DrawerContainer } from "./DrawerContainer";
-import { useFocusTrap } from "../../hooks/use-focus-trap";
+import { useDialogFocusTrap } from "../../hooks/use-dialog-focus-trap";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import { useAnimation } from "../../hooks/use-animation";
 import type { DrawerProps, DrawerSide } from "./Drawer.types";
@@ -83,16 +83,11 @@ function DrawerRoot({
   className,
   ...rest
 }: DrawerProps) {
-  const panelRef = useRef<HTMLDivElement>(null);
   const horizontal = side !== "top" && side !== "bottom";
   const isViewport = attach === "viewport";
 
   const close = useCallback(() => onClose(), [onClose]);
   useEscapeKey(close, open && dismissOnEscape);
-
-  // A container-attached drawer is a panel, not a dialog — trapping focus in it
-  // would strand keyboard users inside a Card. Only the viewport form is modal.
-  useFocusTrap(panelRef, open && isViewport);
 
   useEffect(() => {
     if (!open || !isViewport) return;
@@ -108,6 +103,18 @@ function DrawerRoot({
     enterClass: ENTER[side],
     exitClass: EXIT[side],
   });
+
+  // A container-attached drawer is a panel, not a dialog — trapping focus in it
+  // would strand keyboard users inside a Card. Only the viewport form is modal.
+  // The panel mounts renders after `open` flips; see useDialogFocusTrap.
+  const attachTrap = useDialogFocusTrap(open, isViewport);
+  const attachPanel = useCallback(
+    (node: HTMLDivElement | null) => {
+      (animRef as React.MutableRefObject<HTMLElement | null>).current = node;
+      attachTrap(node);
+    },
+    [animRef, attachTrap],
+  );
 
   const ctx = useMemo(() => ({ open, close, side }), [open, close, side]);
 
@@ -132,10 +139,7 @@ function DrawerRoot({
       ) : null}
 
       <div
-        ref={(node) => {
-          panelRef.current = node;
-          (animRef as React.MutableRefObject<HTMLElement | null>).current = node;
-        }}
+        ref={attachPanel}
         data-react-fancy-drawer=""
         data-side={side}
         role="dialog"

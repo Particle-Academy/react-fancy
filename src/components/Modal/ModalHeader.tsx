@@ -3,7 +3,15 @@ import { cn } from "../../utils/cn";
 import { useModal } from "./Modal.context";
 import type { ModalHeaderProps } from "./Modal.types";
 
-export function ModalHeader({ children, className }: ModalHeaderProps) {
+/**
+ * The close button draws at 28px (20px icon + `p-1`) and HITS at 44px, the
+ * WCAG 2.5.5 (AAA) target: a `::before` overhangs it by 8px on every side. A
+ * pseudo-element is part of its button for hit-testing, so the look, the hover
+ * fill and the header's height are all unchanged — the header's `py-4` already
+ * has room for the overhang. A size option was the alternative; it would have
+ * left every existing Modal at 28px unless someone opted in.
+ */
+export function ModalHeader({ children, className, closeLabel = "Close" }: ModalHeaderProps) {
   const { close } = useModal();
 
   return (
@@ -18,8 +26,9 @@ export function ModalHeader({ children, className }: ModalHeaderProps) {
       <button
         type="button"
         onClick={close}
-        className="rounded-lg p-1 text-zinc-400 transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-600 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-300"
-        aria-label="Close"
+        data-react-fancy-modal-close=""
+        className="relative rounded-lg p-1 text-zinc-400 before:absolute before:-inset-2 before:content-[''] transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-600 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-300"
+        aria-label={closeLabel}
       >
         <X size={20} />
       </button>

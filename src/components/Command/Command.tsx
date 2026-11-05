@@ -16,7 +16,7 @@ import { CommandList } from "./CommandList";
 import { CommandItem } from "./CommandItem";
 import { CommandGroup } from "./CommandGroup";
 import { CommandEmpty } from "./CommandEmpty";
-import { useFocusTrap } from "../../hooks/use-focus-trap";
+import { useDialogFocusTrap } from "../../hooks/use-dialog-focus-trap";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import { useAnimation } from "../../hooks/use-animation";
 import { useControllableState } from "../../hooks/use-controllable-state";
@@ -43,7 +43,6 @@ function CommandRoot({
   }, [onClose]);
 
   useEscapeKey(close, open);
-  useFocusTrap(panelRef, open);
 
   // Cmd+K global shortcut is handled by the consumer
   useEffect(() => {
@@ -134,6 +133,17 @@ function CommandRoot({
     exitClass: "fancy-fade-out",
   });
 
+  // The panel mounts renders after `open` flips; see useDialogFocusTrap.
+  const attachTrap = useDialogFocusTrap(open);
+  const attachPanel = useCallback(
+    (node: HTMLDivElement | null) => {
+      panelRef.current = node;
+      (animRef as React.MutableRefObject<HTMLElement | null>).current = node;
+      attachTrap(node);
+    },
+    [animRef, attachTrap],
+  );
+
   const ctx = useMemo(
     () => ({
       open,
@@ -160,11 +170,7 @@ function CommandRoot({
             aria-hidden="true"
           />
           <div
-            ref={(node) => {
-              panelRef.current = node;
-              (animRef as React.MutableRefObject<HTMLElement | null>).current =
-                node;
-            }}
+            ref={attachPanel}
             data-react-fancy-command=""
             className={cn(
               "relative w-full max-w-lg overflow-hidden rounded-2xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-2xl dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",

@@ -59,6 +59,8 @@ export interface DrawerHeaderProps {
   /** Show the close button. Default `true`. */
   closable?: boolean;
   className?: string;
+  /** Accessible name of the close button. Default `"Close"`; pass your locale's word. */
+  closeLabel?: string;
 }
 
 export interface DrawerBodyProps {

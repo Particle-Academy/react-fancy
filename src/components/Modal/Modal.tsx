@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { cn } from "../../utils/cn";
 import { Portal } from "../Portal";
 import { ModalContext } from "./Modal.context";
 import { ModalHeader } from "./ModalHeader";
 import { ModalBody } from "./ModalBody";
 import { ModalFooter } from "./ModalFooter";
-import { useFocusTrap } from "../../hooks/use-focus-trap";
+import { useDialogFocusTrap } from "../../hooks/use-dialog-focus-trap";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import { useAnimation } from "../../hooks/use-animation";
 import type { ModalProps } from "./Modal.types";
@@ -47,11 +47,8 @@ function ModalRoot({
   className,
   ...rest
 }: ModalProps) {
-  const panelRef = useRef<HTMLDivElement>(null);
-
   const close = useCallback(() => onClose(), [onClose]);
   useEscapeKey(close, open);
-  useFocusTrap(panelRef, open);
 
   // Body scroll lock
   useEffect(() => {
@@ -70,6 +67,16 @@ function ModalRoot({
     exitClass: "fancy-fade-out",
   });
 
+  // The panel mounts renders after `open` flips; see useDialogFocusTrap.
+  const attachTrap = useDialogFocusTrap(open);
+  const attachPanel = useCallback(
+    (node: HTMLDivElement | null) => {
+      (animRef as React.MutableRefObject<HTMLElement | null>).current = node;
+      attachTrap(node);
+    },
+    [animRef, attachTrap],
+  );
+
   const ctx = useMemo(() => ({ open, close }), [open, close]);
 
   if (!mounted) return null;
@@ -86,11 +93,7 @@ function ModalRoot({
           />
           {/* Panel */}
           <div
-            ref={(node) => {
-              panelRef.current = node;
-              (animRef as React.MutableRefObject<HTMLElement | null>).current =
-                node;
-            }}
+            ref={attachPanel}
             data-react-fancy-modal=""
             role="dialog"
             aria-modal="true"
