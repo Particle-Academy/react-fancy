@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.11.0] - 2026-11-04
+
 ### Added
 
 - **`Modal.Header` and `Drawer.Header` take `closeLabel`**, the close button's accessible name, so it can be translated. Default `"Close"`, as before. **Consumer action:** none; pass your locale's word if you localise.
