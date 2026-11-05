@@ -10,12 +10,13 @@ import type { PhoneCountry, PhoneInputReason, PhoneParse, ParsePhoneOptions } fr
  */
 
 export const PHONE_COUNTRIES: readonly PhoneCountry[] = COUNTRY_ROWS.map(
-  ([code, dialCode, minLength, maxLength, trunkPrefixes]) => ({
+  ([code, dialCode, minLength, maxLength, trunkPrefixes, status]) => ({
     code,
     dialCode,
     minLength,
     maxLength,
-    trunkPrefixes: trunkPrefixes ?? ["0"],
+    trunkPrefixes,
+    lengthVerified: status === "verified",
   }),
 );
 

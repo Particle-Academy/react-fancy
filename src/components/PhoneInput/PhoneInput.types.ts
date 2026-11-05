@@ -15,6 +15,12 @@ export interface PhoneCountry {
   maxLength: number;
   /** What is typed before the number within the country (`"0"`). Empty: none. */
   trunkPrefixes: readonly string[];
+  /**
+   * Whether `minLength` / `maxLength` were checked against a cited plan. When
+   * `false` the range is the widest E.164 allows (4 to 15 minus the dial code),
+   * so only the digits and the overall length are checked.
+   */
+  lengthVerified: boolean;
 }
 
 /** What the component read, reported with every value. JSON-serialisable. */
@@ -25,7 +31,12 @@ export interface PhoneInputDetail {
   dialCode: string | null;
   /** The national significant number: digits only, no trunk prefix. */
   nationalNumber: string;
-  /** Whether the value is an E.164 number that passed the length check. */
+  /**
+   * Whether the number is PLAUSIBLE: digits only, a known dial code, and a length
+   * inside the country's range. Real per-country ranges apply only where the
+   * table's row is verified; elsewhere the range is the E.164 maximum. Never a
+   * claim that the number exists: validate on a server.
+   */
   valid: boolean;
   /** Why it is not valid. `null` when valid, and when blank. */
   reason: PhoneInputReason | null;

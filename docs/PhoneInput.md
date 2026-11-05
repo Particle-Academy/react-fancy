@@ -4,6 +4,8 @@ A country picker and a number field whose value is an E.164 number (`+9594512345
 
 It is a **light** phone field: a first-party table of dial codes and national-number lengths, and no phone-number library or data. **The length check is a sanity check, not validation.** It catches a number that is plainly too short or too long for its country; it does not know which ranges are allocated, whether a number is mobile, or whether anyone holds it. Validate on your server (Twilio Lookup, for example) before you rely on a number.
 
+**`detail.valid` means plausible, not valid.** Real per-country lengths apply only to the rows whose lengths were checked against a cited plan: Benin, Côte d'Ivoire, Colombia, Gabon, Kazakhstan, Lithuania, Myanmar, Saint Helena and Mayotte (`PHONE_COUNTRIES[i].lengthVerified`). Every other country accepts 4 to 15 digits including its dial code, the widest E.164 allows, so there the check is digits, a known dial code and the E.164 maximum. That is deliberate: a range that is too tight would refuse a real person's number and block their form, while a wrong number accepted here is caught by your server.
+
 ## Import
 
 ```tsx
@@ -65,7 +67,7 @@ const [phone, setPhone] = useState<string | null>(null);
 
 Digits in Arabic-Indic, Persian, Devanagari, Bengali, Thai, Myanmar and fullwidth forms are read as digits, and the invisible direction marks a right-to-left page wraps around copied text are ignored. Only `+` and `00` start an international number: other international prefixes (`011` in North America, `010` in Japan) are not recognised.
 
-**Partial input.** Nothing below a country's shortest length is ever emitted, so in a fixed-length plan (the United States, France) a half-typed number is always `null`. Where a plan has numbers of different lengths (Myanmar runs 7 to 10 digits), a prefix of a long number can itself be a valid length, and is emitted: a length check cannot tell "still typing" from "done". Use `detail` and your server for that.
+**Partial input.** Nothing below a country's shortest length is ever emitted, so in a verified fixed-length plan (Colombia, Côte d'Ivoire) a half-typed number is always `null`. In an unverified row the shortest length is 4 digits, so a half-typed number of 4 digits or more is emitted. Where a plan has numbers of different lengths (Myanmar runs 7 to 10 digits), a prefix of a long number can itself be a valid length, and is emitted: a length check cannot tell "still typing" from "done". Use `detail` and your server for that.
 
 **When messages show.** `invalid_chars` and `too_long` show at once, because typing more cannot fix them. `too_short` and `unknown_country` show when focus leaves the field, and clear while you type again. The message is the readable sentence for the reason, in `messages` if you pass them; `{country}` is replaced with the country's name. Every reason also reaches `setCustomValidity`, so a native form submit is blocked while the number is not whole.
 
@@ -99,4 +101,4 @@ The component is controlled, so an agent writes `value` as an E.164 string and t
 
 ## Data
 
-`src/components/PhoneInput/phone-countries.ts` holds one row per country: ISO code, dial code, shortest and longest national number, and trunk prefixes, each with its source in a comment. Dial codes come from the ITU-T E.164 list of assigned country codes; lengths from the national numbering plans notified to the ITU. Where a plan is open or a range was not confirmed the row says `wide`, and the range is deliberately generous. Correct a row there, with its source.
+`src/components/PhoneInput/phone-countries.ts` holds one row per country: ISO code, dial code, shortest and longest national number, trunk prefixes and a `VERIFIED` / `UNVERIFIED` status, each with its source in a comment. Dial codes come from the ITU-T E.164 list of assigned country codes. A `VERIFIED` row's length was checked against the country's numbering plan as cited in its comment. An `UNVERIFIED` row's length is the E.164 maximum, and its comment keeps the range that was transcribed from memory. To verify one: check it against the plan, put the range in, mark it `VERIFIED`, and cite the source. A test holds every unverified row at the E.164 maximum, so a narrowed range without a status change fails the build.

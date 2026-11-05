@@ -112,12 +112,13 @@ describe("parsePhone", () => {
     expect(r.country).toBe("MM");
   });
 
-  it("never emits an E.164 for partial input in a fixed-length plan", () => {
+  it("never emits an E.164 for partial input in a verified fixed-length plan", () => {
+    // Colombia and Cote d'Ivoire are verified rows, both 10 digits.
     for (const [full, country] of [
-      ["+1 (212) 555-0100", null],
-      ["+33 6 12 34 56 78", null],
-      ["(212) 555-0100", "US"],
-      ["06 12 34 56 78", "FR"],
+      ["+57 601 234 5678", null],
+      ["+225 07 12 34 56 78", null],
+      ["601 234 5678", "CO"],
+      ["07 12 34 56 78", "CI"],
     ] as const) {
       for (let i = 1; i < full.length; i++) {
         const r = parsePhone(full.slice(0, i), { country });
@@ -256,6 +257,35 @@ describe("the country table", () => {
     }
   });
 
+  it("verifies lengths only where this session checked a source", () => {
+    const verified = PHONE_COUNTRIES.filter((c) => c.lengthVerified).map((c) => c.code).sort();
+    expect(verified).toEqual(["BJ", "CI", "CO", "GA", "KZ", "LT", "MM", "SH", "YT"]);
+  });
+
+  it("every unverified row accepts any length E.164 allows, and refuses one more", () => {
+    // A range written from memory that is too tight refuses a real number and
+    // blocks a form; the server validates, so an unverified row must not.
+    const unverified = PHONE_COUNTRIES.filter((c) => !c.lengthVerified);
+    expect(unverified.length).toBeGreaterThan(200);
+    for (const c of unverified) {
+      const max = 15 - c.dialCode.length;
+      expect([c.minLength, c.maxLength], c.code).toEqual([4, max]);
+      // "2" is no country's trunk prefix, so the digits are read as typed.
+      const atMax = parsePhone("2".repeat(max), { country: c.code });
+      expect(atMax, c.code).toMatchObject({ valid: true, country: c.code, value: `+${c.dialCode}${"2".repeat(max)}` });
+      expect(parsePhone("2".repeat(4), { country: c.code }).valid, c.code).toBe(true);
+      expect(parsePhone("2".repeat(max + 1), { country: c.code }).reason, c.code).toBe("too_long");
+    }
+  });
+
+  it("marks each unverified row as such in its source comment", () => {
+    const source = readFileSync(resolve(process.cwd(), "src/components/PhoneInput/phone-countries.ts"), "utf8");
+    for (const c of PHONE_COUNTRIES) {
+      const line = source.split("\n").find((l) => l.includes(`["${c.code}",`))!;
+      expect(line.includes("UNVERIFIED], //") && line.includes("length UNVERIFIED"), c.code).toBe(!c.lengthVerified);
+    }
+  });
+
   it("records a source for every row", () => {
     const source = readFileSync(resolve(process.cwd(), "src/components/PhoneInput/phone-countries.ts"), "utf8");
     for (const c of PHONE_COUNTRIES) {
@@ -285,13 +315,13 @@ describe("PhoneInput value contract", () => {
 
   it("emits null with a reason for every partial keystroke, and the E.164 only when it is whole", () => {
     const onValue = vi.fn();
-    const h = mount(<Harness defaultCountry="US" onValue={onValue} />);
-    typeSlowly(number(h), "(212) 555-0100");
+    const h = mount(<Harness defaultCountry="CO" onValue={onValue} />);
+    typeSlowly(number(h), "(601) 234-5678");
     const emitted = onValue.mock.calls.map((c) => c[0]);
-    expect(emitted.at(-1)).toBe("+12125550100");
-    expect(emitted.filter((v) => v !== null)).toEqual(["+12125550100"]);
+    expect(emitted.at(-1)).toBe("+576012345678");
+    expect(emitted.filter((v) => v !== null)).toEqual(["+576012345678"]);
     const partial = onValue.mock.calls.find((c) => c[0] === null && c[1].nationalNumber !== "")!;
-    expect(partial[1]).toMatchObject({ country: "US", valid: false, reason: "too_short" });
+    expect(partial[1]).toMatchObject({ country: "CO", valid: false, reason: "too_short" });
   });
 
   it("blank is null", () => {
