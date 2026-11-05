@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`PhoneInput`**: a country picker and a number field whose value is an E.164 string or `null`, reported with `detail` (`country`, `dialCode`, `nationalNumber`, `valid`, `reason` of `too_short` / `too_long` / `invalid_chars` / `unknown_country`, and `approximate`). Blank is `null`; nothing shorter than a country's shortest number is ever emitted, so a half-typed number in a fixed-length plan is always `null` with a reason. Pasting `+959 4512 3456`, `00959…` or a number with spaces, dashes, brackets or a `(0)` picks the country from its dial code. A shared dial code (`+1`, `+7`, `+44`, …) picks by leading digits, then the selected country, then the main one, and says so with `approximate: true`; the E.164 is exact either way. The picker is searchable by name (from `Intl.DisplayNames` in `locale`), ISO code or dial code, keyboard-operable, and flags are regional-indicator letters, not images. The number stays left-to-right (`dir="ltr"`) under `dir="rtl"` while the picker and label mirror. Visible label, messages tied with `aria-describedby`, 44px targets, and every piece of text replaceable through `messages`. **No phone-number library or third-party data:** a first-party table of dial codes and national-number lengths, sourced per row from the ITU-T E.164 list and the national numbering plans. The lengths are a sanity check, not validation; validate on a server. Also exported: `parsePhone()` and `PHONE_COUNTRIES`, and the `./phone-input` subpath. **Consumer action:** none.
+
+### Fixed
+
+- **A popup aligned to the anchor's far edge now lands on it.** `useFloatingPosition` measured the popup while its scale-in animation had it at 95% size, and never re-measured, so an RTL `bottom-start` popup (Select, Autocomplete, Dropdown, Popover) and an LTR `bottom-end` one sat 5% of the popup's width short of the edge, about 20px for a 400px list. It now reads the popup's layout size. LTR `bottom-start`, the default, was unaffected. Found by a real-browser check. **Consumer action:** none.
+
 ## [6.9.0] - 2026-11-04
 
 ### Added

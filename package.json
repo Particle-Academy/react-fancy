@@ -693,6 +693,16 @@
         "default": "./dist/pdf-viewer.cjs"
       }
     },
+    "./phone-input": {
+      "import": {
+        "types": "./dist/phone-input.d.ts",
+        "default": "./dist/phone-input.js"
+      },
+      "require": {
+        "types": "./dist/phone-input.d.cts",
+        "default": "./dist/phone-input.cjs"
+      }
+    },
     "./pillbox": {
       "import": {
         "types": "./dist/pillbox.d.ts",

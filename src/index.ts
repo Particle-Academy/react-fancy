@@ -378,6 +378,17 @@ export type { PillboxProps } from "./components/Pillbox";
 export { OtpInput } from "./components/OtpInput";
 export type { OtpInputProps } from "./components/OtpInput";
 
+export { PhoneInput, parsePhone, PHONE_COUNTRIES } from "./components/PhoneInput";
+export type {
+  PhoneInputProps,
+  PhoneInputDetail,
+  PhoneInputMessages,
+  PhoneInputReason,
+  PhoneCountry,
+  PhoneParse,
+  ParsePhoneOptions,
+} from "./components/PhoneInput";
+
 export { FileUpload, useFileUpload } from "./components/FileUpload";
 export type {
   FileUploadProps,

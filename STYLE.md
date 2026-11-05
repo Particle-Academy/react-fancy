@@ -69,7 +69,9 @@ trigger, so they follow `<html>`: set it there.
   `className="rtl:-scale-x-100"`, or on a Button's `icon`,
   `className="rtl:[&_svg]:-scale-x-100"`.
 - **These stay left-to-right:** CodeBlock, CodeView, `<pre>` and `<code>` inside
-  Editor and ContentRenderer, and OtpInput's cells, because a code is a number.
+  Editor and ContentRenderer, OtpInput's cells, because a code is a number, and
+  PhoneInput's number and dial codes. PhoneInput's picker and label follow the
+  page: the picker sits at the inline start, on the right in RTL.
 - **Not mirrored, by design:** plotted charts and MoodMeter keep their axes, and
   QrCode modules are data.
 
@@ -162,6 +164,15 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-time-picker]` | TimePicker |
 | `[data-react-fancy-color-picker]` | ColorPicker |
 | `[data-react-fancy-otp-input]` | OtpInput |
+| `[data-react-fancy-phone-input]` | PhoneInput (`data-country` = ISO code, `data-valid`, `data-reason`) |
+| `[data-react-fancy-phone-input-country]` | PhoneInput country picker button |
+| `[data-react-fancy-phone-input-flag]` | PhoneInput flag in the picker button |
+| `[data-react-fancy-phone-input-number]` | PhoneInput number `<input>` (`dir="ltr"`) |
+| `[data-react-fancy-phone-input-error]` | PhoneInput error message (`data-reason`) |
+| `[data-react-fancy-phone-input-popup]` | PhoneInput country list popup (portalled) |
+| `[data-react-fancy-phone-input-search]` | PhoneInput country search box |
+| `[data-react-fancy-phone-input-listbox]` | PhoneInput country listbox |
+| `[data-react-fancy-phone-input-option]` | PhoneInput country option (VALUE is the ISO code; `data-active`) |
 | `[data-react-fancy-pillbox]` | Pillbox |
 | `[data-react-fancy-file-upload]` | FileUpload |
 | `[data-react-fancy-file-upload-dropzone]` | FileUpload.Dropzone |

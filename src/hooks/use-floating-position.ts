@@ -104,7 +104,17 @@ export function useFloatingPosition(
     if (!anchor || !floating) return;
 
     const anchorRect = anchor.getBoundingClientRect();
-    const floatingRect = floating.getBoundingClientRect();
+    // The popup's SIZE comes from layout, not from its transformed box: popups
+    // open with `fancy-scale-in` (scale 0.95 to 1) and are measured during it, so
+    // the box is 5% small, and nothing re-measures when the animation ends. That
+    // left an RTL `bottom-start` (and an LTR `bottom-end`) popup off the anchor's
+    // edge for good. Layout size is 0 where nothing lays out (jsdom), so the box
+    // is the fallback.
+    const box = floating.getBoundingClientRect();
+    const floatingRect = {
+      width: floating.offsetWidth || box.width,
+      height: floating.offsetHeight || box.height,
+    } as DOMRect;
     const next = getPosition(anchorRect, floatingRect, placement, offset, directionOf(anchor));
     // Bail out when nothing changed so this can run after every commit
     // (below) without causing an infinite render loop.

@@ -110,6 +110,7 @@ npx vite build                      # Build demo app (verifies imports work)
 | Autocomplete | Input with filtered dropdown suggestions, async search, keyboard nav | [docs](docs/Autocomplete.md) |
 | Pillbox | Tag/pill input with add/remove, backspace delete | [docs](docs/Pillbox.md) |
 | OtpInput | Single-digit OTP code input with auto-advance and paste support | [docs](docs/OtpInput.md) |
+| PhoneInput | Country picker and number producing E.164, with a length sanity check; the number stays left-to-right in RTL | [docs](docs/PhoneInput.md) |
 | FileUpload | Drag-and-drop file upload with dropzone and file list | [docs](docs/FileUpload.md) |
 | TimePicker | Hour/minute/AM-PM time selection | [docs](docs/TimePicker.md) |
 | Calendar | Month grid with single, range, and multi-select modes | [docs](docs/Calendar.md) |

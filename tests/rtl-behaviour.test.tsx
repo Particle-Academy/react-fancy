@@ -235,6 +235,39 @@ describe("computed positions land on the inline side", () => {
     expect(x(mount(<Probe placement="bottom-end" />))).toBe(600);
   });
 
+  it("measures a popup's layout size, not its size mid scale-in animation", () => {
+    // Popups open with `fancy-scale-in` (scale 0.95 to 1), and the hook measures
+    // during it. A transformed box is 5% narrow, which put an RTL bottom-start
+    // popup 5% of its width off the field's right edge, for good: nothing
+    // re-measures when the animation ends. Found by PhoneInput's browser check.
+    function Scaled() {
+      const anchor = useRef<HTMLDivElement | null>(null);
+      const floating = useRef<HTMLDivElement | null>(null);
+      const pos = useFloatingPosition(anchor, floating, { placement: "bottom-start", offset: 0 });
+      return (
+        <>
+          <div
+            ref={(el) => {
+              anchor.current = el;
+              if (el) rect(el, { left: 600, top: 100, width: 200, height: 30 });
+            }}
+          />
+          <div
+            ref={(el) => {
+              floating.current = el;
+              if (!el) return;
+              rect(el, { left: 0, top: 0, width: 114, height: 47.5 });
+              Object.defineProperty(el, "offsetWidth", { configurable: true, value: 120 });
+              Object.defineProperty(el, "offsetHeight", { configurable: true, value: 50 });
+            }}
+            data-x={pos.x}
+          />
+        </>
+      );
+    }
+    expect(x(mount(<Scaled />))).toBe(800 - 120);
+  });
+
   it("ContextMenu opens toward the inline end of the pointer, and carries the dir", () => {
     const host = mount(
       <ContextMenu>
