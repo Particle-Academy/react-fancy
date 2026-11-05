@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.9.0] - 2026-11-04
+
 ### Added
 
 - **A right-to-left section in `STYLE.md`**: where to set `dir`, which placements and props are logical and which physical, how keys behave, which icons mirror, what stays left-to-right, and how to mirror an icon of your own. **Consumer action:** none.
