@@ -46,7 +46,7 @@ export function MenuItem({
       )}
     >
       {icon && <span className="flex h-5 w-5 shrink-0 items-center justify-center">{icon}</span>}
-      <span className="flex-1 truncate text-left">{children}</span>
+      <span className="flex-1 truncate text-start">{children}</span>
       {badge && <span className="shrink-0">{badge}</span>}
     </Tag>
   );

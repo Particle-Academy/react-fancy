@@ -73,8 +73,8 @@ export function FileBrowserStatusRow({ depth, kind, message, onRetry }: FileBrow
       <div
         role="none"
         data-react-fancy-file-browser-status="error"
-        className="flex items-center gap-1.5 py-0.5 pr-2 text-xs text-red-600 dark:text-red-400"
-        style={{ paddingLeft }}
+        className="flex items-center gap-1.5 py-0.5 pe-2 text-xs text-red-600 dark:text-red-400"
+        style={{ paddingInlineStart: paddingLeft }}
       >
         <CircleAlert size={12} className="shrink-0" />
         <span className="min-w-0 flex-1 truncate">{message || "Failed to load"}</span>
@@ -97,7 +97,7 @@ export function FileBrowserStatusRow({ depth, kind, message, onRetry }: FileBrow
       role="none"
       data-react-fancy-file-browser-status={kind}
       className="flex items-center gap-1.5 py-0.5 text-xs text-[color:var(--fancy-text-faint,var(--color-zinc-400))] italic dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
-      style={{ paddingLeft }}
+      style={{ paddingInlineStart: paddingLeft }}
     >
       {kind === "loading" && <Loader2 size={12} className="shrink-0 animate-spin" aria-hidden="true" />}
       <span className="truncate">
@@ -176,14 +176,14 @@ export function FileBrowserNode({ entry, depth }: FileBrowserNodeProps) {
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
         className={cn(
-          "flex w-full cursor-pointer items-center gap-1 rounded-md py-0.5 pr-2 text-left text-[13px] transition-colors select-none",
+          "flex w-full cursor-pointer items-center gap-1 rounded-md py-0.5 pe-2 text-start text-[13px] transition-colors select-none",
           selected
             ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
             : "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
           entry.disabled && "pointer-events-none opacity-40",
           "group-focus-visible:ring-2 group-focus-visible:ring-blue-500/40 group-focus-visible:ring-inset",
         )}
-        style={{ paddingLeft }}
+        style={{ paddingInlineStart: paddingLeft }}
       >
         {expandable ? (
           loading ? (
@@ -198,7 +198,9 @@ export function FileBrowserNode({ entry, depth }: FileBrowserNodeProps) {
             >
               <ChevronRight
                 size={14}
-                className={cn("transition-transform duration-150", expanded && "rotate-90")}
+                // Mirrored in RTL; the mirror applies before the rotation, so
+                // an open row turns the other way to still point down.
+                className={cn("transition-transform duration-150 rtl:-scale-x-100", expanded && "rotate-90 rtl:-rotate-90")}
               />
             </button>
           )

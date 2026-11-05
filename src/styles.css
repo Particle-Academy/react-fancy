@@ -578,6 +578,34 @@
 .fancy-slide-out-right {
   animation: fancy-slide-out-right 0.2s ease-in forwards;
 }
+
+/* Logical edges for `side="start"` / `side="end"`: the inline start is the
+   left in LTR and the right in RTL, so each picks its physical twin by the
+   element's resolved direction. */
+.fancy-slide-in-start {
+  animation: fancy-slide-in-left 0.25s ease-out;
+}
+.fancy-slide-out-start {
+  animation: fancy-slide-out-left 0.2s ease-in forwards;
+}
+.fancy-slide-in-end {
+  animation: fancy-slide-in-right 0.25s ease-out;
+}
+.fancy-slide-out-end {
+  animation: fancy-slide-out-right 0.2s ease-in forwards;
+}
+.fancy-slide-in-start:dir(rtl) {
+  animation-name: fancy-slide-in-right;
+}
+.fancy-slide-out-start:dir(rtl) {
+  animation-name: fancy-slide-out-right;
+}
+.fancy-slide-in-end:dir(rtl) {
+  animation-name: fancy-slide-in-left;
+}
+.fancy-slide-out-end:dir(rtl) {
+  animation-name: fancy-slide-out-left;
+}
 }
 
 

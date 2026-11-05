@@ -75,9 +75,11 @@ const TimelineRoot = forwardRef<HTMLDivElement, TimelineProps>(
             {items.length > 1 && (
               <div className={cn(
                 "absolute top-0 bottom-0 w-px bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
+                // From the inline start; the centred line nudges toward the
+                // inline start too, so its 1px shift flips in RTL.
                 isAlternating
-                  ? "left-4 md:left-1/2 md:-translate-x-px"
-                  : "left-4",
+                  ? "start-4 md:start-1/2 md:-translate-x-px md:rtl:translate-x-px"
+                  : "start-4",
               )} />
             )}
             {content}

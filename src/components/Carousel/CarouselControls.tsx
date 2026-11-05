@@ -64,7 +64,10 @@ export const CarouselControls = forwardRef<HTMLDivElement, CarouselControlsProps
           type="button"
           onClick={prev}
           disabled={prevDisabled}
-          className="rounded-lg border px-3 py-1 text-sm disabled:opacity-50 dark:border-zinc-600"
+          // The default glyphs are arrows, which Unicode does not mirror: flip
+          // them in RTL so "previous" points to the inline start. A label the
+          // consumer supplies is text and is left alone.
+          className={cn("rounded-lg border px-3 py-1 text-sm disabled:opacity-50 dark:border-zinc-600", prevLabel == null && "rtl:-scale-x-100")}
         >
           {prevLabel ?? "\u2190"}
         </button>
@@ -72,7 +75,7 @@ export const CarouselControls = forwardRef<HTMLDivElement, CarouselControlsProps
           type="button"
           onClick={next}
           disabled={nextDisabled}
-          className="rounded-lg border px-3 py-1 text-sm disabled:opacity-50 dark:border-zinc-600"
+          className={cn("rounded-lg border px-3 py-1 text-sm disabled:opacity-50 dark:border-zinc-600", nextLabel == null && "rtl:-scale-x-100")}
         >
           {nextLabel ?? "\u2192"}
         </button>

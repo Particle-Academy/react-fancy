@@ -96,7 +96,7 @@ export function FileBrowserPathBar({
             return (
               <Fragment key={segment.path}>
                 {i > 0 && (
-                  <ChevronRight size={12} aria-hidden="true" className="shrink-0 text-zinc-400" />
+                  <ChevronRight size={12} aria-hidden="true" className="shrink-0 text-zinc-400 rtl:-scale-x-100" />
                 )}
                 {last ? (
                   <span

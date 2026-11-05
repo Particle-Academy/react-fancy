@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import type { NavigableProps } from "../../utils/types";
 
 export type MobileMenuVariant = "flyout" | "bottom-bar";
-export type MobileMenuSide = "left" | "right";
+/** `start` / `end` follow the writing direction; `left` / `right` are physical. */
+export type MobileMenuSide = "start" | "end" | "left" | "right";
 
 export interface MobileMenuProps {
   children: ReactNode;

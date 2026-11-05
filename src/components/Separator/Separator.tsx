@@ -12,7 +12,7 @@ export const Separator = forwardRef<HTMLDivElement, SeparatorProps>(
           aria-orientation="vertical"
           data-react-fancy-separator=""
           className={cn(
-            "inline-block h-full border-l border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
+            "inline-block h-full border-s border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
             className,
           )}
         />

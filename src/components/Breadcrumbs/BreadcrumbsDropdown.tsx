@@ -36,10 +36,10 @@ export function BreadcrumbsDropdown({ items, activeLabel }: BreadcrumbsDropdownP
         <ChevronDown size={14} className={cn("transition-transform", open && "rotate-180")} />
       </button>
       {open && (
-        <div className="absolute top-full left-0 z-50 mt-1 min-w-[180px] rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] py-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]">
+        <div className="absolute top-full start-0 z-50 mt-1 min-w-[180px] rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] py-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]">
           {items.map((item, i) => {
             const cls = cn(
-              "block w-full px-3 py-1.5 text-left text-sm",
+              "block w-full px-3 py-1.5 text-start text-sm",
               item.active
                 ? "font-medium text-zinc-900 dark:text-white"
                 : "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] hover:bg-zinc-50 hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:hover:bg-zinc-800 dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",

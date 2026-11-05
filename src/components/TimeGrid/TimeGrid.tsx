@@ -114,7 +114,7 @@ const BooleanTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(
                   onClick={() => toggleRow(r)}
                   data-react-fancy-timegrid-row={r}
                   className={cn(
-                    "pr-1 text-right font-medium text-zinc-500",
+                    "pe-1 text-end font-medium text-zinc-500",
                     toggleStripsOnHeaderClick &&
                       "cursor-pointer hover:text-zinc-800 dark:hover:text-zinc-200",
                   )}

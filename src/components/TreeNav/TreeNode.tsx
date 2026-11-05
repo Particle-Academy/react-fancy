@@ -55,7 +55,9 @@ function ChevronIcon({ open }: { open: boolean }) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={cn("shrink-0 transition-transform duration-150", open && "rotate-90")}
+      // Closed, it points to the inline end (mirrored in RTL); open, it points
+      // down. The mirror applies before the rotation, so RTL turns the other way.
+      className={cn("shrink-0 transition-transform duration-150 rtl:-scale-x-100", open && "rotate-90 rtl:-rotate-90")}
     >
       <polyline points="9 18 15 12 9 6" />
     </svg>
@@ -278,7 +280,7 @@ function TreeNodeImpl({ node, depth }: TreeNodeProps) {
         <div
           data-react-fancy-tree-drop-indicator="before"
           className="pointer-events-none h-0.5 rounded-full bg-blue-500"
-          style={{ marginLeft: paddingLeft }}
+          style={{ marginInlineStart: paddingLeft }}
         />
       )}
 
@@ -291,7 +293,7 @@ function TreeNodeImpl({ node, depth }: TreeNodeProps) {
         onContextMenu={handleContextMenu}
         disabled={node.disabled}
         className={cn(
-          "flex w-full items-center gap-1 rounded-md py-0.5 text-left text-[13px] transition-colors",
+          "flex w-full items-center gap-1 rounded-md py-0.5 text-start text-[13px] transition-colors",
           isSelected
             ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
             : "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
@@ -306,7 +308,7 @@ function TreeNodeImpl({ node, depth }: TreeNodeProps) {
             (dragCursor === "grab" ? "cursor-grab active:cursor-grabbing" : "active:cursor-grabbing"),
           isDropTarget && dropPosition === "inside" && "bg-blue-500/10 ring-1 ring-blue-500/30 ring-inset",
         )}
-        style={{ paddingLeft }}
+        style={{ paddingInlineStart: paddingLeft }}
       >
         {isFolder && <ChevronIcon open={isExpanded} />}
         {!isFolder && <span className="w-3.5 shrink-0" />}
@@ -323,7 +325,7 @@ function TreeNodeImpl({ node, depth }: TreeNodeProps) {
         <div
           data-react-fancy-tree-drop-indicator="after"
           className="pointer-events-none h-0.5 rounded-full bg-blue-500"
-          style={{ marginLeft: paddingLeft }}
+          style={{ marginInlineStart: paddingLeft }}
         />
       )}
 

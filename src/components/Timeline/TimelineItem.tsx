@@ -155,7 +155,7 @@ export const TimelineItem = forwardRef<HTMLDivElement, TimelineItemProps>(
             "min-w-0 flex-1",
             !isLast && "pb-8",
             isLargeDot && "pt-1",
-            isEven ? "md:col-start-1 md:row-start-1 md:text-right" : "md:col-start-3",
+            isEven ? "md:col-start-1 md:row-start-1 md:text-end" : "md:col-start-3",
           )}>
             {date && <time className="text-xs font-medium uppercase tracking-wide text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">{date}</time>}
             {children}

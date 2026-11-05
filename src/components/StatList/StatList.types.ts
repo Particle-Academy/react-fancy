@@ -18,6 +18,9 @@ export interface StatListItem {
 export interface StatListProps extends HTMLAttributes<HTMLDivElement> {
   /** The figures. Data rather than children — the repeated thing is a shape. */
   items: StatListItem[];
-  /** Which edge the stack aligns to. Default `"right"`. */
-  align?: "left" | "right";
+  /**
+   * Which edge the stack aligns to. Default `"end"`: the right in LTR, the
+   * left in RTL. `"left"` / `"right"` are physical and stay put in RTL.
+   */
+  align?: "start" | "end" | "left" | "right";
 }

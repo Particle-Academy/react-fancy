@@ -20,7 +20,7 @@ import { Sidebar } from "../src/components/Sidebar";
  * background sits as a lighter block against the card behind it.
  *
  * `embedded` is the opt-out. Not a `className` override: neutralising
- * `border-r`, `bg-white`, `dark:bg-zinc-900` and `w-60` from outside takes four
+ * `border-e`, `bg-white`, `dark:bg-zinc-900` and `w-60` from outside takes four
  * `!important` utilities that every embedding host has to rediscover, and they
  * silently rot the moment the base classes change.
  */
@@ -43,7 +43,7 @@ describe("the default rail is unchanged", () => {
     const { unmount } = mount(<Sidebar><Sidebar.Item>Home</Sidebar.Item></Sidebar>);
     const cls = rail().className;
 
-    expect(cls).toContain("border-r");
+    expect(cls).toContain("border-e");
     // The rail's surface is the surface token since 5.52.0.
     expect(cls).toContain("bg-[color:var(--fancy-surface,var(--color-white))]");
     expect(cls).toContain("w-60");
@@ -60,7 +60,7 @@ describe("embedded", () => {
     const cls = rail().className;
 
     // The line the host sees slicing their card.
-    expect(cls).not.toContain("border-r");
+    expect(cls).not.toContain("border-e");
     // The opaque block sitting on top of the card's own surface.
     // Token names, not the old literals — `not.toContain("bg-white")` would
     // pass vacuously now that the class is the surface token.

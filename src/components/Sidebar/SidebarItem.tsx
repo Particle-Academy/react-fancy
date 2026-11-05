@@ -93,7 +93,7 @@ export function SidebarItem({
         <span
           data-react-fancy-sidebar-badge=""
           aria-hidden={badgeLabelEl ? "true" : undefined}
-          className="pointer-events-none absolute -right-3 -top-2.5 whitespace-nowrap"
+          className="pointer-events-none absolute -end-3 -top-2.5 whitespace-nowrap"
         >
           {badge}
         </span>
@@ -110,10 +110,10 @@ export function SidebarItem({
             DOT_BASE,
             badgeDot[dotColor],
             anchoredToItem
-              ? "right-1.5 top-1.5"
+              ? "end-1.5 top-1.5"
               : showCollapsedBadge
-                ? "-bottom-0.5 -right-0.5"
-                : "-right-0.5 -top-0.5",
+                ? "-bottom-0.5 -end-0.5"
+                : "-end-0.5 -top-0.5",
           )}
         />
       )}
@@ -207,7 +207,7 @@ export function SidebarItem({
             Only shows up with labels longer than the sidebar is wide, which is
             why it survived: short nav labels never trigger it.
           */}
-          <span className="min-w-0 flex-1 truncate text-left">{children}</span>
+          <span className="min-w-0 flex-1 truncate text-start">{children}</span>
           {dotLabelEl}
           {/*
             Label and badge are adjacent elements, and adjacent elements

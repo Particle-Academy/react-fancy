@@ -151,7 +151,9 @@ function ChevronIcon({
       strokeLinecap="round"
       strokeLinejoin="round"
       style={{ transform }}
-      className={className}
+      // Horizontal, it points toward the inline start, which is the right in
+      // RTL. The mirror composes after the rotation; vertical is symmetric.
+      className={cn(className, orientation === "horizontal" && "rtl:-scale-x-100")}
       aria-hidden="true"
     >
       <polyline points="6 4 10 8 6 12" />

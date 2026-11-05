@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
+import { inlineStep } from "../../utils/direction";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import { Portal } from "../Portal";
 import { Badge } from "../Badge";
@@ -25,7 +26,7 @@ export interface ToastStackProps<T> {
   frontIndex?: number;
   defaultFrontIndex?: number;
   onFrontIndexChange?: (index: number) => void;
-  /** A screen corner, or `"inline"` to render where it is placed. Default `"bottom-right"`. */
+  /** A screen corner, or `"inline"` to render where it is placed. Default `"bottom-end"`: the right in LTR, the left in RTL. */
   position?: ToastPosition | "inline";
   /** The stack's accessible name. Default "Notifications". */
   label?: string;
@@ -35,6 +36,10 @@ export interface ToastStackProps<T> {
 }
 
 const POSITION_STYLES: Record<ToastPosition, string> = {
+  "top-start": "top-4 start-4",
+  "top-end": "top-4 end-4",
+  "bottom-start": "bottom-4 start-4",
+  "bottom-end": "bottom-4 end-4",
   "top-right": "top-4 right-4",
   "top-left": "top-4 left-4",
   "bottom-right": "bottom-4 right-4",
@@ -82,7 +87,7 @@ export function ToastStack<T>({
   frontIndex: controlledFront,
   defaultFrontIndex = 0,
   onFrontIndexChange,
-  position = "bottom-right",
+  position = "bottom-end",
   label = "Notifications",
   cardClassName,
   className,
@@ -187,10 +192,12 @@ export function ToastStack<T>({
       tabIndex={0}
       onKeyDown={(e) => {
         if (isTextField(e.target)) return;
-        if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+        // Left / right follow the reading direction: ArrowLeft is "next" in RTL.
+        const inline = inlineStep(e.key, e.currentTarget);
+        if (e.key === "ArrowDown" || inline === 1) {
           e.preventDefault();
           step(1);
-        } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+        } else if (e.key === "ArrowUp" || inline === -1) {
           e.preventDefault();
           step(-1);
         }
@@ -228,7 +235,7 @@ export function ToastStack<T>({
           size="sm"
           variant="soft"
           color="zinc"
-          className="absolute -top-2 right-2 z-20 shadow-sm ring-1 ring-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-zinc-800 dark:text-zinc-100 dark:ring-[color:var(--fancy-border-dark,var(--color-zinc-700))]"
+          className="absolute -top-2 end-2 z-20 shadow-sm ring-1 ring-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-zinc-800 dark:text-zinc-100 dark:ring-[color:var(--fancy-border-dark,var(--color-zinc-700))]"
         >
           +{hidden}
         </Badge>

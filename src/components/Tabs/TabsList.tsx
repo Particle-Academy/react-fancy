@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
+import { inlineStep } from "../../utils/direction";
 import { TabsListContext, useTabs } from "./Tabs.context";
 import type { TabsListProps } from "./Tabs.types";
 
@@ -39,12 +40,15 @@ export function TabsList({ children, className }: TabsListProps) {
     const items = Array.from(buttons);
     const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement);
 
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+    // ArrowRight / ArrowLeft follow the VISUAL order: in RTL the next tab is
+    // to the left, so ArrowLeft moves forward.
+    const step = e.key === "ArrowDown" ? 1 : e.key === "ArrowUp" ? -1 : inlineStep(e.key, listRef.current);
+    if (step === 1) {
       e.preventDefault();
       const next = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
       items[next].focus();
       items[next].click();
-    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+    } else if (step === -1) {
       e.preventDefault();
       const prev = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
       items[prev].focus();

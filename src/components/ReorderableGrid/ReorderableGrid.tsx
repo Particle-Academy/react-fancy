@@ -16,6 +16,7 @@ import type {
 } from "react";
 import { cn } from "../../utils/cn";
 import { composeRefs } from "../../utils/compose-refs";
+import { inlineStep, isRtl } from "../../utils/direction";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import { moveItem } from "./move-item";
@@ -400,17 +401,22 @@ function ReorderableGridInner<T extends ReorderableGridItem>(
 
     if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) return;
     e.preventDefault();
+    // `step` speaks in reading order. The grid flows right-to-left in RTL, so
+    // a visual ArrowLeft there is the NEXT slot.
+    const key = e.key === "ArrowLeft" || e.key === "ArrowRight"
+      ? (inlineStep(e.key, e.currentTarget) === 1 ? "ArrowRight" : "ArrowLeft")
+      : e.key;
 
     if (s?.mode === "keyboard") {
       if (s.target === null) return;
-      const t = step(shownRef.current, s.target, e.key, true);
+      const t = step(shownRef.current, s.target, key, true);
       if (t !== null) retarget(t);
       return;
     }
     if (s) return;
 
     const order = shownRef.current;
-    const t = step(order, order.indexOf(id), e.key, false);
+    const t = step(order, order.indexOf(id), key, false);
     if (t === null) return;
     const next = order[t] as string;
     setActiveId(next);
@@ -498,7 +504,11 @@ function ReorderableGridInner<T extends ReorderableGridItem>(
     let vx = speed(d.clientX - box.left) ? -speed(d.clientX - box.left) : speed(box.right - d.clientX);
     // Only where it can actually go.
     if ((vy < 0 && sc.scrollTop <= 0) || (vy > 0 && sc.scrollTop + sc.clientHeight >= sc.scrollHeight)) vy = 0;
-    if ((vx < 0 && sc.scrollLeft <= 0) || (vx > 0 && sc.scrollLeft + sc.clientWidth >= sc.scrollWidth)) vx = 0;
+    // An RTL scroller's `scrollLeft` runs from 0 (the right end) down to
+    // negative values, so its range is shifted, not mirrored.
+    const span = sc.scrollWidth - sc.clientWidth;
+    const minLeft = isRtl(sc) ? -span : 0;
+    if ((vx < 0 && sc.scrollLeft <= minLeft) || (vx > 0 && sc.scrollLeft >= minLeft + span)) vx = 0;
     if (!vx && !vy) {
       scrollFrame.current = null;
       return;

@@ -19,7 +19,7 @@ import type { StatListProps } from "./StatList.types";
  * keeps it meaningful when a design replaces the styling wholesale.
  */
 export const StatList = forwardRef<HTMLDivElement, StatListProps>(
-  ({ items, align = "right", className, ...props }, ref) => {
+  ({ items, align = "end", className, ...props }, ref) => {
     if (items.length === 0) return null;
 
     return (
@@ -30,7 +30,13 @@ export const StatList = forwardRef<HTMLDivElement, StatListProps>(
         data-align={align}
         className={cn(
           "flex flex-col gap-0.5 font-mono text-[11.5px] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
-          align === "right" ? "items-end text-right" : "items-start text-left",
+          {
+            start: "items-start text-start",
+            end: "items-end text-end",
+            // Physical: flex alignment is logical, so RTL swaps it back.
+            left: "items-start rtl:items-end text-left",
+            right: "items-end rtl:items-start text-right",
+          }[align],
           className,
         )}
       >

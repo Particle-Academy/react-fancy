@@ -11,16 +11,23 @@ export function MobileMenuFlyout({
   children,
   open,
   onClose,
-  side = "left",
+  side = "start",
   title,
   className,
 }: MobileMenuFlyoutProps) {
-  const isLeft = side === "left";
+  // `start` / `end` resolve against the writing direction in CSS, so the
+  // same markup is right for both and nothing is measured.
+  const edge = {
+    start: { pos: "start-0", enter: "fancy-slide-in-start", exit: "fancy-slide-out-start" },
+    end: { pos: "end-0", enter: "fancy-slide-in-end", exit: "fancy-slide-out-end" },
+    left: { pos: "left-0", enter: "fancy-slide-in-left", exit: "fancy-slide-out-left" },
+    right: { pos: "right-0", enter: "fancy-slide-in-right", exit: "fancy-slide-out-right" },
+  }[side];
 
   const { mounted, className: animClass, ref } = useAnimation({
     open,
-    enterClass: isLeft ? "fancy-slide-in-left" : "fancy-slide-in-right",
-    exitClass: isLeft ? "fancy-slide-out-left" : "fancy-slide-out-right",
+    enterClass: edge.enter,
+    exitClass: edge.exit,
   });
 
   useEscapeKey(onClose, open);
@@ -56,7 +63,7 @@ export function MobileMenuFlyout({
             ref={ref as React.RefObject<HTMLDivElement>}
             className={cn(
               "absolute top-0 flex h-full w-72 max-w-[80vw] flex-col bg-[color:var(--fancy-surface,var(--color-white))] shadow-xl dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
-              isLeft ? "left-0" : "right-0",
+              edge.pos,
               animClass,
               className,
             )}

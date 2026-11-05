@@ -7,6 +7,10 @@ import { ToastStack } from "./ToastStack";
 import type { ToastData, ToastProviderProps } from "./Toast.types";
 
 const POSITION_STYLES = {
+  "top-start": "top-4 start-4",
+  "top-end": "top-4 end-4",
+  "bottom-start": "bottom-4 start-4",
+  "bottom-end": "bottom-4 end-4",
   "top-right": "top-4 right-4",
   "top-left": "top-4 left-4",
   "bottom-right": "bottom-4 right-4",
@@ -15,7 +19,7 @@ const POSITION_STYLES = {
 
 function ToastProvider({
   children,
-  position = "bottom-right",
+  position = "bottom-end",
   maxToasts = 5,
 }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastData[]>([]);

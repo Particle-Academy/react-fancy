@@ -19,9 +19,10 @@ export function SidebarToggle({ className }: SidebarToggleProps) {
       )}
     >
       {collapsed ? (
-        <PanelLeftOpen className="h-4 w-4" />
+        // The glyph draws the rail on the inline-start side: mirrored in RTL.
+        <PanelLeftOpen className="h-4 w-4 rtl:-scale-x-100" />
       ) : (
-        <PanelLeftClose className="h-4 w-4" />
+        <PanelLeftClose className="h-4 w-4 rtl:-scale-x-100" />
       )}
     </button>
   );

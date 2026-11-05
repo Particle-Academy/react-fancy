@@ -23,7 +23,7 @@ const [open, setOpen] = useState(false);
 
 <button onClick={() => setOpen(true)}>Menu</button>
 
-<MobileMenu.Flyout open={open} onClose={() => setOpen(false)} side="left" title="Menu">
+<MobileMenu.Flyout open={open} onClose={() => setOpen(false)} side="start" title="Menu">
   <MobileMenu.Item href="/" icon={<Icon name="home" />} active>Home</MobileMenu.Item>
   <MobileMenu.Item href="/about" icon={<Icon name="info" />}>About</MobileMenu.Item>
   <MobileMenu.Item href="/contact" icon={<Icon name="mail" />}>Contact</MobileMenu.Item>
@@ -50,7 +50,7 @@ A fixed bottom navigation bar for mobile.
 |------|------|---------|-------------|
 | open | `boolean` | - | Whether the flyout is visible (required) |
 | onClose | `() => void` | - | Callback to close the flyout (required) |
-| side | `"left" \| "right"` | - | Which edge the panel slides from |
+| side | `"start" \| "end" \| "left" \| "right"` | `"start"` | Which edge the panel slides from. `start` / `end` follow the writing direction (`start` is the left in LTR, the right in RTL); `left` / `right` are physical |
 | title | `string` | - | Optional header title |
 | className | `string` | - | Additional CSS classes |
 

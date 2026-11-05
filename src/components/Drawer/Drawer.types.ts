@@ -1,12 +1,18 @@
 import type { HTMLAttributes, ReactNode } from "react";
 
-/** Which edge the drawer is anchored to, and therefore slides in from. */
-export type DrawerSide = "left" | "right" | "top" | "bottom";
+/**
+ * Which edge the drawer is anchored to, and therefore slides in from.
+ *
+ * `start` / `end` are the inline edges and follow the writing direction: `end`
+ * is the right in LTR and the left in RTL. `left` / `right` are physical and
+ * stay put in RTL — use them only when the side really is a screen side.
+ */
+export type DrawerSide = "start" | "end" | "left" | "right" | "top" | "bottom";
 
 /**
  * How large the drawer is along its own axis.
  *
- * `size` controls WIDTH for `left`/`right` and HEIGHT for `top`/`bottom` — the
+ * `size` controls WIDTH for the side edges and HEIGHT for `top`/`bottom` — the
  * cross-axis always fills its anchor. One scale, two meanings, so `size="md"`
  * reads the same whichever edge you attach to.
  */
@@ -33,7 +39,7 @@ export interface DrawerProps extends Omit<HTMLAttributes<HTMLDivElement>, "child
   children: ReactNode;
   open: boolean;
   onClose: () => void;
-  /** Edge to anchor to. Default `right`. */
+  /** Edge to anchor to. Default `end`: the right in LTR, the left in RTL. */
   side?: DrawerSide;
   /** Extent along the drawer's own axis. Default `md`. */
   size?: DrawerSize;

@@ -73,9 +73,9 @@ describe("StatList", () => {
     unmount();
   });
 
-  it("aligns right by default and left on request", () => {
+  it("aligns to the inline end by default (the right in LTR) and left on request", () => {
     const right = mount(<StatList items={ITEMS} />);
-    expect(right.host.querySelector("[data-align]")?.getAttribute("data-align")).toBe("right");
+    expect(right.host.querySelector("[data-align]")?.getAttribute("data-align")).toBe("end");
     right.unmount();
 
     const left = mount(<StatList items={ITEMS} align="left" />);

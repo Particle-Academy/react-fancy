@@ -36,7 +36,7 @@ export function MenuSubmenu({
         </button>
         <div
           className={cn(
-            "invisible absolute left-0 top-full z-50 min-w-[180px] pt-1 opacity-0 transition-all",
+            "invisible absolute start-0 top-full z-50 min-w-[180px] pt-1 opacity-0 transition-all",
             "group-hover:visible group-hover:opacity-100",
           )}
         >
@@ -61,7 +61,7 @@ export function MenuSubmenu({
         )}
       >
         {icon && <span className="flex h-5 w-5 shrink-0 items-center justify-center">{icon}</span>}
-        <span className="flex-1 text-left">{label}</span>
+        <span className="flex-1 text-start">{label}</span>
         <ChevronDown
           className={cn(
             "h-3.5 w-3.5 opacity-60 transition-transform duration-200",
@@ -76,7 +76,7 @@ export function MenuSubmenu({
         )}
       >
         <div className="overflow-hidden">
-          <div className="ml-4 border-l border-[color:var(--fancy-border,var(--color-zinc-200))] pl-2 pt-1 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]">
+          <div className="ms-4 border-s border-[color:var(--fancy-border,var(--color-zinc-200))] ps-2 pt-1 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]">
             {children}
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { Children, forwardRef, useCallback, useId, useRef, useState } from "react";
 import type { KeyboardEvent, PointerEvent } from "react";
 import { cn } from "../../utils/cn";
+import { isRtl } from "../../utils/direction";
 import type { ResizablePanelsProps } from "./ResizablePanels.types";
 
 function clamp(n: number, lo: number, hi: number): number {
@@ -103,8 +104,12 @@ export const ResizablePanels = forwardRef<HTMLDivElement, ResizablePanelsProps>(
 
     const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
       if (disabled) return;
-      const dec = horizontal ? "ArrowLeft" : "ArrowUp";
-      const inc = horizontal ? "ArrowRight" : "ArrowDown";
+      // Side by side, the first panel sits at the inline START: the right in
+      // RTL. The separator moves the way the arrow points, so ArrowLeft GROWS
+      // the first panel there.
+      const rtl = horizontal && isRtl(e.currentTarget);
+      const dec = horizontal ? (rtl ? "ArrowRight" : "ArrowLeft") : "ArrowUp";
+      const inc = horizontal ? (rtl ? "ArrowLeft" : "ArrowRight") : "ArrowDown";
       const by = e.shiftKey ? largeStep : step;
       let next: number;
       if (e.key === dec) next = latest.current - by;
@@ -134,7 +139,10 @@ export const ResizablePanels = forwardRef<HTMLDivElement, ResizablePanelsProps>(
       if (!rect) return null;
       const size = horizontal ? rect.width : rect.height;
       if (!size) return null;
-      const offset = horizontal ? clientX - rect.left : clientY - rect.top;
+      // Measured from the inline start, which is the right edge in RTL.
+      const offset = horizontal
+        ? isRtl(rootRef.current) ? rect.right - clientX : clientX - rect.left
+        : clientY - rect.top;
       return (offset / size) * 100;
     };
 

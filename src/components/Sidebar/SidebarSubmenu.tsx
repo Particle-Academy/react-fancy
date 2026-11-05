@@ -60,7 +60,7 @@ export function SidebarSubmenu({
         )}
       >
         {icon && <span className="flex h-5 w-5 shrink-0 items-center justify-center">{icon}</span>}
-        <span className="flex-1 text-left">{label}</span>
+        <span className="flex-1 text-start">{label}</span>
         <ChevronDown
           className={cn(
             "h-3.5 w-3.5 opacity-60 transition-transform duration-200",
@@ -75,7 +75,7 @@ export function SidebarSubmenu({
         )}
       >
         <div className="overflow-hidden">
-          <div className="ml-4 border-l border-[color:var(--fancy-border,var(--color-zinc-200))] pl-2 pt-1 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]">
+          <div className="ms-4 border-s border-[color:var(--fancy-border,var(--color-zinc-200))] ps-2 pt-1 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]">
             {children}
           </div>
         </div>

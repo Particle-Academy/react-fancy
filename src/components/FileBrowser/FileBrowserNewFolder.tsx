@@ -176,7 +176,7 @@ export function FileBrowserNewFolder({ className }: { className?: string }) {
         <p
           data-react-fancy-file-browser-new-folder-error=""
           role="alert"
-          className="pl-4 text-[11px] text-red-600 dark:text-red-400"
+          className="ps-4 text-[11px] text-red-600 dark:text-red-400"
         >
           {shown}
         </p>

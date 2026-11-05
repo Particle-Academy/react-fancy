@@ -13,7 +13,7 @@ import { Toast, useToast } from "@particle-academy/react-fancy";
 Wrap your app with `Toast.Provider`:
 
 ```tsx
-<Toast.Provider position="bottom-right" maxToasts={5}>
+<Toast.Provider position="bottom-end" maxToasts={5}>
   <App />
 </Toast.Provider>
 ```
@@ -47,7 +47,7 @@ function MyComponent() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| position | `"top-right" \| "top-left" \| "bottom-right" \| "bottom-left"` | `"bottom-right"` | Screen corner for toast stack |
+| position | `"top-start" \| "top-end" \| "bottom-start" \| "bottom-end" \| "top-right" \| "top-left" \| "bottom-right" \| "bottom-left"` | `"bottom-end"` | Screen corner for the toast stack. `start` / `end` follow the writing direction (`end` is the right in LTR, the left in RTL); `left` / `right` are physical |
 | maxToasts | `number` | `5` | Maximum visible toasts (oldest removed first) |
 
 ### useToast() return value

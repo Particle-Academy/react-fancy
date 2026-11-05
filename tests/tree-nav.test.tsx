@@ -172,9 +172,9 @@ describe("TreeNav — virtualize", () => {
     const host = mount(<Selectable nodes={nodes} virtualize />);
 
     expect(host.querySelector("[data-react-fancy-tree-node-children]")).toBeNull();
-    expect(row(host, "folder d0").style.paddingLeft).toBe("4px");
-    expect(row(host, "folder d0/d0").style.paddingLeft).toBe("20px");
-    expect(row(host, "folder d0/d0/d0").style.paddingLeft).toBe("36px");
+    expect(row(host, "folder d0").style.paddingInlineStart).toBe("4px");
+    expect(row(host, "folder d0/d0").style.paddingInlineStart).toBe("20px");
+    expect(row(host, "folder d0/d0/d0").style.paddingInlineStart).toBe("36px");
   });
 
   it("collapsing a folder removes its rows, expanding brings them back", () => {

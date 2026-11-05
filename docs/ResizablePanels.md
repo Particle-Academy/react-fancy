@@ -67,6 +67,8 @@ Other HTML attributes (including `data-*` handles) pass through to the root.
 
 Shift + Arrow moves by `largeStep`. Home / End jump to `min` / `max`.
 
+Right-to-left: side by side, the first panel sits at the inline start, which is the right under `dir="rtl"`. The separator still moves the way the arrow points, so ArrowLeft grows the first panel there, and dragging measures from the right edge.
+
 ## Accessibility
 
 The separator is `role="separator"`, `tabIndex=0`, with `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-orientation`, `aria-label` and `aria-controls` pointing at the primary panel. It shows a focus ring from the `--fancy-focus` token. Pointer and touch drags use pointer capture (`touch-action: none` on the separator), and the separator has a 12px hit area around its 1px line.

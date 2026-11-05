@@ -142,6 +142,8 @@ The grid is one tab stop (roving tabindex). With nothing picked up, the arrow ke
 
 ArrowDown from a row above a short last row lands on the last cell. Moves stop at the edges.
 
+Under `dir="rtl"` the grid flows right to left, and ArrowLeft / ArrowRight still move the way they point: ArrowLeft is the next slot there.
+
 Escape goes through the kit's layer stack (`useEscapeKey`), so a picked-up cell inside a `Modal` or a full-screen surface cancels the pick-up first. The next Escape closes the Modal.
 
 ## Locked cells

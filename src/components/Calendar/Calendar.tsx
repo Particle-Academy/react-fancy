@@ -186,7 +186,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
             className="rounded-lg p-1 text-zinc-400 hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             aria-label="Previous month"
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={16} className="rtl:-scale-x-100" />
           </button>
           <span className="text-sm font-semibold" data-react-fancy-calendar-month="">
             {MONTHS[viewMonth]} {viewYear}
@@ -197,7 +197,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
             className="rounded-lg p-1 text-zinc-400 hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             aria-label="Next month"
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={16} className="rtl:-scale-x-100" />
           </button>
         </div>
 

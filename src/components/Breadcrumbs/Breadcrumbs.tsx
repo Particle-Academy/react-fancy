@@ -15,7 +15,7 @@ function BreadcrumbsRoot({
   const [expanded, setExpanded] = useState(false);
 
   const sep = separator ?? (
-    <ChevronRight size={12} className="text-zinc-400" />
+    <ChevronRight size={12} className="text-zinc-400 rtl:-scale-x-100" />
   );
 
   const lastItem = items[items.length - 1];

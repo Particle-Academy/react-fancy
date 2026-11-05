@@ -71,7 +71,7 @@ export function Pagination({
         className={cn(btnBase, btnDefault, page <= 1 && btnDisabled, "px-2")}
         aria-label="Previous page"
       >
-        <ChevronLeft size={16} />
+        <ChevronLeft size={16} className="rtl:-scale-x-100" />
       </button>
 
       {pages.map((p, i) =>
@@ -108,7 +108,7 @@ export function Pagination({
         )}
         aria-label="Next page"
       >
-        <ChevronRight size={16} />
+        <ChevronRight size={16} className="rtl:-scale-x-100" />
       </button>
     </nav>
   );

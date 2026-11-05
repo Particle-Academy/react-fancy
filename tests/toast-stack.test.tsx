@@ -385,7 +385,7 @@ describe("Toast.Stack", () => {
     expect(host.querySelector("[data-react-fancy-toast-stack]")).toBeNull();
     expect(stack().closest("[data-react-fancy-toast-stack-position]")?.getAttribute(
       "data-react-fancy-toast-stack-position",
-    )).toBe("bottom-right");
+    )).toBe("bottom-end");
   });
 
   it('position="inline" renders where it is placed', () => {

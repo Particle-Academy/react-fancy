@@ -66,6 +66,8 @@ export function JsonEditorRow({ node }: JsonEditorRowProps) {
             aria-label={expanded ? `Collapse ${label}` : `Expand ${label}`}
             aria-expanded={expanded}
             icon={expanded ? "chevron-down" : "chevron-right"}
+            // Collapsed, the chevron points to the inline end: mirrored in RTL.
+            className={expanded ? undefined : "rtl:[&_svg]:-scale-x-100"}
             onClick={() => ctx.toggleExpanded(dotted)}
           />
         ) : (

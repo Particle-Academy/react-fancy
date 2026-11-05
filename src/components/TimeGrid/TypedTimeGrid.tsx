@@ -17,6 +17,7 @@ import {
 import { flushSync } from "react-dom";
 import { cn } from "../../utils/cn";
 import { composeRefs } from "../../utils/compose-refs";
+import { isRtl } from "../../utils/direction";
 import {
   resolveRange,
   rowSegment,
@@ -66,7 +67,7 @@ const MARK_DOT =
 const HEADER_COL =
   "overflow-visible whitespace-nowrap text-[10px] leading-4 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]";
 const HEADER_ROW =
-  "whitespace-nowrap pr-1 text-right text-[10px] font-medium text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]";
+  "whitespace-nowrap pe-1 text-end text-[10px] font-medium text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]";
 const HEADER_HOVER =
   "cursor-pointer hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]";
 
@@ -262,7 +263,7 @@ const CellChunk = memo(function CellChunk({
         className={cls}
       >
         {markIds?.length ? (
-          <span aria-hidden className="pointer-events-none absolute right-0 top-0 flex gap-px">
+          <span aria-hidden className="pointer-events-none absolute end-0 top-0 flex gap-px">
             {markIds.map((m) => {
               const def = marks[m];
               return def?.icon ? (
@@ -376,7 +377,10 @@ export const TypedTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(function 
     if (!el) return;
     const rh = el.querySelector<HTMLElement>('[role="rowheader"]');
     metrics.current = {
-      left: el.scrollLeft,
+      // Distance scrolled from the inline START. In an RTL scroller
+      // `scrollLeft` runs from 0 down to negative values, so the window
+      // would otherwise shrink as the user scrolled.
+      left: Math.abs(el.scrollLeft),
       width: el.clientWidth || (typeof window !== "undefined" ? window.innerWidth : 1024),
       headerW: rh ? rh.offsetWidth + 2 : 0,
     };
@@ -418,11 +422,14 @@ export const TypedTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(function 
       const { headerW } = metrics.current;
       const width = el.clientWidth || metrics.current.width;
       const x = headerW + c * pitchX;
-      let left = el.scrollLeft;
+      // `left` is measured from the inline start; RTL writes it back negative.
+      const sign = isRtl(el) ? -1 : 1;
+      const was = Math.abs(el.scrollLeft);
+      let left = was;
       if (x < left + headerW) left = Math.max(0, x - headerW);
       else if (x + pitchX > left + width) left = x + pitchX - width;
-      if (left !== el.scrollLeft) {
-        el.scrollLeft = left;
+      if (left !== was) {
+        el.scrollLeft = sign * left;
         measure();
       }
     },
@@ -532,12 +539,15 @@ export const TypedTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(function 
       if (!first || !last) return null;
       const a = first.getBoundingClientRect();
       const b = last.getBoundingClientRect();
-      const w = (b.right - a.left) / (colEnd - colStart + 1);
+      // Columns run from the inline start: right-to-left in RTL, where the
+      // first rendered cell is the RIGHTMOST one.
+      const rtl = isRtl(first);
+      const w = (rtl ? a.right - b.left : b.right - a.left) / (colEnd - colStart + 1);
       const h = (b.bottom - a.top) / nRows;
       if (!(w > 0) || !(h > 0)) return null;
       return {
         r: Math.min(nRows - 1, Math.max(0, Math.floor((y - a.top) / h))),
-        c: Math.min(nCols - 1, Math.max(0, colStart + Math.floor((x - a.left) / w))),
+        c: Math.min(nCols - 1, Math.max(0, colStart + Math.floor((rtl ? a.right - x : x - a.left) / w))),
       };
     },
     [baseId, nRows, nCols, colStart, colEnd],
@@ -616,11 +626,13 @@ export const TypedTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(function 
   /* ── keyboard: the grid holds focus; aria-activedescendant names the cell ── */
 
   const onKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    // Left / right follow the screen: columns run right-to-left in RTL.
+    const fwd = isRtl(e.currentTarget) ? -1 : 1;
     const move: Record<string, [number, number]> = {
       ArrowUp: [-1, 0],
       ArrowDown: [1, 0],
-      ArrowLeft: [0, -1],
-      ArrowRight: [0, 1],
+      ArrowLeft: [0, -fwd],
+      ArrowRight: [0, fwd],
     };
     const d = move[e.key];
     if (d) {

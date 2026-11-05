@@ -1,7 +1,15 @@
 import type { ReactNode } from "react";
 
 export type ToastVariant = "default" | "success" | "error" | "warning" | "info";
+/**
+ * Where toasts stack. `*-start` / `*-end` follow the writing direction (`end` is
+ * the right in LTR, the left in RTL); `*-left` / `*-right` are physical.
+ */
 export type ToastPosition =
+  | "top-start"
+  | "top-end"
+  | "bottom-start"
+  | "bottom-end"
   | "top-right"
   | "top-left"
   | "bottom-right"

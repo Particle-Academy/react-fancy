@@ -1,4 +1,5 @@
 import { cn } from "../../utils/cn";
+import { inlineStep } from "../../utils/direction";
 import { useFileBrowser } from "./FileBrowser.context";
 import { FileBrowserNode, FileBrowserStatusRow } from "./FileBrowserNode";
 import type { FileBrowserRow, FileBrowserTreeProps } from "./FileBrowser.types";
@@ -38,7 +39,13 @@ export function FileBrowserTree({ ariaLabel = "Files", className }: FileBrowserT
     const index = rows.findIndex((row) => row.entry.path === tabFocusPath);
     const current = index >= 0 ? rows[index] : rows[0];
 
-    switch (e.key) {
+    // A tree expands toward the inline END (WAI-ARIA tree pattern): in RTL
+    // that is ArrowLeft, and ArrowRight collapses.
+    const key = e.key === "ArrowLeft" || e.key === "ArrowRight"
+      ? (inlineStep(e.key, e.currentTarget as Element) === 1 ? "ArrowRight" : "ArrowLeft")
+      : e.key;
+
+    switch (key) {
       case "ArrowDown":
         e.preventDefault();
         if (index < rows.length - 1) moveTo(rows[index + 1]);

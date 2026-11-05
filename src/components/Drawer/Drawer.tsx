@@ -34,6 +34,8 @@ const HEIGHT = {
 } as const;
 
 const ANCHOR: Record<DrawerSide, string> = {
+  start: "inset-y-0 start-0",
+  end: "inset-y-0 end-0",
   left: "inset-y-0 left-0",
   right: "inset-y-0 right-0",
   top: "inset-x-0 top-0",
@@ -41,6 +43,8 @@ const ANCHOR: Record<DrawerSide, string> = {
 };
 
 const ENTER: Record<DrawerSide, string> = {
+  start: "fancy-slide-in-start",
+  end: "fancy-slide-in-end",
   left: "fancy-slide-in-left",
   right: "fancy-slide-in-right",
   top: "fancy-slide-in-top",
@@ -48,6 +52,8 @@ const ENTER: Record<DrawerSide, string> = {
 };
 
 const EXIT: Record<DrawerSide, string> = {
+  start: "fancy-slide-out-start",
+  end: "fancy-slide-out-end",
   left: "fancy-slide-out-left",
   right: "fancy-slide-out-right",
   top: "fancy-slide-out-top",
@@ -56,6 +62,8 @@ const EXIT: Record<DrawerSide, string> = {
 
 /** The panel's edge shadow reads as depth away from the anchored edge. */
 const EDGE: Record<DrawerSide, string> = {
+  start: "border-e",
+  end: "border-s",
   left: "border-r",
   right: "border-l",
   top: "border-b",
@@ -66,7 +74,7 @@ function DrawerRoot({
   children,
   open,
   onClose,
-  side = "right",
+  side = "end",
   size = "md",
   attach = "viewport",
   backdrop = true,
@@ -76,7 +84,7 @@ function DrawerRoot({
   ...rest
 }: DrawerProps) {
   const panelRef = useRef<HTMLDivElement>(null);
-  const horizontal = side === "left" || side === "right";
+  const horizontal = side !== "top" && side !== "bottom";
   const isViewport = attach === "viewport";
 
   const close = useCallback(() => onClose(), [onClose]);

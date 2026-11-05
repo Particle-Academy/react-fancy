@@ -7,6 +7,7 @@ import {
 } from "react";
 import { Check } from "lucide-react";
 import { cn } from "../../utils/cn";
+import { isRtl } from "../../utils/direction";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import type {
   StepperProps,
@@ -108,8 +109,10 @@ const StepperRoot = forwardRef<HTMLOListElement, StepperProps>(
       onKeyDown?.(e);
       if (!clickable || e.defaultPrevented) return;
 
-      const prevKey = horizontal ? "ArrowLeft" : "ArrowUp";
-      const nextKey = horizontal ? "ArrowRight" : "ArrowDown";
+      // Horizontal steps run right-to-left in RTL, so the arrows swap there.
+      const rtl = horizontal && isRtl(e.currentTarget);
+      const prevKey = horizontal ? (rtl ? "ArrowRight" : "ArrowLeft") : "ArrowUp";
+      const nextKey = horizontal ? (rtl ? "ArrowLeft" : "ArrowRight") : "ArrowDown";
       if (![prevKey, nextKey, "Home", "End"].includes(e.key)) return;
 
       const list = e.currentTarget;
@@ -167,7 +170,7 @@ const StepperRoot = forwardRef<HTMLOListElement, StepperProps>(
 
           const headerClass = horizontal
             ? "flex flex-col items-center gap-2 text-center"
-            : "flex items-center gap-x-4 text-left";
+            : "flex items-center gap-x-4 text-start";
 
           const header = clickable ? (
             <button
@@ -210,8 +213,8 @@ const StepperRoot = forwardRef<HTMLOListElement, StepperProps>(
                   className={cn(
                     "absolute",
                     horizontal
-                      ? "top-4 left-[calc(50%+1.5rem)] h-px w-[calc(100%-3rem)]"
-                      : "top-10 bottom-2 left-4 w-px -translate-x-1/2",
+                      ? "top-4 start-[calc(50%+1.5rem)] h-px w-[calc(100%-3rem)]"
+                      : "top-10 bottom-2 start-4 w-px -translate-x-1/2 rtl:translate-x-1/2",
                     index < current
                       ? "bg-zinc-900 dark:bg-white"
                       : "bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
@@ -220,7 +223,7 @@ const StepperRoot = forwardRef<HTMLOListElement, StepperProps>(
               )}
               {header}
               {(step.description != null || showBody) && (
-                <div className={horizontal ? "mt-1 px-2 text-center" : "pl-12"}>
+                <div className={horizontal ? "mt-1 px-2 text-center" : "ps-12"}>
                   {step.description != null && (
                     <div
                       data-react-fancy-stepper-description=""
