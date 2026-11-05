@@ -37,6 +37,42 @@ mq.addEventListener("change", (e) => {
 });
 ```
 
+## Right-to-left (RTL)
+
+Set the direction once, on `<html>`, with the language beside it:
+
+```html
+<html dir="rtl" lang="ar">
+```
+
+There is no `dir` prop. Every component follows the direction the browser has
+already resolved for it, inherited from the nearest ancestor, so `dir` on a
+wrapper works too. Popups opened from a trigger (Tooltip, Popover, Dropdown,
+Select, Autocomplete, ContextMenu) copy the trigger's direction onto the popup,
+because they are portalled to `<body>`. Modal, Drawer and Toast portal without a
+trigger, so they follow `<html>`: set it there.
+
+- **Layout is logical.** Components use `ms-`/`me-`/`ps-`/`pe-`/`start-`/`end-`/
+  `text-start`/`border-s`/`rounded-e`, so they mirror. Override with logical
+  utilities too: a `pl-4` you pass stays on the left in RTL, by definition.
+- **Placements.** `-start` / `-end` are logical (`bottom-start` lines up with the
+  trigger's right edge in RTL); `left` / `right` are physical. The same holds for
+  `Drawer side`, `Toast position`, `MobileMenu.Flyout side` and `InputTag
+  placement`, whose defaults are now the logical `end` / `bottom-end` / `start` /
+  `bottom-start`, identical to before in LTR.
+- **Keys follow the screen.** ArrowLeft moves left in both directions, so in RTL
+  it is "next" in Tabs, Stepper, ReorderableGrid, TimeGrid and Toast.Stack, it
+  grows the first panel of ResizablePanels, and it expands a FileBrowser folder.
+- **Icons that mean direction mirror** (chevrons, the breadcrumb separator, the
+  send arrow, Carousel's arrows); icons that do not (check, search, play) do not.
+  `<Icon>` never mirrors by name. For a directional icon of your own add
+  `className="rtl:-scale-x-100"`, or on a Button's `icon`,
+  `className="rtl:[&_svg]:-scale-x-100"`.
+- **These stay left-to-right:** CodeBlock, CodeView, `<pre>` and `<code>` inside
+  Editor and ContentRenderer, and OtpInput's cells, because a code is a number.
+- **Not mirrored, by design:** plotted charts and MoodMeter keep their axes, and
+  QrCode modules are data.
+
 ## Data Attributes
 
 Every component renders a `data-react-fancy-*=""` attribute on its root element. Sub-components follow the pattern `data-react-fancy-{parent}-{sub}`. Use these for CSS targeting.

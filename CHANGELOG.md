@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **A right-to-left section in `STYLE.md`**: where to set `dir`, which placements and props are logical and which physical, how keys behave, which icons mirror, what stays left-to-right, and how to mirror an icon of your own. **Consumer action:** none.
 - **`useFloatingPosition` also returns `dir`**, the anchor's resolved writing direction, for a floating element to carry as its own `dir` attribute. A popup is portalled to `<body>`, so a `dir` set on a wrapper rather than on `<html>` would otherwise not reach it. Additive. **Consumer action:** none.
 - **`InputTag` `placement` takes `bottom-start` / `bottom-end` / `top-start` / `top-end`**, resolved against the picker's own direction before paint. The physical values remain and stay physical. **Consumer action:** none.
 - **Logical sides for the edge-anchored components:** `Drawer side="start" | "end"`, `Toast.Provider` / `Toast.Stack` `position="top-start" | "top-end" | "bottom-start" | "bottom-end"`, `MobileMenu.Flyout side="start" | "end"` and `StatList align="start" | "end"`. `end` is the right in LTR and the left in RTL. `left` / `right` keep their physical meaning. New CSS classes `fancy-slide-in-start` / `-end` and `fancy-slide-out-start` / `-end` animate from the matching edge. **Consumer action:** none.
