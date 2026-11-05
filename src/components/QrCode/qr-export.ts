@@ -72,9 +72,29 @@ function fileForeground(colour: string | undefined): string {
   return colour === undefined || colour === "" || colour === "currentColor" ? BLACK : colour;
 }
 
+const REPLACEMENT = String.fromCharCode(0xfffd);
+
+/**
+ * Text XML 1.0 can carry: C0 controls other than tab, newline and return are
+ * dropped (they are invalid even as character references), and a lone
+ * surrogate becomes U+FFFD. Without this, one control character in a label
+ * makes the whole file unparseable. A loop over code points, not a pattern.
+ */
+function xmlChars(text: string): string {
+  let out = "";
+  for (const char of text) {
+    const code = char.charCodeAt(0);
+    if (code < 0x20 && code !== 0x09 && code !== 0x0a && code !== 0x0d) {
+      continue;
+    }
+    out += char.length === 1 && code >= 0xd800 && code <= 0xdfff ? REPLACEMENT : char;
+  }
+  return out;
+}
+
 /** XML text and attribute escaping. One pass over a fixed character class. */
 function xml(text: string): string {
-  return text.replace(/[&<>"']/g, (char) => {
+  return xmlChars(text).replace(/[&<>"']/g, (char) => {
     switch (char) {
       case "&":
         return "&amp;";

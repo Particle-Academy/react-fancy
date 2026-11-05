@@ -128,6 +128,15 @@ describe("qrCodeSvg", () => {
         expect(doc.querySelector("title")?.textContent).toBe(hostile);
     });
 
+    it("drops what XML cannot carry, so a hostile label still gives a valid file", () => {
+        // C0 controls other than tab, newline and return are not allowed in
+        // XML 1.0 even as references; a lone surrogate is not text at all.
+        const label = `a${String.fromCharCode(1)}b${String.fromCharCode(0x1f)}c\td${String.fromCharCode(0xd800)}`;
+        const doc = parseSvg(qrCodeSvg(value, { label }));
+        expect(doc.querySelector("parsererror")).toBeNull();
+        expect(doc.querySelector("title")?.textContent).toBe(`abc\td${String.fromCharCode(0xfffd)}`);
+    });
+
     it("sizes in pixels, defaulting to ten per module", () => {
         const extent = encodeQr(value).size + 8;
         const svg = parseSvg(qrCodeSvg(value, { label: "x" })).documentElement;
