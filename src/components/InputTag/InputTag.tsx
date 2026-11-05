@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { isImeComposing } from "../../utils/ime";
+import { isRtl } from "../../utils/direction";
 
 /**
  * InputTag — attach a `/`-style or `@`-style autocomplete picker to *any*
@@ -91,8 +92,14 @@ export interface InputTagProps {
   triggers: InputTagTriggers;
   /** Max rows shown. Default 8. */
   maxItems?: number;
-  /** Where the picker anchors relative to the surface. Default `"bottom-left"`. */
-  placement?: "bottom-left" | "bottom-right" | "top-left" | "top-right";
+  /**
+   * Where the picker anchors relative to the surface. `*-start` / `*-end`
+   * follow the writing direction (`start` is the right edge in RTL);
+   * `*-left` / `*-right` are physical. Default `"bottom-start"`.
+   */
+  placement?:
+    | "bottom-start" | "bottom-end" | "top-start" | "top-end"
+    | "bottom-left" | "bottom-right" | "top-left" | "top-right";
   /** Custom class for the popover container. */
   className?: string;
   /** Inline style for the popover container. */
@@ -158,7 +165,7 @@ export function InputTag({
   adapter,
   triggers,
   maxItems = 8,
-  placement = "bottom-left",
+  placement = "bottom-start",
   className,
   style,
   onPick,
@@ -167,6 +174,10 @@ export function InputTag({
   const [active, setActive] = useState<ActiveTrigger | null>(null);
   const [cursor, setCursor] = useState(0);
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
+  // The picker's own resolved direction, read before paint: it renders in
+  // place, so it inherits the surface's `dir`.
+  const popRef = useRef<HTMLDivElement | null>(null);
+  const [rtl, setRtl] = useState(false);
 
   // Latest state in refs so key handlers see fresh data without re-registering.
   const stateRef = useRef<InputTagAdapterState>({ text: "", caretIndex: 0 });
@@ -270,15 +281,20 @@ export function InputTag({
     });
   }, [adapter, items, pickItem]);
 
+  useLayoutEffect(() => {
+    if (popRef.current) setRtl(isRtl(popRef.current));
+  });
+
   if (!active || !anchorRect || items.length === 0) return null;
 
   const cfg = triggers[active.char];
   if (!cfg) return null;
 
-  const popStyle = computePopoverStyle(anchorRect, placement);
+  const popStyle = computePopoverStyle(anchorRect, logicalToPhysical(placement, rtl));
 
   return (
     <div
+      ref={popRef}
       role="listbox"
       aria-label={cfg.label ?? `Pick a ${active.char === "/" ? "command" : "mention"}`}
       className={[
@@ -339,9 +355,22 @@ function labelForChar(ch: string): string {
   return `Trigger ${ch}`;
 }
 
+type PhysicalPlacement = "bottom-left" | "bottom-right" | "top-left" | "top-right";
+
+/** `start` is the left edge in LTR and the right edge in RTL. */
+function logicalToPhysical(
+  placement: NonNullable<InputTagProps["placement"]>,
+  rtl: boolean,
+): PhysicalPlacement {
+  const [block, inline] = placement.split("-") as ["top" | "bottom", string];
+  if (inline === "start") return `${block}-${rtl ? "right" : "left"}`;
+  if (inline === "end") return `${block}-${rtl ? "left" : "right"}`;
+  return placement as PhysicalPlacement;
+}
+
 function computePopoverStyle(
   anchor: DOMRect,
-  placement: NonNullable<InputTagProps["placement"]>,
+  placement: PhysicalPlacement,
 ): CSSProperties {
   const offset = 4;
   switch (placement) {

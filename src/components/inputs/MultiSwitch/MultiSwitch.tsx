@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback, useId, useMemo, type Ref } from "react";
 import { cn } from "../../../utils/cn";
 import { composeRefs } from "../../../utils/compose-refs";
+import { isRtl } from "../../../utils/direction";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { Field } from "../Field";
 import { useFieldMode } from "../mode/FieldMode.context";
@@ -60,7 +61,7 @@ export function MultiSwitch<V = string>({
   const externalRef = (rest as { ref?: Ref<HTMLDivElement> }).ref;
   const containerSetRef = useMemo(() => composeRefs(externalRef, containerRef), [externalRef]);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const [indicator, setIndicator] = useState<{ left: number; width: number } | null>(null);
+  const [indicator, setIndicator] = useState<{ left: number; width: number; rtl?: boolean } | null>(null);
 
   const selectedIndex = resolvedOptions.findIndex(
     (o) => o.value === value,
@@ -77,9 +78,14 @@ export function MultiSwitch<V = string>({
     }
     const containerRect = container.getBoundingClientRect();
     const itemRect = activeItem.getBoundingClientRect();
+    // Offset from the inline START edge. In RTL that is the right edge, and
+    // measuring from the left there would put the thumb a border-width off the
+    // item, since the container's border is on the other side.
+    const rtl = isRtl(container);
     setIndicator({
-      left: itemRect.left - containerRect.left,
+      left: rtl ? containerRect.right - itemRect.right : itemRect.left - containerRect.left,
       width: itemRect.width,
+      rtl,
     });
   }, [selectedIndex]);
 
@@ -140,7 +146,7 @@ export function MultiSwitch<V = string>({
               ? `absolute top-0 bottom-0 rounded-lg ${colorClasses.thumb} transition-all duration-200 ease-out`
               : "absolute top-0 bottom-0 rounded-lg bg-blue-600 transition-all duration-200 ease-out"
           }
-          style={{ left: indicator.left, width: indicator.width }}
+          style={indicator.rtl ? { right: indicator.left, width: indicator.width } : { left: indicator.left, width: indicator.width }}
         />
       )}
       {resolvedOptions.map((option, index) => {

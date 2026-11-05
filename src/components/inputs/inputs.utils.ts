@@ -18,7 +18,7 @@ export const labelSizeClasses: Record<Size, string> = {
 };
 
 export function dirtyClasses(dirty?: boolean): string {
-  return dirty ? "border-l-[3px] border-l-amber-400" : "";
+  return dirty ? "border-s-[3px] border-s-amber-400" : "";
 }
 
 export function dirtyRingClasses(dirty?: boolean): string {

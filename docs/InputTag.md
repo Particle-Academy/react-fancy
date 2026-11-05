@@ -108,7 +108,7 @@ The DOM adapters use React's native value setter so the consumer's controlled `o
 | `adapter`     | `InputTagAdapter`             | —                | Surface adapter.                            |
 | `triggers`    | `Record<string, …>`           | —                | Per-trigger-char config (see above).        |
 | `maxItems`    | `number`                      | `8`              | Max rows shown.                             |
-| `placement`   | `"bottom-left"` \| `"bottom-right"` \| `"top-left"` \| `"top-right"` | `"bottom-left"` | Anchor position relative to surface. |
+| `placement`   | `"bottom-start"` \| `"bottom-end"` \| `"top-start"` \| `"top-end"` \| `"bottom-left"` \| `"bottom-right"` \| `"top-left"` \| `"top-right"` | `"bottom-start"` | Anchor position relative to surface. `start` / `end` follow the surface's writing direction; `left` / `right` are physical. |
 | `className`   | `string`                      | —                | Class on the popover container.             |
 | `style`       | `CSSProperties`               | —                | Inline style on the popover container.      |
 | `onPick`      | `(info) => void`              | —                | Fires after each insertion.                 |

@@ -67,12 +67,14 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
       xl: "h-6 w-6",
     }[size];
 
+    // On travels toward the inline END: rightward in LTR, leftward in RTL,
+    // where the knob starts on the right.
     const translateOn = {
-      xs: "translate-x-2.5",
-      sm: "translate-x-3",
-      md: "translate-x-4",
-      lg: "translate-x-5",
-      xl: "translate-x-6",
+      xs: "translate-x-2.5 rtl:-translate-x-2.5",
+      sm: "translate-x-3 rtl:-translate-x-3",
+      md: "translate-x-4 rtl:-translate-x-4",
+      lg: "translate-x-5 rtl:-translate-x-5",
+      xl: "translate-x-6 rtl:-translate-x-6",
     }[size];
 
     return (
@@ -159,7 +161,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
                 )}
               >
                 {label}
-                {required && <span className="ml-0.5 text-red-500">*</span>}
+                {required && <span className="ms-0.5 text-red-500">*</span>}
               </label>
             )}
             {description && (

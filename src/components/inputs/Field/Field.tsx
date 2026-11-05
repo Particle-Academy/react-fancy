@@ -29,7 +29,7 @@ export function Field({
           )}
         >
           {label}
-          {required && <span className="ml-0.5 text-red-500">*</span>}
+          {required && <span className="ms-0.5 text-red-500">*</span>}
         </label>
       )}
       {children}

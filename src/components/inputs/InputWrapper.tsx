@@ -17,23 +17,23 @@ interface InputWrapperProps {
 
 // NOTE: these must be COMPLETE, static class strings. Tailwind only detects
 // utilities it can see verbatim in the source — building the arbitrary variant
-// at runtime (e.g. `[&_input]:${"pl-9"}`) means `[&_input]:pl-9` is never
+// at runtime (e.g. `[&_input]:${"pl-9"}`) means `[&_input]:ps-9` is never
 // emitted to CSS, so the inside affix gets no padding and overlaps the text
 // (issue #6). Keep input/select/textarea spelled out here.
 const insidePaddingLeft: Record<Size, string> = {
-  xs: "[&_input]:pl-7 [&_select]:pl-7 [&_textarea]:pl-7",
-  sm: "[&_input]:pl-8 [&_select]:pl-8 [&_textarea]:pl-8",
-  md: "[&_input]:pl-9 [&_select]:pl-9 [&_textarea]:pl-9",
-  lg: "[&_input]:pl-10 [&_select]:pl-10 [&_textarea]:pl-10",
-  xl: "[&_input]:pl-11 [&_select]:pl-11 [&_textarea]:pl-11",
+  xs: "[&_input]:ps-7 [&_select]:ps-7 [&_textarea]:ps-7",
+  sm: "[&_input]:ps-8 [&_select]:ps-8 [&_textarea]:ps-8",
+  md: "[&_input]:ps-9 [&_select]:ps-9 [&_textarea]:ps-9",
+  lg: "[&_input]:ps-10 [&_select]:ps-10 [&_textarea]:ps-10",
+  xl: "[&_input]:ps-11 [&_select]:ps-11 [&_textarea]:ps-11",
 };
 
 const insidePaddingRight: Record<Size, string> = {
-  xs: "[&_input]:pr-7 [&_select]:pr-7 [&_textarea]:pr-7",
-  sm: "[&_input]:pr-8 [&_select]:pr-8 [&_textarea]:pr-8",
-  md: "[&_input]:pr-9 [&_select]:pr-9 [&_textarea]:pr-9",
-  lg: "[&_input]:pr-10 [&_select]:pr-10 [&_textarea]:pr-10",
-  xl: "[&_input]:pr-11 [&_select]:pr-11 [&_textarea]:pr-11",
+  xs: "[&_input]:pe-7 [&_select]:pe-7 [&_textarea]:pe-7",
+  sm: "[&_input]:pe-8 [&_select]:pe-8 [&_textarea]:pe-8",
+  md: "[&_input]:pe-9 [&_select]:pe-9 [&_textarea]:pe-9",
+  lg: "[&_input]:pe-10 [&_select]:pe-10 [&_textarea]:pe-10",
+  xl: "[&_input]:pe-11 [&_select]:pe-11 [&_textarea]:pe-11",
 };
 
 const affixOutsideClasses =
@@ -61,7 +61,7 @@ export function InputWrapper({
     return (
       <div data-react-fancy-input-wrapper="" className="flex">
         {hasOutsidePrefix && (
-          <span className={cn(affixOutsideClasses, "rounded-l-lg border-r-0")}>
+          <span className={cn(affixOutsideClasses, "rounded-s-lg border-e-0")}>
             {prefix}
           </span>
         )}
@@ -72,15 +72,15 @@ export function InputWrapper({
           )}
         >
           {hasInsidePrefix && (
-            <span className="pointer-events-none absolute left-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
+            <span className="pointer-events-none absolute start-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
               {prefix}
             </span>
           )}
           <div
             className={cn(
               "w-full [&>*]:w-full",
-              hasOutsidePrefix && !hasOutsideSuffix && "[&_input]:rounded-l-none [&_select]:rounded-l-none [&_textarea]:rounded-l-none",
-              !hasOutsidePrefix && hasOutsideSuffix && "[&_input]:rounded-r-none [&_select]:rounded-r-none [&_textarea]:rounded-r-none",
+              hasOutsidePrefix && !hasOutsideSuffix && "[&_input]:rounded-s-none [&_select]:rounded-s-none [&_textarea]:rounded-s-none",
+              !hasOutsidePrefix && hasOutsideSuffix && "[&_input]:rounded-e-none [&_select]:rounded-e-none [&_textarea]:rounded-e-none",
               hasOutsidePrefix && hasOutsideSuffix && "[&_input]:rounded-none [&_select]:rounded-none [&_textarea]:rounded-none",
               hasInsidePrefix && insidePaddingLeft[size],
             )}
@@ -88,13 +88,13 @@ export function InputWrapper({
             {children}
           </div>
           {hasInsideSuffix && (
-            <span className="pointer-events-none absolute right-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
+            <span className="pointer-events-none absolute end-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
               {suffix}
             </span>
           )}
         </div>
         {hasOutsideSuffix && (
-          <span className={cn(affixOutsideClasses, "rounded-r-lg border-l-0")}>
+          <span className={cn(affixOutsideClasses, "rounded-e-lg border-s-0")}>
             {suffix}
           </span>
         )}
@@ -106,7 +106,7 @@ export function InputWrapper({
   return (
     <div data-react-fancy-input-wrapper="" className="relative flex items-center">
       {hasInsidePrefix && (
-        <span className="pointer-events-none absolute left-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
+        <span className="pointer-events-none absolute start-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
           {prefix}
         </span>
       )}
@@ -120,7 +120,7 @@ export function InputWrapper({
         {children}
       </div>
       {hasInsideSuffix && (
-        <span className="pointer-events-none absolute right-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
+        <span className="pointer-events-none absolute end-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
           {suffix}
         </span>
       )}

@@ -14,10 +14,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **`useFloatingPosition` also returns `dir`**, the anchor's resolved writing direction, for a floating element to carry as its own `dir` attribute. A popup is portalled to `<body>`, so a `dir` set on a wrapper rather than on `<html>` would otherwise not reach it. Additive. **Consumer action:** none.
+- **`InputTag` `placement` takes `bottom-start` / `bottom-end` / `top-start` / `top-end`**, resolved against the picker's own direction before paint. The physical values remain and stay physical. **Consumer action:** none.
+
+### Changed
+
+- **`InputTag`'s default `placement` is `"bottom-start"`** (was `"bottom-left"`): the same position in LTR, the right edge under `dir="rtl"`. **Consumer action:** none, unless you want the physical left edge in RTL, then pass `"bottom-left"`.
+- **`Input` reserves its measured adornment width as `padding-inline-start` / `padding-inline-end`** (was `paddingLeft` / `paddingRight`), and its fallback classes are `ps-9` / `pe-9`. Same pixels in LTR. **Consumer action:** only if a test of yours reads `input.style.paddingLeft`: read `paddingInlineStart`. A `style={{ paddingLeft }}` you pass still wins, as before.
 
 ### Fixed
 
 - **Overlays open on the correct side under `dir="rtl"`.** A `-start` / `-end` placement is now logical: `bottom-start` lines a Popover, Dropdown, Tooltip, Select or Autocomplete list up with the trigger's RIGHT edge in RTL (its left in LTR, as before). The base sides `left` / `right` stay physical, as their names say. Each popup carries its trigger's `dir`. `ContextMenu` opens toward the inline end of the pointer (leftward in RTL) and keeps its first frame on that side with no measurement; its submenu opens toward the inline end and flips at the start edge, and the submenu chevron mirrors. Item text in Dropdown, ContextMenu, Command, Autocomplete and EmojiSelect aligns to the inline start. Measured in a real browser: LTR boxes identical to 6.8.0. **Consumer action:** none.
+- **Form inputs mirror under `dir="rtl"`.** `Input`'s leading and trailing adornments, inside and outside affixes (with their joined corners), the reveal button, the dirty marker, `Select`'s chevron room and option text, `Textarea`/`Select` inside affixes, the required asterisk on `Field`, `Checkbox` and `Switch`, `TimePicker`'s AM/PM spacing and the paste placeholder all use logical sides, so the leading icon sits on the right in RTL. **Consumer action:** none.
+- **`Switch`'s knob travels toward the inline end**, leftward in RTL, where it starts on the right. **Consumer action:** none.
+- **`MultiSwitch`'s thumb lines up with its option in RTL.** It was measured from the left edge, which put it a border-width off. LTR keeps its inline `left`. **Consumer action:** none.
+- **`Slider`'s range fill and marks follow the native range**, which runs right-to-left in RTL; they were drawn from the left. **Consumer action:** none.
+- **`OtpInput` keeps its cells in left-to-right order** (`dir="ltr"`), because a code is a number and numbers read left-to-right in RTL scripts too; under RTL the row sits at the inline start (the right). ArrowLeft / ArrowRight move the way they point. **Consumer action:** none.
 
 ## [6.8.0] - 2026-11-04
 

@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useRef } from "react";
 import { cn } from "../../utils/cn";
+import { inlineStep } from "../../utils/direction";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import { useFieldMode } from "../inputs/mode/FieldMode.context";
 import { useInlineEdit } from "../inputs/mode/useInlineEdit";
@@ -65,10 +66,10 @@ export const OtpInput = forwardRef<HTMLDivElement, OtpInputProps>(
             setValue(chars.join("").trimEnd());
             focusInput(index - 1);
           }
-        } else if (e.key === "ArrowLeft") {
-          focusInput(index - 1);
-        } else if (e.key === "ArrowRight") {
-          focusInput(index + 1);
+        } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+          // Visual direction: the cells run right-to-left in RTL, so
+          // ArrowLeft is the NEXT cell there.
+          focusInput(index + inlineStep(e.key, e.currentTarget));
         }
       },
       [value, length, setValue, focusInput],
@@ -121,7 +122,11 @@ export const OtpInput = forwardRef<HTMLDivElement, OtpInputProps>(
       <div
         data-react-fancy-otp-input=""
         ref={ref}
-        className={cn("flex gap-2", className)}
+        // A code is a number, and numbers read left-to-right in RTL scripts
+        // too: the cells stay in LTR order, sitting at the inline start
+        // (the right) of an RTL page.
+        dir="ltr"
+        className={cn("flex gap-2 rtl:justify-end", className)}
         onBlur={(e) => {
           if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
         }}

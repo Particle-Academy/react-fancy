@@ -148,7 +148,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
             errorClasses(error),
             "w-full appearance-none bg-no-repeat bg-[length:16px] bg-[right_8px_center]",
             "bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%236b7280%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.23%207.21a.75.75%200%20011.06.02L10%2011.168l3.71-3.938a.75.75%200%20111.08%201.04l-4.25%204.5a.75.75%200%2001-1.08%200l-4.25-4.5a.75.75%200%2001.02-1.06z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E')]",
-            "pr-8",
+            "pe-8",
             className,
           )}
           onChange={(e) => {
@@ -468,7 +468,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
           inputSizeClasses[size],
           dirtyClasses(dirty),
           errorClasses(error),
-          "flex w-full cursor-pointer items-center justify-between gap-2 text-left",
+          "flex w-full cursor-pointer items-center justify-between gap-2 text-start",
           !hasValue && "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
           className,
         )}
@@ -494,6 +494,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
           ref={listRef}
           role="listbox"
           aria-multiselectable={multiple || undefined}
+          dir={position.dir}
           className="fixed z-50 max-h-60 min-w-[8rem] overflow-y-auto rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:shadow-zinc-950/50 fancy-scale-in"
           style={{
             left: position.x,
@@ -522,7 +523,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
             <button
               type="button"
               onClick={handleCreate}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-start text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
             >
               <svg className="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 3a.75.75 0 01.75.75v5.5h5.5a.75.75 0 010 1.5h-5.5v5.5a.75.75 0 01-1.5 0v-5.5h-5.5a.75.75 0 010-1.5h5.5v-5.5A.75.75 0 0110 3z" clipRule="evenodd" />
@@ -545,7 +546,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
                   disabled={option.disabled}
                   onClick={() => toggleOption(option.value as string)}
                   className={cn(
-                    "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
+                    "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-start text-sm transition-colors",
                     i === activeIndex
                       ? "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
                       : "hover:bg-[color:var(--fancy-surface-hover,var(--color-zinc-50))] dark:hover:bg-[color:var(--fancy-surface-hover-dark,color-mix(in_oklab,var(--color-zinc-800)_50%,transparent))]",

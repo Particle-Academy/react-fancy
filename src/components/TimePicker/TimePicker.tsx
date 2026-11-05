@@ -159,7 +159,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
             type="button"
             onClick={toggleAmPm}
             disabled={disabled}
-            className="ml-1 rounded-lg bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] px-2 py-1 text-sm font-medium transition-colors hover:bg-zinc-200 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:bg-zinc-700"
+            className="ms-1 rounded-lg bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] px-2 py-1 text-sm font-medium transition-colors hover:bg-zinc-200 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:bg-zinc-700"
           >
             {isPM ? "PM" : "AM"}
           </button>

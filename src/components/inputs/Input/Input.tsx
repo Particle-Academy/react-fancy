@@ -139,7 +139,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {leading && (
             <span
               ref={leadingRef}
-              className="pointer-events-none absolute left-3 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
+              className="pointer-events-none absolute start-3 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
             >
               {leading}
             </span>
@@ -165,10 +165,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                   disabled={disabled === true}
                   ariaLabelledBy={label ? labelId : props["aria-labelledby"]}
                   ariaInvalid={Boolean(error)}
-                  placeholderClassName={cn(pastePlaceholderClasses[size], leading ? "left-9" : undefined)}
+                  placeholderClassName={cn(pastePlaceholderClasses[size], leading ? "start-9" : undefined)}
                   style={{
-                    ...(leadingWidth ? { paddingLeft: leadingWidth + 20 } : null),
-                    ...(trailingWidth ? { paddingRight: trailingWidth + 20 } : null),
+                    ...(leadingWidth ? { paddingInlineStart: leadingWidth + 20 } : null),
+                    ...(trailingWidth ? { paddingInlineEnd: trailingWidth + 20 } : null),
                   }}
                   className={cn(
                     inputBaseClasses,
@@ -177,8 +177,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     errorClasses(error),
                     // One line, like the <input> it stands in for.
                     "min-h-0 max-h-none w-full overflow-x-auto overflow-y-hidden whitespace-nowrap break-normal",
-                    leading && !leadingWidth && "pl-9",
-                    trailing && !trailingWidth && "pr-9",
+                    leading && !leadingWidth && "ps-9",
+                    trailing && !trailingWidth && "pe-9",
                     className,
                     pasteClassNames?.input,
                   )}
@@ -219,14 +219,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 // with its real width -- a fixed 36px is correct for one icon and
                 // wrong for anything wider, which is how `https://` came to
                 // render on top of the value.
-                leading && !leadingWidth && "pl-9",
-                (trailing || canReveal) && !trailingWidth && "pr-9",
+                leading && !leadingWidth && "ps-9",
+                (trailing || canReveal) && !trailingWidth && "pe-9",
                 className,
               )}
               style={{
-                // 12px clears `left-3`/`right-3`; 8px is the gap to the text.
-                ...(leadingWidth ? { paddingLeft: leadingWidth + 20 } : null),
-                ...(trailingWidth ? { paddingRight: trailingWidth + 20 } : null),
+                // 12px clears `start-3`/`end-3`; 8px is the gap to the text. Logical,
+                // like the adornments, so both sides swap in RTL.
+                ...(leadingWidth ? { paddingInlineStart: leadingWidth + 20 } : null),
+                ...(trailingWidth ? { paddingInlineEnd: trailingWidth + 20 } : null),
                 ...props.style,
               }}
               onChange={(e) => {
@@ -261,7 +262,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               // most people do not want. Still reachable by click and by
               // screen readers.
               tabIndex={-1}
-              className="absolute right-2 inline-flex items-center justify-center rounded p-1 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] transition-colors hover:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:cursor-not-allowed disabled:opacity-50 dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))] dark:hover:text-zinc-300"
+              className="absolute end-2 inline-flex items-center justify-center rounded p-1 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] transition-colors hover:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:cursor-not-allowed disabled:opacity-50 dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))] dark:hover:text-zinc-300"
             >
               {shown ? <EyeOffIcon /> : <EyeIcon />}
             </button>
@@ -269,7 +270,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             trailing && (
               <span
                 ref={trailingRef}
-                className="pointer-events-none absolute right-3 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
+                className="pointer-events-none absolute end-3 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
               >
                 {trailing}
               </span>
@@ -304,11 +305,11 @@ Input.displayName = "Input";
 
 /** Where the placeholder sits over the paste editor, matching `inputSizeClasses`. */
 const pastePlaceholderClasses = {
-  xs: "left-2 top-1 text-xs",
-  sm: "left-2.5 top-1.5 text-sm",
-  md: "left-3 top-2 text-sm",
-  lg: "left-4 top-2.5 text-base",
-  xl: "left-5 top-3 text-lg",
+  xs: "start-2 top-1 text-xs",
+  sm: "start-2.5 top-1.5 text-sm",
+  md: "start-3 top-2 text-sm",
+  lg: "start-4 top-2.5 text-base",
+  xl: "start-5 top-3 text-lg",
 } as const;
 
 /**

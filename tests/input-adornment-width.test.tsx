@@ -58,11 +58,11 @@ describe("an input reserves space for the width it actually measured", () => {
         const input = host.querySelector("input")!;
 
         // 52 measured + 12 to clear left-3 + 8 gap
-        expect(input.style.paddingLeft).toBe("72px");
+        expect(input.style.paddingInlineStart).toBe("72px");
 
         // ...and the fixed fallback is gone once a real width is known, or the
         // two would fight and the narrower would win.
-        expect(input.className).not.toContain("pl-9");
+        expect(input.className).not.toContain("ps-9");
     });
 
     it("pads by the measured trailing width too", () => {
@@ -70,8 +70,8 @@ describe("an input reserves space for the width it actually measured", () => {
         const host = mount(<Input label="Amount" trailing="USD" defaultValue="42" />);
         const input = host.querySelector("input")!;
 
-        expect(input.style.paddingRight).toBe("54px");
-        expect(input.className).not.toContain("pr-9");
+        expect(input.style.paddingInlineEnd).toBe("54px");
+        expect(input.className).not.toContain("pe-9");
     });
 
     it("keeps the fixed fallback while the width is still unknown", () => {
@@ -81,8 +81,8 @@ describe("an input reserves space for the width it actually measured", () => {
         const host = mount(<Input label="Domain" leading="https://" />);
         const input = host.querySelector("input")!;
 
-        expect(input.className).toContain("pl-9");
-        expect(input.style.paddingLeft).toBe("");
+        expect(input.className).toContain("ps-9");
+        expect(input.style.paddingInlineStart).toBe("");
     });
 
     it("adds no padding at all when there is no adornment", () => {
@@ -90,8 +90,8 @@ describe("an input reserves space for the width it actually measured", () => {
         const host = mount(<Input label="Plain" defaultValue="x" />);
         const input = host.querySelector("input")!;
 
-        expect(input.style.paddingLeft).toBe("");
-        expect(input.style.paddingRight).toBe("");
-        expect(input.className).not.toContain("pl-9");
+        expect(input.style.paddingInlineStart).toBe("");
+        expect(input.style.paddingInlineEnd).toBe("");
+        expect(input.className).not.toContain("ps-9");
     });
 });

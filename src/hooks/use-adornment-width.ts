@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from "react";
  *
  * `leading` / `trailing` render ABSOLUTELY over the input, so they take no
  * space in flow and the input must be padded by hand to keep text clear of
- * them. That padding used to be a fixed `pl-9` / `pr-9` — 36px, sized for a
+ * them. That padding used to be a fixed `pl-9` / `pr-9` (now `ps-9` / `pe-9`) — 36px, sized for a
  * single icon. Any wider adornment ran straight under the value: `leading =
  * "https://"` is roughly 50px, so `https://` and `fancy.app` rendered on top of
  * one another.
