@@ -40,13 +40,13 @@ describe("Eyebrow", () => {
   });
 
   it("pushes the aside to the far end without centring a lone item", () => {
-    // `ml-auto` on the aside, not `justify-between` on the row: with
+    // `ms-auto` on the aside, not `justify-between` on the row: with
     // justify-between a single-item eyebrow would drift, and half of them have
     // only one item.
     const withAside = root(<Eyebrow num="00" label="Index" aside="Graphic design studio" />);
 
     expect(withAside.text).toBe("00 — IndexGraphic design studio");
-    expect(withAside.html).toContain("ml-auto");
+    expect(withAside.html).toContain("ms-auto");
     expect(root(<Eyebrow label="Alone" />).className).not.toContain("justify-between");
   });
 

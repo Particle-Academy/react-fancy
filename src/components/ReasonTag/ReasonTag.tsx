@@ -96,7 +96,7 @@ export function ReasonTag({
       >
         {value}
         <span
-          className="ml-0.5 font-mono text-[10px]"
+          className="ms-0.5 font-mono text-[10px]"
           style={{ color: t.color }}
         >
           ?
@@ -118,7 +118,7 @@ export function ReasonTag({
       <span className="inline-flex flex-col items-start gap-0.5 align-top">
         {trigger}
         <span
-          className="block max-w-[280px] rounded border-l-2 pl-2 text-[11px] leading-snug text-zinc-600 dark:text-zinc-300"
+          className="block max-w-[280px] rounded border-s-2 ps-2 text-[11px] leading-snug text-zinc-600 dark:text-zinc-300"
           style={{ borderColor: t.color }}
         >
           {reason}
@@ -140,7 +140,7 @@ export function ReasonTag({
               {t.label} confidence · {(confidence * 100).toFixed(0)}%
             </span>
             {by && (
-              <span className="ml-auto font-mono text-[10px] text-zinc-400">
+              <span className="ms-auto font-mono text-[10px] text-zinc-400">
                 @{by}
               </span>
             )}

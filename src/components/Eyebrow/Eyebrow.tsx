@@ -41,9 +41,9 @@ export const Eyebrow = forwardRef<HTMLDivElement, EyebrowProps>(
           </span>
         )}
 
-        {/* `ml-auto` rather than `justify-between`, so a single-item eyebrow
+        {/* `ms-auto` rather than `justify-between`, so a single-item eyebrow
             still sits flush left instead of being centred by the gap. */}
-        {aside != null && <span className="ml-auto">{aside}</span>}
+        {aside != null && <span className="ms-auto">{aside}</span>}
       </div>
     );
   },

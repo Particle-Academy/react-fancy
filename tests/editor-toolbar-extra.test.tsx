@@ -107,9 +107,9 @@ describe("Editor.Toolbar — toolbarExtra", () => {
       </Editor>,
     );
     const slot = view.host.querySelector("[data-react-fancy-editor-toolbar-extra]")!;
-    expect(slot.className.split(" ")).toContain("ml-auto");
-    // Exactly one ml-auto, or the gap is split between two elements.
-    expect(view.toolbar().querySelectorAll(".ml-auto")).toHaveLength(1);
+    expect(slot.className.split(" ")).toContain("ms-auto");
+    // Exactly one ms-auto, or the gap is split between two elements.
+    expect(view.toolbar().querySelectorAll(".ms-auto")).toHaveLength(1);
     view.unmount();
   });
 

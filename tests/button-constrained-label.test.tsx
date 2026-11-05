@@ -75,7 +75,7 @@ describe("Button label under a constrained width", () => {
       </Button>,
     );
     expect(html).toContain('data-react-fancy-button=""');
-    expect(html).toContain("inline-flex items-center justify-center text-left");
+    expect(html).toContain("inline-flex items-center justify-center text-start");
     expect(html).toContain("gap-2");
   });
 });

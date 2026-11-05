@@ -90,7 +90,12 @@ export interface CardMediaProps extends HTMLAttributes<HTMLDivElement> {
   /** `object-position` for the image. Default `"center"`. */
   objectPosition?: string;
   loading?: "lazy" | "eager";
-  /** Slots pinned to the media's corners — a number chip, a status pill. */
+  /**
+   * Slots pinned to the media's corners — a number chip, a status pill.
+   * The names are the LTR corners: under `dir="rtl"` they mirror, so
+   * `topLeft` is the top inline-START corner (the top right in RTL), the way a
+   * chip and a duration badge swap sides on a right-to-left page.
+   */
   topLeft?: ReactNode;
   topRight?: ReactNode;
   bottomLeft?: ReactNode;

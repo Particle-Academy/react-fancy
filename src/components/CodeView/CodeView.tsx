@@ -55,6 +55,10 @@ export function CodeView({
   return (
     <div
       data-react-fancy-code-view=""
+      // Code is left-to-right whatever the page's direction. The overlay and the
+      // transparent textarea must also agree on it exactly, or the caret drifts
+      // off the glyphs it sits over.
+      dir="ltr"
       // No baked-in height: the consumer picks the fill mechanism — `flex-1`
       // inside a flex column (the Editor source body), or `h-full` when the
       // parent has a definite height. A hard-coded `h-full` here collapses to

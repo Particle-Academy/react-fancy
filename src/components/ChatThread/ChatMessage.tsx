@@ -94,7 +94,7 @@ function AttachmentItem({
   } else {
     const href = sanitizeComponentHref("ChatMessage", attachment.url);
     const size = typeof attachment.size === "number" ? (
-      <span className={cn("ml-1", TEXT_MUTED)}>({formatBytes(attachment.size)})</span>
+      <span className={cn("ms-1", TEXT_MUTED)}>({formatBytes(attachment.size)})</span>
     ) : null;
     body = href ? (
       <a href={href} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 break-all">

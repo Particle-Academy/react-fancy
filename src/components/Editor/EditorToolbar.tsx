@@ -60,17 +60,17 @@ export function EditorToolbar({
               {action.icon}
             </button>
           ))}
-          {showSourceToggle && <EditorSourceToggle className="ml-auto" />}
+          {showSourceToggle && <EditorSourceToggle className="ms-auto" />}
           {hasExtra && (
             <div
               data-react-fancy-editor-toolbar-extra=""
-              className={cn("flex items-center gap-0.5", !showSourceToggle && "ml-auto")}
+              className={cn("flex items-center gap-0.5", !showSourceToggle && "ms-auto")}
             >
               {toolbarExtra}
             </div>
           )}
           {showFullScreenToggle && (
-            <EditorFullScreenToggle className={showSourceToggle || hasExtra ? undefined : "ml-auto"} />
+            <EditorFullScreenToggle className={showSourceToggle || hasExtra ? undefined : "ms-auto"} />
           )}
         </>
       )}

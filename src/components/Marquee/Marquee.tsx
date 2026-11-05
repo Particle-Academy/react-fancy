@@ -130,7 +130,7 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
     // Tilted strips widen slightly (the classic 102% / -1% trick) so the
     // rotation never exposes the page background at the edges.
     const angleStyle: CSSProperties = angle
-      ? { transform: `rotate(${angle}deg)`, width: "102%", marginLeft: "-1%" }
+      ? { transform: `rotate(${angle}deg)`, width: "102%", marginInlineStart: "-1%" }
       : {};
 
     return (

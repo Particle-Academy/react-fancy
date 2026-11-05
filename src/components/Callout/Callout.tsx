@@ -23,7 +23,7 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(
         role="alert"
         data-react-fancy-callout=""
         className={cn(
-          "flex items-start gap-3 rounded-lg border-l-4 p-4",
+          "flex items-start gap-3 rounded-lg border-s-4 p-4",
           calloutContainer[color],
           className,
         )}

@@ -404,7 +404,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       // `text-left` overrides the UA <button> center default so a wrapped,
       // width-constrained multi-word label stacks left-aligned. Overridable —
       // twMerge lets a `text-center` / `text-right` in `className` win.
-      "inline-flex items-center justify-center text-left font-medium transition-all duration-200",
+      "inline-flex items-center justify-center text-start font-medium transition-all duration-200",
       // `focus-visible:`, not `focus:` — `:focus` also matches a MOUSE-clicked
       // button, so a clicked Button kept its ring until focus moved, and with no
       // ring colour the ring fell back to currentColor (a thick near-black

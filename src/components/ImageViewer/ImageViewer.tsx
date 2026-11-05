@@ -191,7 +191,7 @@ export const ImageViewer = forwardRef<HTMLDivElement, ImageViewerProps>(
         {showControls && (
           <div
             data-react-fancy-image-viewer-controls=""
-            className="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-white/90 p-0.5 text-zinc-700 shadow-sm backdrop-blur dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-900/90 dark:text-zinc-200"
+            className="absolute bottom-2 end-2 flex items-center gap-0.5 rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-white/90 p-0.5 text-zinc-700 shadow-sm backdrop-blur dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-900/90 dark:text-zinc-200"
           >
             <button
               type="button"

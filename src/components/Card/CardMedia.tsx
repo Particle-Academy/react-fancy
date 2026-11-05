@@ -81,10 +81,10 @@ export const CardMedia = forwardRef<HTMLDivElement, CardMediaProps>(
 
         {children}
 
-        {topLeft ? <span className="absolute left-2 top-2 z-10">{topLeft}</span> : null}
-        {topRight ? <span className="absolute right-2 top-2 z-10">{topRight}</span> : null}
-        {bottomLeft ? <span className="absolute bottom-2 left-2 z-10">{bottomLeft}</span> : null}
-        {bottomRight ? <span className="absolute bottom-2 right-2 z-10">{bottomRight}</span> : null}
+        {topLeft ? <span className="absolute start-2 top-2 z-10">{topLeft}</span> : null}
+        {topRight ? <span className="absolute end-2 top-2 z-10">{topRight}</span> : null}
+        {bottomLeft ? <span className="absolute bottom-2 start-2 z-10">{bottomLeft}</span> : null}
+        {bottomRight ? <span className="absolute bottom-2 end-2 z-10">{bottomRight}</span> : null}
       </div>
     );
   },

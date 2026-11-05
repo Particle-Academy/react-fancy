@@ -239,7 +239,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   // over this button's right edge. With a smaller right padding the
                   // × lands on top of the label.
                   className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-zinc-50 py-1 pl-2.5 pr-7 text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700",
+                    "inline-flex items-center gap-1.5 rounded-full border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-zinc-50 py-1 ps-2.5 pe-7 text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700",
                     classNames?.pill,
                     classNames?.textPill,
                   )}
@@ -256,7 +256,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   disabled={disabled}
                   aria-label="Discard this pasted text"
                   className={cn(
-                    "absolute right-1 top-1/2 -translate-y-1/2 rounded-full px-1 text-xs text-zinc-400 transition-colors hover:text-zinc-700 dark:hover:text-zinc-100",
+                    "absolute end-1 top-1/2 -translate-y-1/2 rounded-full px-1 text-xs text-zinc-400 transition-colors hover:text-zinc-700 dark:hover:text-zinc-100",
                     classNames?.remove,
                   )}
                 >
@@ -268,7 +268,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   data-react-fancy-composer-paste-pill-preview={paste.id}
                   role="tooltip"
                   className={cn(
-                    "pointer-events-none absolute bottom-full left-0 z-10 mb-1 hidden max-w-xs whitespace-pre-wrap break-all rounded-md bg-zinc-900 px-2 py-1 text-xs text-white group-hover:block dark:bg-zinc-100 dark:text-zinc-900",
+                    "pointer-events-none absolute bottom-full start-0 z-10 mb-1 hidden max-w-xs whitespace-pre-wrap break-all rounded-md bg-zinc-900 px-2 py-1 text-xs text-white group-hover:block dark:bg-zinc-100 dark:text-zinc-900",
                     classNames?.preview,
                   )}
                 >

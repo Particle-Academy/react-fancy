@@ -117,7 +117,7 @@ export function ChatDrawer({
           onClick={handleToggle}
           aria-label={open ? "Collapse drawer" : "Expand drawer"}
           aria-expanded={open}
-          className="ml-auto inline-flex h-6 w-6 items-center justify-center rounded-full text-zinc-400 transition hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-700 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-200"
+          className="ms-auto inline-flex h-6 w-6 items-center justify-center rounded-full text-zinc-400 transition hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-700 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-200"
         >
           <Icon
             name={open ? "chevron-down" : "chevron-up"}

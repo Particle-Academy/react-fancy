@@ -177,7 +177,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
       {hasHeader && (
         <div
           data-react-fancy-code-block-header=""
-          className="flex items-center justify-between gap-2 border-b py-1 pl-3 pr-1 text-xs"
+          className="flex items-center justify-between gap-2 border-b py-1 ps-3 pe-1 text-xs"
           style={{
             backgroundColor: paletteColor("gutterBackground"),
             color: paletteColor("gutterForeground"),
@@ -193,6 +193,11 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
 
       <pre
         data-react-fancy-code-block-pre=""
+        // Code reads left-to-right whatever the page's direction: in an RTL
+        // page it would otherwise right-align, and the bidi algorithm would
+        // reorder its brackets and operators. The header around it, and the
+        // floating copy button over it, stay with the LTR code.
+        dir="ltr"
         className={cn(TEXT_METRICS, "border-none", wrap ? "overflow-x-hidden" : "overflow-x-auto", floating && "pr-12")}
         style={{
           whiteSpace: wrap ? "pre-wrap" : "pre",

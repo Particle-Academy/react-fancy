@@ -15,7 +15,7 @@ export interface ButtonProps
   alert?: boolean;
   /** Leading icon slug (resolved via Icon component, e.g. "pencil", "chevron-right") */
   icon?: string;
-  /** Trailing icon slug (convenience for right-side icon) */
+  /** Trailing icon slug: the inline end, which is the right in LTR and the left in RTL */
   iconTrailing?: string;
   /** Icon placement direction */
   iconPlace?:

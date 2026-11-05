@@ -27,12 +27,12 @@ export function ChartHorizontalBar({
 
           return (
             <div key={item.label} className="flex items-center gap-3">
-              <span className="w-20 shrink-0 truncate text-right text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
+              <span className="w-20 shrink-0 truncate text-end text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                 {item.label}
               </span>
               <div className="relative flex-1">
                 <div
-                  className="h-7 rounded-r-md transition-all duration-500"
+                  className="h-7 rounded-e-md transition-all duration-500"
                   style={{
                     width: `${widthPct}%`,
                     backgroundColor: color,
@@ -40,7 +40,7 @@ export function ChartHorizontalBar({
                   }}
                 />
                 {showValues && (
-                  <span className="absolute top-1/2 left-full ml-2 -translate-y-1/2 text-xs font-medium text-zinc-500">
+                  <span className="absolute top-1/2 start-full ms-2 -translate-y-1/2 text-xs font-medium text-zinc-500">
                     {item.value}
                   </span>
                 )}

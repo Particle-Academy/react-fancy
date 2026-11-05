@@ -219,7 +219,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
             )}
           >
             {dots && (
-              <div className="mr-1.5 flex gap-[5px]">
+              <div className="me-1.5 flex gap-[5px]">
                 {DOT_COLORS.map((color, i) => (
                   <span key={i} className={cn("h-[9px] w-[9px] rounded-full", color)} />
                 ))}
@@ -227,7 +227,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
             )}
             {url != null && <span className="min-w-0 flex-1 truncate">{url}</span>}
             {meta != null && <span className="shrink-0 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">{meta}</span>}
-            {hasControls && <div className={cn(url == null && meta == null && "ml-auto")}>{controlsBar}</div>}
+            {hasControls && <div className={cn(url == null && meta == null && "ms-auto")}>{controlsBar}</div>}
           </div>
         )}
 
@@ -257,7 +257,9 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
               <div
                 ref={stageRef}
                 data-react-fancy-faux-client-content=""
-                className="absolute left-0 top-0 origin-top-left"
+                // Pinned to the inline start and scaled toward it, so the
+                // shrunken page sits in the frame in either direction.
+                className="absolute start-0 top-0 origin-top-left rtl:origin-top-right"
                 style={{ width, transform: `scale(${effective})` }}
               >
                 {children}
@@ -277,7 +279,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
         </div>
 
         {hasControls && !isBrowser && (
-          <div className="pointer-events-none absolute right-2 top-2 z-10">{controlsBar}</div>
+          <div className="pointer-events-none absolute end-2 top-2 z-10">{controlsBar}</div>
         )}
       </div>
     );

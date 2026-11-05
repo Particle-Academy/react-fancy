@@ -161,7 +161,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
         {showValue && !indeterminate && (
           <span
             className={cn(
-              "mt-1 block text-right text-xs font-medium",
+              "mt-1 block text-end text-xs font-medium",
               progressText[color],
             )}
           >

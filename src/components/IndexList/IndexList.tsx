@@ -57,7 +57,7 @@ export const IndexList = forwardRef<HTMLOListElement, IndexListProps>(
             )}
 
             {item.value != null && (
-              <span data-react-fancy-index-value="" className="ml-auto shrink-0 font-mono text-xs tabular-nums text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
+              <span data-react-fancy-index-value="" className="ms-auto shrink-0 font-mono text-xs tabular-nums text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                 {item.value}
               </span>
             )}

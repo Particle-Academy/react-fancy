@@ -1123,7 +1123,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
               disabled={disabled}
               id={inputId}
               maxHeight={maxHeight}
-              placeholderClassName="left-3 top-2.5 text-[14px] leading-relaxed"
+              placeholderClassName="start-3 top-2.5 text-[14px] leading-relaxed"
               className={cn(
                 "block min-h-[5.5rem] px-3 py-2.5 text-[14px] leading-relaxed",
                 pasteClassNames?.input,
@@ -1166,7 +1166,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
         {picker && items.length > 0 && (
           <div
             data-react-fancy-prompt-input-menu={picker.kind}
-            className="absolute bottom-full left-2 z-10 mb-1 w-72 overflow-hidden rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]">
+            className="absolute bottom-full start-2 z-10 mb-1 w-72 overflow-hidden rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]">
             <div className="border-b border-zinc-100 bg-zinc-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950">
               {picker.kind === "cmd" ? "Commands" : "Mention"} · {items.length}
             </div>
@@ -1296,7 +1296,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
           <div
             data-react-fancy-prompt-input-meter=""
             data-level={meterLevel}
-            className="ml-2 flex min-w-0 items-center gap-1.5 overflow-hidden"
+            className="ms-2 flex min-w-0 items-center gap-1.5 overflow-hidden"
           >
             <div className="h-1.5 w-24 shrink overflow-hidden rounded-full bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]">
               <div
@@ -1309,7 +1309,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
             </span>
           </div>
         )}
-        <div className="ml-auto flex shrink-0 items-center gap-2">
+        <div className="ms-auto flex shrink-0 items-center gap-2">
           {/* With an icon send button the shortcut lives in its tooltip instead. */}
           {showHint && sendButton !== "icon" && (
             <span
@@ -1346,7 +1346,8 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
               color="violet"
               size="sm"
               iconTrailing="arrow-right"
-              className="shrink-0"
+              // "Send" points forward, which is leftward in RTL.
+              className="shrink-0 rtl:[&_svg]:-scale-x-100"
               data-react-fancy-prompt-input-send=""
               disabled={disabled || sendDisabled}
               loading={submitting}
