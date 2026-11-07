@@ -11,6 +11,8 @@ import { TimePicker } from "../src/components/TimePicker";
 import { ColorPicker } from "../src/components/ColorPicker";
 import { EmojiSelect } from "../src/components/EmojiSelect";
 import { FileUpload } from "../src/components/FileUpload";
+import { Composer } from "../src/components/Composer";
+import { PromptInput } from "../src/components/PromptInput";
 import { contrast } from "./contrast-helper";
 import { cls, mount, unmountAll, NON_TEXT } from "./contrast-assert";
 
@@ -225,5 +227,17 @@ describe("file upload", () => {
       </FileUpload>,
     );
     expectStrongOutline("FileUpload dropzone", q("[data-react-fancy-file-upload-dropzone]"));
+  });
+});
+
+describe("chat composers: the container is the text field's only boundary", () => {
+  it("Composer", () => {
+    mount(<Composer />);
+    expectStrongOutline("Composer container", q("[data-react-fancy-composer]"));
+  });
+
+  it("PromptInput, idle (not dragging)", () => {
+    mount(<PromptInput budgetTokens={1000} platform="generic" onSubmit={() => {}} />);
+    expectStrongOutline("PromptInput container", q("[data-react-fancy-prompt-input]"));
   });
 });

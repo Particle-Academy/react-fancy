@@ -208,7 +208,9 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
         data-submit-state={ack.status === "idle" ? undefined : ack.status}
         ref={ref}
         className={cn(
-          "rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
+          // The container is the text field's only boundary, so it is a
+          // control outline (6.15.0, WCAG 1.4.11).
+          "rounded-xl border border-[color:var(--fancy-border-strong,var(--color-zinc-500))] bg-[color:var(--fancy-surface,var(--color-white))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           disabled && "opacity-50",
           className,
         )}

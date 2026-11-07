@@ -478,7 +478,9 @@ describe("PromptInput — a programmatic restore is not an edit", () => {
  * `--fancy-text-muted` token (the grey-text sweep); class strings only.
  * A sixth, in 6.15.0: the two hint keycaps moved from `--fancy-border-strong`
  * to `--fancy-border`, because border-strong is now the zinc-500 control
- * outline and a keycap is decorative; class strings only.
+ * outline and a keycap is decorative; and the container's resting border moved
+ * from bare `zinc-200` / `zinc-800` to `--fancy-border-strong` (zinc-500 both
+ * modes), because it is the text field's only boundary; class strings only.
  * Icon SVGs are stripped: the
  * icon set loads asynchronously, so whether one has arrived depends on test
  * order, not on this component.

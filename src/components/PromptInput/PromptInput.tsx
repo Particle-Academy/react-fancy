@@ -1059,7 +1059,9 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
         "relative rounded-md border bg-[color:var(--fancy-surface,var(--color-white))] transition dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
         dragOver
           ? "border-violet-400 bg-violet-50/50 dark:border-violet-600 dark:bg-violet-950/30"
-          : "border-zinc-200 dark:border-zinc-800",
+          : // The container is the text field's only boundary, so it is a
+            // control outline (6.15.0, WCAG 1.4.11). Was zinc-200 / zinc-800.
+            "border-[color:var(--fancy-border-strong,var(--color-zinc-500))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))]",
         disabled && "opacity-50",
         className,
       )}
