@@ -68,7 +68,7 @@ export const THEME_TOKENS = {
     light: "var(--color-zinc-500)",
     dark: "var(--color-zinc-500)",
     description:
-      "The resting outline of interactive form controls (inputs, selects, pickers, checkboxes, radios, the off switch track). zinc-500 in both modes since 6.15.0, for 3:1 non-text contrast.",
+      "The resting outline of drawn form controls (inputs, selects, pickers, the off switch track). zinc-500 in both modes since 6.15.0, for 3:1 non-text contrast. Native checkboxes and radios are drawn by the browser and do not read it.",
   },
   input: {
     variable: "--fancy-input",

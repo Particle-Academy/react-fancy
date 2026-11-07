@@ -74,7 +74,14 @@ describe("the audited form controls read tokens", () => {
       // gains none — only the dark field surface it always had.
       if (name !== "EmojiSelect") expect(cls, name).toMatch(/var\(--fancy-input,/);
       expect(cls, name).toMatch(/var\(--fancy-input-dark,/);
-      expect(cls, name).toMatch(/var\(--fancy-(border|border-strong),/);
+      // Native checkboxes and radios carry no outline class since 6.15.1: the
+      // browser draws them and ignores an author border (see
+      // control-outline-contrast.test.tsx, which measures what renders).
+      if (!["Checkbox", "CheckboxGroup", "RadioGroup"].includes(name)) {
+        expect(cls, name).toMatch(/var\(--fancy-(border|border-strong),/);
+      } else {
+        expect(cls, name).not.toMatch(/var\(--fancy-(border|border-strong)(-dark)?,/);
+      }
       // The raw literal the audit flagged must be gone from the DOM, except as
       // the token's own fallback.
       expect(cls.replace(/var\(--fancy-[a-z-]+,[^)\]]+\)/g, ""), name).not.toMatch(/#1e1e24/i);

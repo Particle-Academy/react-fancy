@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.15.1] - 2026-11-07
+
+### Fixed
+
+- **Correction to 6.15.0: Checkbox, CheckboxGroup and RadioGroup did not darken.** 6.15.0 listed them among the controls whose outline moved to zinc-500. That was wrong. They render native `<input type="checkbox">` / `<input type="radio">` without `appearance: none`, so the browser draws the box itself and ignores the author border; the `border-[color:var(--fancy-border-strong…)]` classes had no visible effect. The 6.15.0 test checked the class string, not what renders, so it passed on a dead class. The box you see is the browser's own, whose default outline is generally above 3:1 in current engines (Chromium's form-control outline is #767676, 4.54:1 on white; not re-measured for this release). Found by a consumer. **Consumer action:** none.
+- **What 6.15.1 does instead, for native checkboxes and radios:**
+  - The checked colour is set with `accent-color`: blue-600, the colour the kit already uses for a checked native control (Slider's `accent-blue-600`) and the one these inputs' `text-blue-600` named, which also painted nothing on a native control and is removed.
+  - In dark mode they carry `color-scheme: dark` (`dark:[color-scheme:dark]`, and in the zero-specificity dark defaults in `styles.css`), so the browser draws its dark box on a dark surface whatever the page's own `color-scheme` is. Before, a light page scheme drew a white box on the dark field.
+  - The dead border classes are removed: `border`, the `border-strong` colour pair, and `border-red-500` when `error` is set (the error message still renders; the box itself never showed the red border). The `styles.css` dark default no longer sets their `border-color`.
+  - They are not redrawn with `appearance: none`; that is a design change for another release.
+
+  **Consumer action:** none. A host that styled these boxes with its own `appearance-none` class keeps working, but it now has to supply its own border too, because the kit no longer sets one on them.
+- The outline tests now measure what renders: the consumer's Tailwind is compiled for the classes in the document and installed in jsdom, and a control must have a computed border width (or ring, or track fill) to pass. A sweep over every element inside the 6.15.0 controls found no other dead border class. Every other control 6.15.0 listed does draw the zinc-500 outline.
+
 ## [6.15.0] - 2026-11-07
 
 ### Changed
