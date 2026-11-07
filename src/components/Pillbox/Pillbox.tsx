@@ -59,7 +59,7 @@ export const Pillbox = forwardRef<HTMLDivElement, PillboxProps>(
         data-react-fancy-pillbox=""
         ref={ref}
         className={cn(
-          "flex flex-wrap items-center gap-1.5 rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-input,var(--color-white))] px-3 py-2 transition-[border-color,box-shadow] duration-150 focus-within:border-[color:var(--fancy-focus,var(--color-blue-500))] focus-within:ring-2 focus-within:ring-[color:var(--fancy-focus,var(--color-blue-500))]/40 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:text-zinc-100 dark:focus-within:border-[color:var(--fancy-focus-dark,var(--color-blue-400))] dark:focus-within:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]/20",
+          "flex flex-wrap items-center gap-1.5 rounded-lg border border-[color:var(--fancy-border-strong,var(--color-zinc-500))] bg-[color:var(--fancy-input,var(--color-white))] px-3 py-2 transition-[border-color,box-shadow] duration-150 focus-within:border-[color:var(--fancy-focus,var(--color-blue-500))] focus-within:ring-2 focus-within:ring-[color:var(--fancy-focus,var(--color-blue-500))]/40 dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))] dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:text-zinc-100 dark:focus-within:border-[color:var(--fancy-focus-dark,var(--color-blue-400))] dark:focus-within:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]/20",
           disabled && "cursor-not-allowed opacity-50",
           className,
         )}

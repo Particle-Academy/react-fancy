@@ -99,7 +99,9 @@ export function FileUploadDropzone({
         "has-focus-visible:ring-2 has-focus-visible:ring-offset-2 has-focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))] has-focus-visible:ring-offset-[color:var(--fancy-surface,var(--color-white))] dark:has-focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))] dark:has-focus-visible:ring-offset-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
         dragOver
           ? "border-blue-400 bg-blue-50 dark:border-blue-500 dark:bg-blue-950"
-          : "border-[color:var(--fancy-border-strong,var(--color-zinc-300))] hover:border-zinc-400 dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:hover:border-zinc-500",
+          : // The hover is a step past the resting zinc-500 (6.15.0): the old
+            // zinc-400 / zinc-500 hover would now lighten, or not move.
+            "border-[color:var(--fancy-border-strong,var(--color-zinc-500))] hover:border-zinc-600 dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))] dark:hover:border-zinc-400",
         disabled && "cursor-not-allowed opacity-50",
         className,
       )}

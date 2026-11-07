@@ -218,7 +218,7 @@ const RangeSlider = forwardRef<HTMLInputElement, SliderProps & { range: true }>(
       >
         <div className="flex items-center gap-3">
           <div className="relative w-full">
-            <div className="pointer-events-none absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))]" />
+            <div className="pointer-events-none absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-[color:var(--fancy-border-strong,var(--color-zinc-500))] dark:bg-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))]" />
             <div
               className="pointer-events-none absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-blue-500"
               // A native range runs right-to-left in RTL, so the fill is

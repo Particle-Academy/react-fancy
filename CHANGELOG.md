@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.15.0] - 2026-11-07
+
+### Changed
+
+- **VISIBLE CHANGE: form-control outlines are darker, to meet WCAG 1.4.11 (3:1 non-text contrast).** The outline is what shows where a field is, and on the kit's defaults it did not reach 3:1 anywhere: the `border` token was zinc-200 on white (1.27:1) and zinc-700 on the `#1e1e24` dark field (1.59:1); `border-strong` was zinc-300 (1.48:1) and zinc-700 (1.59:1). Every interactive form control's resting outline now reads `--fancy-border-strong` / `--fancy-border-strong-dark`, and both defaults are now **zinc-500** (4.83:1 on white, 3.44:1 on `#1e1e24`, 3.67:1 on the zinc-900 surface). Owner ruling, 2026-11-07.
+  - **Already on `border-strong`, now darker through the new default:** Input (and its outside prefix/suffix), Textarea, NumberField, Select (native and listbox trigger), DatePicker, PhoneInput (country trigger, number field and country search), EmojiSelect trigger, Checkbox, CheckboxGroup, RadioGroup, MultiSwitch (when no option colour is set), FileUpload dropzone, and PdfViewer's page "Retry" button.
+  - **Moved from `border` (or a bare palette class) to `border-strong`:** Autocomplete input, OtpInput cells, Pillbox, TimePicker, EmojiSelect's search field, Select's `indicator="checkbox"` box on an unselected option (was `zinc-300` / `zinc-600`), ColorPicker's swatch ring in the `outline` variant (was `zinc-300` / `zinc-600`), the Switch track when off (its fill is its only boundary; was `border` zinc-200 / zinc-600), and Slider's unfilled track in `range` mode.
+  - **Hover states that would now lighten moved a step past the new rest:** FileUpload dropzone hover is zinc-600 light / zinc-400 dark (was zinc-400 / zinc-500), ColorPicker swatch hover ring likewise.
+  - Focus, invalid and disabled styling are unchanged (a disabled control is exempt from 1.4.11). The zero-specificity dark defaults in `styles.css` (for hosts that do not `@source` the kit) moved to zinc-500 to match.
+  - **Decorative borders keep their token:** cards, dividers, panels, table rules, popover and listbox chrome. PromptInput's two shortcut keycaps were the one decorative use of `border-strong`; they now read `--fancy-border` (zinc-200 / zinc-700), so they do not darken.
+  - Button's default (outline) variant was already hovering to `border-strong`, so its light hover border is now zinc-500 instead of zinc-300. Its resting border is unchanged.
+
+  **Consumer action:** none. A host that wants the previous look sets `--fancy-border-strong` (and `--fancy-border-strong-dark`) back to `var(--color-zinc-300)` / `var(--color-zinc-700)`; that is the single knob. It also governs the controls moved over from `border`, so they come back at zinc-300 rather than zinc-200; set the variables on a wrapper around just those controls if the exact old shade matters. A host that already set `--fancy-border-strong` sees its own value on the newly converted controls too.
+
 ## [6.14.0] - 2026-11-07
 
 ### Added

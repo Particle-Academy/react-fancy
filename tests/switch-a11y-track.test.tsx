@@ -79,11 +79,14 @@ describe("Switch — aria-* name the control, not the wrapper", () => {
 });
 
 describe("Switch — the unchecked track reads the kit's semantic token", () => {
-  it("uses --fancy-border / --fancy-border-dark with today's zinc-200 / zinc-600 as fallbacks", () => {
+  // 6.15.0: the off track is the switch's only boundary, so it reads the
+  // control-outline token (zinc-500 both modes, WCAG 1.4.11), not `border`.
+  it("uses --fancy-border-strong / --fancy-border-strong-dark with zinc-500 as both fallbacks", () => {
     const host = mount(<Switch />);
     const cls = control(host).className;
-    expect(cls).toContain("bg-[color:var(--fancy-border,var(--color-zinc-200))]");
-    expect(cls).toContain("dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-600))]");
+    expect(cls).toContain("bg-[color:var(--fancy-border-strong,var(--color-zinc-500))]");
+    expect(cls).toContain("dark:bg-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))]");
+    expect(cls).not.toContain("--fancy-border,");
     expect(cls).not.toMatch(/(^|\s)bg-zinc-200(\s|$)/);
     expect(cls).not.toMatch(/(^|\s)dark:bg-zinc-600(\s|$)/);
   });

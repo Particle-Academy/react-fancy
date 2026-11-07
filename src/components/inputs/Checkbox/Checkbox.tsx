@@ -110,7 +110,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             onChange={(e) => setChecked(e.target.checked)}
             className={cn(
               sizeClasses,
-              "cursor-pointer rounded border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] bg-[color:var(--fancy-input,var(--color-white))] text-blue-600 transition-[border-color,box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-input-dark,#1e1e24)]",
+              "cursor-pointer rounded border border-[color:var(--fancy-border-strong,var(--color-zinc-500))] bg-[color:var(--fancy-input,var(--color-white))] text-blue-600 transition-[border-color,box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))] dark:bg-[color:var(--fancy-input-dark,#1e1e24)]",
               dirtyRingClasses(dirty),
               error && "border-red-500",
             )}

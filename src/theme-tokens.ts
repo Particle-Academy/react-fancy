@@ -62,9 +62,13 @@ export const THEME_TOKENS = {
   "border-strong": {
     variable: "--fancy-border-strong",
     darkVariable: "--fancy-border-strong-dark",
-    light: "var(--color-zinc-300)",
-    dark: "var(--color-zinc-700)",
-    description: "The firmer outline on form controls (inputs, checkboxes, radios) and keycaps.",
+    // zinc-500 in BOTH modes since 6.15.0 (WCAG 1.4.11, 3:1 non-text): 4.83:1
+    // on the white field, 3.44:1 on the #1e1e24 dark field. The old defaults,
+    // zinc-300 / zinc-700, were 1.48:1 / 1.59:1.
+    light: "var(--color-zinc-500)",
+    dark: "var(--color-zinc-500)",
+    description:
+      "The resting outline of interactive form controls (inputs, selects, pickers, checkboxes, radios, the off switch track). zinc-500 in both modes since 6.15.0, for 3:1 non-text contrast.",
   },
   input: {
     variable: "--fancy-input",

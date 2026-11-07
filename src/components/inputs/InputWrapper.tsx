@@ -37,7 +37,7 @@ const insidePaddingRight: Record<Size, string> = {
 };
 
 const affixOutsideClasses =
-  "inline-flex items-center border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] bg-zinc-50 px-3 text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]";
+  "inline-flex items-center border border-[color:var(--fancy-border-strong,var(--color-zinc-500))] bg-zinc-50 px-3 text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]";
 
 export function InputWrapper({
   children,

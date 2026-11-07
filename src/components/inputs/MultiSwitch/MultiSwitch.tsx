@@ -13,7 +13,7 @@ import type { MultiSwitchProps } from "./MultiSwitch.types";
 import { multiSwitchColorClasses } from "./MultiSwitch.colors";
 
 const BORDER_DEFAULT =
-  "border-[color:var(--fancy-border-strong,var(--color-zinc-300))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))]";
+  "border-[color:var(--fancy-border-strong,var(--color-zinc-500))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))]";
 
 const sizeClasses: Record<Size, string> = {
   xs: "px-2 py-1 text-xs",

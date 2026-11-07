@@ -124,7 +124,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
           if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
         }}
         className={cn(
-          "inline-flex items-center gap-1 rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-2 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
+          "inline-flex items-center gap-1 rounded-lg border border-[color:var(--fancy-border-strong,var(--color-zinc-500))] bg-[color:var(--fancy-surface,var(--color-white))] p-2 dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
           disabled && "opacity-50",
           className,
         )}

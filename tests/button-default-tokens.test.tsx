@@ -35,7 +35,8 @@ describe("default Button fill follows the theme tokens", () => {
 
   it("reads the tokens for its light hover fill and border", () => {
     expect(cls).toContain("hover:bg-[color:var(--fancy-surface-hover,var(--color-zinc-50))]");
-    expect(cls).toContain("hover:border-[color:var(--fancy-border-strong,var(--color-zinc-300))]");
+    // border-strong's default is zinc-500 since 6.15.0 (WCAG 1.4.11).
+    expect(cls).toContain("hover:border-[color:var(--fancy-border-strong,var(--color-zinc-500))]");
     expect(cls).not.toContain("hover:bg-zinc-50");
     expect(cls).not.toContain("hover:border-zinc-300");
   });

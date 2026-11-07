@@ -126,12 +126,12 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           className={cn(
             "relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
             trackSizes,
-            // The unchecked track is the `border` role ("tracks"). The dark
-            // fallback stays zinc-600, today's colour, not the role's zinc-700
-            // default — set nothing, see no change.
+            // The unchecked track's fill is the switch's only boundary, so it
+            // reads `border-strong` (6.15.0, WCAG 1.4.11): zinc-500 in both
+            // modes. It was the `border` role, zinc-200 / zinc-600.
             checked
               ? switchTrack[color]
-              : "bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-600))]",
+              : "bg-[color:var(--fancy-border-strong,var(--color-zinc-500))] dark:bg-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))]",
             dirtyRingClasses(dirty),
             error && "ring-2 ring-red-500/50",
           )}

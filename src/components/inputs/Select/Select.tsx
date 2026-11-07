@@ -576,7 +576,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
                         "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors",
                         selected
                           ? "border-blue-500 bg-blue-500 text-white dark:border-blue-400 dark:bg-blue-400"
-                          : "border-zinc-300 dark:border-zinc-600",
+                          : "border-[color:var(--fancy-border-strong,var(--color-zinc-500))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))]",
                       )}
                     >
                       {selected && (

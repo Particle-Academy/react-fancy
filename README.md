@@ -293,7 +293,7 @@ remapping Tailwind's `zinc`. Each role is two variables: one per mode.
 | `surface` | `--fancy-surface` | `--fancy-surface-dark` | white / zinc-900 | cards, overlays, sidebars, navbars |
 | `surface-muted` | `--fancy-surface-muted` | `--fancy-surface-muted-dark` | zinc-100 / zinc-800 | hover + selected rows, chips, wells |
 | `border` | `--fancy-border` | `--fancy-border-dark` | zinc-200 / zinc-700 | outlines, dividers, tracks |
-| `border-strong` | `--fancy-border-strong` | `--fancy-border-strong-dark` | zinc-300 / zinc-700 | form-control outlines, keycaps |
+| `border-strong` | `--fancy-border-strong` | `--fancy-border-strong-dark` | zinc-500 / zinc-500 | resting outline of interactive form controls (3:1, WCAG 1.4.11; since 6.15.0) |
 | `input` | `--fancy-input` | `--fancy-input-dark` | white / `#1e1e24` | text inputs, checkboxes, radios, OTP |
 | `text` | `--fancy-text` | `--fancy-text-dark` | zinc-900 / zinc-100 | headings, values, active items |
 | `text-soft` | `--fancy-text-soft` | `--fancy-text-soft-dark` | zinc-700 / zinc-300 | body copy, menu items |

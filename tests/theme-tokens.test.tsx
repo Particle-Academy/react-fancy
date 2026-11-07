@@ -115,11 +115,9 @@ const SAME_IN_BOTH_MODES = new Set([
  * fallback — same rule as above: "set nothing, see no change". Listed by exact
  * class so a new one has to be argued for here.
  */
-const KEEPS_TODAYS_COLOUR = new Set([
-  // Switch's unchecked track (5.54.1): the `border` role ("tracks"), but it was
-  // `dark:bg-zinc-600`, one step lighter than the role's zinc-700 — a track has
-  // to read against a zinc-800/900 surface where a hairline border does not.
-  "dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-600))]",
+const KEEPS_TODAYS_COLOUR = new Set<string>([
+  // Empty since 6.15.0: Switch's unchecked track, the one entry, moved to the
+  // `border-strong` role at its documented default (WCAG 1.4.11).
 ]);
 
 describe("THEME_TOKENS — the table", () => {

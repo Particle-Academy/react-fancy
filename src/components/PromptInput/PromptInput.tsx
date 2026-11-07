@@ -1316,11 +1316,11 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
               className="hidden text-[10px] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] sm:inline"
               data-react-fancy-prompt-input-hint={modKey === "⌘" ? "apple" : "generic"}
             >
-              <kbd className="rounded border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
+              <kbd className="rounded border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
                 {modKey}
               </kbd>{" "}
               +{" "}
-              <kbd className="rounded border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
+              <kbd className="rounded border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
                 Enter
               </kbd>{" "}
               to send

@@ -476,6 +476,9 @@ describe("PromptInput — a programmatic restore is not an edit", () => {
  * ring). A fifth, in 6.12.0: the textarea placeholder and the send-shortcut
  * hint moved from bare `zinc-400` / `zinc-500` classes to the
  * `--fancy-text-muted` token (the grey-text sweep); class strings only.
+ * A sixth, in 6.15.0: the two hint keycaps moved from `--fancy-border-strong`
+ * to `--fancy-border`, because border-strong is now the zinc-500 control
+ * outline and a keycap is decorative; class strings only.
  * Icon SVGs are stripped: the
  * icon set loads asynchronously, so whether one has arrived depends on test
  * order, not on this component.

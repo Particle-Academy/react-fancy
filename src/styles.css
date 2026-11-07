@@ -243,7 +243,7 @@
 :where(.dark [data-react-fancy-otp-input] input, [data-theme="dark"] [data-react-fancy-otp-input] input),
 :where(.dark [data-react-fancy-time-picker] input, [data-theme="dark"] [data-react-fancy-time-picker] input) {
   background-color: var(--fancy-input-dark, #1e1e24);
-  border-color: var(--fancy-border-strong-dark, #3f3f46);
+  border-color: var(--fancy-border-strong-dark, #71717b); /* zinc-500, 3.44:1 on #1e1e24 (6.15.0) */
 }
 
 /* Focus ring — brighter border + subtle glow */
@@ -268,18 +268,18 @@
 :where(.dark [data-react-fancy-checkbox] input, [data-theme="dark"] [data-react-fancy-checkbox] input),
 :where(.dark [data-react-fancy-radio-group] input, [data-theme="dark"] [data-react-fancy-radio-group] input) {
   background-color: var(--fancy-input-dark, #1e1e24);
-  border-color: var(--fancy-border-strong-dark, #3f3f46);
+  border-color: var(--fancy-border-strong-dark, #71717b); /* zinc-500 */
 }
 
-/* Switch unchecked track */
+/* Switch unchecked track — its fill is the switch's only boundary (6.15.0) */
 :where(.dark [data-react-fancy-switch] button[aria-checked="false"], [data-theme="dark"] [data-react-fancy-switch] button[aria-checked="false"]) {
-  background-color: var(--fancy-border-dark, #3f3f46);
+  background-color: var(--fancy-border-strong-dark, #71717b); /* zinc-500 */
 }
 
 /* Input wrapper affixes */
 :where(.dark [data-react-fancy-input-wrapper] > span:first-child, [data-theme="dark"] [data-react-fancy-input-wrapper] > span:first-child),
 :where(.dark [data-react-fancy-input-wrapper] > span:last-child, [data-theme="dark"] [data-react-fancy-input-wrapper] > span:last-child) {
-  border-color: var(--fancy-border-strong-dark, #3f3f46);
+  border-color: var(--fancy-border-strong-dark, #71717b); /* zinc-500 */
   background-color: var(--fancy-surface-muted-dark, #27272a);
 }
 

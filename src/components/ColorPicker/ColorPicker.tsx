@@ -124,11 +124,14 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
           className={cn(
             "relative shrink-0 rounded-full transition-shadow",
             SWATCH_SIZES[size],
+            // The ring is the swatch's boundary whatever colour it holds, so it
+            // reads `border-strong` (6.15.0, WCAG 1.4.11); the hover is a step
+            // past it.
             variant === "outline" &&
-              "ring-1 ring-zinc-300 dark:ring-zinc-600",
+              "ring-1 ring-[color:var(--fancy-border-strong,var(--color-zinc-500))] dark:ring-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))]",
             disabled
               ? "cursor-not-allowed opacity-50"
-              : "cursor-pointer hover:ring-2 hover:ring-zinc-400 dark:hover:ring-zinc-500",
+              : "cursor-pointer hover:ring-2 hover:ring-zinc-600 dark:hover:ring-zinc-400",
           )}
           style={{ backgroundColor: color }}
           aria-label={`Selected color: ${color}`}
