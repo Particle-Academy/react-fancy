@@ -41,6 +41,18 @@ export function FileUploadDropzone({
   const custom = children !== undefined && children !== null;
   const inputLabel = browseLabel ?? (custom ? DEFAULT_BROWSE_LABEL : DEFAULT_COPY);
 
+  /*
+   * The hint (and the icon above it) read the host's text tokens. They were
+   * bare zinc until 6.11.1, so an app that mapped `--fancy-text-muted` themed
+   * every component but this one: on a #0A2347 surface the hint was 3.23:1.
+   *
+   * Drag-over steps up to `subtle`: the drag fill (blue-50) is darker than the
+   * page, and muted on it is 4.44:1, under AA. Subtle is 7.09:1 there.
+   */
+  const hintColour = dragOver
+    ? "text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]"
+    : "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]";
+
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
@@ -134,8 +146,8 @@ export function FileUploadDropzone({
           disabled={disabled}
           className="flex cursor-pointer flex-col items-center rounded-md outline-none disabled:cursor-not-allowed"
         >
-          <Upload size={32} strokeWidth={1.5} aria-hidden="true" className="mb-2 text-zinc-400" />
-          <span className="text-sm text-zinc-500">{DEFAULT_COPY}</span>
+          <Upload size={32} strokeWidth={1.5} aria-hidden="true" className={cn("mb-2", hintColour)} />
+          <span className={cn("text-sm", hintColour)}>{DEFAULT_COPY}</span>
         </button>
       )}
     </div>

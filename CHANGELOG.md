@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.11.1] - 2026-11-07
+
+### Fixed
+
+- **`FileUpload` text follows the `--fancy-text-*` theme tokens.** The dropzone hint and icon, the list's size meta, the thumbnail's file name and extension, and the remove button were bare `text-zinc-*`, so an app that mapped the tokens themed every other component and left FileUpload grey. On a `#0A2347` surface the hint was 3.23:1, under AA (found by axe at AAA in a consumer app). They now read `--fancy-text-muted` (hint, meta, name, extension, remove), `--fancy-text-soft` (remove on hover) and `--fancy-text-faint` (the decorative file glyphs), with the same fallbacks as every other component. Default contrast also improves where it fell short: the hint in dark mode was 3.67:1 and is now 6.75:1; the size meta in light was 2.62:1 and is now 4.83:1; the list's remove icon was 2.62:1 in light, under the 3:1 a text-less control owes (WCAG 1.4.11), and is now 4.83:1. During drag-over the hint and icon step up to `--fancy-text-subtle`, because muted on the blue drag fill is 4.44:1; subtle is 7.09:1 there. **Consumer action:** none; an app that maps `--fancy-text-muted` now themes the FileUpload hint.
+- **The thumbnail remove button shows on keyboard focus.** It was `opacity-0` until the tile was hovered, so tabbing onto it focused an invisible control. **Consumer action:** none.
+- **Known limit:** the kit's muted token is 4.83:1 on the default light surface and 6.75:1 on the default dark one, below AAA's 7:1 in both. FileUpload uses it as the other components do; the token is unchanged. An app that needs AAA can map `--fancy-text-muted` / `--fancy-text-muted-dark`.
+
 ## [6.11.0] - 2026-11-04
 
 ### Added

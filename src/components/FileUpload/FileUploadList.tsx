@@ -15,6 +15,23 @@ function getExtension(name: string): string {
   return parts.length > 1 ? parts.pop()!.toUpperCase() : "";
 }
 
+/*
+ * Text colours read the host's `--fancy-text-*` tokens (bare zinc until
+ * 6.11.1). Fallbacks are the kit-wide defaults, so an app that maps nothing
+ * sees the same greys every other component uses.
+ */
+const MUTED =
+  "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]";
+/** Decorative file glyphs (aria-hidden): themed, but owe no text contrast. */
+const FAINT =
+  "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]";
+/**
+ * The list's remove control is an icon with no text, so its glyph owes 3:1
+ * (WCAG 1.4.11). Bare zinc-400 was 2.62:1 on white; muted is 4.83:1.
+ */
+const REMOVE =
+  `${MUTED} hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]`;
+
 function ThumbnailItem({ file, index, onRemove }: { file: File; index: number; onRemove: (i: number) => void }) {
   const isImage = file.type.startsWith("image/");
   const objectUrl = useMemo(() => (isImage ? URL.createObjectURL(file) : null), [file, isImage]);
@@ -32,20 +49,22 @@ function ThumbnailItem({ file, index, onRemove }: { file: File; index: number; o
           <img src={objectUrl} alt={file.name} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-1">
-            <File size={20} className="text-zinc-400" />
-            <span className="text-[10px] font-medium text-zinc-500">{getExtension(file.name)}</span>
+            <File size={20} aria-hidden="true" className={FAINT} />
+            <span className={cn("text-[10px] font-medium", MUTED)}>{getExtension(file.name)}</span>
           </div>
         )}
         <button
           type="button"
           onClick={() => onRemove(index)}
-          className="absolute top-1 end-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity hover:bg-black/80 group-hover:opacity-100"
+          // Hidden until the tile is hovered, so keyboard focus must reveal it
+          // too, or a keyboard user tabs onto an invisible control.
+          className="absolute top-1 end-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity hover:bg-black/80 group-hover:opacity-100 focus-visible:opacity-100"
           aria-label={`Remove ${file.name}`}
         >
-          <X size={10} />
+          <X size={10} aria-hidden="true" />
         </button>
       </div>
-      <span className="w-full truncate text-center text-xs text-zinc-500">{file.name}</span>
+      <span className={cn("w-full truncate text-center text-xs", MUTED)}>{file.name}</span>
     </div>
   );
 }
@@ -72,18 +91,18 @@ export function FileUploadList({ thumbnail, className }: FileUploadListProps) {
           key={`${file.name}-${i}`}
           className="flex items-center gap-3 rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] px-3 py-2 text-sm dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]"
         >
-          <File size={16} className="shrink-0 text-zinc-400" />
+          <File size={16} aria-hidden="true" className={cn("shrink-0", FAINT)} />
           <span className="flex-1 truncate">{file.name}</span>
-          <span className="shrink-0 text-xs text-zinc-400">
+          <span className={cn("shrink-0 text-xs", MUTED)}>
             {formatSize(file.size)}
           </span>
           <button
             type="button"
             onClick={() => removeFile(i)}
-            className="shrink-0 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+            className={cn("shrink-0", REMOVE)}
             aria-label={`Remove ${file.name}`}
           >
-            <X size={14} />
+            <X size={14} aria-hidden="true" />
           </button>
         </li>
       ))}
