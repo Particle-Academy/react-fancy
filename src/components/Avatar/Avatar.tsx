@@ -84,7 +84,7 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
         ) : (
           <span
             className={cn(
-              "font-medium text-zinc-600 dark:text-zinc-300 select-none",
+              "font-medium text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] select-none",
               fallbackTextSize[size],
             )}
           >

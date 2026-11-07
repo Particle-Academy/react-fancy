@@ -112,7 +112,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
     }
 
     const spinBtnClass =
-      "flex h-7 w-full items-center justify-center rounded text-zinc-400 transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-600 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-300 disabled:opacity-50";
+      "flex h-7 w-full items-center justify-center rounded text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] disabled:opacity-50";
     const displayClass =
       "flex h-10 w-12 items-center justify-center text-lg font-medium tabular-nums";
 
@@ -140,7 +140,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
           </button>
         </div>
 
-        <span className="text-lg text-zinc-400">:</span>
+        <span aria-hidden="true" className="text-lg text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">:</span>
 
         {/* Minute column */}
         <div className="flex flex-col items-center">

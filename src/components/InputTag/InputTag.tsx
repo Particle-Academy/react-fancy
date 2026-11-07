@@ -306,10 +306,10 @@ export function InputTag({
       style={{ ...popStyle, ...style }}
     >
       {(cfg.label || active.query) && (
-        <div className="flex items-center justify-between border-b border-zinc-100 bg-zinc-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="flex items-center justify-between border-b border-zinc-100 bg-zinc-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:border-zinc-800 dark:bg-zinc-950">
           <span>{cfg.label ?? labelForChar(active.char)}</span>
           {active.query && (
-            <span className="font-mono text-[10px] normal-case tracking-normal text-zinc-400">
+            <span className="font-mono text-[10px] normal-case tracking-normal text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
               {active.char}
               {active.query}
             </span>

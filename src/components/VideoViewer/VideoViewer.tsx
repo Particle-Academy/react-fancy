@@ -40,7 +40,7 @@ export const VideoViewer = forwardRef<HTMLDivElement, VideoViewerProps>(
         style={style}
       >
         {errored ? (
-          <div className="flex flex-col items-center justify-center gap-1 p-4 text-center text-sm text-zinc-400">
+          <div className="flex flex-col items-center justify-center gap-1 p-4 text-center text-sm text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
             <span className="font-medium">Couldn&apos;t load video</span>
             <span className="max-w-full truncate text-xs opacity-70">{src}</span>
           </div>

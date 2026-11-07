@@ -65,7 +65,7 @@ export function AccordionPanelTrigger({
         data-orientation={orientation}
         className={cn(
           "group relative flex shrink-0 items-center justify-center cursor-pointer",
-          "text-zinc-500 dark:text-zinc-500",
+          "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
           "hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
           // Wide hitbox + thin visible line (drawn via ::before).
           orientation === "horizontal"

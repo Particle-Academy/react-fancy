@@ -40,7 +40,7 @@ export function ChartHorizontalBar({
                   }}
                 />
                 {showValues && (
-                  <span className="absolute top-1/2 start-full ms-2 -translate-y-1/2 text-xs font-medium text-zinc-500">
+                  <span className="absolute top-1/2 start-full ms-2 -translate-y-1/2 text-xs font-medium text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                     {item.value}
                   </span>
                 )}

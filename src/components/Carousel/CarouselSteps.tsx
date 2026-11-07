@@ -38,7 +38,7 @@ export const CarouselSteps = forwardRef<HTMLDivElement, CarouselStepsProps>(
                     "flex h-6 w-6 items-center justify-center rounded-full text-xs",
                     isActive && "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
                     isCompleted && "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-                    !isActive && !isCompleted && "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] text-zinc-500 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-zinc-500",
+                    !isActive && !isCompleted && "bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]",
                   )}
                 >
                   {isCompleted ? "\u2713" : i + 1}

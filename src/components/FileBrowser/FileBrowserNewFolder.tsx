@@ -95,7 +95,7 @@ export function FileBrowserNewFolder({ className }: { className?: string }) {
         onClick={() => setOpen(true)}
         title={`New folder in ${path}`}
         className={cn(
-          "flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-xs text-zinc-500 transition-colors",
+          "flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] transition-colors",
           "hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
           className,
         )}
@@ -123,7 +123,7 @@ export function FileBrowserNewFolder({ className }: { className?: string }) {
       className={cn("flex shrink-0 flex-col gap-0.5", className)}
     >
       <div className="flex items-center gap-1">
-        <FolderPlus size={13} aria-hidden="true" className="shrink-0 text-zinc-400" />
+        <FolderPlus size={13} aria-hidden="true" className="shrink-0 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]" />
         <input
           ref={inputRef}
           type="text"
@@ -150,7 +150,7 @@ export function FileBrowserNewFolder({ className }: { className?: string }) {
           }}
           className={cn(
             "w-32 min-w-0 rounded-md border px-1.5 py-0.5 text-xs outline-none",
-            "bg-transparent text-[color:var(--fancy-text-soft,var(--color-zinc-700))] placeholder:text-zinc-400 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
+            "bg-transparent text-[color:var(--fancy-text-soft,var(--color-zinc-700))] placeholder:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:placeholder:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
             shown ? "border-red-400 dark:border-red-500" : "border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]",
           )}
         />
@@ -167,7 +167,7 @@ export function FileBrowserNewFolder({ className }: { className?: string }) {
           type="button"
           data-react-fancy-file-browser-new-folder-cancel=""
           onClick={close}
-          className="rounded-md px-1.5 py-0.5 text-xs text-zinc-500 transition-colors hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
+          className="rounded-md px-1.5 py-0.5 text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] transition-colors hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
         >
           Cancel
         </button>

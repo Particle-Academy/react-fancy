@@ -14,7 +14,7 @@ export function TablePagination({
 
   return (
     <div data-react-fancy-table-pagination="" className={cn("flex items-center justify-between px-4 py-3 text-sm", className)}>
-      <span className="text-zinc-500">
+      <span className="text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
         Page {page + 1} of {totalPages}
       </span>
       <div className="flex gap-1">

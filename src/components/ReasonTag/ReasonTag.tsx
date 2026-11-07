@@ -118,7 +118,7 @@ export function ReasonTag({
       <span className="inline-flex flex-col items-start gap-0.5 align-top">
         {trigger}
         <span
-          className="block max-w-[280px] rounded border-s-2 ps-2 text-[11px] leading-snug text-zinc-600 dark:text-zinc-300"
+          className="block max-w-[280px] rounded border-s-2 ps-2 text-[11px] leading-snug text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
           style={{ borderColor: t.color }}
         >
           {reason}
@@ -140,7 +140,7 @@ export function ReasonTag({
               {t.label} confidence · {(confidence * 100).toFixed(0)}%
             </span>
             {by && (
-              <span className="ms-auto font-mono text-[10px] text-zinc-400">
+              <span className="ms-auto font-mono text-[10px] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                 @{by}
               </span>
             )}
@@ -150,7 +150,7 @@ export function ReasonTag({
           </p>
           {sources.length > 0 && (
             <div>
-              <div className="text-[10px] uppercase tracking-wider text-zinc-400">
+              <div className="text-[10px] uppercase tracking-wider text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                 sources
               </div>
               <ul className="mt-0.5 space-y-0.5 text-[12px]">
@@ -161,7 +161,7 @@ export function ReasonTag({
                         {s.label}
                       </a>
                     ) : (
-                      <span className="text-zinc-600 dark:text-zinc-300">
+                      <span className="text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]">
                         {s.label}
                       </span>
                     )}

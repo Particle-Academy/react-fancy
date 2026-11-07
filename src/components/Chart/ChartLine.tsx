@@ -150,7 +150,7 @@ export function ChartLine({
             y2={PADDING.top + plotHeight}
             stroke="currentColor"
             strokeDasharray="4 4"
-            className="text-zinc-300 dark:text-zinc-600"
+            className="text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
           />
         )}
       </svg>
@@ -169,7 +169,7 @@ export function ChartLine({
                     className="inline-block h-2 w-2 rounded-full"
                     style={{ backgroundColor: s.color ?? DEFAULT_COLORS[si % DEFAULT_COLORS.length] }}
                   />
-                  <span className="text-zinc-500">{s.label}:</span>
+                  <span className="text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">{s.label}:</span>
                   <span className="font-medium">{s.data[hoverInfo.labelIdx]}</span>
                 </div>
               ))}

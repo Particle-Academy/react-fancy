@@ -473,7 +473,10 @@ describe("PromptInput — a programmatic restore is not an edit", () => {
  * both submitted an enclosing form). A fourth, in 6.1.0: the attach / send
  * Buttons' focus ring moved from `focus:` to `focus-visible:` and gained a
  * colour (Button's own fix; a mouse click no longer leaves a currentColor
- * ring). Icon SVGs are stripped: the
+ * ring). A fifth, in 6.12.0: the textarea placeholder and the send-shortcut
+ * hint moved from bare `zinc-400` / `zinc-500` classes to the
+ * `--fancy-text-muted` token (the grey-text sweep); class strings only.
+ * Icon SVGs are stripped: the
  * icon set loads asynchronously, so whether one has arrived depends on test
  * order, not on this component.
  */

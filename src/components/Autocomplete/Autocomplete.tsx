@@ -179,9 +179,9 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
               }}
             >
               {loading ? (
-                <div className="px-3 py-2 text-sm text-zinc-400">Loading...</div>
+                <div className="px-3 py-2 text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">Loading...</div>
               ) : filtered.length === 0 ? (
-                <div className="px-3 py-2 text-sm text-zinc-400">
+                <div className="px-3 py-2 text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                   {emptyMessage}
                 </div>
               ) : (

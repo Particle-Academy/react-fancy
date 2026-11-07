@@ -18,7 +18,7 @@ export function AccordionTrigger({
       onClick={() => toggle(value)}
       aria-expanded={isOpen}
       className={cn(
-        "flex w-full items-center justify-between py-4 text-start text-sm font-medium transition-colors hover:text-zinc-600 dark:hover:text-zinc-300",
+        "flex w-full items-center justify-between py-4 text-start text-sm font-medium transition-colors hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
         className,
       )}
     >

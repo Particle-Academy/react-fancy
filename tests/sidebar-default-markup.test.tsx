@@ -17,6 +17,12 @@ import { Sidebar } from "../src/components/Sidebar";
  * change: without it the label and badge concatenated in the accessible name
  * ("Inbox3"). Items without a badge, and both collapsed snapshots, are
  * byte-identical to 6.0.0. Nothing else may change here.
+ *
+ * DELIBERATE CHANGE, 6.12.0: the collapse toggle's colour classes moved from
+ * bare `text-zinc-400` / `hover:text-zinc-600` / `dark:hover:text-zinc-300` to
+ * the `--fancy-text-muted` and `--fancy-text-soft` tokens (the grey-text
+ * sweep; the glyph was 2.62:1 in light, under the 3:1 a control owes). Class
+ * strings on the toggle only; no element or attribute changed.
  */
 
 const icon = <svg data-icon="" />;

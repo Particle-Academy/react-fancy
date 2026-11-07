@@ -33,7 +33,7 @@ export function ChartAxis({
           const tx = scale(tick);
           return (
             <g key={tick}>
-              <line x1={tx} y1={y} x2={tx} y2={y + 4} stroke="currentColor" className="text-zinc-300 dark:text-zinc-600" />
+              <line x1={tx} y1={y} x2={tx} y2={y + 4} stroke="currentColor" className="text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]" />
               <text x={tx} y={y + 16} textAnchor="middle" className="fill-[color:var(--fancy-text-muted,var(--color-zinc-500))] text-[10px] dark:fill-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                 {formatTick(tick)}
               </text>
@@ -56,7 +56,7 @@ export function ChartAxis({
         const ty = scale(tick);
         return (
           <g key={tick}>
-            <line x1={x - 4} y1={ty} x2={x} y2={ty} stroke="currentColor" className="text-zinc-300 dark:text-zinc-600" />
+            <line x1={x - 4} y1={ty} x2={x} y2={ty} stroke="currentColor" className="text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]" />
             <text x={x - 8} y={ty + 3} textAnchor="end" className="fill-[color:var(--fancy-text-muted,var(--color-zinc-500))] text-[10px] dark:fill-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
               {formatTick(tick)}
             </text>

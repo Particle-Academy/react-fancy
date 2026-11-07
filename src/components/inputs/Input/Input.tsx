@@ -262,7 +262,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               // most people do not want. Still reachable by click and by
               // screen readers.
               tabIndex={-1}
-              className="absolute end-2 inline-flex items-center justify-center rounded p-1 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] transition-colors hover:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:cursor-not-allowed disabled:opacity-50 dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))] dark:hover:text-zinc-300"
+              className="absolute end-2 inline-flex items-center justify-center rounded p-1 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] transition-colors hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {shown ? <EyeOffIcon /> : <EyeIcon />}
             </button>

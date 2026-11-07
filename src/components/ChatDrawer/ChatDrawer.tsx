@@ -101,7 +101,7 @@ export function ChatDrawer({
                       "inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-semibold",
                       active
                         ? "bg-white/20 text-white"
-                        : "bg-[color:var(--fancy-border,var(--color-zinc-200))] text-zinc-600 group-hover:bg-zinc-300 dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:text-zinc-300",
+                        : "bg-[color:var(--fancy-border,var(--color-zinc-200))] group-hover:bg-zinc-300 dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
                     ].join(" ")}
                   >
                     {number}
@@ -117,7 +117,7 @@ export function ChatDrawer({
           onClick={handleToggle}
           aria-label={open ? "Collapse drawer" : "Expand drawer"}
           aria-expanded={open}
-          className="ms-auto inline-flex h-6 w-6 items-center justify-center rounded-full text-zinc-400 transition hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-700 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-200"
+          className="ms-auto inline-flex h-6 w-6 items-center justify-center rounded-full text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] transition hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
         >
           <Icon
             name={open ? "chevron-down" : "chevron-up"}

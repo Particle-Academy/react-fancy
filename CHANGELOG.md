@@ -11,6 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.12.0] - 2026-11-07
+
+### Changed
+
+- **Secondary grey text follows the `--fancy-text-*` theme tokens across the kit.** 6.11.1 fixed FileUpload; the audit that followed found the same bare `text-zinc-400/500/600` on 83 lines in 44 files, which an app that maps the tokens could not reach. 80 of them now read a token, with the same fallbacks as the rest of the kit, chosen by role:
+  - `--fancy-text-muted` (zinc-500 / zinc-400) for secondary text, placeholders and the glyph of an icon-only control: Autocomplete loading and empty states, Select "No results found" and its chevron, Command group headings and input placeholder, chart tooltip labels and totals, HorizontalBar values, Calendar weekday headers and days outside the month, EmojiSelect, InputTag and PromptInput picker headers, MoodMeter quadrant labels, Pagination ellipsis, Table "Page x of y", boolean TimeGrid headers, ReasonTag author and "sources", FileBrowser's New folder / Cancel, and every placeholder the audit found (Command, Composer, Editor, FileBrowser filter / path / new folder, InlinePasteEditor, Pillbox, PromptInput).
+  - `--fancy-text-subtle` (zinc-600 / zinc-400) where muted fails AA on a tinted surface: Carousel step numbers and the MagicWand action tag (muted is 4.39:1 on zinc-100), the PromptInput attachment size (zinc-100 chip) and the command hint and mention kind on the picker's violet-100 active row (muted is about 4.1:1 there). ReasonTag's unlinked source label also uses it.
+  - `--fancy-text-soft` (zinc-700 / zinc-300) for hover colours, and for the Avatar initials, ChatDrawer tab numbers and ReasonTag's pinned reason, which sit on a zinc-200 / zinc-700 fill where subtle's dark value is too light.
+  - `--fancy-text-faint` (zinc-400 / zinc-500) for decorative glyphs and lines: Breadcrumbs and FileBrowser path separators, chart tick marks and the hover rule, the Command and FileBrowser search icons, FileBrowser's folder and spinner glyphs, the PromptInput paperclip, the TimePicker colon and the Toast default icon colour. Separators, the colon and the paperclip are now `aria-hidden`.
+  - VideoViewer's error message sits on a black frame in both modes, so it reads `--fancy-text-muted-dark` in both.
+- The three opt-in `color="zinc"` entries in `Button.colors.ts`, `Callout.colors.ts` and `Progress.colors.ts` are a named palette and stay zinc. No token's default value changed.
+- **Look different by default:** the out-of-month days in Calendar (zinc-300 / zinc-600, now muted) and the chart tick marks (zinc-300 / zinc-600, now faint) are noticeably darker in light mode and lighter in dark mode. Light-mode icon buttons (Modal, Drawer, Toast, MobileMenu close; Sidebar, ChatDrawer toggles; Calendar and TimePicker steppers; FileBrowser, Pillbox, Composer removers; the Input password reveal) step from zinc-400 to zinc-500, and placeholders listed above from zinc-400 to zinc-500. Hover colours that were zinc-600 are now zinc-700. Elsewhere the change is within one palette step.
+- **Consumer action:** none, unless your app relied on these greys staying fixed while it themed `--fancy-text-*`: they now follow your tokens like the rest of the kit.
+
+### Fixed
+
+- **Contrast of that text against its real surface**, for an app that sets no `--fancy-*` variable. Readable text and placeholders now reach AA (4.5:1) in light and dark, and icon-only controls 3:1 at rest (WCAG 1.4.11). Before: 2.62:1 for most `zinc-400` text and icon buttons in light mode, 3.67:1 for `zinc-500` text in dark mode (it had no `dark:` colour), 4.12:1 for the picker headers on zinc-950, 2.39:1 for the Pillbox remove button on its zinc-100 pill, and 1.48:1 for Calendar's out-of-month days. After: at least 4.62:1 for text (on the zinc-50 strips) and 4.39:1 for a control (on a zinc-100 pill). The muted token itself is unchanged, so text on a plain surface stays at 4.83:1 light / 6.75:1 dark, AA but not AAA. **Consumer action:** none.
+- **The Input password reveal reaches 3:1 at rest.** It rested on the faint token (2.62:1 in light, 3.44:1 in dark); it now rests on muted and hovers to soft. **Consumer action:** none.
+- A permanent test fails the build on any new bare `text-zinc-400/500/600` in `src/components` outside a token fallback or the named palettes.
+
 ## [6.11.1] - 2026-11-07
 
 ### Fixed

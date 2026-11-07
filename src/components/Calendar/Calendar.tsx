@@ -183,7 +183,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
           <button
             type="button"
             onClick={prevMonth}
-            className="rounded-lg p-1 text-zinc-400 hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
+            className="rounded-lg p-1 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             aria-label="Previous month"
           >
             <ChevronLeft size={16} className="rtl:-scale-x-100" />
@@ -194,7 +194,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
           <button
             type="button"
             onClick={nextMonth}
-            className="rounded-lg p-1 text-zinc-400 hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
+            className="rounded-lg p-1 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             aria-label="Next month"
           >
             <ChevronRight size={16} className="rtl:-scale-x-100" />
@@ -206,7 +206,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
           {DAYS.map((d) => (
             <div
               key={d}
-              className="flex h-8 items-center justify-center text-xs font-medium text-zinc-400"
+              className="flex h-8 items-center justify-center text-xs font-medium text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"
             >
               {d}
             </div>
@@ -245,7 +245,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
                 }
                 className={cn(
                   btnBase,
-                  !isCurrentMonth && "text-zinc-300 dark:text-zinc-600",
+                  !isCurrentMonth && "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
                   isCurrentMonth &&
                     !selected &&
                     !inRange &&

@@ -110,7 +110,7 @@ export function EmojiSelect({ value, defaultValue, onChange, placeholder = "Sear
         className="flex items-center gap-2 rounded-lg border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] px-3 py-2 text-sm transition-[border-color,box-shadow] duration-150 dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-input-dark,#1e1e24)]"
         onClick={() => setOpen((v) => !v)}
       >
-        {selected ? <span className="text-xl">{selected}</span> : <span className="text-zinc-400">Pick emoji</span>}
+        {selected ? <span className="text-xl">{selected}</span> : <span className="text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">Pick emoji</span>}
       </button>
 
       {open && (
@@ -155,7 +155,7 @@ export function EmojiSelect({ value, defaultValue, onChange, placeholder = "Sear
               />
             ) : (
               <div>
-                <div className="px-1 py-1 text-xs font-semibold uppercase text-zinc-500">
+                <div className="px-1 py-1 text-xs font-semibold uppercase text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                   {EMOJI_DATA[activeCategory].label}
                 </div>
                 <EmojiGrid

@@ -187,14 +187,14 @@ export function FileBrowserNode({ entry, depth }: FileBrowserNodeProps) {
       >
         {expandable ? (
           loading ? (
-            <Loader2 size={14} className="shrink-0 animate-spin text-zinc-400" aria-hidden="true" />
+            <Loader2 size={14} className="shrink-0 animate-spin text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]" aria-hidden="true" />
           ) : (
             <button
               type="button"
               tabIndex={-1}
               aria-hidden="true"
               onClick={handleChevronClick}
-              className="flex shrink-0 items-center justify-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              className="flex shrink-0 items-center justify-center text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
             >
               <ChevronRight
                 size={14}

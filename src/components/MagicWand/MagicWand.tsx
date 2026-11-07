@@ -323,7 +323,7 @@ function Wand({
           >
             {busy === a.id ? "…" : appearance === "pill" ? a.label[0] : a.label}
             {appearance === "floating" && a.tag && (
-              <span className="ms-1 rounded-full bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] px-1 text-[9px] font-medium text-zinc-500 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]">
+              <span className="ms-1 rounded-full bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] px-1 text-[9px] font-medium dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]">
                 {a.tag}
               </span>
             )}

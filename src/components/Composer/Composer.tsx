@@ -256,7 +256,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   disabled={disabled}
                   aria-label="Discard this pasted text"
                   className={cn(
-                    "absolute end-1 top-1/2 -translate-y-1/2 rounded-full px-1 text-xs text-zinc-400 transition-colors hover:text-zinc-700 dark:hover:text-zinc-100",
+                    "absolute end-1 top-1/2 -translate-y-1/2 rounded-full px-1 text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] transition-colors hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
                     classNames?.remove,
                   )}
                 >
@@ -320,7 +320,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
             disabled={disabled}
             rows={3}
             className={cn(
-              "w-full resize-none bg-transparent px-4 pt-3 text-sm outline-none placeholder:text-zinc-400",
+              "w-full resize-none bg-transparent px-4 pt-3 text-sm outline-none placeholder:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:placeholder:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
               classNames?.input,
             )}
           />

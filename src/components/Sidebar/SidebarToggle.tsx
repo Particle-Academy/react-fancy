@@ -13,8 +13,8 @@ export function SidebarToggle({ className }: SidebarToggleProps) {
       onClick={() => setCollapsed(!collapsed)}
       title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       className={cn(
-        "flex items-center justify-center rounded-md p-1.5 text-zinc-400 transition-colors",
-        "hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-600 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-300",
+        "flex items-center justify-center rounded-md p-1.5 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] transition-colors",
+        "hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         className,
       )}
     >

@@ -482,7 +482,7 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
           <span
             aria-hidden="true"
             className={cn(
-              "pointer-events-none absolute start-4 top-3 text-sm text-zinc-400",
+              "pointer-events-none absolute start-4 top-3 text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
               placeholderClassName,
             )}
           >

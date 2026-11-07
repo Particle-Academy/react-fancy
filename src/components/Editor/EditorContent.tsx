@@ -84,7 +84,7 @@ export function EditorContent({ className, maxHeight: maxHeightProp, sourceClass
         "focus:outline-none",
         proseClasses,
         extClasses,
-        "empty:before:content-[attr(data-placeholder)] empty:before:text-zinc-400 empty:before:pointer-events-none",
+        "empty:before:content-[attr(data-placeholder)] empty:before:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:empty:before:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] empty:before:pointer-events-none",
         className,
       )}
     />

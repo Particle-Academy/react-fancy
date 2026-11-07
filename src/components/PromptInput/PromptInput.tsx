@@ -1079,9 +1079,9 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
               data-react-fancy-prompt-input-attachment={a.id}
               className="inline-flex items-center gap-1.5 rounded-md bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] px-2 py-0.5 text-[11px] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             >
-              <Icon name="paperclip" size="xs" className="text-zinc-400" />
+              <Icon name="paperclip" size="xs" aria-hidden="true" className="text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]" />
               <span className="font-mono">{a.name}</span>
-              <span className="text-zinc-400">{fmtSize(a.bytes)}</span>
+              <span className="text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]">{fmtSize(a.bytes)}</span>
               <button
                 // A bare <button> is `submit`: inside a host's <form> this chip
                 // submitted the form instead of only removing the attachment.
@@ -1158,7 +1158,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
             onPaste={onPaste}
             placeholder={resolvedPlaceholder}
             spellCheck={false}
-            className="block w-full resize-none bg-transparent px-3 py-2.5 text-[14px] leading-relaxed outline-none placeholder:text-zinc-400"
+            className="block w-full resize-none bg-transparent px-3 py-2.5 text-[14px] leading-relaxed outline-none placeholder:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:placeholder:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"
             rows={3}
           />
         )}
@@ -1167,7 +1167,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
           <div
             data-react-fancy-prompt-input-menu={picker.kind}
             className="absolute bottom-full start-2 z-10 mb-1 w-72 overflow-hidden rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]">
-            <div className="border-b border-zinc-100 bg-zinc-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950">
+            <div className="border-b border-zinc-100 bg-zinc-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:border-zinc-800 dark:bg-zinc-950">
               {picker.kind === "cmd" ? "Commands" : "Mention"} · {items.length}
             </div>
             {/* Row text breaks or truncates long tokens rather than widening the
@@ -1207,7 +1207,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
                       <div className="font-mono font-medium text-violet-700 [overflow-wrap:anywhere] dark:text-violet-300">
                         {c.name}
                       </div>
-                      <div className="text-[11px] text-zinc-500 [overflow-wrap:anywhere]">{c.hint}</div>
+                      <div className="text-[11px] text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))] [overflow-wrap:anywhere]">{c.hint}</div>
                     </li>
                   );
                 }
@@ -1239,7 +1239,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
                       {m.name}
                     </span>
                     <span
-                      className="min-w-0 max-w-[40%] truncate text-[10px] uppercase tracking-wider text-zinc-400"
+                      className="min-w-0 max-w-[40%] truncate text-[10px] uppercase tracking-wider text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]"
                       title={m.kind}
                     >
                       {m.kind}
@@ -1313,7 +1313,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
           {/* With an icon send button the shortcut lives in its tooltip instead. */}
           {showHint && sendButton !== "icon" && (
             <span
-              className="hidden text-[10px] text-zinc-500 sm:inline"
+              className="hidden text-[10px] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] sm:inline"
               data-react-fancy-prompt-input-hint={modKey === "⌘" ? "apple" : "generic"}
             >
               <kbd className="rounded border border-[color:var(--fancy-border-strong,var(--color-zinc-300))] bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">

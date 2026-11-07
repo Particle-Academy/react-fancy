@@ -16,7 +16,7 @@ const VARIANT_STYLES = {
 } as const;
 
 const VARIANT_ICON_COLORS = {
-  default: "text-zinc-400",
+  default: "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
   success: "text-emerald-500",
   error: "text-red-500",
   warning: "text-amber-500",
@@ -80,7 +80,7 @@ export function ToastItem({ data, onDismiss }: ToastItemProps) {
         <button
           type="button"
           onClick={() => onDismiss(id)}
-          className="shrink-0 rounded p-0.5 text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
+          className="shrink-0 rounded p-0.5 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] transition-colors hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
           aria-label="Dismiss"
         >
           <X size={14} />

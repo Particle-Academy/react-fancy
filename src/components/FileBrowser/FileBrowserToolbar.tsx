@@ -30,7 +30,7 @@ export function FileBrowserToolbar({ filterPlaceholder = "Filter", className }: 
         data-react-fancy-file-browser-filter=""
         className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] px-2 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]"
       >
-        <Search size={13} aria-hidden="true" className="shrink-0 text-zinc-400" />
+        <Search size={13} aria-hidden="true" className="shrink-0 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]" />
         <input
           type="text"
           value={filter}
@@ -38,14 +38,14 @@ export function FileBrowserToolbar({ filterPlaceholder = "Filter", className }: 
           placeholder={filterPlaceholder}
           aria-label="Filter by name"
           spellCheck={false}
-          className="min-w-0 flex-1 bg-transparent py-1 text-xs text-[color:var(--fancy-text-soft,var(--color-zinc-700))] outline-none placeholder:text-zinc-400 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
+          className="min-w-0 flex-1 bg-transparent py-1 text-xs text-[color:var(--fancy-text-soft,var(--color-zinc-700))] outline-none placeholder:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:placeholder:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
         />
         {filter !== "" && (
           <button
             type="button"
             aria-label="Clear filter"
             onClick={() => setFilter("")}
-            className="shrink-0 text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
+            className="shrink-0 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] transition-colors hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
           >
             <X size={12} />
           </button>

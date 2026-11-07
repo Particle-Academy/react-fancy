@@ -167,16 +167,16 @@ export function MoodMeter({
 
       {showGrid && (
         <>
-          <div className="pointer-events-none absolute left-1.5 top-1.5 text-[10px] uppercase tracking-wider text-zinc-400">
+          <div className="pointer-events-none absolute left-1.5 top-1.5 text-[10px] uppercase tracking-wider text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
             ↑ sure
           </div>
-          <div className="pointer-events-none absolute bottom-1.5 left-1.5 text-[10px] uppercase tracking-wider text-zinc-400">
+          <div className="pointer-events-none absolute bottom-1.5 left-1.5 text-[10px] uppercase tracking-wider text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
             ↓ unsure
           </div>
-          <div className="pointer-events-none absolute right-1.5 top-1.5 text-[10px] uppercase tracking-wider text-zinc-400">
+          <div className="pointer-events-none absolute right-1.5 top-1.5 text-[10px] uppercase tracking-wider text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
             {fmt(max)} →
           </div>
-          <div className="pointer-events-none absolute bottom-1.5 right-1.5 text-[10px] uppercase tracking-wider text-zinc-400">
+          <div className="pointer-events-none absolute bottom-1.5 right-1.5 text-[10px] uppercase tracking-wider text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
             ← {fmt(min)}
           </div>
         </>

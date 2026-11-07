@@ -15,7 +15,7 @@ function BreadcrumbsRoot({
   const [expanded, setExpanded] = useState(false);
 
   const sep = separator ?? (
-    <ChevronRight size={12} className="text-zinc-400 rtl:-scale-x-100" />
+    <ChevronRight size={12} aria-hidden="true" className="text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))] rtl:-scale-x-100" />
   );
 
   const lastItem = items[items.length - 1];
@@ -56,7 +56,7 @@ function BreadcrumbsRoot({
               type="button"
               onClick={() => setExpanded(true)}
               onMouseEnter={() => setExpanded(true)}
-              className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              className="text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
             >
               ...
             </button>

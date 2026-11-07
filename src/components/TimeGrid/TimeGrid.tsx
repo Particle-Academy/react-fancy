@@ -97,9 +97,9 @@ const BooleanTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(
                   style={{ width: cellWidth }}
                   data-react-fancy-timegrid-col={c}
                   className={cn(
-                    "text-zinc-400",
+                    "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
                     toggleStripsOnHeaderClick &&
-                      "cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-200",
+                      "cursor-pointer hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
                   )}
                 >
                   {sparseColLabels ? (c % colStep === 0 ? label : "") : label}
@@ -114,9 +114,9 @@ const BooleanTimeGrid = forwardRef<HTMLDivElement, TimeGridProps>(
                   onClick={() => toggleRow(r)}
                   data-react-fancy-timegrid-row={r}
                   className={cn(
-                    "pe-1 text-end font-medium text-zinc-500",
+                    "pe-1 text-end font-medium text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
                     toggleStripsOnHeaderClick &&
-                      "cursor-pointer hover:text-zinc-800 dark:hover:text-zinc-200",
+                      "cursor-pointer hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
                   )}
                 >
                   {label}

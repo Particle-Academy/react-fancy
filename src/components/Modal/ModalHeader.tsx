@@ -27,7 +27,7 @@ export function ModalHeader({ children, className, closeLabel = "Close" }: Modal
         type="button"
         onClick={close}
         data-react-fancy-modal-close=""
-        className="relative rounded-lg p-1 text-zinc-400 before:absolute before:-inset-2 before:content-[''] transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-600 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-300"
+        className="relative rounded-lg p-1 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] before:absolute before:-inset-2 before:content-[''] transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
         aria-label={closeLabel}
       >
         <X size={20} />

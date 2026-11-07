@@ -78,7 +78,7 @@ export const Pillbox = forwardRef<HTMLDivElement, PillboxProps>(
                   e.stopPropagation();
                   removeItem(i);
                 }}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                className="text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
                 aria-label={`Remove ${item}`}
               >
                 <X size={12} />
@@ -94,7 +94,7 @@ export const Pillbox = forwardRef<HTMLDivElement, PillboxProps>(
           onKeyDown={handleKeyDown}
           placeholder={items.length === 0 ? placeholder : ""}
           disabled={disabled}
-          className="min-w-[80px] flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
+          className="min-w-[80px] flex-1 bg-transparent text-sm outline-none placeholder:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:placeholder:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"
         />
       </div>
     );

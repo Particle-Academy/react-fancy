@@ -475,7 +475,8 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
       >
         <span className="truncate">{getDisplayText()}</span>
         <svg
-          className={cn("h-4 w-4 shrink-0 text-zinc-400 transition-transform", open && "rotate-180")}
+          aria-hidden="true"
+          className={cn("h-4 w-4 shrink-0 transition-transform", "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]", open && "rotate-180")}
           viewBox="0 0 20 20"
           fill="currentColor"
         >
@@ -533,7 +534,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
           )}
 
           {filtered.length === 0 && !canCreate ? (
-            <div className="px-3 py-2 text-sm text-zinc-400">No results found</div>
+            <div className="px-3 py-2 text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">No results found</div>
           ) : filtered.length === 0 ? null : (
             filtered.map((option, i) => {
               const selected = isSelected(option.value as string);

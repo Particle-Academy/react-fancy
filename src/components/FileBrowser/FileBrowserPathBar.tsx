@@ -69,7 +69,7 @@ export function FileBrowserPathBar({
           spellCheck={false}
           placeholder={placeholder}
           aria-label="Path"
-          className="min-w-0 flex-1 rounded-md border border-zinc-300 bg-transparent px-2 py-0.5 font-mono text-xs text-[color:var(--fancy-text-soft,var(--color-zinc-700))] outline-none placeholder:text-zinc-400 focus:border-blue-400 dark:border-zinc-600 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
+          className="min-w-0 flex-1 rounded-md border border-zinc-300 bg-transparent px-2 py-0.5 font-mono text-xs text-[color:var(--fancy-text-soft,var(--color-zinc-700))] outline-none placeholder:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:placeholder:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] focus:border-blue-400 dark:border-zinc-600 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
         />
       ) : (
         <nav
@@ -96,7 +96,7 @@ export function FileBrowserPathBar({
             return (
               <Fragment key={segment.path}>
                 {i > 0 && (
-                  <ChevronRight size={12} aria-hidden="true" className="shrink-0 text-zinc-400 rtl:-scale-x-100" />
+                  <ChevronRight size={12} aria-hidden="true" className="shrink-0 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))] rtl:-scale-x-100" />
                 )}
                 {last ? (
                   <span
@@ -126,7 +126,7 @@ export function FileBrowserPathBar({
           type="button"
           aria-label="Edit path"
           onClick={startEdit}
-          className="shrink-0 rounded-md p-1 text-zinc-400 transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-zinc-600 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:hover:text-zinc-300"
+          className="shrink-0 rounded-md p-1 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
         >
           <Pencil size={13} />
         </button>

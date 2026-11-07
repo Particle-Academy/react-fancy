@@ -11,7 +11,7 @@ export function CommandInput({
 
   return (
     <div data-react-fancy-command-input="" className="flex items-center border-b border-[color:var(--fancy-border,var(--color-zinc-200))] px-4 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]">
-      <Search size={16} className="shrink-0 text-zinc-400" />
+      <Search size={16} aria-hidden="true" className="shrink-0 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]" />
       <input
         type="text"
         // A combobox: focus stays here while the arrows move the active option,
@@ -24,7 +24,7 @@ export function CommandInput({
         onChange={(e) => setQuery(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          "flex-1 bg-transparent px-3 py-3 text-sm outline-none placeholder:text-zinc-400",
+          "flex-1 bg-transparent px-3 py-3 text-sm outline-none placeholder:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:placeholder:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
           className,
         )}
         autoFocus
