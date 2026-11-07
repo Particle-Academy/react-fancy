@@ -49,13 +49,6 @@ export function warnUnknownTokens(names: string[]): void {
   }
 }
 
-/** Fill a label template's `{name}` slots (single braces, label-only). */
-export function fillLabel(template: string, values: Record<string, string | number>): string {
-  return template.replace(/\{(\w+)\}/g, (whole: string, name: string) =>
-    name in values ? String(values[name]) : whole,
-  );
-}
-
 /**
  * The link for a step's `url`: absolute `http:` / `https:` only, with its host
  * for the button label. Uses the global `URL`, which exists on the server too.

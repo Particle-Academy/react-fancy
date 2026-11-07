@@ -388,7 +388,7 @@ export { Pillbox } from "./components/Pillbox";
 export type { PillboxProps } from "./components/Pillbox";
 
 export { OtpInput } from "./components/OtpInput";
-export type { OtpInputProps } from "./components/OtpInput";
+export type { OtpInputProps, OtpInputLabels } from "./components/OtpInput";
 
 export { PhoneInput, parsePhone, PHONE_COUNTRIES } from "./components/PhoneInput";
 export type {

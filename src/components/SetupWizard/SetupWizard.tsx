@@ -12,7 +12,8 @@ import { Stepper } from "../Stepper/Stepper";
 import type { StepperStep, StepperStepState } from "../Stepper/Stepper.types";
 import { Text } from "../Text/Text";
 import { defaultClipboardWriter, runWriter } from "../ContentRenderer/copy";
-import { externalLink, fillLabel, fillTokens, warnUnknownTokens } from "./tokens";
+import { fillLabel } from "../../utils/label-template";
+import { externalLink, fillTokens, warnUnknownTokens } from "./tokens";
 import type {
   SetupWizardLabels,
   SetupWizardProps,
