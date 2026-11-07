@@ -75,13 +75,13 @@ export function DisplayValue({
         "border-0 bg-transparent px-0",
         interactive &&
           "-mx-2 cursor-text rounded-md px-2 outline-none transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
-        empties && "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
+        empties && "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
         className,
       )}
     >
-      {leading && <span className="text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">{leading}</span>}
+      {leading && <span className="text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">{leading}</span>}
       <span className="min-w-0 truncate">{empties ? empty : children}</span>
-      {trailing && <span className="text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">{trailing}</span>}
+      {trailing && <span className="text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">{trailing}</span>}
     </div>
   );
 }

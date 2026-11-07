@@ -21,7 +21,7 @@ import { MultiSwitch } from "@particle-academy/react-fancy";
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `list` | `InputOption[]` | **required** | Options as strings or `{ value, label, disabled? }` |
+| `list` | `InputOption[]` | **required** | Options as strings or `{ value, label, disabled?, lang?, dir? }` |
 | `value` | `V` | - | Controlled selected value |
 | `defaultValue` | `V` | first option | Default selected value (uncontrolled) |
 | `onValueChange` | `(value: V) => void` | - | Callback when selection changes |

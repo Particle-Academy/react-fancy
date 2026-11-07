@@ -65,7 +65,7 @@ const MARK_DOT =
   "h-1.5 w-1.5 rounded-full ring-1 ring-[color:var(--fancy-surface,var(--color-white))] dark:ring-[color:var(--fancy-surface-dark,var(--color-zinc-900))]";
 
 const HEADER_COL =
-  "overflow-visible whitespace-nowrap text-[10px] leading-4 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]";
+  "overflow-visible whitespace-nowrap text-[10px] leading-4 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]";
 const HEADER_ROW =
   "whitespace-nowrap pe-1 text-end text-[10px] font-medium text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]";
 const HEADER_HOVER =

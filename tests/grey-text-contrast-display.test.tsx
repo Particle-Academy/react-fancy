@@ -93,8 +93,8 @@ describe("paging", () => {
 });
 
 describe("TimeGrid headers", () => {
-  // The boolean grid (no `cells`). The typed grid's headers were already
-  // tokenised and are not part of this sweep.
+  // The boolean grid (no `cells`). The typed grid's column headers were on
+  // the faint token until 6.13.0; `grey-text-contrast-faint` measures them.
   it("column and row headers, at rest and on hover", () => {
     const { host } = mount(
       <TimeGrid rows={["Mon"]} cols={["9", "10"]} value={[[false, false]]} onChange={() => {}} toggleStripsOnHeaderClick />,

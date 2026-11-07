@@ -96,7 +96,7 @@ export function FileBrowserStatusRow({ depth, kind, message, onRetry }: FileBrow
     <div
       role="none"
       data-react-fancy-file-browser-status={kind}
-      className="flex items-center gap-1.5 py-0.5 text-xs text-[color:var(--fancy-text-faint,var(--color-zinc-400))] italic dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
+      className="flex items-center gap-1.5 py-0.5 text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] italic dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"
       style={{ paddingInlineStart: paddingLeft }}
     >
       {kind === "loading" && <Loader2 size={12} className="shrink-0 animate-spin" aria-hidden="true" />}
@@ -211,7 +211,7 @@ export function FileBrowserNode({ entry, depth }: FileBrowserNodeProps) {
           (entry.kind === "dir" ? <FolderIcon open={expanded} /> : <FileIcon ext={ext} />)}
         <span className="min-w-0 flex-1 truncate">{entry.name}</span>
         {entry.kind === "file" && entry.size !== undefined && (
-          <span className="shrink-0 text-[11px] text-[color:var(--fancy-text-faint,var(--color-zinc-400))] tabular-nums dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
+          <span className="shrink-0 text-[11px] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] tabular-nums dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
             {formatFileSize(entry.size)}
           </span>
         )}

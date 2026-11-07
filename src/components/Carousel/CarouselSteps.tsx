@@ -28,7 +28,7 @@ export const CarouselSteps = forwardRef<HTMLDivElement, CarouselStepsProps>(
                   "flex items-center gap-1.5 text-sm font-medium transition-colors",
                   isActive && "text-blue-600 dark:text-blue-400",
                   isCompleted && "text-green-600 dark:text-green-400",
-                  !isActive && !isCompleted && "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
+                  !isActive && !isCompleted && "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
                 )}
                 aria-label={name || `Step ${i + 1}`}
                 aria-current={isActive ? "step" : undefined}

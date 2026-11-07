@@ -5,7 +5,7 @@ import { Field } from "../Field";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { DisplayValue } from "../mode/DisplayValue";
 import { useInlineEdit } from "../mode/useInlineEdit";
-import { dirtyRingClasses, resolveOption } from "../inputs.utils";
+import { dirtyRingClasses, optionLabelList, optionLangProps, resolveOption } from "../inputs.utils";
 import type { CheckboxGroupProps } from "./CheckboxGroup.types";
 
 export function CheckboxGroup<V = string>({
@@ -53,11 +53,7 @@ export function CheckboxGroup<V = string>({
 
   const content = !showControl ? (
     <DisplayValue size={size} interactive={interactive} onActivate={enterEdit}>
-      {list
-        .map(resolveOption)
-        .filter((o) => value.includes(o.value))
-        .map((o) => o.label)
-        .join(", ")}
+      {optionLabelList(list.map(resolveOption).filter((o) => value.includes(o.value)))}
     </DisplayValue>
   ) : (
     <div
@@ -98,6 +94,7 @@ export function CheckboxGroup<V = string>({
             <div className="flex flex-col">
               <label
                 htmlFor={optionId}
+                {...optionLangProps(resolved)}
                 className={cn(
                   "cursor-pointer text-sm text-zinc-700 dark:text-zinc-100",
                   (disabled || resolved.disabled) &&

@@ -100,7 +100,7 @@ export function AccordionPanelTrigger({
       data-orientation={orientation}
       className={cn(
         "flex shrink-0 items-center justify-center rounded-md",
-        "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
+        "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
         "hover:text-[color:var(--fancy-text,var(--color-zinc-900))] dark:hover:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
         "hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
         "transition-colors cursor-pointer",

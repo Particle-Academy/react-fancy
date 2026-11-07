@@ -136,7 +136,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
           "pointer-events-auto flex shrink-0 items-center gap-px opacity-0 transition-opacity duration-150",
           "group-hover/faux-client:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100",
           isBrowser
-            ? "-my-1 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
+            ? "-my-1 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"
             : "rounded-full bg-zinc-900/60 px-1 py-0.5 text-white/80 shadow-sm backdrop-blur-sm",
         )}
       >
@@ -226,7 +226,7 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
               </div>
             )}
             {url != null && <span className="min-w-0 flex-1 truncate">{url}</span>}
-            {meta != null && <span className="shrink-0 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">{meta}</span>}
+            {meta != null && <span className="shrink-0 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">{meta}</span>}
             {hasControls && <div className={cn(url == null && meta == null && "ms-auto")}>{controlsBar}</div>}
           </div>
         )}

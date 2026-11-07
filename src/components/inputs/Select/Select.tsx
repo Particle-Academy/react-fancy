@@ -12,6 +12,9 @@ import {
   errorClasses,
   inputBaseClasses,
   inputSizeClasses,
+  optionLabelList,
+  optionLabelNode,
+  optionLangProps,
   resolveOption,
 } from "../inputs.utils";
 import { useFieldMode } from "../mode/FieldMode.context";
@@ -45,6 +48,7 @@ function renderNativeOption(option: InputOption, index: number) {
       key={`${resolved.value}-${index}`}
       value={resolved.value as string}
       disabled={resolved.disabled}
+      {...optionLangProps(resolved)}
     >
       {resolved.label}
     </option>
@@ -99,7 +103,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
           interactive={interactive}
           onActivate={enterEdit}
         >
-          {opt?.label ?? current}
+          {optionLabelNode(opt, current)}
         </DisplayValue>
       );
       if (label || error || description) {
@@ -370,6 +374,16 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
     }, [search, multiple, currentMulti, onCreate, onValuesChange, onValueChange, close]);
 
     // ── Display text ───────────────────────────────────────
+    // The one option the trigger is showing, if any: its label carries the
+    // option's `lang` / `dir`. A placeholder or an "N selected" count has none.
+    const displayedOption = multiple
+      ? currentMulti.length === 1
+        ? resolvedOptions.find((o) => o.value === currentMulti[0])
+        : undefined
+      : currentSingle
+        ? resolvedOptions.find((o) => o.value === currentSingle)
+        : undefined;
+
     const getDisplayText = (): string => {
       if (multiple) {
         if (currentMulti.length === 0) return placeholder;
@@ -418,16 +432,14 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
 
     // ── View mode ──────────────────────────────────────────
     if (!showControl) {
-      const labels = multiple
-        ? currentMulti.map(
-            (v) => resolvedOptions.find((o) => o.value === v)?.label ?? v,
-          )
+      const shown = multiple
+        ? currentMulti.map((v) => resolvedOptions.find((o) => o.value === v) ?? v)
         : currentSingle
-          ? [resolvedOptions.find((o) => o.value === currentSingle)?.label ?? currentSingle]
+          ? [resolvedOptions.find((o) => o.value === currentSingle) ?? currentSingle]
           : [];
       const display = (
         <DisplayValue size={size} interactive={interactive} onActivate={enterEdit}>
-          {labels.join(", ")}
+          {optionLabelList(shown)}
         </DisplayValue>
       );
       if (label || error || description) {
@@ -469,11 +481,11 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
           dirtyClasses(dirty),
           errorClasses(error),
           "flex w-full cursor-pointer items-center justify-between gap-2 text-start",
-          !hasValue && "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
+          !hasValue && "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
           className,
         )}
       >
-        <span className="truncate">{getDisplayText()}</span>
+        <span className="truncate" {...optionLangProps(displayedOption)}>{getDisplayText()}</span>
         <svg
           aria-hidden="true"
           className={cn("h-4 w-4 shrink-0 transition-transform", "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]", open && "rotate-180")}
@@ -515,7 +527,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder={creatable && !searchable ? "Type to add…" : "Search…"}
-                className="w-full rounded-md border-0 bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] px-2.5 py-1.5 text-sm text-[color:var(--fancy-text,var(--color-zinc-900))] placeholder:text-[color:var(--fancy-text-faint,var(--color-zinc-400))] outline-none dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))] dark:placeholder:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]"
+                className="w-full rounded-md border-0 bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] px-2.5 py-1.5 text-sm text-[color:var(--fancy-text,var(--color-zinc-900))] placeholder:text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] outline-none dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))] dark:placeholder:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))]"
               />
             </div>
           )}
@@ -585,9 +597,9 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
 
                   {/* Label + description */}
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate">{option.label}</span>
+                    <span className="block truncate" {...optionLangProps(option)}>{option.label}</span>
                     {option.description && (
-                      <span className="block truncate text-xs text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">{option.description}</span>
+                      <span className="block truncate text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">{option.description}</span>
                     )}
                   </span>
                 </button>

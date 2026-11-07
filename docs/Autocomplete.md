@@ -25,7 +25,7 @@ import { Autocomplete } from "@particle-academy/react-fancy";
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `options` | `AutocompleteOption[]` | **required** | `{ value: string; label: string; disabled?: boolean }` |
+| `options` | `AutocompleteOption[]` | **required** | `{ value: string; label: string; disabled?: boolean; lang?: string; dir?: "ltr" \| "rtl" \| "auto" }`. `lang` / `dir` go on the option and on the field while it shows that option's label (6.13.0) |
 | `value` | `string` | - | Controlled selected value |
 | `defaultValue` | `string` | `""` | Default value (uncontrolled) |
 | `onChange` | `(value: string) => void` | - | Callback when an option is selected |

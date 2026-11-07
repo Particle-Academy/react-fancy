@@ -49,6 +49,7 @@ export type {
   InputBaseProps,
   InputOption,
   InputOptionGroup,
+  OptionDir,
   AffixPosition,
   InputAffixProps,
   FieldProps,

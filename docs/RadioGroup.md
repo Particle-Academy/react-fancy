@@ -22,7 +22,7 @@ import { RadioGroup } from "@particle-academy/react-fancy";
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `list` | `InputOption[]` | **required** | Options as strings or `{ value, label, disabled?, description? }` |
+| `list` | `InputOption[]` | **required** | Options as strings or `{ value, label, disabled?, description?, lang?, dir? }` |
 | `value` | `V` | - | Controlled selected value |
 | `defaultValue` | `V` | - | Default selected value (uncontrolled) |
 | `onValueChange` | `(value: V) => void` | - | Callback when selection changes |

@@ -5,7 +5,7 @@ import { Field } from "../Field";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { DisplayValue } from "../mode/DisplayValue";
 import { useInlineEdit } from "../mode/useInlineEdit";
-import { dirtyRingClasses, resolveOption } from "../inputs.utils";
+import { dirtyRingClasses, optionLabelNode, optionLangProps, resolveOption } from "../inputs.utils";
 import type { RadioGroupProps } from "./RadioGroup.types";
 
 export function RadioGroup<V = string>({
@@ -52,7 +52,7 @@ export function RadioGroup<V = string>({
 
   const content = !showControl ? (
     <DisplayValue size={size} interactive={interactive} onActivate={enterEdit}>
-      {list.map(resolveOption).find((o) => o.value === value)?.label}
+      {optionLabelNode(list.map(resolveOption).find((o) => o.value === value))}
     </DisplayValue>
   ) : (
     <div
@@ -98,6 +98,7 @@ export function RadioGroup<V = string>({
             <div className="flex flex-col">
               <label
                 htmlFor={optionId}
+                {...optionLangProps(resolved)}
                 className={cn(
                   "cursor-pointer text-sm text-zinc-700 dark:text-zinc-100",
                   (disabled || resolved.disabled) &&

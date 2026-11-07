@@ -34,7 +34,7 @@ export const IndexList = forwardRef<HTMLOListElement, IndexListProps>(
             className="relative flex items-baseline gap-4 border-b border-zinc-200 py-3 last:border-b-0 dark:border-zinc-800"
           >
             {item.num != null && (
-              <span data-react-fancy-index-num="" className="shrink-0 font-mono text-xs tabular-nums text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
+              <span data-react-fancy-index-num="" className="shrink-0 font-mono text-xs tabular-nums text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                 {item.num}
               </span>
             )}

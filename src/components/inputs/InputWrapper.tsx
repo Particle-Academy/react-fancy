@@ -72,7 +72,7 @@ export function InputWrapper({
           )}
         >
           {hasInsidePrefix && (
-            <span className="pointer-events-none absolute start-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
+            <span className="pointer-events-none absolute start-3 z-10 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
               {prefix}
             </span>
           )}
@@ -88,7 +88,7 @@ export function InputWrapper({
             {children}
           </div>
           {hasInsideSuffix && (
-            <span className="pointer-events-none absolute end-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
+            <span className="pointer-events-none absolute end-3 z-10 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
               {suffix}
             </span>
           )}
@@ -106,7 +106,7 @@ export function InputWrapper({
   return (
     <div data-react-fancy-input-wrapper="" className="relative flex items-center">
       {hasInsidePrefix && (
-        <span className="pointer-events-none absolute start-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
+        <span className="pointer-events-none absolute start-3 z-10 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
           {prefix}
         </span>
       )}
@@ -120,7 +120,7 @@ export function InputWrapper({
         {children}
       </div>
       {hasInsideSuffix && (
-        <span className="pointer-events-none absolute end-3 z-10 text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]">
+        <span className="pointer-events-none absolute end-3 z-10 text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
           {suffix}
         </span>
       )}

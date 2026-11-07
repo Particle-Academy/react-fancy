@@ -23,6 +23,12 @@ import { Sidebar } from "../src/components/Sidebar";
  * the `--fancy-text-muted` and `--fancy-text-soft` tokens (the grey-text
  * sweep; the glyph was 2.62:1 in light, under the 3:1 a control owes). Class
  * strings on the toggle only; no element or attribute changed.
+ *
+ * DELIBERATE CHANGE, 6.13.0: the group heading ("Main") moved from the faint
+ * token to muted (zinc-400 / zinc-500 to zinc-500 / zinc-400): readable text
+ * on faint was 2.62:1 in light, under AA. One class string on that `<p>` in
+ * the "expanded" snapshot; no element or attribute changed, and the collapsed
+ * snapshots (which draw no heading) are untouched.
  */
 
 const icon = <svg data-icon="" />;

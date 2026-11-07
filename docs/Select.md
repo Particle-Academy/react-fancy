@@ -31,7 +31,7 @@ Extends native `<select>` attributes (except `size`, `prefix`, `multiple`).
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `list` | `InputOption[] \| InputOptionGroup[]` | **required** | Options as strings or `{ value, label, disabled?, description? }`. Groups via `{ label, options }`. |
+| `list` | `InputOption[] \| InputOptionGroup[]` | **required** | Options as strings or `{ value, label, disabled?, description?, lang?, dir? }`. Groups via `{ label, options }`. |
 | `variant` | `"native" \| "listbox"` | `"native"` (auto `"listbox"` if `multiple`) | Rendering variant |
 | `placeholder` | `string` | `"Select..."` (listbox) | Placeholder text |
 | `size` | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"md"` | Controls sizing |
@@ -59,7 +59,33 @@ Extends native `<select>` attributes (except `size`, `prefix`, `multiple`).
 ### InputOption type
 
 ```ts
-type InputOption = string | { value: string; label: string; disabled?: boolean; description?: string };
+type InputOption =
+  | string
+  | {
+      value: string;
+      label: string;
+      disabled?: boolean;
+      description?: string;
+      lang?: string; // BCP 47 language of `label` (WCAG 3.1.2), since 6.13.0
+      dir?: "ltr" | "rtl" | "auto"; // direction of `label`, since 6.13.0
+    };
+```
+
+`lang` and `dir` go on the element holding the option's label: the native
+`<option>`, the listbox option's label, and the trigger or view-mode value when
+that option is the one selected. Unset adds no attribute; `dir="auto"` is
+available but never added for you.
+
+```tsx
+<Select
+  label="Language"
+  list={[
+    { value: "en", label: "English" },
+    { value: "my", label: "မြန်မာ", lang: "my" },
+    { value: "ar", label: "العربية", lang: "ar", dir: "rtl" },
+    { value: "hi", label: "हिन्दी", lang: "hi" },
+  ]}
+/>
 ```
 
 ### InputOptionGroup type

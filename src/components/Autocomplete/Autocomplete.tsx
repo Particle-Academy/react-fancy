@@ -8,6 +8,7 @@ import { useOutsideClick } from "../../hooks/use-outside-click";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import { useFieldMode } from "../inputs/mode/FieldMode.context";
 import { useInlineEdit } from "../inputs/mode/useInlineEdit";
+import { optionLangProps } from "../inputs/inputs.utils";
 import type { AutocompleteProps } from "./Autocomplete.types";
 
 export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
@@ -55,6 +56,8 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
 
     useOutsideClick(wrapperRef, close, open);
     useEscapeKey(close, open);
+
+    const selected = value ? options.find((o) => o.value === value) : undefined;
 
     const filtered = options.filter((o) =>
       o.label.toLowerCase().includes(query.toLowerCase()),
@@ -106,6 +109,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
           role={interactive ? "button" : undefined}
           tabIndex={interactive ? 0 : undefined}
           title={interactive ? "Click to edit" : undefined}
+          {...optionLangProps(matched)}
           onClick={interactive ? enterEdit : undefined}
           onKeyDown={
             interactive
@@ -119,7 +123,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
           }
           className={cn(
             "text-sm text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]",
-            !value && "text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]",
+            !value && "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
             interactive &&
               "cursor-pointer rounded-md outline-none transition-colors hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]",
             className,
@@ -160,10 +164,13 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
           placeholder={placeholder}
           disabled={disabled}
           autoFocus={interactive}
+          // While the field shows the selected option's label, it carries that
+          // option's `lang` / `dir`; once the text is edited away it does not.
+          {...(selected && query === selected.label ? optionLangProps(selected) : {})}
           role="combobox"
           aria-expanded={open}
           aria-autocomplete="list"
-          className="w-full rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-input,var(--color-white))] px-3 py-2 text-sm text-[color:var(--fancy-text,var(--color-zinc-900))] placeholder:text-[color:var(--fancy-text-faint,var(--color-zinc-400))] outline-none transition-[border-color,box-shadow] duration-150 focus:border-[color:var(--fancy-focus,var(--color-blue-500))] focus:ring-2 focus:ring-[color:var(--fancy-focus,var(--color-blue-500))]/40 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))] dark:placeholder:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))] dark:focus:border-[color:var(--fancy-focus-dark,var(--color-blue-400))] dark:focus:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]/20"
+          className="w-full rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-input,var(--color-white))] px-3 py-2 text-sm text-[color:var(--fancy-text,var(--color-zinc-900))] placeholder:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] outline-none transition-[border-color,box-shadow] duration-150 focus:border-[color:var(--fancy-focus,var(--color-blue-500))] focus:ring-2 focus:ring-[color:var(--fancy-focus,var(--color-blue-500))]/40 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))] dark:placeholder:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:focus:border-[color:var(--fancy-focus-dark,var(--color-blue-400))] dark:focus:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]/20"
         />
         {open && (
           <Portal>
@@ -191,6 +198,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
                     type="button"
                     role="option"
                     aria-selected={i === activeIndex}
+                    {...optionLangProps(option)}
                     disabled={option.disabled}
                     onClick={() => select(option.value)}
                     className={cn(

@@ -7,7 +7,7 @@ import { Field } from "../Field";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { DisplayValue } from "../mode/DisplayValue";
 import { useInlineEdit } from "../mode/useInlineEdit";
-import { resolveOption } from "../inputs.utils";
+import { optionLabelNode, optionLangProps, resolveOption } from "../inputs.utils";
 import type { Color, Size } from "../../../utils/types";
 import type { MultiSwitchProps } from "./MultiSwitch.types";
 import { multiSwitchColorClasses } from "./MultiSwitch.colors";
@@ -111,7 +111,7 @@ export function MultiSwitch<V = string>({
 
   const control = !showControl ? (
     <DisplayValue size={size} interactive={interactive} onActivate={enterEdit}>
-      {resolvedOptions.find((o) => o.value === value)?.label}
+      {optionLabelNode(resolvedOptions.find((o) => o.value === value))}
     </DisplayValue>
   ) : (
     <div
@@ -158,6 +158,7 @@ export function MultiSwitch<V = string>({
             type="button"
             role="radio"
             aria-checked={isSelected}
+            {...optionLangProps(option)}
             disabled={disabled || option.disabled}
             autoFocus={interactive && (selectedIndex === -1 ? index === 0 : isSelected)}
             onClick={() => {

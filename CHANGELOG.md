@@ -11,6 +11,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.13.0] - 2026-11-07
+
+### Added
+
+- **Per-option `lang` and `dir`** (council change CC-fancy-0014). The object form of `InputOption` takes optional `lang?: string` (BCP 47) and `dir?: "ltr" | "rtl" | "auto"`, and so does `AutocompleteOption`. A language switcher that names each language in itself (Burmese, Hanifi Rohingya, Hindi) can now mark each label's language, as WCAG 3.1.2 (language of parts) asks, and set `dir="rtl"` on a right-to-left label inside a left-to-right control. The attributes go on the element that holds the label text:
+  - the native `<option>` in Select (including inside an `<optgroup>`);
+  - the label of each listbox option in the custom Select, and the Select trigger's value while that option is the one shown (single, or `multiple` with exactly one chosen; never the placeholder or an "N selected" count);
+  - each Autocomplete option, and the Autocomplete field while it shows the picked option's label;
+  - the `<label>` of each RadioGroup and CheckboxGroup option, and each MultiSwitch segment;
+  - every component's view-mode value (`mode="view"`), each label keeping its own attributes when several are listed.
+  
+  An option that sets neither renders exactly as before: no attribute, no extra element. `dir="auto"` is available, and is never added for you, because that would change the output of every existing select. The new `OptionDir` type is exported. **Consumer action:** none. To use it, add `lang` (and `dir: "rtl"` for a right-to-left script) to the options whose label is in a language other than the page's.
+
+### Fixed
+
+- **Readable text that 6.12.0 left on the faint token now reaches AA.** `--fancy-text-faint` (zinc-400 / zinc-500) is 2.62:1 on the kit's white surface and 3.67:1 on its zinc-900 dark surface, under AA in both modes; it is meant for decoration. These now read `--fancy-text-muted` (zinc-500 / zinc-400), with the same fallbacks and `-dark` twins as the rest of the kit:
+  - placeholders: Input, Textarea and every other field on the shared input classes, and Autocomplete;
+  - empty-value text: the listbox Select trigger with nothing chosen, Autocomplete's view mode, and the empty value of every view-mode field;
+  - field affixes drawn inside the box: Input `leading` / `trailing`, the inside `prefix` / `suffix` of InputWrapper, and the view-mode prefix and suffix;
+  - secondary labels: Select option descriptions, the typed TimeGrid column headers, the Carousel wizard's upcoming step names, Menu and Sidebar group headings, FileBrowser's status row ("Empty", "No matches", "Loading...") and file sizes, FauxClient's browser-bar meta and zoom readout, and IndexList numbers;
+  - two icon-only controls the 6.12.0 sweep missed, which owe 3:1: the AccordionPanel trigger while closed and the Table row expand toggle.
+  
+  The Select search box sits on a zinc-100 / zinc-800 fill where muted is 4.39:1, so its placeholder reads `--fancy-text-subtle` (zinc-600 / zinc-400) instead, as 6.12.0 did for other text on that fill. Before: 2.62:1 light / 3.67:1 dark on white / zinc-900 (2.51:1 on FauxClient's zinc-50 bar, 2.39:1 in the Select search box). After: 4.83:1 / 6.75:1 on white / zinc-900, 4.62:1 / 7.59:1 on the FauxClient bar, 7.02:1 / 5.68:1 in the Select search box, and 6.32:1 for dark placeholders on the `#1e1e24` field. Faint now holds only decorative glyphs and lines (separators, tick marks, aria-hidden icons, scrollbar colour), and a scan test fails any new use outside that list. **Consumer action:** none. Placeholders and the text above are one palette step darker in light mode and one step lighter in dark mode; an app that maps `--fancy-text-muted` will see them follow it instead of `--fancy-text-faint`.
+
 ## [6.12.0] - 2026-11-07
 
 ### Changed
