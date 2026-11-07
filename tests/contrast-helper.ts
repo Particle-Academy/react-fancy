@@ -61,9 +61,20 @@ export function resolveColour(name: string): RGB {
   const raw = themePalette().get(v);
   if (!raw) throw new Error(`unknown colour ${name}`);
   if (raw.startsWith("#")) return hexToRgb(raw);
-  const m = raw.match(/oklch\(([\d.]+)%\s+([\d.]+)\s+([\d.]+)\)/);
-  if (!m) throw new Error(`unparsed colour ${name}: ${raw}`);
-  return oklchToRgb(Number(m[1]) / 100, Number(m[2]), Number(m[3]));
+  const lch = parseOklch(raw);
+  if (!lch) throw new Error(`unparsed colour ${name}: ${raw}`);
+  return oklchToRgb(...lch);
+}
+
+/**
+ * `oklch(L% C H)` -> [L 0..1, C, H]. Newer Tailwind writes an achromatic hue as
+ * the CSS `none` keyword (`oklch(98.5% 0 none)`, as CI resolves it), older
+ * versions as a number. `none` is a missing component, which converts as 0.
+ */
+export function parseOklch(raw: string): [number, number, number] | null {
+  const m = raw.match(/oklch\(([\d.]+)%\s+([\d.]+)\s+([\d.]+|none)\)/);
+  if (!m) return null;
+  return [Number(m[1]) / 100, Number(m[2]), m[3] === "none" ? 0 : Number(m[3])];
 }
 
 function luminance([r, g, b]: RGB): number {
