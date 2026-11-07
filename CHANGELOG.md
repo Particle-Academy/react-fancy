@@ -11,6 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.14.0] - 2026-11-07
+
+### Added
+
+- **`SetupWizard`**: a controlled, one-step-at-a-time guide for setting up a third-party service, for someone who has never done it. It knows nothing about any provider; a guide is plain JSON (`SetupWizardStep[]`).
+  - `value: { current, done }` and `onChange(next)`, fully controlled. Back, "Mark done and continue", and jumping to any step through the step indicator, which is react-fancy's `Stepper`. Indicator states come from `done`, so a skipped step is not shown complete.
+  - A badge says who does each step: "You" (`actor: "person"`, the default) or "Your agent" (`actor: "agent"`).
+  - Person steps show the detail as plain text, an "Open <host>" link when `url` is an absolute `http:` / `https:` URL (new tab, `rel="noopener noreferrer"`; any other URL renders no link), and each `copy` entry with a Copy button. Agent steps show the `prompt` in a `CodeBlock` with one "Copy prompt" button and a line saying to paste it to the agent building the app. `done` adds "You'll know it worked when: ...".
+  - `tokens` fills `{{name}}` in `detail`, `prompt` and `copy[].value` by literal string replacement: rendered as text, never HTML, never evaluated. An unknown token stays as written and logs one development warning per name.
+  - `verify` adds a final "Check it works" step that shows the result and what it `proves`; a passing check is added to `done`, and a `verify` that throws is shown as a failed check.
+  - Copy uses `navigator.clipboard` when present and shows "Copied"; when it is missing or refuses, the text is selected instead. Results are announced through a polite live region. Nothing reads `window` during render, so it renders on the server.
+  - The current step is a labelled region, and focus moves to its heading when the step changes. Every visible string is in `labels`, English by default. Stable handles: `data-setup-step`, `data-setup-actor`, `data-setup-copy`, `data-setup-copy-prompt`, `data-setup-open`, `data-setup-verify` and more, with element ids derived from `id`. Subpath `@particle-academy/react-fancy/setup-wizard`. Docs: `docs/SetupWizard.md`.
+
+  **Consumer action:** none.
+
+### Fixed
+
+- **CodeBlock no longer rewrites its code on every re-render.** React 19 re-applies `dangerouslySetInnerHTML` whenever the `{ __html }` object changes, and CodeBlock built a new one each render, so any re-render of its parent replaced the code's text nodes and collapsed a selection inside the code (someone dragging over a command lost it when anything nearby updated). The objects are now memoised on the highlighted HTML, with and without `showLineNumbers`. Found building SetupWizard, whose copy fallback selects text inside a CodeBlock. **Consumer action:** none.
+
 ## [6.13.0] - 2026-11-07
 
 ### Added

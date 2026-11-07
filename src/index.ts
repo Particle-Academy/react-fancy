@@ -244,6 +244,17 @@ export type { TimelineProps, TimelineItemProps, TimelineBlockProps, TimelineEven
 export { Stepper } from "./components/Stepper";
 export type { StepperProps, StepperStep, StepperStepProps, StepperStepState, StepperOrientation } from "./components/Stepper";
 
+export { SetupWizard } from "./components/SetupWizard";
+export type {
+  SetupWizardProps,
+  SetupWizardStep,
+  SetupWizardValue,
+  SetupWizardActor,
+  SetupWizardCopyEntry,
+  SetupWizardVerifyResult,
+  SetupWizardLabels,
+} from "./components/SetupWizard";
+
 export { TimeGrid } from "./components/TimeGrid";
 export type { TimeGridProps, TimeGridTone, TimeGridCell, TimeGridStateDef, TimeGridMarkDef, TimeGridCoord, TimeGridSelection, TimeGridSelectionShape, TimeGridDisabledRange, TimeGridBlockedCell } from "./components/TimeGrid";
 

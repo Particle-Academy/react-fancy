@@ -95,6 +95,12 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
     if (all.length > 1 && code.endsWith("\n")) all.pop();
     return all;
   }, [code, tokens, showLineNumbers]);
+  // The `{ __html }` objects are memoised, not built inline: React 19 rewrites
+  // `innerHTML` whenever this OBJECT changes, so a fresh one per render replaced
+  // the code's text nodes on every parent re-render and collapsed any selection
+  // inside the code (tests/code-block-rerender-selection.test.tsx).
+  const codeHtml = useMemo(() => ({ __html: html ?? "" }), [html]);
+  const lineHtml = useMemo(() => lines?.map((l) => ({ __html: l })) ?? null, [lines]);
 
   const [copyState, setCopyState] = useState<CopyState>("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -211,7 +217,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
             data-react-fancy-code-block-code=""
             style={{ display: wrap ? "block" : "inline-block", minWidth: "100%" }}
           >
-            {lines.map((lineHtml, i) => (
+            {lines.map((_line, i) => (
               <span key={i} data-react-fancy-code-block-line={i + 1} style={{ display: "flex" }}>
                 <span
                   data-react-fancy-code-block-line-number=""
@@ -231,13 +237,13 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
                 <span
                   data-react-fancy-code-block-line-content=""
                   style={{ flex: "1 1 auto", minWidth: 0 }}
-                  dangerouslySetInnerHTML={{ __html: lineHtml }}
+                  dangerouslySetInnerHTML={lineHtml![i]}
                 />
               </span>
             ))}
           </code>
         ) : (
-          <code data-react-fancy-code-block-code="" dangerouslySetInnerHTML={{ __html: html ?? "" }} />
+          <code data-react-fancy-code-block-code="" dangerouslySetInnerHTML={codeHtml} />
         )}
       </pre>
 

@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "6.13.0",
+  "version": "6.14.0",
   "description": "React UI component library for Human+ UX — controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
@@ -851,6 +851,16 @@
       "require": {
         "types": "./dist/separator.d.cts",
         "default": "./dist/separator.cjs"
+      }
+    },
+    "./setup-wizard": {
+      "import": {
+        "types": "./dist/setup-wizard.d.ts",
+        "default": "./dist/setup-wizard.js"
+      },
+      "require": {
+        "types": "./dist/setup-wizard.d.cts",
+        "default": "./dist/setup-wizard.cjs"
       }
     },
     "./sidebar": {

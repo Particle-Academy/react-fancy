@@ -133,6 +133,7 @@ npx vite build                      # Build demo app (verifies imports work)
 | Callout | Alert/info box with icon, color, and dismissible support | [docs](docs/Callout.md) |
 | Timeline | Stacked, alternating, and horizontal timeline with data-driven or compound API | [docs](docs/Timeline.md) |
 | Stepper | Ordered steps with upcoming / current / complete / error states; pure content by default, opt-in clickable steps | [docs](docs/Stepper.md) |
+| SetupWizard | Controlled, one-step-at-a-time setup guide for a third-party service: who does each step, links, copy buttons, agent prompts, tokens, and an optional live check | [docs](docs/SetupWizard.md) |
 | Marquee | Auto-scrolling ticker strip with seamless wrap, px/s speed, fade edges, reduced-motion gate | [docs](docs/Marquee.md) |
 
 ### Overlay & Floating
