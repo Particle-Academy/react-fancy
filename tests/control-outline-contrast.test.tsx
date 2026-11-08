@@ -13,6 +13,7 @@ import { EmojiSelect } from "../src/components/EmojiSelect";
 import { FileUpload } from "../src/components/FileUpload";
 import { Composer } from "../src/components/Composer";
 import { PromptInput } from "../src/components/PromptInput";
+import { StreamingAudio } from "../src/components/StreamingAudio";
 import { contrast } from "./contrast-helper";
 import { cls, mount, unmountAll, NON_TEXT } from "./contrast-assert";
 import { installRenderedCss, removeRenderedCss } from "./rendered-css";
@@ -331,6 +332,31 @@ describe("chat composers: the container is the text field's only boundary", () =
   it("PromptInput, idle (not dragging)", async () => {
     mount(<PromptInput budgetTokens={1000} platform="generic" onSubmit={() => {}} />);
     await expectStrongOutline("PromptInput container", q("[data-react-fancy-prompt-input]"));
+  });
+});
+
+describe("StreamingAudio (6.16.0): its buttons are controls, not decoration", () => {
+  const radio = () => (
+    <StreamingAudio
+      stations={[{ id: "jazz", name: "Jazz FM", src: "https://ice.example.com/jazz" }]}
+      value={{ stationId: "jazz", playing: false, volume: 1, muted: false }}
+      onChange={() => {}}
+    />
+  );
+
+  it("play button", async () => {
+    mount(radio());
+    await expectStrongOutline("StreamingAudio play", q('[data-streaming-control="play"]'));
+  });
+
+  it("mute button", async () => {
+    mount(radio());
+    await expectStrongOutline("StreamingAudio mute", q('[data-streaming-control="mute"]'));
+  });
+
+  it("station select", async () => {
+    mount(radio());
+    await expectStrongOutline("StreamingAudio station", q('[data-streaming-control="station"]'));
   });
 });
 

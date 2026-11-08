@@ -184,6 +184,7 @@ Standalone, read-only viewers for displaying media files — drop one in anywher
 | ImageViewer | Fit-to-container image with zoom/pan and transparency checkerboard | [docs](docs/ImageViewer.md) |
 | VideoViewer | Native video controls, poster, fit | [docs](docs/VideoViewer.md) |
 | AudioViewer | Themed card around the native audio player | [docs](docs/AudioViewer.md) |
+| StreamingAudio | Controlled player for server-hosted MP3s and Icecast/Shoutcast live streams on native `<audio>`: station picker, LIVE badge, reconnect with backoff, Media Session | [docs](docs/StreamingAudio.md) |
 | PdfViewer | Inline PDF via `<object>`/`<iframe>` with download fallback | [docs](docs/PdfViewer.md) |
 
 ### Human+ Primitives

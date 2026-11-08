@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.16.0] - 2026-11-07
+
+### Added
+
+- **`StreamingAudio`**: a controlled player for server-hosted MP3s and Icecast / Shoutcast live streams, on the native `<audio>` element only. No new dependency; HLS is out of scope.
+  - `stations: StreamingStation[]` (`{ id, name, src, kind?, description?, artwork?, genre? }`), `value: { stationId, playing, volume, muted }` and `onChange(next)`. Nothing plays until `value.playing` is true. The picker is react-fancy's `Select`; play / pause and mute are `Button`s; volume and seek are `Slider`s.
+  - `kind` is guessed when omitted: a path ending in an audio file extension is `"file"`, anything else `"live"` (exported as `guessStationKind`). Icecast mounts named like files (`/stream.mp3`) need `kind: "live"`.
+  - Live streams: no seek; pause drops the connection (`removeAttribute("src")` + `load()`) and play reconnects from the live edge, so no stale buffer is replayed. An `error` or `stalled` while playing reconnects with backoff (1s, 2s, 4s; three attempts), then shows the error, calls `onError(id, "failed")` and `onChange({ ...value, playing: false })`.
+  - Files: elapsed / duration and a seek bar; pause keeps the position.
+  - Only absolute `http(s)` URLs and same-origin relative paths are played (exported as `isPlayableSrc`). `javascript:`, `data:`, `blob:`, protocol-relative `//host` and any backslash or control character are refused: the element never receives the address, and `onError(id, "refused")` fires.
+  - Autoplay: a `NotAllowedError` from `play()` becomes one `onChange({ ...value, playing: false })`, a "Press play to listen" hint and `onError(id, "blocked")`. It never retries by itself.
+  - Switching stations while playing keeps playing.
+  - `nowPlaying` is supplied by the host: browsers cannot read ICY metadata from `<audio>`. Media Session metadata, `playbackState` and play / pause handlers are published when the API exists; nothing reads `window` or `navigator` during render, so it renders on the server.
+  - Handles: `data-react-fancy-streaming-audio`, `data-streaming-station`, `data-streaming-control="station" | "play" | "mute" | "volume" | "seek"`. `ref` to the root, `audioRef` to the element, `labels` for every visible string, a polite live region for station changes and errors, `layout: "bar" | "compact"`. Button outlines read `--fancy-border-strong`, like every control since 6.15.0.
+  - Subpath: `@particle-academy/react-fancy/streaming-audio`.
+
+  **Consumer action:** none; this is a new component.
+
 ## [6.15.1] - 2026-11-07
 
 ### Fixed

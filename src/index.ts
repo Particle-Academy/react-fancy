@@ -681,6 +681,17 @@ export type { VideoViewerProps } from "./components/VideoViewer";
 export { AudioViewer } from "./components/AudioViewer";
 export type { AudioViewerProps } from "./components/AudioViewer";
 
+export { StreamingAudio, guessStationKind, isPlayableSrc } from "./components/StreamingAudio";
+export type {
+  StreamingAudioProps,
+  StreamingAudioValue,
+  StreamingAudioLabels,
+  StreamingAudioLayout,
+  StreamingAudioErrorKind,
+  StreamingStation,
+  StreamingStationKind,
+} from "./components/StreamingAudio";
+
 export { PdfViewer } from "./components/PdfViewer";
 export type { PdfViewerProps, PdfPageSource, PdfViewerPolicy, PdfViewerWatermark, PdfPageErrorContext } from "./components/PdfViewer";
 

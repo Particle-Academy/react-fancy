@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "6.15.1",
+  "version": "6.16.0",
   "description": "React UI component library for Human+ UX — controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
@@ -931,6 +931,16 @@
       "require": {
         "types": "./dist/sticky-note.d.cts",
         "default": "./dist/sticky-note.cjs"
+      }
+    },
+    "./streaming-audio": {
+      "import": {
+        "types": "./dist/streaming-audio.d.ts",
+        "default": "./dist/streaming-audio.js"
+      },
+      "require": {
+        "types": "./dist/streaming-audio.d.cts",
+        "default": "./dist/streaming-audio.cjs"
       }
     },
     "./styles.css": "./dist/styles.css",
