@@ -47,7 +47,7 @@ describe("MultiSwitch — per-option colour", () => {
   it("paints the thumb in the selected option's colour", () => {
     const { host } = mount(<MultiSwitch list={LIST} value="assign" />);
     expect(thumb(host).getAttribute("data-color")).toBe("green");
-    expect(thumb(host).className).toContain("bg-green-600");
+    expect(thumb(host).className).toContain("bg-green-700");
     expect(thumb(host).className).not.toContain("bg-blue-600");
   });
 

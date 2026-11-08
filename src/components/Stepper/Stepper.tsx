@@ -52,7 +52,8 @@ const indicatorClass: Record<StepperStepState, string> = {
     "border-2 border-zinc-900 bg-[color:var(--fancy-surface,var(--color-white))] text-zinc-900 ring-4 ring-zinc-900/10 dark:border-white dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:text-white dark:ring-white/15",
   upcoming:
     "border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
-  error: "border-transparent bg-red-600 text-white dark:bg-red-500",
+  // red-600 in both modes: white on red-500 is 3.81:1.
+  error: "border-transparent bg-red-600 text-white",
 };
 
 const titleClass: Record<StepperStepState, string> = {

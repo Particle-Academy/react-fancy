@@ -11,6 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.19.1] - 2026-11-08
+
+### Fixed
+
+- **White text on a coloured fill now meets WCAG 1.4.3's 4.5:1 in both modes.** axe flagged `ChatThread`'s proposal accept button (`[data-chat-proposal-action=accept]`, `Button color="emerald"`): white on emerald-500 is 2.47:1. The same shape ran through the kit. Each fill is now the lightest shade of its own hue where white clears 4.5:1, recorded once in `scripts/solid-shades.cjs`: 500 for slate, gray, zinc, neutral, stone and indigo; 600 for red, blue, violet, purple, fuchsia, pink and rose; 700 for orange, green, emerald, teal, cyan and sky. amber, yellow and lime already used dark text and are unchanged. Ratios are from Tailwind v4's oklch palette, rounded to 8-bit sRGB.
+  - **`Button` solid colours** (light rest / light hover / dark rest / dark hover). Each keeps its shape, shifted: rest at that shade, hover one darker; dark one deeper at rest and back to that shade on hover. emerald 2.47 / 3.65 / 3.65 / 2.47 → 5.36 / 7.61 / 7.61 / 5.36 (700/800). Before → after at light rest: red 3.81 → 4.77, orange 2.89 → 5.22, green 2.22 → 4.95, teal 2.42 → 5.36, cyan 2.37 → 5.28, sky 2.71 → 5.86, blue 3.76 → 5.25, violet 4.40 → 5.89, purple 4.12 → 5.54, fuchsia 3.54 → 4.66, pink 3.58 → 4.54, rose 3.75 → 4.53. Dark-hover was the same pair as light rest and moves the same way; dark rest and light hover were 3.22 to 4.02 for orange, green, emerald, teal, cyan and sky and are now 7.13 to 7.61. The greys and indigo were already 4.58 or better and are unchanged.
+  - **`Button active` and `Button checked`.** active blue 3.76 → 5.25 (600, hover 700); checked emerald 2.47 / 3.65 → 5.36 / 7.61 (700, hover 800).
+  - **`Badge variant="solid"`.** Light was 600 and dark 500: light fails for orange 3.60, green 3.22, emerald 3.65, teal 3.67, cyan 3.62 and sky 4.02 (now 700, 4.95 to 5.86); dark failed for 13 hues, 2.22 to 4.40 (now the light shade in both modes, 4.53 to 5.89).
+  - **`MultiSwitch` selected thumb** follows `Badge`: the same 6 light and 13 dark failures, the same shades.
+  - **`Stepper` error indicator** (dark): red-500 3.81 → red-600 4.77.
+  - **`Carousel` wizard Finish button**: blue-500 3.76 → blue-600 5.25, hover blue-700 6.83 (was blue-600).
+  - **`ChatDrawer` active tab**: violet-500 4.40 → violet-600 5.89. Its number chip is translucent white over the tab; it was `bg-white/20` over violet-500 (3.21:1) and is now `bg-white/15` over violet-600 (4.71:1), since white/20 over violet-600 is still 4.31.
+  - `tests/solid-fill-contrast.test.tsx` measures every pair above through the compiled CSS (computed `color` and `background-color`, resolved through the palette variables), in light and dark, at rest and on hover (`installRenderedCss({ forceHover })`). It fails on 6.19.0.
+  - The `@theme` override example in `styles.css` used `--color-brand: var(--color-emerald-600)`, which is 3.65:1 under white `brand-contrast`; it now reads emerald-700.
+  - `scripts/gen-button-colors.cjs` and `gen-badge-colors.cjs` now emit the `brand` entries that had been added to the generated files by hand, so regenerating no longer drops them.
+
+  Unchanged, because they carry no text and only owe 3:1 for non-text (WCAG 1.4.11), and are noted for a follow-up: `Select`'s multi-select tick (white on blue-500 3.76, dark blue-400 2.64) and `Timeline`'s icon dots (white icons on the 500 fills, 1.91 to 4.58).
+
+  **Consumer action:** none. Affected fills are one or two shades darker. To keep an old colour, pass your own `className` (for example `bg-emerald-500`), knowing white text on it fails AA.
+
 ## [6.19.0] - 2026-11-08
 
 ### Added

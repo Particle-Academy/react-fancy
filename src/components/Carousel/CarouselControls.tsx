@@ -37,7 +37,7 @@ export const CarouselControls = forwardRef<HTMLDivElement, CarouselControlsProps
             <button
               type="button"
               onClick={onFinish}
-              className="rounded-lg border border-blue-500 bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600"
+              className="rounded-lg border border-blue-600 bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
             >
               {finishLabel ?? "Finish"}
             </button>

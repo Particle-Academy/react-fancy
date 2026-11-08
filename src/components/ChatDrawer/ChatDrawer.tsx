@@ -90,7 +90,7 @@ export function ChatDrawer({
                 className={[
                   "group inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] font-medium transition",
                   active
-                    ? "border-violet-500 bg-violet-500 text-white"
+                    ? "border-violet-600 bg-violet-600 text-white"
                     : "border-[color:var(--fancy-border,var(--color-zinc-200))] bg-transparent text-[color:var(--fancy-text-soft,var(--color-zinc-700))] hover:border-zinc-300 hover:bg-zinc-50 dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:hover:border-zinc-600 dark:hover:bg-zinc-800",
                 ].join(" ")}
                 aria-pressed={active}
@@ -100,7 +100,7 @@ export function ChatDrawer({
                     className={[
                       "inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-semibold",
                       active
-                        ? "bg-white/20 text-white"
+                        ? "bg-white/15 text-white"
                         : "bg-[color:var(--fancy-border,var(--color-zinc-200))] group-hover:bg-zinc-300 dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
                     ].join(" ")}
                   >

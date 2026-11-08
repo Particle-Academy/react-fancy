@@ -44,11 +44,13 @@ const alertIconSizeMap: Record<Size, "xs" | "sm" | "md" | "lg" | "xl"> = {
 const defaultClasses =
   "bg-[color:var(--fancy-surface,var(--color-white))] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] border border-[color:var(--fancy-border,var(--color-zinc-200))] hover:bg-[color:var(--fancy-surface-hover,var(--color-zinc-50))] hover:border-[color:var(--fancy-border-strong,var(--color-zinc-500))] dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:hover:bg-zinc-700";
 
+// Active and checked follow the solid map's shades (scripts/solid-shades.cjs):
+// the lightest fill where white text clears 4.5:1, one step darker on hover.
 const activeClasses =
-  "bg-blue-500 text-white border border-blue-600 hover:bg-blue-600 dark:bg-blue-600 dark:border-blue-500 dark:hover:bg-blue-500";
+  "bg-blue-600 text-white border border-blue-700 hover:bg-blue-700 dark:bg-blue-700 dark:border-blue-600 dark:hover:bg-blue-600";
 
 const checkedClasses =
-  "bg-emerald-500 text-white border border-emerald-600 hover:bg-emerald-600 dark:bg-emerald-600 dark:border-emerald-500 dark:hover:bg-emerald-500";
+  "bg-emerald-700 text-white border border-emerald-800 hover:bg-emerald-800 dark:bg-emerald-800 dark:border-emerald-700 dark:hover:bg-emerald-700";
 
 const warnClasses =
   "bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700 dark:hover:bg-amber-900/50";

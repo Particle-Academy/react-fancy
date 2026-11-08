@@ -24,7 +24,7 @@
    yours wins — nothing here is `!important`, and the utilities read the variable
    rather than baking a value in:
 
-     @theme { --color-brand: var(--color-emerald-600); }
+     @theme { --color-brand: var(--color-emerald-700); }
    ──────────────────────────────────────────────────────────────────────────── */
 @theme {
   /* THE HOST'S OWN COLOUR. `color="brand"` on any component resolves to these.

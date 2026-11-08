@@ -481,6 +481,9 @@ describe("PromptInput — a programmatic restore is not an edit", () => {
  * outline and a keycap is decorative; and the container's resting border moved
  * from bare `zinc-200` / `zinc-800` to `--fancy-border-strong` (zinc-500 both
  * modes), because it is the text field's only boundary; class strings only.
+ * A seventh, in 6.19.1: the violet send Button moved from violet-500 / dark
+ * violet-600 to violet-600 / dark violet-700, hover a step darker (Button's own
+ * fix: white on violet-500 is 4.40:1, under AA); class strings only.
  * Icon SVGs are stripped: the
  * icon set loads asynchronously, so whether one has arrived depends on test
  * order, not on this component.

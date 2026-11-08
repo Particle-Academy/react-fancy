@@ -31,8 +31,16 @@ const ENTRY = [
   "@custom-variant dark (&:where(.dark, .dark *, [data-theme=dark], [data-theme=dark] *));",
 ].join("\n");
 
-async function compiler() {
-  return compile(ENTRY, {
+/**
+ * `forceHover` (6.19.1): jsdom has no pointer, so `:hover` never matches, and
+ * Tailwind wraps the variant in `@media (hover: hover)`, which `unnest` drops.
+ * Redefining the variant as `&[data-force-hover]` keeps the specificity a real
+ * `:hover` adds (one attribute for one pseudo-class), so the same rule wins
+ * the cascade; a test marks the element it means to hover.
+ */
+async function compiler(opts: { forceHover?: boolean } = {}) {
+  const entry = opts.forceHover ? `${ENTRY}\n@custom-variant hover (&[data-force-hover]);` : ENTRY;
+  return compile(entry, {
     base: process.cwd(),
     loadStylesheet: async (id: string, base: string) => {
       const resolved = id.startsWith("tailwindcss")
@@ -147,8 +155,8 @@ function classesUnder(root: ParentNode): string[] {
 let installed: HTMLStyleElement | null = null;
 
 /** Compile and install the CSS for every class currently in the document. */
-export async function installRenderedCss(): Promise<string> {
-  const { build } = await compiler();
+export async function installRenderedCss(opts: { forceHover?: boolean } = {}): Promise<string> {
+  const { build } = await compiler(opts);
   const css = flatten(build(classesUnder(document)));
   installed?.remove();
   installed = document.createElement("style");
