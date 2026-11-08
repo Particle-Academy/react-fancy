@@ -54,10 +54,19 @@ function hexToRgb(hex: string): RGB {
   return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) as RGB;
 }
 
-/** `zinc-500`, `white`, `#0a2347`, or `var(--color-zinc-500)` -> 8-bit sRGB. */
+/**
+ * `zinc-500`, `white`, `#0a2347`, `var(--color-zinc-500)`, or a literal
+ * `oklch(L% C H)` (what a computed style resolves a palette variable to) ->
+ * 8-bit sRGB.
+ */
 export function resolveColour(name: string): RGB {
   const v = name.trim().replace(/^var\(--color-([a-z]+-?\d*)\)$/, "$1");
   if (v.startsWith("#")) return hexToRgb(v);
+  if (v.startsWith("oklch(")) {
+    const lch = parseOklch(v);
+    if (!lch) throw new Error(`unparsed colour ${name}`);
+    return oklchToRgb(...lch);
+  }
   const raw = themePalette().get(v);
   if (!raw) throw new Error(`unknown colour ${name}`);
   if (raw.startsWith("#")) return hexToRgb(raw);
@@ -72,7 +81,8 @@ export function resolveColour(name: string): RGB {
  * versions as a number. `none` is a missing component, which converts as 0.
  */
 export function parseOklch(raw: string): [number, number, number] | null {
-  const m = raw.match(/oklch\(([\d.]+)%\s+([\d.]+)\s+([\d.]+|none)\)/);
+  // jsdom's computed style drops the space after the `%` (`oklch(63.7%0.237 25.331)`).
+  const m = raw.match(/oklch\(([\d.]+)%\s*([\d.]+)\s+([\d.]+|none)\)/);
   if (!m) return null;
   return [Number(m[1]) / 100, Number(m[2]), m[3] === "none" ? 0 : Number(m[3])];
 }

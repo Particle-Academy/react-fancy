@@ -26,6 +26,16 @@ export function dirtyRingClasses(dirty?: boolean): string {
   return dirty ? "ring-2 ring-amber-400/50" : "";
 }
 
+/**
+ * Validation text: the error message and the required asterisk of Field,
+ * Checkbox and Switch. Reads the `error` theme token (CC-fancy-0018, 6.19.0);
+ * its defaults clear WCAG 1.4.3's 4.5:1 for small text. red-600 is 4.77:1 on
+ * white; red-400 is 5.74:1 on #1e1e24, 6.13:1 on zinc-900, 5.16:1 on zinc-800.
+ * The old `text-red-500` was 3.81:1 on white and 3.91:1 on zinc-800.
+ */
+export const ERROR_TEXT =
+  "text-[color:var(--fancy-error,var(--color-red-600))] dark:text-[color:var(--fancy-error-dark,var(--color-red-400))]";
+
 export function errorClasses(error?: string): string {
   return error ? "border-red-500 focus:ring-red-500" : "";
 }

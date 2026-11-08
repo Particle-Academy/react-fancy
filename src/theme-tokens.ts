@@ -136,6 +136,16 @@ export const THEME_TOKENS = {
     description:
       "The checked colour (`accent-color`) of native checkboxes and radios: Checkbox, CheckboxGroup, RadioGroup. Added 6.18.0; dark default blue-500 since 6.18.1.",
   },
+  error: {
+    variable: "--fancy-error",
+    darkVariable: "--fancy-error-dark",
+    // Text, so 4.5:1 (WCAG 1.4.3): red-600 is 4.77:1 on white; red-400 is
+    // 5.74:1 on #1e1e24, 6.13:1 on zinc-900 and 5.16:1 on zinc-800.
+    light: "var(--color-red-600)",
+    dark: "var(--color-red-400)",
+    description:
+      "Validation text: the error message and required asterisk of Field (and every input that wraps it), Checkbox and Switch. Added 6.19.0 (CC-fancy-0018).",
+  },
 } as const;
 
 export type ThemeTokenRole = keyof typeof THEME_TOKENS;

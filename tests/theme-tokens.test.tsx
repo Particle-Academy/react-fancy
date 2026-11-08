@@ -124,9 +124,10 @@ describe("THEME_TOKENS — the table", () => {
   it("is small, and names a light and a dark default for every role", () => {
     const roles = Object.keys(THEME_TOKENS);
     expect(roles.length).toBeGreaterThanOrEqual(8);
-    // 13 since 6.18.0 (`accent`, CC-fancy-0015). Raise this only with a role
-    // the council has agreed; the table is meant to stay small.
-    expect(roles.length).toBeLessThanOrEqual(13);
+    // 13 since 6.18.0 (`accent`, CC-fancy-0015); 14 since 6.19.0 (`error`,
+    // CC-fancy-0018). Raise this only with a role the council has agreed; the
+    // table is meant to stay small.
+    expect(roles.length).toBeLessThanOrEqual(14);
     for (const role of roles) {
       const t = THEME_TOKENS[role as keyof typeof THEME_TOKENS];
       expect(t.light, role).toBeTruthy();

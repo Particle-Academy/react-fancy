@@ -11,6 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.19.0] - 2026-11-08
+
+### Added
+
+- **`--fancy-error` / `--fancy-error-dark`: a theme token for validation text (council CC-fancy-0018).** The error message and required asterisk of `Field` (and so every input that wraps it: `Input`, `Textarea`, `Select`, `Pillbox`, `DatePicker`, `Slider`, `NumberField`, `CheckboxGroup`, `RadioGroup`, `MultiSwitch`), `Checkbox` and `Switch` now read `text-[color:var(--fancy-error,var(--color-red-600))]`, with `--fancy-error-dark` (default red-400) under `dark:`.
+  - Recorded as the `error` role in `THEME_TOKENS` and in the README token table, which now lists fourteen roles.
+
+### Fixed
+
+- **Validation text now meets WCAG 1.4.3's 4.5:1 in both modes.** It was hard-coded `text-red-500` with no dark variant, which measures 3.81:1 on white, 4.36:1 on #1e1e24 and 3.91:1 on zinc-800 (4.65:1 on zinc-900). The new defaults: red-600 is 4.77:1 on white; red-400 is 5.74:1 on #1e1e24, 6.13:1 on zinc-900 and 5.16:1 on zinc-800. Ratios are from Tailwind v4's oklch palette, rounded to 8-bit sRGB.
+  - `tests/error-text-contrast.test.tsx` measures the error message and asterisk of Field, Input, Pillbox, Checkbox and Switch through the compiled CSS (computed `color`, resolved through the token fallback) in light and dark, checks the `THEME_TOKENS` defaults, and checks a host-set token is honoured. It failed on 6.18.1.
+  - Unchanged, because they are not text and clear 3:1 for non-text: the error border on inputs (`border-red-500`, 3.81:1 on white, 4.36:1 on #1e1e24), and the error-toast icon (red-500 on red-50, 3.48:1).
+
+  **Consumer action:** none. If you set nothing, error text is a step darker in light mode and a step lighter in dark mode. To keep the old colour, set `--fancy-error: var(--color-red-500)`, knowing it fails AA.
+
 ## [6.18.1] - 2026-11-08
 
 ### Fixed

@@ -1,5 +1,5 @@
 import { cn } from "../../../utils/cn";
-import { labelSizeClasses } from "../inputs.utils";
+import { ERROR_TEXT, labelSizeClasses } from "../inputs.utils";
 import type { FieldProps } from "./Field.types";
 
 export function Field({
@@ -31,7 +31,7 @@ export function Field({
           )}
         >
           {label}
-          {required && <span className="ms-0.5 text-red-500">*</span>}
+          {required && <span className={cn("ms-0.5", ERROR_TEXT)}>*</span>}
         </label>
       )}
       {children}
@@ -40,7 +40,7 @@ export function Field({
           {description}
         </p>
       )}
-      {error && <p id={errorId} className="text-xs text-red-500">{error}</p>}
+      {error && <p id={errorId} className={cn("text-xs", ERROR_TEXT)}>{error}</p>}
     </div>
   );
 }

@@ -286,7 +286,7 @@ is the one they hit first.
 ## Semantic tokens
 
 The kit's neutral chrome -- surfaces, outlines, text, form fields, focus -- reads
-thirteen semantic tokens, so you can repaint it with your own palette without
+fourteen semantic tokens, so you can repaint it with your own palette without
 remapping Tailwind's `zinc`. Each role is two variables: one per mode.
 
 | Role | Light variable | Dark variable | Default (light / dark) | Used for |
@@ -304,6 +304,7 @@ remapping Tailwind's `zinc`. Each role is two variables: one per mode.
 | `text-subtle` | `--fancy-text-subtle` | `--fancy-text-subtle-dark` | zinc-600 / zinc-400 | inactive nav labels (Sidebar, Menu, Navbar, MultiSwitch) |
 | `surface-hover` | `--fancy-surface-hover` | `--fancy-surface-hover-dark` | zinc-50 / zinc-800 at 50% | hover fill on nav items, options, rows |
 | `accent` | `--fancy-accent` | `--fancy-accent-dark` | blue-600 / blue-500 | checked colour (`accent-color`) of Checkbox, CheckboxGroup, RadioGroup (since 6.18.0) |
+| `error` | `--fancy-error` | `--fancy-error-dark` | red-600 / red-400 | validation text: error message + required asterisk of Field, Checkbox, Switch (4.5:1, WCAG 1.4.3; since 6.19.0) |
 
 ```css
 /* A cream/terracotta light theme and a blue-grey dark one. */

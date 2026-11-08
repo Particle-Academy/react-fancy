@@ -3,7 +3,7 @@ import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { useInlineEdit } from "../mode/useInlineEdit";
-import { dirtyRingClasses } from "../inputs.utils";
+import { dirtyRingClasses, ERROR_TEXT } from "../inputs.utils";
 import type { CheckboxProps } from "./Checkbox.types";
 
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
@@ -132,7 +132,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                 )}
               >
                 {label}
-                {required && <span className="ms-0.5 text-red-500">*</span>}
+                {required && <span className={cn("ms-0.5", ERROR_TEXT)}>*</span>}
               </label>
             )}
             {description && (
@@ -140,7 +140,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                 {description}
               </span>
             )}
-            {error && <span className="text-xs text-red-500">{error}</span>}
+            {error && <span className={cn("text-xs", ERROR_TEXT)}>{error}</span>}
           </div>
         )}
       </div>
