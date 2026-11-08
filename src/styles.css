@@ -265,12 +265,11 @@
 }
 
 /* Checkbox & radio — native controls: the browser draws the box and ignores an
-   author border, so none is set (6.15.1); a dark color-scheme makes it draw its
-   dark box instead. */
+   author border (6.15.1) or background (6.17.0), so neither is set; a dark
+   color-scheme makes it draw its dark box instead. */
 :where(.dark [data-react-fancy-checkbox] input, [data-theme="dark"] [data-react-fancy-checkbox] input),
 :where(.dark [data-react-fancy-checkbox-group] input, [data-theme="dark"] [data-react-fancy-checkbox-group] input),
 :where(.dark [data-react-fancy-radio-group] input, [data-theme="dark"] [data-react-fancy-radio-group] input) {
-  background-color: var(--fancy-input-dark, #1e1e24);
   color-scheme: dark;
 }
 

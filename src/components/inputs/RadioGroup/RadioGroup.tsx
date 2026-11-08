@@ -90,9 +90,10 @@ export function RadioGroup<V = string>({
               onChange={() => setValue(resolved.value)}
               className={cn(
                 sizeClasses,
-                // Native radios: no author borders (the browser ignores them);
-                // themed via accent-color and a dark scheme (6.15.1).
-                "cursor-pointer bg-[color:var(--fancy-input,var(--color-white))] accent-blue-600 transition-[box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:[color-scheme:dark]",
+                // Native radios: no author borders or backgrounds (the browser
+                // ignores them, 6.15.1 / 6.17.0); themed via accent-color and
+                // a dark scheme.
+                "cursor-pointer accent-blue-600 transition-[box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:[color-scheme:dark]",
                 dirtyRingClasses(dirty),
               )}
             />

@@ -10,6 +10,16 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, "childr
   open: boolean;
   onClose: () => void;
   size?: "sm" | "md" | "lg" | "xl" | "full";
+  /**
+   * Keep the children mounted while closed. Default `false`: the modal
+   * unmounts its children on close.
+   *
+   * When `true`, a closed modal stays in the tree `hidden`, `inert` and
+   * `aria-hidden`: not painted, focusable or announced, but its children keep
+   * their state and DOM identity. Focus trap, scroll lock and Escape still
+   * apply only while open. Same contract as `Drawer`'s `keepMounted`.
+   */
+  keepMounted?: boolean;
   className?: string;
 }
 

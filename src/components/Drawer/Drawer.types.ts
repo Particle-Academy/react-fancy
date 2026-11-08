@@ -51,6 +51,18 @@ export interface DrawerProps extends Omit<HTMLAttributes<HTMLDivElement>, "child
   dismissOnBackdrop?: boolean;
   /** Escape closes. Default `true`. */
   dismissOnEscape?: boolean;
+  /**
+   * Keep the children mounted while closed. Default `false`: the drawer
+   * unmounts its children on close.
+   *
+   * When `true`, a closed drawer stays in the tree `hidden`, `inert` and
+   * `aria-hidden`, so its contents are not painted, focusable or announced, but
+   * keep their state and DOM identity: an `<audio>` element keeps playing, a
+   * form keeps what was typed. Focus trap, scroll lock and Escape still apply
+   * only while open. The children mount on the first render even if the drawer
+   * starts closed.
+   */
+  keepMounted?: boolean;
   className?: string;
 }
 

@@ -137,6 +137,38 @@ async function expectStrongOutline(label: string, el: Element | null | undefined
 /** The kit's checked / selected colour for native toggles (Slider's `accent-blue-600`). */
 const CHECKED_ACCENT = "var(--color-blue-600)";
 
+/** A class reading a surface or border role. Text roles are the label's, not the box's. */
+const SURFACE_OR_BORDER_TOKEN = /var\(--fancy-(input|surface|surface-muted|surface-hover|border|border-strong)(-dark)?,/;
+
+/** The native inputs' class strings as 6.16.0 shipped them, background classes included. */
+const LEGACY_NATIVE_TOGGLE: Record<string, string> = {
+  Checkbox:
+    "h-[18px] w-[18px] cursor-pointer rounded bg-[color:var(--fancy-input,var(--color-white))] accent-blue-600 transition-[box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:[color-scheme:dark]",
+  CheckboxGroup:
+    "h-[18px] w-[18px] cursor-pointer rounded bg-[color:var(--fancy-input,var(--color-white))] accent-blue-600 transition-[box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:[color-scheme:dark]",
+  RadioGroup:
+    "h-[18px] w-[18px] cursor-pointer bg-[color:var(--fancy-input,var(--color-white))] accent-blue-600 transition-[box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:[color-scheme:dark]",
+};
+
+/**
+ * What the browser actually uses when it draws a native checkbox or radio:
+ * its size, the checked colour, the scheme, opacity, cursor, the focus ring
+ * and any author border. Background is deliberately absent; it is not painted.
+ */
+function honoured(el: Element) {
+  const cs = getComputedStyle(el);
+  return {
+    width: cs.width,
+    height: cs.height,
+    accent: cs.getPropertyValue("accent-color").trim(),
+    scheme: cs.getPropertyValue("color-scheme").trim() || "normal",
+    opacity: cs.opacity,
+    cursor: cs.cursor,
+    boxShadow: cs.boxShadow,
+    border: renderedBorderPx(el),
+  };
+}
+
 /**
  * A native checkbox or radio: the browser draws the box, so the kit themes what
  * the browser exposes and claims nothing else.
@@ -152,9 +184,43 @@ async function expectNativeToggle(label: string, render: () => ReactElement, sel
   const c = cls(lightEl);
   const borderClasses = c.split(/\s+/).filter((t) => /^(dark:)?border(-|$)/.test(t));
   expect(borderClasses, `${label}: border classes on a native toggle paint nothing`).toEqual([]);
+  // 6.17.0: nor surface classes. The browser paints the box, not the author
+  // background, so a `--fancy-input` fill on it was as dead as the border was.
+  const surfaceOrBorderTokens = c
+    .split(/\s+/)
+    .filter((t) => SURFACE_OR_BORDER_TOKEN.test(t));
+  expect(surfaceOrBorderTokens, `${label}: surface / border token classes on a native toggle paint nothing`).toEqual([]);
+
+  // What it rendered like in 6.16.0, with the dead background classes still on.
+  const before = document.createElement("input");
+  before.type = lightEl instanceof HTMLInputElement ? lightEl.type : "checkbox";
+  before.className = LEGACY_NATIVE_TOGGLE[label]!;
+  const beforeDark = before.cloneNode() as HTMLInputElement;
+  const legacy = document.createElement("div");
+  const legacyDark = document.createElement("div");
+  legacyDark.className = "dark";
+  legacy.append(before);
+  legacyDark.append(beforeDark);
+  document.body.append(legacy, legacyDark);
 
   await installRenderedCss();
   expect(renderedBorderPx(lightEl), `${label}: no author border on a native toggle`).toBe(0);
+  const bg = getComputedStyle(lightEl).backgroundColor;
+  expect(bg === "" || bg === "transparent" || bg === "rgba(0, 0, 0, 0)", `${label}: no author background (${bg})`).toBe(true);
+  // No visible change: every property the browser honours on a native toggle
+  // computes the same as it did with the background classes on. Guard first:
+  // the CSS really reached both, or two empty readings would compare equal.
+  expect(honoured(lightEl).width, `${label}: rendered CSS applied`).toBe("18px");
+  expect(honoured(beforeDark).scheme, `${label}: legacy dark rendered`).toBe("dark");
+  expect(getComputedStyle(before).backgroundColor, `${label}: the legacy element still carried its fill`).not.toMatch(/^(|transparent|rgba\(0, 0, 0, 0\))$/);
+  for (const [now, then, mode] of [
+    [lightEl, before, "light"],
+    [darkEl, beforeDark, "dark"],
+  ] as const) {
+    expect(honoured(now), `${label} (${mode}): no visible change from 6.16.0`).toEqual(honoured(then));
+  }
+  legacy.remove();
+  legacyDark.remove();
   expect(getComputedStyle(lightEl).getPropertyValue("accent-color").trim(), `${label}: checked colour`).toBe(CHECKED_ACCENT);
   expect(getComputedStyle(darkEl).getPropertyValue("accent-color").trim(), `${label}: checked colour, dark`).toBe(CHECKED_ACCENT);
   expect(getComputedStyle(lightEl).getPropertyValue("color-scheme").trim() || "normal", `${label}: light scheme`).toBe("normal");

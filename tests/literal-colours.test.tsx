@@ -64,7 +64,19 @@ const CONTROLS: Array<[string, ReactElement]> = [
   ["EmojiSelect", <EmojiSelect key="es" />],
 ];
 
+const NATIVE_TOGGLES = ["Checkbox", "CheckboxGroup", "RadioGroup"];
+
 describe("the audited form controls read tokens", () => {
+  it("styles.css paints no background on native toggles in dark mode", () => {
+    // The zero-specificity dark default carried the same dead fill as the class.
+    const css = readFileSync(path.resolve(__dirname, "../src/styles.css"), "utf8");
+    const at = css.indexOf("[data-react-fancy-radio-group] input");
+    expect(at).toBeGreaterThan(0);
+    const rule = css.slice(css.indexOf("{", at), css.indexOf("}", at));
+    expect(rule).toContain("color-scheme: dark");
+    expect(rule).not.toMatch(/background/);
+  });
+
   for (const [name, el] of CONTROLS) {
     it(`${name}: surface, outline and dark surface come from --fancy-* tokens`, () => {
       const { host, unmount } = mount(el);
@@ -72,15 +84,16 @@ describe("the audited form controls read tokens", () => {
       // Light + dark field surface and the control's outline. EmojiSelect's
       // trigger has no light fill today (it is transparent on its parent), so it
       // gains none — only the dark field surface it always had.
-      if (name !== "EmojiSelect") expect(cls, name).toMatch(/var\(--fancy-input,/);
-      expect(cls, name).toMatch(/var\(--fancy-input-dark,/);
-      // Native checkboxes and radios carry no outline class since 6.15.1: the
-      // browser draws them and ignores an author border (see
-      // control-outline-contrast.test.tsx, which measures what renders).
-      if (!["Checkbox", "CheckboxGroup", "RadioGroup"].includes(name)) {
-        expect(cls, name).toMatch(/var\(--fancy-(border|border-strong),/);
+      // Native checkboxes and radios are drawn by the browser, which ignores an
+      // author border (6.15.1) and an author background (6.17.0), so they carry
+      // NO surface or border token at all; control-outline-contrast.test.tsx
+      // measures what renders. Every drawn control reads both.
+      if (NATIVE_TOGGLES.includes(name)) {
+        expect(cls, name).not.toMatch(/var\(--fancy-(input|surface|surface-muted|surface-hover|border|border-strong)(-dark)?,/);
       } else {
-        expect(cls, name).not.toMatch(/var\(--fancy-(border|border-strong)(-dark)?,/);
+        if (name !== "EmojiSelect") expect(cls, name).toMatch(/var\(--fancy-input,/);
+        expect(cls, name).toMatch(/var\(--fancy-input-dark,/);
+        expect(cls, name).toMatch(/var\(--fancy-(border|border-strong),/);
       }
       // The raw literal the audit flagged must be gone from the DOM, except as
       // the token's own fallback.

@@ -80,6 +80,7 @@ function DrawerRoot({
   backdrop = true,
   dismissOnBackdrop = true,
   dismissOnEscape = true,
+  keepMounted = false,
   className,
   ...rest
 }: DrawerProps) {
@@ -118,11 +119,20 @@ function DrawerRoot({
 
   const ctx = useMemo(() => ({ open, close, side }), [open, close, side]);
 
-  if (!mounted) return null;
+  if (!mounted && !keepMounted) return null;
+
+  // keepMounted: once the exit has played, the frame stays in the tree but is
+  // `hidden` (display: none, so not painted, no tab stops and no live-region
+  // chatter), `inert` and `aria-hidden`. Plain attributes, so the server and
+  // the client render the same markup.
+  const concealed = keepMounted && !mounted;
 
   const frame = (
     <div
       data-react-fancy-drawer-frame=""
+      hidden={concealed || undefined}
+      inert={concealed || undefined}
+      aria-hidden={concealed || undefined}
       className={cn(isViewport ? "fixed inset-0 z-50" : "absolute inset-0 z-20", !backdrop && "pointer-events-none")}
     >
       {backdrop ? (

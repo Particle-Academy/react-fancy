@@ -111,10 +111,10 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             className={cn(
               sizeClasses,
               // A native checkbox: the browser draws the box and ignores author
-              // borders, so none are set (6.15.1). The kit themes what the
-              // browser exposes: the checked colour (`accent-color`) and, in
-              // dark mode, a dark-scheme box.
-              "cursor-pointer rounded bg-[color:var(--fancy-input,var(--color-white))] accent-blue-600 transition-[box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[color:var(--fancy-input-dark,#1e1e24)] dark:[color-scheme:dark]",
+              // borders (6.15.1) and backgrounds (6.17.0), so neither is set.
+              // The kit themes what the browser exposes: the checked colour
+              // (`accent-color`) and, in dark mode, a dark-scheme box.
+              "cursor-pointer rounded accent-blue-600 transition-[box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:[color-scheme:dark]",
               dirtyRingClasses(dirty),
             )}
           />

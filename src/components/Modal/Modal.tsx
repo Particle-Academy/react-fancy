@@ -44,6 +44,7 @@ function ModalRoot({
   open,
   onClose,
   size = "md",
+  keepMounted = false,
   className,
   ...rest
 }: ModalProps) {
@@ -79,12 +80,22 @@ function ModalRoot({
 
   const ctx = useMemo(() => ({ open, close }), [open, close]);
 
-  if (!mounted) return null;
+  if (!mounted && !keepMounted) return null;
+
+  // keepMounted: once the exit has played, the frame stays in the tree but is
+  // `hidden` (display: none, so not painted, no tab stops and no live-region
+  // chatter), `inert` and `aria-hidden`. Same as Drawer.
+  const concealed = keepMounted && !mounted;
 
   return (
     <ModalContext.Provider value={ctx}>
       <Portal>
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          hidden={concealed || undefined}
+          inert={concealed || undefined}
+          aria-hidden={concealed || undefined}
+        >
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"

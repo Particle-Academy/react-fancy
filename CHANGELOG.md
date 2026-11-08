@@ -11,6 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.17.0] - 2026-11-07
+
+### Added
+
+- **`keepMounted` on `Drawer` and `Modal`.** Both overlays unmount their children when they close, so anything with state or identity inside them (an `<audio>` element, a half-filled form) was lost on close. The showcase's radio drawer had to use a `Card` for this reason.
+  - `keepMounted?: boolean`, default `false`: without it nothing changes.
+  - With it, a closed overlay stays in the tree after its exit animation, with `hidden`, `inert` and `aria-hidden="true"` on its frame. `hidden` is `display: none`, so the contents are not painted, have no tab stops and are not announced, live regions included. The children keep their DOM identity across close and reopen; an `<audio>` element keeps playing.
+  - The children mount on the first render even if the overlay starts closed. They are plain attributes, so server and client render the same markup.
+  - Focus trap, body scroll lock, Escape and return-focus still apply only while `open` is true.
+
+  **Consumer action:** none; the prop is opt-in.
+
+### Fixed
+
+- **Checkbox, CheckboxGroup and RadioGroup no longer carry dead background classes.** Their native inputs had `bg-[color:var(--fancy-input…)]` and the `-dark` pair, and `styles.css` set a dark `background-color` on them. The browser draws a native checkbox or radio itself and does not paint an author background, so these did nothing, the same way the border classes removed in 6.15.1 did nothing. They are removed; `accent-color` and the dark `color-scheme` remain. Tests now require native toggles to carry no surface or border token classes, and compare the computed size, checked colour, scheme, opacity, cursor, focus ring and border with 6.16.0's classes in compiled Tailwind: no visible change. **Consumer action:** none.
+
 ## [6.16.0] - 2026-11-07
 
 ### Added
