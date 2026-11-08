@@ -7,7 +7,9 @@ export function Field({
   labelHidden,
   labelId,
   description,
+  descriptionId,
   error,
+  errorId,
   required,
   htmlFor,
   size = "md",
@@ -34,11 +36,11 @@ export function Field({
       )}
       {children}
       {description && !error && (
-        <p className="text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
+        <p id={descriptionId} className="text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
           {description}
         </p>
       )}
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p id={errorId} className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }

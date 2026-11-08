@@ -16,7 +16,11 @@ export interface FieldProps
    */
   labelId?: string;
   description?: string;
+  /** `id` for the rendered description, so the control can point `aria-describedby` at it. */
+  descriptionId?: string;
   error?: string;
+  /** `id` for the rendered error, so the control can point `aria-describedby` at it. */
+  errorId?: string;
   required?: boolean;
   htmlFor?: string;
   size?: Size;

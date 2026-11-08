@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.17.1] - 2026-11-08
+
+### Fixed
+
+- **`Pillbox`'s text input now has an accessible name, and a validation message can be linked to it (WCAG 1.3.1, 4.1.2).** It accepted only `value`, `defaultValue`, `onChange`, `placeholder`, `maxItems`, `disabled` and `className`, so the input had no name and nothing to carry an error.
+  - New props from `InputBaseProps`: `label`, `labelHidden`, `description`, `error`, `required` and `id`, rendered with the shared `Field` wrapper the other inputs use.
+  - The input gets `aria-describedby` (the error, or the description when there is no error) and `aria-invalid` when `error` is set. `required` sets `aria-required` rather than native `required`: the entry box is empty whenever the value is complete, so a native `required` would block the form.
+  - Adding and removing a pill is announced in a polite live region.
+  - New `labels` prop (`PillboxLabels`, exported) for translation: `remove` (`"Remove {tag}"`, the remove button's name), `added` (`"Added {tag}"`) and `removed` (`"Removed {tag}"`). `{tag}` is filled by the same `fillLabel` helper `OtpInput` and `SetupWizard` use.
+  - `Field` gains optional `descriptionId` and `errorId`, so a control can point `aria-describedby` at its messages.
+
+  **Consumer action:** none required. Without `label` the markup is 6.17.0's plus a visually hidden live region. Pass `label` (with `labelHidden` if the design has no visible label) to name the input.
+
 ## [6.17.0] - 2026-11-07
 
 ### Added

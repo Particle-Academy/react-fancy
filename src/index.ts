@@ -385,7 +385,7 @@ export type {
 } from "./components/Autocomplete";
 
 export { Pillbox } from "./components/Pillbox";
-export type { PillboxProps } from "./components/Pillbox";
+export type { PillboxProps, PillboxLabels } from "./components/Pillbox";
 
 export { OtpInput } from "./components/OtpInput";
 export type { OtpInputProps, OtpInputLabels } from "./components/OtpInput";
