@@ -131,9 +131,10 @@ export const THEME_TOKENS = {
     variable: "--fancy-accent",
     darkVariable: "--fancy-accent-dark",
     light: "var(--color-blue-600)",
-    dark: "var(--color-blue-600)",
+    // blue-500, not blue-600: blue-600 is 2.84:1 on zinc-800, under WCAG 1.4.11's 3:1. Since 6.18.1.
+    dark: "var(--color-blue-500)",
     description:
-      "The checked colour (`accent-color`) of native checkboxes and radios: Checkbox, CheckboxGroup, RadioGroup. Added 6.18.0.",
+      "The checked colour (`accent-color`) of native checkboxes and radios: Checkbox, CheckboxGroup, RadioGroup. Added 6.18.0; dark default blue-500 since 6.18.1.",
   },
 } as const;
 

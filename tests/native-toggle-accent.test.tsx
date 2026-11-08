@@ -3,12 +3,14 @@ import { afterEach, describe, expect, it } from "vitest";
 import type { CSSProperties, ReactElement } from "react";
 import { THEME_TOKENS } from "../src/theme-tokens";
 import { Checkbox, CheckboxGroup, RadioGroup } from "../src/components/inputs";
-import { mount, unmountAll } from "./contrast-assert";
+import { cls, mount, NON_TEXT, unmountAll } from "./contrast-assert";
+import { contrast, defaultColourOf } from "./contrast-helper";
 import { installRenderedCss, removeRenderedCss, resolveVars } from "./rendered-css";
 
 /**
  * CC-fancy-0015 (6.18.0): the checked colour of the native toggles is a theme
- * token, `--fancy-accent` / `--fancy-accent-dark`, both defaulting to blue-600.
+ * token, `--fancy-accent` / `--fancy-accent-dark`. 6.18.1 moved the dark
+ * default from blue-600 to blue-500 so it clears 3:1 on dark surfaces.
  *
  * Measured through the rendered CSS rather than the class string: the consumer's
  * Tailwind is compiled for the classes in the document and the computed
@@ -43,26 +45,64 @@ function place(render: () => ReactElement, selector: string, opts: { dark?: bool
 }
 
 describe("the accent token pair", () => {
-  it("is recorded in THEME_TOKENS with blue-600 in both modes", () => {
+  it("is recorded in THEME_TOKENS with blue-600 light and blue-500 dark", () => {
     expect(THEME_TOKENS.accent).toMatchObject({
       variable: "--fancy-accent",
       darkVariable: "--fancy-accent-dark",
       light: "var(--color-blue-600)",
-      dark: "var(--color-blue-600)",
+      dark: "var(--color-blue-500)",
+    });
+  });
+});
+
+/**
+ * 6.18.1: the dark default was blue-600, which falls under WCAG 1.4.11's 3:1
+ * on the kit's own dark surfaces (zinc-800 is the dark card and popover). The
+ * ratios come from the palette's real oklch values via the contrast helper,
+ * for both the THEME_TOKENS record and the fallback each component ships.
+ */
+const DARK_SURFACES = ["#1e1e24", "zinc-900", "zinc-800"] as const;
+
+describe("the accent default clears 3:1 (WCAG 1.4.11)", () => {
+  const sources: Array<[string, { light: string | null; dark: string | null }]> = [
+    ["THEME_TOKENS", { light: THEME_TOKENS.accent.light, dark: THEME_TOKENS.accent.dark }],
+    ...TOGGLES.map(([label, render, selector]): [string, { light: string | null; dark: string | null }] => [
+      label,
+      {
+        light: defaultColourOf(cls(place(render, selector, {})), "", "accent"),
+        dark: defaultColourOf(cls(place(render, selector, { dark: true })), "dark:", "accent"),
+      },
+    ]),
+  ];
+  unmountAll();
+
+  describe.each(sources)("%s", (label, defaults) => {
+    it.each(DARK_SURFACES)("dark default on %s", (bg) => {
+      expect(defaults.dark, `${label}: dark default found`).not.toBeNull();
+      const r = contrast(defaults.dark!, bg);
+      expect(r, `${label}: ${defaults.dark} on ${bg} = ${r.toFixed(2)}:1`).toBeGreaterThanOrEqual(NON_TEXT);
+    });
+
+    it("light default on white", () => {
+      expect(defaults.light, `${label}: light default found`).not.toBeNull();
+      const r = contrast(defaults.light!, "white");
+      expect(r, `${label}: ${defaults.light} on white = ${r.toFixed(2)}:1`).toBeGreaterThanOrEqual(NON_TEXT);
     });
   });
 });
 
 describe.each(TOGGLES)("%s accent-color", (label, render, selector) => {
-  it("defaults to blue-600 in light and dark", async () => {
+  it("defaults to blue-600 in light and blue-500 in dark", async () => {
     const light = place(render, selector, {});
     const dark = place(render, selector, { dark: true });
     await installRenderedCss();
-    const blue = resolveVars(light, "var(--color-blue-600)");
-    // Guard on the guard: the palette variable really resolved to a colour.
-    expect(blue, "blue-600 resolved").toMatch(/^oklch\(/);
-    expect(accentOf(light), `${label}: light`).toBe(blue);
-    expect(accentOf(dark), `${label}: dark`).toBe(blue);
+    const blue600 = resolveVars(light, "var(--color-blue-600)");
+    const blue500 = resolveVars(light, "var(--color-blue-500)");
+    // Guard on the guard: the palette variables really resolved to colours.
+    expect(blue600, "blue-600 resolved").toMatch(/^oklch\(/);
+    expect(blue500, "blue-500 resolved").toMatch(/^oklch\(/);
+    expect(accentOf(light), `${label}: light`).toBe(blue600);
+    expect(accentOf(dark), `${label}: dark`).toBe(blue500);
   });
 
   it("honours a host-set token in each mode", async () => {

@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.18.1] - 2026-11-08
+
+### Fixed
+
+- **`--fancy-accent-dark` now defaults to blue-500, not blue-600.** The checked colour of `Checkbox`, `CheckboxGroup` and `RadioGroup` in dark mode fell under WCAG 1.4.11's 3:1 minimum for a non-text control on the kit's dark card and popover surface: blue-600 measures 2.84:1 on zinc-800 (3.38:1 on zinc-900, 3.16:1 on #1e1e24). blue-500 measures 3.96:1 on zinc-800, 4.71:1 on zinc-900 and 4.41:1 on #1e1e24. The light default stays blue-600 (5.25:1 on white). Ratios are from Tailwind v4's oklch palette, rounded to 8-bit sRGB.
+  - Changed in the component fallbacks, the `accent` role in `THEME_TOKENS` and the README token table.
+  - `tests/native-toggle-accent.test.tsx` now measures both defaults with the contrast helper from the palette's oklch values, for `THEME_TOKENS` and for the fallback each component ships, against #1e1e24, zinc-900 and zinc-800 (dark) and white (light).
+
+  **Consumer action:** none. If you set `--fancy-accent-dark`, nothing changes. If you don't, the dark checked colour is a step lighter.
+
 ## [6.18.0] - 2026-11-08
 
 ### Added

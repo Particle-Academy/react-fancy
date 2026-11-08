@@ -115,7 +115,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               // The kit themes what the browser exposes: the checked colour
               // (`accent-color`, the `--fancy-accent` token since 6.18.0) and, in
               // dark mode, a dark-scheme box.
-              "cursor-pointer rounded accent-[color:var(--fancy-accent,var(--color-blue-600))] dark:accent-[color:var(--fancy-accent-dark,var(--color-blue-600))] transition-[box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:[color-scheme:dark]",
+              "cursor-pointer rounded accent-[color:var(--fancy-accent,var(--color-blue-600))] dark:accent-[color:var(--fancy-accent-dark,var(--color-blue-500))] transition-[box-shadow] duration-150 focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:[color-scheme:dark]",
               dirtyRingClasses(dirty),
             )}
           />

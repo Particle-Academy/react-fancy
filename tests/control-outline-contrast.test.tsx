@@ -136,6 +136,12 @@ async function expectStrongOutline(label: string, el: Element | null | undefined
 
 /** The kit's checked colour for native toggles: the `--fancy-accent` default, blue-600. */
 const CHECKED_ACCENT = "var(--color-blue-600)";
+/**
+ * The `--fancy-accent-dark` default, blue-500 since 6.18.1: blue-600 is under
+ * 3:1 on zinc-800 (see native-toggle-accent.test.tsx). The one deliberate
+ * difference from 6.16.0, so the dark comparison below leaves accent out.
+ */
+const CHECKED_ACCENT_DARK = "var(--color-blue-500)";
 
 /** A class reading a surface or border role. Text roles are the label's, not the box's. */
 const SURFACE_OR_BORDER_TOKEN = /var\(--fancy-(input|surface|surface-muted|surface-hover|border|border-strong)(-dark)?,/;
@@ -215,18 +221,19 @@ async function expectNativeToggle(label: string, render: () => ReactElement, sel
   expect(honoured(lightEl).width, `${label}: rendered CSS applied`).toBe("18px");
   expect(honoured(beforeDark).scheme, `${label}: legacy dark rendered`).toBe("dark");
   expect(getComputedStyle(before).backgroundColor, `${label}: the legacy element still carried its fill`).not.toMatch(/^(|transparent|rgba\(0, 0, 0, 0\))$/);
-  for (const [now, then, mode] of [
-    [lightEl, before, "light"],
-    [darkEl, beforeDark, "dark"],
-  ] as const) {
-    expect(honoured(now), `${label} (${mode}): no visible change from 6.16.0`).toEqual(honoured(then));
-  }
+  expect(honoured(lightEl), `${label} (light): no visible change from 6.16.0`).toEqual(honoured(before));
+  // Dark: unchanged except the checked colour, which 6.18.1 moved on purpose.
+  const { accent: _darkAccent, ...darkNow } = honoured(darkEl);
+  const { accent: _legacyAccent, ...darkThen } = honoured(beforeDark);
+  expect(darkNow, `${label} (dark): no visible change from 6.16.0 besides the accent`).toEqual(darkThen);
   legacy.remove();
   legacyDark.remove();
   const checked = resolveVars(lightEl, CHECKED_ACCENT);
+  const checkedDark = resolveVars(lightEl, CHECKED_ACCENT_DARK);
   expect(checked, "blue-600 resolved").toMatch(/^oklch\(/);
+  expect(checkedDark, "blue-500 resolved").toMatch(/^oklch\(/);
   expect(honoured(lightEl).accent, `${label}: checked colour`).toBe(checked);
-  expect(honoured(darkEl).accent, `${label}: checked colour, dark`).toBe(checked);
+  expect(honoured(darkEl).accent, `${label}: checked colour, dark`).toBe(checkedDark);
   expect(getComputedStyle(lightEl).getPropertyValue("color-scheme").trim() || "normal", `${label}: light scheme`).toBe("normal");
   expect(getComputedStyle(darkEl).getPropertyValue("color-scheme").trim(), `${label}: dark scheme`).toBe("dark");
 }
