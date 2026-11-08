@@ -81,7 +81,7 @@ function sourceFiles(): string[] {
 }
 
 const TOKEN_CLASS =
-  /[\w:[\]&>*@.-]*?(?:bg|text|border|ring|fill|stroke)-\[color:var\(--fancy-[a-z-]+,[^\]\s]+\)\](?:\/\d+)?/g;
+  /[\w:[\]&>*@.-]*?(?:bg|text|border|ring|fill|stroke|accent)-\[color:var\(--fancy-[a-z-]+,[^\]\s]+\)\](?:\/\d+)?/g;
 
 function tokenClassesInSource(): string[] {
   const found = new Set<string>();
@@ -124,7 +124,9 @@ describe("THEME_TOKENS — the table", () => {
   it("is small, and names a light and a dark default for every role", () => {
     const roles = Object.keys(THEME_TOKENS);
     expect(roles.length).toBeGreaterThanOrEqual(8);
-    expect(roles.length).toBeLessThanOrEqual(12);
+    // 13 since 6.18.0 (`accent`, CC-fancy-0015). Raise this only with a role
+    // the council has agreed; the table is meant to stay small.
+    expect(roles.length).toBeLessThanOrEqual(13);
     for (const role of roles) {
       const t = THEME_TOKENS[role as keyof typeof THEME_TOKENS];
       expect(t.light, role).toBeTruthy();

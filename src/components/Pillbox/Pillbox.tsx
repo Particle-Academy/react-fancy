@@ -16,6 +16,7 @@ export const Pillbox = forwardRef<HTMLDivElement, PillboxProps>(
       onChange,
       placeholder = "Type and press Enter...",
       maxItems,
+      maxLength,
       disabled = false,
       className,
       label,
@@ -31,6 +32,12 @@ export const Pillbox = forwardRef<HTMLDivElement, PillboxProps>(
     const removeLabel = labels?.remove ?? "Remove {tag}";
     const addedLabel = labels?.added ?? "Added {tag}";
     const removedLabel = labels?.removed ?? "Removed {tag}";
+    const remainingLabel = labels?.remaining ?? "{remaining} characters remaining";
+    // Unset (or not a usable number) means no cap: 6.17.1's behaviour.
+    const cap =
+      typeof maxLength === "number" && Number.isFinite(maxLength) && maxLength >= 0
+        ? Math.floor(maxLength)
+        : undefined;
 
     const autoId = useId();
     const inputId = id ?? autoId;
@@ -46,18 +53,23 @@ export const Pillbox = forwardRef<HTMLDivElement, PillboxProps>(
     );
     const [input, setInput] = useState("");
     const [announcement, setAnnouncement] = useState("");
+    // Whether the live region currently holds a remaining-count message, so
+    // leaving the last 5 characters clears it without wiping "Added …".
+    const countingRef = useRef(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const addItem = useCallback(
       (text: string) => {
         const trimmed = text.trim();
         if (!trimmed || items.includes(trimmed)) return;
+        if (cap !== undefined && trimmed.length > cap) return;
         if (maxItems && items.length >= maxItems) return;
         setItems([...items, trimmed]);
         setInput("");
+        countingRef.current = false;
         setAnnouncement(fillLabel(addedLabel, { tag: trimmed }));
       },
-      [items, setItems, maxItems, addedLabel],
+      [items, setItems, maxItems, cap, addedLabel],
     );
 
     const removeItem = useCallback(
@@ -65,11 +77,29 @@ export const Pillbox = forwardRef<HTMLDivElement, PillboxProps>(
         const removed = items[index];
         setItems(items.filter((_, i) => i !== index));
         if (removed !== undefined) {
+          countingRef.current = false;
           setAnnouncement(fillLabel(removedLabel, { tag: removed }));
         }
       },
       [items, setItems, removedLabel],
     );
+
+    const handleInput = (raw: string) => {
+      // The native maxlength stops typing, but not a value set another way
+      // (some paste and IME paths, extensions, an agent writing the DOM), so
+      // the cap is held here too: the text is cut at it, never accepted past it.
+      const next = cap !== undefined && raw.length > cap ? raw.slice(0, cap) : raw;
+      setInput(next);
+      if (cap === undefined) return;
+      const remaining = cap - next.length;
+      if (remaining <= 5) {
+        countingRef.current = true;
+        setAnnouncement(fillLabel(remainingLabel, { remaining }));
+      } else if (countingRef.current) {
+        countingRef.current = false;
+        setAnnouncement("");
+      }
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter") {
@@ -118,7 +148,8 @@ export const Pillbox = forwardRef<HTMLDivElement, PillboxProps>(
           id={inputId}
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => handleInput(e.target.value)}
+          maxLength={cap}
           onKeyDown={handleKeyDown}
           placeholder={items.length === 0 ? placeholder : ""}
           disabled={disabled}

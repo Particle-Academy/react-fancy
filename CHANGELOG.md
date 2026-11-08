@@ -11,6 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.18.0] - 2026-11-08
+
+### Added
+
+- **`--fancy-accent` / `--fancy-accent-dark`: a theme token for the native toggle accent (council CC-fancy-0015).** `Checkbox`, `CheckboxGroup` and `RadioGroup` hard-coded `accent-blue-600`, so the checked colour was the one part of a native toggle a host could not repaint with tokens. They now read `accent-[color:var(--fancy-accent,var(--color-blue-600))]`, with `--fancy-accent-dark` under `dark:`. Both default to blue-600.
+  - Recorded as the `accent` role in `THEME_TOKENS` and in the README token table, which now lists thirteen roles.
+  - Measured through the compiled CSS (`tests/native-toggle-accent.test.tsx`): the default resolves to blue-600 in light and dark, and a host-set token is honoured in each mode.
+  - `Slider` still uses `accent-blue-600`; it was outside the council's scope.
+
+  **Consumer action:** none. With neither variable set, the computed `accent-color` is the blue-600 it was. To theme it, set `--fancy-accent` (and `--fancy-accent-dark`) wherever your other `--fancy-*` tokens live.
+
+- **`Pillbox` gains an optional `maxLength?: number` (council CC-fancy-0017).** The longest pill, in characters (UTF-16 code units, as native `maxlength` counts).
+  - The input carries the native `maxlength`, so typing stops at the cap, and the component also cuts any value that arrives longer another way (some paste and IME paths, extensions, an agent writing the DOM). A value longer than the cap is never added.
+  - Within 5 characters of the cap, the count left is announced in the existing polite live region, and cleared when the text moves back out of range. The words come from the new `labels.remaining` (`"{remaining} characters remaining"`), filled by the same `fillLabel` helper.
+
+  **Consumer action:** none. Unset means no cap, exactly as before.
+
 ## [6.17.1] - 2026-11-08
 
 ### Fixed

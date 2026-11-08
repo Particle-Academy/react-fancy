@@ -23,6 +23,7 @@ import { Pillbox } from "@particle-academy/react-fancy";
 | `onChange` | `(values: string[]) => void` | - | Callback when items change |
 | `placeholder` | `string` | `"Type and press Enter..."` | Placeholder (shown only when no items exist) |
 | `maxItems` | `number` | - | Maximum number of items allowed |
+| `maxLength` | `number` | - | Longest pill, in characters. The input stops accepting characters beyond it, a longer value (pasted text included) is never added, and the count left is announced within 5 characters of it. Unset means no cap |
 | `disabled` | `boolean` | `false` | Disables input and removal |
 | `className` | `string` | - | Additional CSS classes |
 | `label` | `string` | - | Names the text input (rendered with the shared `Field` wrapper) |
@@ -31,13 +32,14 @@ import { Pillbox } from "@particle-academy/react-fancy";
 | `error` | `string` | - | Validation message, linked with `aria-describedby`; sets `aria-invalid` |
 | `required` | `boolean` | - | Shows the required mark and sets `aria-required` (not native `required`: the entry box is empty when the value is complete) |
 | `id` | `string` | auto | `id` of the text input |
-| `labels` | `PillboxLabels` | - | Words read to screen readers, for translation: `remove` (`"Remove {tag}"`), `added` (`"Added {tag}"`), `removed` (`"Removed {tag}"`) |
+| `labels` | `PillboxLabels` | - | Words read to screen readers, for translation: `remove` (`"Remove {tag}"`), `added` (`"Added {tag}"`), `removed` (`"Removed {tag}"`), `remaining` (`"{remaining} characters remaining"`) |
 
 **Behavior:**
 - Press **Enter** to add the current text as a pill. Duplicates and empty strings are ignored.
 - Press **Backspace** on an empty input to remove the last pill.
 - Click the **X** on any pill to remove it.
 - Adding and removing a pill is announced in a polite live region.
+- With `maxLength`, the characters left are announced in the same region once 5 or fewer remain.
 
 ## Examples
 

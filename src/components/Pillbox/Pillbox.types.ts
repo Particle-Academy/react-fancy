@@ -8,6 +8,11 @@ export interface PillboxLabels {
   added?: string;
   /** Announced when a pill is removed. @default "Removed {tag}" */
   removed?: string;
+  /**
+   * Announced while typing within 5 characters of `maxLength`. `{remaining}`
+   * is the count left. @default "{remaining} characters remaining"
+   */
+  remaining?: string;
 }
 
 export interface PillboxProps
@@ -20,6 +25,13 @@ export interface PillboxProps
   onChange?: (values: string[]) => void;
   placeholder?: string;
   maxItems?: number;
+  /**
+   * Longest pill, in characters (UTF-16 code units, as the native `maxlength`
+   * counts). The input stops accepting characters beyond it, a longer value is
+   * never added (pasted text included), and the count left is announced within
+   * 5 characters of it. Unset means no cap.
+   */
+  maxLength?: number;
   disabled?: boolean;
   className?: string;
   /** Remove-button names and add / remove announcements, for translation. */

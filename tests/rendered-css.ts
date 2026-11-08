@@ -163,6 +163,37 @@ export function removeRenderedCss() {
   installed = null;
 }
 
+/** Index of the `)` closing the paren whose `(` is at `open`. */
+function closingParen(s: string, open: number): number {
+  let depth = 0;
+  for (let i = open; i < s.length; i++) {
+    if (s[i] === "(") depth++;
+    else if (s[i] === ")" && --depth === 0) return i;
+  }
+  return s.length;
+}
+
+/**
+ * Substitute every `var(--x, fallback)` in `value` the way a browser would for
+ * `el`: the custom property's computed (inherited) value if it is set, else the
+ * fallback, recursively. jsdom computes custom properties but leaves `var()`
+ * unsubstituted in ordinary properties, so `accent-color` reads as the raw
+ * expression; this reads what it resolves to.
+ */
+export function resolveVars(el: Element, value: string, depth = 0): string {
+  if (depth > 10) throw new Error(`resolveVars: too deep in "${value}"`);
+  const at = value.indexOf("var(");
+  if (at < 0) return value.trim();
+  const end = closingParen(value, at + 3);
+  const inner = value.slice(at + 4, end);
+  const comma = inner.indexOf(",");
+  const name = (comma < 0 ? inner : inner.slice(0, comma)).trim();
+  const fallback = comma < 0 ? "" : inner.slice(comma + 1);
+  const set = getComputedStyle(el).getPropertyValue(name).trim();
+  const replaced = set ? resolveVars(el, set, depth + 1) : resolveVars(el, fallback, depth + 1);
+  return resolveVars(el, value.slice(0, at) + replaced + value.slice(end + 1), depth + 1);
+}
+
 /** `border-top-width` as px. jsdom leaves keywords unresolved, so `medium` etc. read as NaN. */
 export function borderTopPx(el: Element): number {
   const cs = getComputedStyle(el);

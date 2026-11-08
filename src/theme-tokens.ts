@@ -127,6 +127,14 @@ export const THEME_TOKENS = {
     dark: "var(--color-blue-400)",
     description: "The focus border and ring on form controls.",
   },
+  accent: {
+    variable: "--fancy-accent",
+    darkVariable: "--fancy-accent-dark",
+    light: "var(--color-blue-600)",
+    dark: "var(--color-blue-600)",
+    description:
+      "The checked colour (`accent-color`) of native checkboxes and radios: Checkbox, CheckboxGroup, RadioGroup. Added 6.18.0.",
+  },
 } as const;
 
 export type ThemeTokenRole = keyof typeof THEME_TOKENS;
