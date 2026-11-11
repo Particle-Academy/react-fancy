@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Releases need a lab-run certificate.** `publish.yml` gains a read-only
+  `lab-certificate` job that every publishing job needs: a tag is published only
+  when the fancy-labs lab has certified that exact version and commit. Consumers
+  do nothing; this changes how releases are cut, not what the package does.
+
 ## [6.19.1] - 2026-11-08
 
 ### Fixed
@@ -2627,7 +2634,6 @@ still type-checks.
   gestures — the component was never asked, so it never rejected anything. The
   input is now cleared after each change.
 
-
 ## [5.32.0] - 2026-10-02
 
 ### Added
@@ -2860,7 +2866,6 @@ recognising.
   11-step size ramp. Forking a card-local copy would give two answers to "how
   big is a heading", and they would drift.
 
-
 ## [5.29.1] - 2026-09-29
 
 ### Fixed
@@ -3080,7 +3085,6 @@ recognising.
   discarded. If you worked around it by moving a handle onto a wrapping
   element, that still works; you can now move it back.
 
-
 ## [5.25.0] - 2026-08-23
 
 ### Fixed
@@ -3109,7 +3113,6 @@ recognising.
   remove it or you will get the inset twice. If you genuinely want a
   full-bleed child, use the same escape hatch `Card.Media` uses — `!px-0
   !py-0` — which keeps working and is now reachable from any tag.
-
 
 ## [5.24.0] - 2026-08-20
 
@@ -3167,7 +3170,6 @@ caller could not reach past the outer wrapper — and they failed differently.
   is set but never read is worse than none, because the doc comment then
   promises a hook that does nothing.
 
-
 ## [5.23.1] - 2026-08-20
 
 ### Fixed
@@ -3200,7 +3202,6 @@ caller could not reach past the outer wrapper — and they failed differently.
   Found by the browser, not the suite: jsdom cannot compute grid layout, so the
   tests could confirm the template referenced the property but never that the
   resulting column count was right.
-
 
 ## [5.23.0] - 2026-08-20
 
@@ -3274,7 +3275,6 @@ rebuild — and filed as #23, #24 and #25.
   password"). Different concept, and renaming a 5.x prop to free the name would
   be breaking for the sake of a nicer word.
 
-
 ## [5.22.0] - 2026-08-19
 
 ### Changed
@@ -3297,7 +3297,6 @@ rebuild — and filed as #23, #24 and #25.
   **Nothing to do on upgrade.** `ClassValue` is now exported from this package
   rather than re-exported from `clsx`; if you imported the type from `clsx`
   yourself, that is still your own dependency and unaffected.
-
 
 ## [5.21.0] - 2026-08-18
 
@@ -3362,7 +3361,6 @@ rebuild — and filed as #23, #24 and #25.
   buffered by the time a user pressed play — in that case pass `preload="auto"`
   explicitly. The expensive option is now the one you opt into.
 
-
 ## [5.19.0] - 2026-08-11
 
 ### Added
@@ -3384,7 +3382,6 @@ rebuild — and filed as #23, #24 and #25.
   `dark:bg-zinc-900` and `w-60` from outside takes four `!important` utilities
   that every embedding host has to rediscover, and that rot the moment the base
   classes change.
-
 
 ## [5.18.0] - 2026-08-11
 
@@ -3429,7 +3426,6 @@ rebuild — and filed as #23, #24 and #25.
 - **`validateFolderName(name, siblings)`** — the same rule the component uses,
   exported so a host can pre-flight a name it is about to submit programmatically.
 
-
 ## [5.17.1] — 2026-08-11
 
 ### Fixed
@@ -3461,7 +3457,6 @@ rebuild — and filed as #23, #24 and #25.
   `max-h-*` and `overflow` on `Modal` or `Modal.Body`, those still win — they
   are on the same elements and later in the class string — so nothing breaks,
   but you can now delete them.
-
 
 ## [5.17.0] — 2026-08-10
 
@@ -3949,7 +3944,6 @@ rebuild — and filed as #23, #24 and #25.
 
   **What you must do:** nothing. Additive.
 
-
 ## [5.6.1] — 2026-08-09
 
 ### Fixed
@@ -3966,7 +3960,6 @@ rebuild — and filed as #23, #24 and #25.
   problem it was built for.
 
   **What you must do:** nothing. Attributes only.
-
 
 ## [5.6.0] — 2026-08-09
 
@@ -3998,7 +3991,6 @@ rebuild — and filed as #23, #24 and #25.
 
   **What you must do:** nothing. Both additive.
 
-
 ## [5.5.0] — 2026-08-09
 
 ### Added
@@ -4022,7 +4014,6 @@ rebuild — and filed as #23, #24 and #25.
   it is rather than as two unrelated keys.
 
   **What you must do:** nothing. Additive.
-
 
 ## [5.4.0] — 2026-08-09
 
@@ -4061,7 +4052,6 @@ rebuild — and filed as #23, #24 and #25.
   **What you must do:** nothing. Both are additive; `Brand` and every existing
   component render unchanged.
 
-
 ## [5.3.0] — 2026-08-09
 
 ### Added
@@ -4095,7 +4085,6 @@ rebuild — and filed as #23, #24 and #25.
   **What you must do:** nothing. Both are additive, and a `Card` written before
   this release renders identically — pinned by a test.
 
-
 ## [5.2.0] — 2026-08-09
 
 ### Added
@@ -4121,7 +4110,6 @@ rebuild — and filed as #23, #24 and #25.
   Tracking is applied to the display steps ONLY — spacing tuned for
   body-adjacent headings reads loose once type is big, and that difference was
   most of why a hand-rolled `<h1>` looked better than the component did.
-
 
 ## 5.1.0 — 2026-08-07
 
@@ -4154,7 +4142,6 @@ rebuild — and filed as #23, #24 and #25.
 
   The icons are inline SVG rather than `<Icon>`, so a password field does not
   depend on an icon set being registered.
-
 
 ## 5.0.0 — 2026-08-04
 
