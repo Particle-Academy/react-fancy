@@ -60,6 +60,14 @@ export const VideoViewer = forwardRef<HTMLDivElement, VideoViewerProps>(
             }}
             className={cn(
               "max-h-full max-w-full",
+              // K8: `<video controls>` is a Tab stop itself and its play /
+              // timeline / volume controls are more, inside its user-agent
+              // shadow root. While one of those has focus the video matches
+              // `:focus-within` but not `:focus`, so the UA outline went away;
+              // and that outline is drawn OUTSIDE the element, where the
+              // wrapper's `overflow-hidden` clipped it anyway. An inset outline
+              // on `:focus-within` covers every stop and cannot be clipped.
+              "focus-within:outline-2 focus-within:outline-solid focus-within:-outline-offset-2 focus-within:outline-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-within:outline-[color:var(--fancy-focus-dark,var(--color-blue-400))]",
               fit === "cover" ? "h-full w-full object-cover" : "object-contain",
             )}
           />

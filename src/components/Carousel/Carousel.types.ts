@@ -15,6 +15,20 @@ export interface CarouselContextValue {
   registerSlideNames: (names: string[]) => void;
   onFinish?: () => void;
   headless: boolean;
+  keepMounted: boolean;
+  labels: CarouselLabels;
+}
+
+/** Every string the carousel announces. All overridable through `labels`. */
+export interface CarouselLabels {
+  /** Accessible name of the default "previous" control. */
+  previous: string;
+  /** Accessible name of the default "next" control. */
+  next: string;
+  /** `aria-roledescription` of each slide. */
+  slide: string;
+  /** Accessible name of each slide. Slots: `{index}` (1-based), `{total}`. */
+  slideOf: string;
 }
 
 export interface CarouselProps {
@@ -29,6 +43,15 @@ export interface CarouselProps {
   variant?: CarouselVariant;
   headless?: boolean;
   onFinish?: () => void;
+  /**
+   * Render every slide, the inactive ones `hidden` + `inert`, instead of only
+   * the active one. Their content is then in the server-rendered HTML.
+   * Default `true` for `directional` (slides are content), `false` for
+   * `wizard` (each step mounts when it is reached).
+   */
+  keepMounted?: boolean;
+  /** Override any announced string (see `CarouselLabels`). */
+  labels?: Partial<CarouselLabels>;
 }
 
 export interface CarouselSlideProps {

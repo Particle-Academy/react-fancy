@@ -5,7 +5,7 @@ import { Field } from "../Field";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { DisplayValue } from "../mode/DisplayValue";
 import { useInlineEdit } from "../mode/useInlineEdit";
-import { dirtyRingClasses, optionLabelNode, optionLangProps, resolveOption } from "../inputs.utils";
+import { dirtyRingClasses, fieldAria, optionLabelNode, optionLangProps, resolveOption } from "../inputs.utils";
 import type { RadioGroupProps } from "./RadioGroup.types";
 
 export function RadioGroup<V = string>({
@@ -32,6 +32,14 @@ export function RadioGroup<V = string>({
   // Same reason as MultiSwitch: a `<label>` cannot name a div[role="radiogroup"].
   // This one did not even pass `htmlFor`, so its label named nothing at all.
   const labelId = label ? `${groupId}-label` : undefined;
+  // `aria-invalid` is supported on a radiogroup; the group, not each radio, is
+  // the thing that is in error.
+  const { errorId, descriptionId, aria } = fieldAria(groupId, {
+    error,
+    description,
+    describedBy: (rest as { "aria-describedby"?: string })["aria-describedby"],
+    invalid: (rest as { "aria-invalid"?: unknown })["aria-invalid"],
+  });
   const resolvedMode = useFieldMode(mode);
   const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
   const [value, setValue] = useControllableState(
@@ -60,6 +68,7 @@ export function RadioGroup<V = string>({
       data-react-fancy-radio-group=""
       role="radiogroup"
       aria-labelledby={labelId}
+      {...aria}
       onBlur={(e) => {
         if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
       }}
@@ -128,7 +137,9 @@ export function RadioGroup<V = string>({
         labelHidden={labelHidden}
         labelId={labelId}
         description={description}
+        descriptionId={descriptionId}
         error={error}
+        errorId={errorId}
         required={required}
         size={size}
       >

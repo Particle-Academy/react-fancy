@@ -7,6 +7,7 @@ import { InputWrapper } from "../InputWrapper";
 import {
   dirtyClasses,
   errorClasses,
+  fieldAria,
   inputBaseClasses,
   inputSizeClasses,
 } from "../inputs.utils";
@@ -116,6 +117,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       [pasteImages, paste, pasteValue],
     );
     const labelId = `${inputId}-label`;
+    const { errorId, descriptionId, aria } = fieldAria(inputId, {
+      error,
+      description,
+      describedBy: props["aria-describedby"],
+      invalid: props["aria-invalid"],
+    });
 
     const input = !showControl ? (
       <DisplayValue
@@ -165,6 +172,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                   disabled={disabled === true}
                   ariaLabelledBy={label ? labelId : props["aria-labelledby"]}
                   ariaInvalid={Boolean(error)}
+                  ariaDescribedBy={aria["aria-describedby"]}
                   placeholderClassName={cn(pastePlaceholderClasses[size], leading ? "start-9" : undefined)}
                   style={{
                     ...(leadingWidth ? { paddingInlineStart: leadingWidth + 20 } : null),
@@ -235,6 +243,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 onValueChange?.(e.target.value);
               }}
               {...props}
+              // After the spread: the host's own aria-describedby is merged in, not lost.
+              {...aria}
               // Inline click-to-edit: focus on entering edit, return to the display
               // (and run the host's onBlur) when focus leaves.
               autoFocus={interactive || props.autoFocus}
@@ -287,7 +297,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           labelId={pasting ? labelId : undefined}
           labelHidden={labelHidden}
           description={description}
+          descriptionId={descriptionId}
           error={error}
+          errorId={errorId}
           required={required}
           htmlFor={inputId}
           size={size}

@@ -10,6 +10,7 @@ import { useEscapeKey } from "../../../hooks/use-escape-key";
 import {
   dirtyClasses,
   errorClasses,
+  fieldAria,
   inputBaseClasses,
   inputSizeClasses,
   optionLabelList,
@@ -130,6 +131,13 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
     const isControlled = value !== undefined;
     const resolvedDefault =
       !isControlled && defaultValue === undefined && placeholder ? "" : defaultValue;
+    // Field derives the message ids from `htmlFor`, the same `${id}-error` shape.
+    const { aria } = fieldAria(selectId, {
+      error,
+      description,
+      describedBy: props["aria-describedby"],
+      invalid: props["aria-invalid"],
+    });
 
     const select = (
       <InputWrapper
@@ -160,6 +168,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, SelectProps>(
             onValueChange?.(e.target.value);
           }}
           {...props}
+          {...aria}
           {...(isControlled ? { value } : { defaultValue: resolvedDefault })}
           autoFocus={interactive || props.autoFocus}
           onBlur={(e) => {
@@ -473,6 +482,7 @@ const ListboxSelect = forwardRef<HTMLSelectElement, SelectProps>(
         role="combobox"
         aria-expanded={open}
         aria-haspopup="listbox"
+        {...fieldAria(selectId, { error, description }).aria}
         data-react-fancy-select=""
         data-variant="listbox"
         className={cn(

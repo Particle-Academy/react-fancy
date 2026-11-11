@@ -76,6 +76,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
     showLineNumbers = false,
     wrap = false,
     copyLabels,
+    labels: textLabels,
     onCopyCode,
     className,
     style,
@@ -130,6 +131,10 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
   const label = copyState === "copied" ? labels.copied : copyState === "failed" ? labels.failed : labels.copy;
   const hasHeader = title != null && title !== false;
   const floating = copyable && !hasHeader;
+  // The <pre> scrolls (horizontally unless `wrap`, and vertically under a
+  // consumer max-height), so it is a focusable, named region: a keyboard user
+  // can then scroll it (axe `scrollable-region-focusable`).
+  const regionLabel = textLabels?.region ?? (typeof title === "string" && title !== "" ? title : "Code");
 
   const copyButton = copyable ? (
     <Button
@@ -186,7 +191,10 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
           className="flex items-center justify-between gap-2 border-b py-1 ps-3 pe-1 text-xs"
           style={{
             backgroundColor: paletteColor("gutterBackground"),
-            color: paletteColor("gutterForeground"),
+            // The title is text a reader needs, so it is painted `foreground`:
+            // `gutterForeground` (meant for line numbers) is about 2.4:1 on this
+            // header in both palettes and failed axe `color-contrast`.
+            color: paletteColor("foreground"),
             borderColor: paletteColor("gutterBorder"),
           }}
         >
@@ -204,7 +212,17 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
         // reorder its brackets and operators. The header around it, and the
         // floating copy button over it, stay with the LTR code.
         dir="ltr"
-        className={cn(TEXT_METRICS, "border-none", wrap ? "overflow-x-hidden" : "overflow-x-auto", floating && "pr-12")}
+        role="region"
+        aria-label={regionLabel}
+        tabIndex={0}
+        className={cn(
+          TEXT_METRICS,
+          "border-none",
+          // Inset, so the root's `overflow-hidden rounded-lg` cannot clip it.
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]",
+          wrap ? "overflow-x-hidden" : "overflow-x-auto",
+          floating && "pr-12",
+        )}
         style={{
           whiteSpace: wrap ? "pre-wrap" : "pre",
           overflowWrap: wrap ? "break-word" : "normal",

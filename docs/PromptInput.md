@@ -57,7 +57,9 @@ import { PromptInput } from "@particle-academy/react-fancy";
 | sendDisabled | `boolean` | `false` | Disables only the send. The text stays editable and attachable; ⌘/Ctrl+Enter does not send. |
 | name | `string` | — | Form field name for the text. On the textarea; with inline pills on, on a hidden input carrying the expanded text. |
 | inputId | `string` | — | `id` of the text field (textarea or inline editor). `id` still names the root. |
-| showHint | `boolean` | `true` | Show the "⌘ + Enter to send" hint. |
+| showHint | `boolean` | `true` | Show the "Ctrl + Enter to send" hint (`⌘` on Apple). |
+| submitKey | `"mod+enter" \| "enter"` | `"mod+enter"` | Which key sends. `"mod+enter"`: Ctrl/⌘+Enter sends, Enter is a newline. `"enter"`: Enter sends, Shift+Enter is a newline. The hint, default placeholder, and the icon send button's tooltip, accessible name and `aria-keyshortcuts` follow it. |
+| labels | `PromptInputLabels` | — | Words about sending: `send` (`"send"`), `sendTooltip` (`"Send · {shortcut}"`), `sendAriaLabel` (`"Send ({shortcut})"`), `shortcut` (replaces the derived `"Ctrl+Enter"` / `"Enter"`), `enterKey` (`"Enter"`), `hint` (`"to send"`). |
 | placeholder | `string` | `"Ask anything…"` | Placeholder text. |
 | charsPerToken | `number` | `4` | Rough estimator for the token meter. |
 | mentionColor | `Record<string, string>` | sensible defaults | Override the chip colour per mention kind. |

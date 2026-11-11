@@ -14,6 +14,7 @@ function TabsRoot({
   activeTab: controlledTab,
   onTabChange,
   variant = "underline",
+  keepMounted = false,
   className,
 }: TabsProps) {
   const [activeTab, setActiveTab] = useControllableState(
@@ -23,8 +24,8 @@ function TabsRoot({
   );
 
   const ctx = useMemo(
-    () => ({ activeTab, setActiveTab, variant }),
-    [activeTab, setActiveTab, variant],
+    () => ({ activeTab, setActiveTab, variant, keepMounted }),
+    [activeTab, setActiveTab, variant, keepMounted],
   );
 
   return (

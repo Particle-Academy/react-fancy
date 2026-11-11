@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/react-fancy",
-  "version": "6.19.1",
+  "version": "6.20.0",
   "description": "React UI component library for Human+ UX — controlled, agent-bridgeable primitives",
   "repository": {
     "type": "git",
@@ -421,6 +421,16 @@
       "require": {
         "types": "./dist/heading.d.cts",
         "default": "./dist/heading.cjs"
+      }
+    },
+    "./hotkey-capture": {
+      "import": {
+        "types": "./dist/hotkey-capture.d.ts",
+        "default": "./dist/hotkey-capture.js"
+      },
+      "require": {
+        "types": "./dist/hotkey-capture.d.cts",
+        "default": "./dist/hotkey-capture.cjs"
       }
     },
     "./icon": {

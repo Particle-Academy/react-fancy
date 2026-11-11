@@ -67,7 +67,12 @@ Also accepts every `<div>` attribute (`id`, `aria-label`, `style`, `data-*`, ...
 | showLineNumbers | `boolean` | `false` | Number each line in a gutter that is not part of the code text |
 | wrap | `boolean` | `false` | Wrap long lines instead of scrolling horizontally |
 | copyLabels | `{ copy?, copied?, failed? }` | `"Copy code"`, `"Copied"`, `"Copy failed"` | Words on the copy button, for translation |
+| labels | `{ region? }` | the `title` when it is a string, else `"Code"` | Accessible name of the scrollable code region |
 | onCopyCode | `(event: { text: string; ok: boolean }) => void` | - | Called after every copy attempt |
+
+## Keyboard
+
+The `<pre>` is a focusable region (`role="region"`, `tabIndex={0}`, named by `labels.region`), so a keyboard user can Tab to it and scroll a long line with the arrow keys. It shows an inset focus ring, which the rounded root cannot clip. The header title is painted in the palette's `foreground` colour, which reaches 4.5:1 on the header in both themes.
 | className | `string` | - | Additional CSS classes on the root element |
 
 ## Copying
@@ -102,7 +107,7 @@ No `window`, `document` or `navigator` access during render. Tested with `render
 | `data-language` | root | the `language` prop |
 | `data-wrap` | root | `true` / `false` |
 | `data-react-fancy-code-block-header` / `-title` | the header and its title | only with `title` |
-| `data-react-fancy-code-block-pre` / `-code` | the `<pre>` / `<code>` | - |
+| `data-react-fancy-code-block-pre` / `-code` | the `<pre>` (a focusable `role="region"`) / `<code>` | - |
 | `data-react-fancy-code-block-copy` | the copy `<button>` | - |
 | `data-copy-state` | the copy `<button>` | `idle` / `copied` / `failed` |
 | `data-react-fancy-code-block-line` | each line, with `showLineNumbers` | the line number |

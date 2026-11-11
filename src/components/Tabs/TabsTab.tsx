@@ -58,13 +58,21 @@ export function TabsTab({
           "rounded-md px-4 py-1.5",
           isActive
             ? "bg-[color:var(--fancy-surface,var(--color-white))] text-zinc-900 shadow-sm dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:text-white"
-            : "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
+            // Soft, not muted: an inactive pill sits on the muted SURFACE, where
+            // the muted text token is 4.39:1 (zinc-500 on zinc-100), under AA.
+            // Soft is zinc-700 / zinc-300; the active tab still reads as active
+            // through its raised chip and the strongest text colour.
+            : "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
         ],
         variant === "boxed" && [
           "flex-1 rounded-md px-4 py-1.5",
           isActive
             ? "bg-[color:var(--fancy-surface,var(--color-white))] text-zinc-900 shadow-sm dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:text-white"
-            : "text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]",
+            // Soft, not muted: an inactive pill sits on the muted SURFACE, where
+            // the muted text token is 4.39:1 (zinc-500 on zinc-100), under AA.
+            // Soft is zinc-700 / zinc-300; the active tab still reads as active
+            // through its raised chip and the strongest text colour.
+            : "text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
         ],
         className,
       )}

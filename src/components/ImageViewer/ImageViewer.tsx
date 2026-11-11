@@ -55,11 +55,13 @@ export const ImageViewer = forwardRef<HTMLDivElement, ImageViewerProps>(
       style,
       frame = false,
       frameProps,
+      aspectRatio,
     },
     ref,
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
+    const [naturalAspect, setNaturalAspect] = useState<string | null>(null);
 
     // Controllable viewport supporting functional updates (usePanZoom needs them).
     const isControlled = viewport !== undefined;
@@ -136,6 +138,20 @@ export const ImageViewer = forwardRef<HTMLDivElement, ImageViewerProps>(
         )}
         style={style}
       >
+        {/*
+          The canvas below is absolutely positioned, so without this the viewer
+          has no in-flow content and collapses to 0 px wherever its height is
+          auto. The sizer gives it an intrinsic box from an aspect ratio. An
+          explicit height still wins: the sizer is clipped by overflow-hidden,
+          and that same overflow makes a flex or grid item's automatic minimum
+          size 0, so the sizer cannot inflate a sized slot either.
+        */}
+        <div
+          aria-hidden="true"
+          data-react-fancy-image-viewer-sizer=""
+          className="pointer-events-none w-full"
+          style={{ aspectRatio: String(aspectRatio ?? naturalAspect ?? "4 / 3") }}
+        />
         <div
           ref={containerRef}
           data-canvas-bg=""
@@ -162,7 +178,9 @@ export const ImageViewer = forwardRef<HTMLDivElement, ImageViewerProps>(
             src={src}
             alt={alt}
             draggable={false}
-            onLoad={() => {
+            onLoad={(e) => {
+              const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
+              if (w > 0 && h > 0) setNaturalAspect(`${w} / ${h}`);
               setStatus("loaded");
               onLoad?.();
             }}

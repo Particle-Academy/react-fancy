@@ -60,4 +60,11 @@ export interface ImageViewerProps {
   className?: string;
   /** Inline styles for the viewport container (e.g. a fixed height). */
   style?: CSSProperties;
+  /**
+   * The viewer's intrinsic aspect (width / height) when nothing gives it a
+   * height: a number (`16 / 9`) or a CSS ratio string (`"16 / 9"`). Default:
+   * `4 / 3` until the image loads, then the image's natural aspect. An explicit
+   * height (`style`, `className`, a sized frame) always wins over it.
+   */
+  aspectRatio?: number | string;
 }

@@ -1,4 +1,4 @@
-import { createElement, Fragment, type ReactNode } from "react";
+import { createElement, Fragment, type AriaAttributes, type ReactNode } from "react";
 import type { Size } from "../../utils/types";
 import type { InputOption, OptionDir } from "./inputs.types";
 
@@ -38,6 +38,51 @@ export const ERROR_TEXT =
 
 export function errorClasses(error?: string): string {
   return error ? "border-red-500 focus:ring-red-500" : "";
+}
+
+/**
+ * What a control needs to expose its error and description to assistive
+ * technology (6.20.0, K1 of the full-kit benchmark). Every form control had
+ * rendered its `error` as a plain paragraph: no `aria-invalid`, no
+ * `aria-describedby`, nothing announced.
+ *
+ * `errorId` / `descriptionId` go to `Field` (which renders the message with
+ * those ids, the error as `role="alert"`); `aria` goes on the control. The
+ * description is only rendered while there is no error, so the control is
+ * described by whichever of the two is on screen, after any id the host passed.
+ */
+export function fieldAria(
+  id: string,
+  {
+    error,
+    description,
+    describedBy,
+    invalid,
+  }: {
+    error?: unknown;
+    description?: unknown;
+    /** The host's own `aria-describedby`, kept ahead of the message id. */
+    describedBy?: string;
+    /** The host's own `aria-invalid` (NumberField, PhoneInput), kept when there is no `error`. */
+    invalid?: unknown;
+  },
+): {
+  errorId: string;
+  descriptionId: string;
+  aria: { "aria-invalid": AriaAttributes["aria-invalid"]; "aria-describedby": string | undefined };
+} {
+  const errorId = `${id}-error`;
+  const descriptionId = `${id}-description`;
+  const own = error ? errorId : description ? descriptionId : undefined;
+  const ids = [describedBy, own].filter(Boolean).join(" ");
+  return {
+    errorId,
+    descriptionId,
+    aria: {
+      "aria-invalid": error ? true : (invalid as AriaAttributes["aria-invalid"]),
+      "aria-describedby": ids || undefined,
+    },
+  };
 }
 
 export const inputBaseClasses =

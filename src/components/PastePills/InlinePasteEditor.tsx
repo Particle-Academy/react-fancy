@@ -67,6 +67,8 @@ interface InlinePasteEditorProps {
   /** Names the textbox for assistive tech; a `<div>` cannot be the target of a `<label>`. */
   ariaLabelledBy?: string;
   ariaInvalid?: boolean;
+  /** Ids of the error / description that describe the textbox. */
+  ariaDescribedBy?: string;
   style?: React.CSSProperties;
 }
 
@@ -214,6 +216,7 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
       id,
       ariaLabelledBy,
       ariaInvalid,
+      ariaDescribedBy,
       style,
     },
     ref,
@@ -497,6 +500,7 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
           aria-multiline={multiline}
           aria-labelledby={ariaLabelledBy}
           aria-invalid={ariaInvalid || undefined}
+          aria-describedby={ariaDescribedBy}
           aria-placeholder={placeholder}
           aria-disabled={disabled || undefined}
           contentEditable={!disabled}

@@ -3,7 +3,7 @@ import { cn } from "../../../utils/cn";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { useFieldMode } from "../mode/FieldMode.context";
 import { useInlineEdit } from "../mode/useInlineEdit";
-import { dirtyRingClasses, ERROR_TEXT } from "../inputs.utils";
+import { dirtyRingClasses, ERROR_TEXT, fieldAria } from "../inputs.utils";
 import type { CheckboxProps } from "./Checkbox.types";
 
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
@@ -31,6 +31,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     const autoId = useId();
     const checkboxId = id ?? autoId;
     const internalRef = useRef<HTMLInputElement | null>(null);
+    const { errorId, descriptionId, aria } = fieldAria(checkboxId, { error, description });
     const resolvedMode = useFieldMode(mode);
     const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
     const [checked, setChecked] = useControllableState(
@@ -103,6 +104,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             disabled={disabled}
             required={required}
             checked={checked}
+            {...aria}
             autoFocus={interactive}
             onBlur={() => {
               if (interactive) exitEdit();
@@ -121,7 +123,8 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           />
         </div>
         )}
-        {(label || description) && (
+        {/* `error` alone renders too: an unlabelled checkbox's error used to be dropped. */}
+        {(label || description || error) && (
           <div className="flex flex-col">
             {label && (
               <label
@@ -136,11 +139,15 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               </label>
             )}
             {description && (
-              <span className="text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
+              <span id={descriptionId} className="text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                 {description}
               </span>
             )}
-            {error && <span className={cn("text-xs", ERROR_TEXT)}>{error}</span>}
+            {error && (
+              <span id={errorId} role="alert" data-react-fancy-field-error="" className={cn("text-xs", ERROR_TEXT)}>
+                {error}
+              </span>
+            )}
           </div>
         )}
       </div>

@@ -13,7 +13,14 @@ export const CarouselControls = forwardRef<HTMLDivElement, CarouselControlsProps
     },
     ref,
   ) => {
-    const { prev, next, activeIndex, totalSlides, variant, loop, onFinish, headless } = useCarousel();
+    const { prev, next, activeIndex, totalSlides, variant, loop, onFinish, headless, labels } = useCarousel();
+
+    // A visible text label names the button itself; adding an aria-label that
+    // says something else would break label-in-name (WCAG 2.5.3). The default
+    // glyphs, or a non-text label such as an icon, get the named label.
+    const isText = (node: unknown) => typeof node === "string" || typeof node === "number";
+    const prevName = isText(prevLabel) ? undefined : labels.previous;
+    const nextName = isText(nextLabel) ? undefined : labels.next;
 
     if (headless) {
       return null;
@@ -64,6 +71,7 @@ export const CarouselControls = forwardRef<HTMLDivElement, CarouselControlsProps
           type="button"
           onClick={prev}
           disabled={prevDisabled}
+          aria-label={prevName}
           // The default glyphs are arrows, which Unicode does not mirror: flip
           // them in RTL so "previous" points to the inline start. A label the
           // consumer supplies is text and is left alone.
@@ -75,6 +83,7 @@ export const CarouselControls = forwardRef<HTMLDivElement, CarouselControlsProps
           type="button"
           onClick={next}
           disabled={nextDisabled}
+          aria-label={nextName}
           className={cn("rounded-lg border px-3 py-1 text-sm disabled:opacity-50 dark:border-zinc-600", nextLabel == null && "rtl:-scale-x-100")}
         >
           {nextLabel ?? "\u2192"}

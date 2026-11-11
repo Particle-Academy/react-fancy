@@ -1,6 +1,8 @@
 export { PromptInput, promptFileToDataUrl, promptDataUrlToFile } from "./PromptInput";
 export type {
   PromptInputProps,
+  PromptInputLabels,
+  PromptSubmitKey,
   PromptCmd,
   PromptMention,
   PromptAttachment,

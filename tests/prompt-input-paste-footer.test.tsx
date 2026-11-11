@@ -353,7 +353,8 @@ describe("PromptInput — quieter footer", () => {
 
     const button = host.querySelector("[data-react-fancy-prompt-input-send]")!;
     expect(button.textContent?.trim()).toBe("");
-    expect(button.getAttribute("aria-label")).toBe("Send");
+    // The name carries the shortcut since CC-fancy-0022, derived from `submitKey`.
+    expect(button.getAttribute("aria-label")).toBe("Send (Ctrl+Enter)");
     expect(host.querySelector("[data-react-fancy-prompt-input-hint]")).toBeNull();
     expect(hover(button)?.textContent).toContain("Ctrl+Enter");
   });

@@ -1,2 +1,2 @@
 export { CodeBlock } from "./CodeBlock";
-export type { CodeBlockProps, CodeBlockCopyLabels, CodeBlockCopyEvent, CodeLanguage } from "./CodeBlock.types";
+export type { CodeBlockProps, CodeBlockCopyLabels, CodeBlockLabels, CodeBlockCopyEvent, CodeLanguage } from "./CodeBlock.types";

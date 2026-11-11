@@ -8,10 +8,15 @@ import { useInlineEdit } from "../mode/useInlineEdit";
 import {
   dirtyClasses,
   errorClasses,
+  fieldAria,
   inputBaseClasses,
   inputSizeClasses,
 } from "../inputs.utils";
 import type { DatePickerProps } from "./DatePicker.types";
+
+/** `inputBaseClasses`' focus ring, keyed on `:focus-within` (see `inputClasses`). */
+const DATE_FOCUS_WITHIN =
+  "focus-within:outline-none focus-within:ring-2 focus-within:ring-[color:var(--fancy-focus,var(--color-blue-500))]/40 focus-within:border-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-within:border-[color:var(--fancy-focus-dark,var(--color-blue-400))] dark:focus-within:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]/20";
 
 /** Locale-format an ISO date / datetime-local string; fall back to the raw value. */
 function formatDateValue(iso: string, includeTime?: boolean): string {
@@ -59,8 +64,15 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
     const inputClasses = cn(
       inputBaseClasses,
       inputSizeClasses[size],
+      // A native date input is four Tab stops: month, day, year and the
+      // calendar button. The button lives in the input's user-agent shadow
+      // root, and while it has focus the input matches `:focus-within` but NOT
+      // `:focus`, so the `focus:` ring above turned off for that stop (K7,
+      // measured in Chrome 157). The same ring, on `:focus-within`.
+      DATE_FOCUS_WITHIN,
       dirtyClasses(dirty),
       errorClasses(error),
+      error && "focus-within:border-red-500 focus-within:ring-red-500",
       "w-full",
     );
 
@@ -157,6 +169,7 @@ const SingleDatePicker = forwardRef<
         disabled={disabled}
         required={required}
         onChange={(e) => setValue(e.target.value)}
+        {...fieldAria(id ?? "", { error, description }).aria}
         className={cn(inputClasses, className)}
         autoFocus={interactive}
         onBlur={() => {
@@ -225,6 +238,8 @@ const RangeDatePicker = forwardRef<
       rangeProps.defaultValue ?? ["", ""] as [string, string],
       rangeProps.onValueChange,
     );
+    // Both inputs: either half can be the one a screen reader lands on.
+    const { aria } = fieldAria(id ?? "", { error, description });
 
     const input = !showControl ? (
       <DisplayValue
@@ -256,6 +271,7 @@ const RangeDatePicker = forwardRef<
           disabled={disabled}
           required={required}
           onChange={(e) => setValue([e.target.value, value[1]])}
+          {...aria}
           className={inputClasses}
           autoFocus={interactive}
         />
@@ -268,6 +284,7 @@ const RangeDatePicker = forwardRef<
           value={value[1]}
           disabled={disabled}
           onChange={(e) => setValue([value[0], e.target.value])}
+          {...aria}
           className={inputClasses}
         />
       </div>

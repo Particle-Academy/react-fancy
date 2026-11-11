@@ -28,6 +28,16 @@ export interface CodeBlockCopyLabels {
   failed?: string;
 }
 
+/** Other words CodeBlock speaks, for translation. */
+export interface CodeBlockLabels {
+  /**
+   * Accessible name of the scrollable code region (the `<pre>`, which is
+   * focusable so a keyboard user can scroll it).
+   * @default the `title` when it is a string, otherwise "Code"
+   */
+  region?: string;
+}
+
 /** Reported through `onCopyCode` after every copy attempt. */
 export interface CodeBlockCopyEvent {
   /** Exactly the `code` prop: the raw source, never the highlighted HTML. */
@@ -60,6 +70,8 @@ export interface CodeBlockProps
   wrap?: boolean;
   /** Words on the copy button. */
   copyLabels?: CodeBlockCopyLabels;
+  /** Other words, such as the code region's accessible name. */
+  labels?: CodeBlockLabels;
   /** Called after every copy attempt, successful or not. */
   onCopyCode?: (event: CodeBlockCopyEvent) => void;
   /** Additional classes on the root element. */

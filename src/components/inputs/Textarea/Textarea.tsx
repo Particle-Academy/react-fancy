@@ -5,6 +5,7 @@ import { InputWrapper } from "../InputWrapper";
 import {
   dirtyClasses,
   errorClasses,
+  fieldAria,
   inputBaseClasses,
   inputSizeClasses,
 } from "../inputs.utils";
@@ -47,6 +48,12 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const internalRef = useRef<HTMLTextAreaElement | null>(null);
     const resolvedMode = useFieldMode(mode);
     const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
+    const { errorId, descriptionId, aria } = fieldAria(textareaId, {
+      error,
+      description,
+      describedBy: props["aria-describedby"],
+      invalid: props["aria-invalid"],
+    });
 
     useEffect(() => {
       const el = internalRef.current;
@@ -105,6 +112,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             onValueChange?.(e.target.value);
           }}
           {...props}
+          {...aria}
           autoFocus={interactive || props.autoFocus}
           onBlur={(e) => {
             props.onBlur?.(e);
@@ -120,7 +128,9 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           label={label}
           labelHidden={labelHidden}
           description={description}
+          descriptionId={descriptionId}
           error={error}
+          errorId={errorId}
           required={required}
           htmlFor={textareaId}
           size={size}

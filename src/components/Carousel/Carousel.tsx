@@ -6,7 +6,14 @@ import { CarouselPanels } from "./CarouselPanels";
 import { CarouselSlide } from "./CarouselSlide";
 import { CarouselControls } from "./CarouselControls";
 import { CarouselSteps } from "./CarouselSteps";
-import type { CarouselProps, CarouselContextValue } from "./Carousel.types";
+import type { CarouselProps, CarouselContextValue, CarouselLabels } from "./Carousel.types";
+
+const DEFAULT_LABELS: CarouselLabels = {
+  previous: "Previous slide",
+  next: "Next slide",
+  slide: "slide",
+  slideOf: "{index} of {total}",
+};
 
 const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
   (
@@ -22,9 +29,18 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
       variant = "directional",
       headless = false,
       onFinish,
+      keepMounted: keepMountedProp,
+      labels: labelsProp,
     },
     ref,
   ) => {
+    const keepMounted = keepMountedProp ?? variant !== "wizard";
+    const labels = useMemo<CarouselLabels>(
+      () => ({ ...DEFAULT_LABELS, ...labelsProp }),
+      // Labels are usually an inline object literal: key on the values.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [labelsProp?.previous, labelsProp?.next, labelsProp?.slide, labelsProp?.slideOf],
+    );
     const [activeIndex, setActiveIndex] = useControllableState<number>(
       controlledIndex,
       defaultIndex,
@@ -99,8 +115,12 @@ const CarouselRoot = forwardRef<HTMLDivElement, CarouselProps>(
         registerSlideNames,
         onFinish: onFinishRef.current,
         headless,
+        keepMounted,
+        labels,
       }),
       [
+        keepMounted,
+        labels,
         activeIndex,
         totalSlides,
         next,

@@ -11,12 +11,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.20.0] - 2026-11-11
+
+Fixes the react-fancy defects the lab's full-kit site benchmark found (K1 to
+K10, K18 in `fancy-labs/docs/kit-site-findings.md`), plus two owner-approved
+additions (CC-fancy-0022). **One behaviour change to read first:** a directional
+`Carousel` now mounts every slide on first render (see Fixed). Pass
+`keepMounted={false}` for the old active-only rendering. Everything else needs
+no action on upgrade.
+
+### Added
+
+- **`PromptInput` `submitKey`** (`"mod+enter"` | `"enter"`, default `"mod+enter"`, unchanged behaviour). `"enter"`: Enter sends and Shift+Enter inserts a newline, in the textarea and the inline paste editor. The inline hint, the default placeholder, and the icon send button's tooltip, accessible name and `aria-keyshortcuts` all derive from it, so no surface names a shortcut that does not send. New `labels` (`PromptInputLabels`): `send`, `sendTooltip` (`"Send · {shortcut}"`), `sendAriaLabel` (`"Send ({shortcut})"`), `shortcut`, `enterKey`, `hint`. No hardcoded English remains in the send tooltip. The icon send button's accessible name now includes the shortcut (`"Send (Ctrl+Enter)"`); a test that matched the exact name `"Send"` needs updating. (CC-fancy-0022)
+- **`HotkeyCapture`**: records a keyboard shortcut, built to the component contract. Controlled `value` / `onChange` (or `defaultValue`) as a normalised string, `"ctrl+shift+k"`: modifiers in the order ctrl, alt, shift, meta, then one physical key, lower case; `""` is unset. Click, Enter or Space starts a capture ("Press the keys…"). A modifier alone does not commit; Escape or blur cancels and leaves the previous value. Renders as `Kbd` keycaps, has an accessible name and a polite live-region announcement, `labels` for every string, SSR-safe platform naming, an optional clear button and a hidden form field. Handles: `data-react-fancy-hotkey-capture` (with `data-state` and `data-value`), `-trigger`, `-clear` and `-status`. Helpers: `parseHotkey`, `formatHotkey`, `comboFromEvent`. Exported from the barrel and `@particle-academy/react-fancy/hotkey-capture`. (CC-fancy-0022)
+- **Accordion is controlled** (`value` / `onChange`, plus `defaultValue`), as the component contract requires. With `type="single"` the value is the open item's `value` or `null`; with `type="multiple"` it is a `string[]`. `defaultOpen` keeps working unchanged, so uncontrolled use needs no action. Each item now carries `data-value` and `data-state="open|closed"` handles, and the root carries `data-type`. New exported types: `AccordionSingleProps`, `AccordionMultipleProps`. (K10)
+- **`CodeBlock` `labels.region`**: the accessible name of the code region. It defaults to the `title` when that is a string, otherwise "Code". New exported type: `CodeBlockLabels`.
+- **`Tabs` `keepMounted`** (and a per-panel `Tabs.Panel` `keepMounted` override): inactive panels stay mounted with `hidden`, so their content is in the server-rendered HTML and their state survives a tab switch. Default `false`, unchanged behaviour: a panel can hold a heavy or size-dependent surface (a chart, a map) that should not mount while invisible. (K3)
+- **`Carousel` `keepMounted` and `labels`** (`previous`, `next`, `slide`, `slideOf` with `{index}` / `{total}`; type `CarouselLabels`). Each slide is now an APG slide group (`role="group"`, `aria-roledescription="slide"`, `aria-label="1 of 3"`).
+- **`ImageViewer` `aspectRatio`** (number or CSS ratio string), also reachable from `MediaViewer` through `imageProps`.
+
 ### Changed
 
 - **Releases need a lab-run certificate.** `publish.yml` gains a read-only
   `lab-certificate` job that every publishing job needs: a tag is published only
   when the fancy-labs lab has certified that exact version and commit. Consumers
   do nothing; this changes how releases are cut, not what the package does.
+
+### Fixed
+
+- **Field errors reach assistive technology** (K1). `Input`, `Textarea`, `Select` (native and listbox), `RadioGroup`, `Checkbox` and `DatePicker` (single and both range inputs) now set `aria-invalid="true"` while they have an `error`, point `aria-describedby` at the message (or at the description when there is no error), and render the message as `role="alert"` so it is announced when it appears. Before, the error was a plain paragraph: on screen, silent to a screen reader, and invisible to axe. Any `aria-describedby` or `aria-invalid` you pass is kept. `Field` derives `${htmlFor}-error` / `${htmlFor}-description` ids when none are given, and a `Checkbox` with an `error` but no `label` now shows the error instead of dropping it. Nothing to do on upgrade.
+- **DatePicker keeps its focus ring on every Tab stop** (K7). A native date input has four (month, day, year, calendar button); on the calendar button the input matches `:focus-within` but not `:focus`, so the ring disappeared. The ring now also applies on `:focus-within`, red when the field is in error.
+- **VideoViewer shows focus** (K8) on the video and on its native play / timeline / volume controls: an inset 2px outline on `:focus-within` in the `--fancy-focus` / `--fancy-focus-dark` colour. The browser's own outline was drawn outside the element, where the wrapper's `overflow-hidden` clipped it, and it switched off entirely while an inner control had focus. It also shows on a mouse click on a control, since `:focus-within` cannot tell the two apart.
+- **Tabs `pills` and `boxed`: inactive tab text was 4.39:1** on the list (zinc-500 on zinc-100), under WCAG AA. It now uses the soft text token (zinc-700 / zinc-300 in dark). (K2)
+- **Carousel (directional) rendered only the active slide,** so the other slides' text was missing from the server-rendered HTML. Every slide is now rendered; inactive ones are `hidden` + `inert`. **Behaviour change:** slides that were never mounted now mount on first render. Pass `keepMounted={false}` to restore active-only rendering. The `wizard` variant is unchanged. (K4)
+- **Carousel default controls** (the glyphs ← and →) had no accessible name. They are now named "Previous slide" / "Next slide", overridable through `labels`. A text `prevLabel` / `nextLabel` keeps naming its button itself. (K5)
+- **ImageViewer / MediaViewer (image) collapsed to 0 px tall** wherever its height was auto, because the image is absolutely positioned. It now has an intrinsic box: 4 / 3 until the image loads, then its natural aspect, or `aspectRatio`. An explicit height still wins. (K6)
+- **CodeBlock's header title now passes contrast.** It was painted in the gutter colour, about 2.3:1 (light) and 2.5:1 (dark) on the header, and failed axe `color-contrast`. It now uses the palette's `foreground` colour, above 4.5:1 in both themes. (K9)
+- **CodeBlock's scrollable code can be reached from the keyboard.** The `<pre>` is now a focusable, named region (`role="region"`, `tabIndex={0}`, `aria-label`) with an inset focus ring, which clears axe `scrollable-region-focusable` (serious). Each code block now adds one tab stop. (K9)
+- **The build no longer runs out of memory when the clone sits inside another project** (K18). `tsconfig.json` set no `types`, so TypeScript auto-included every package in every ANCESTOR `node_modules/@types`. The lab clones candidates inside its own tree, which has `@types/node`; that pulled Node's globals into the declaration build and the tsup DTS worker died with `ERR_WORKER_OUT_OF_MEMORY` at an 8 GB heap. `compilerOptions.types` is now `[]`. Reproduced and confirmed fixed by building the same commit under a directory carrying only that `@types/node`. The declaration build still needs about 6 GB on its own, which `npm run build` already provides.
 
 ## [6.19.1] - 2026-11-08
 

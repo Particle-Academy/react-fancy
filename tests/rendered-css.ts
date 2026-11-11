@@ -38,8 +38,19 @@ const ENTRY = [
  * `:hover` adds (one attribute for one pseudo-class), so the same rule wins
  * the cascade; a test marks the element it means to hover.
  */
-async function compiler(opts: { forceHover?: boolean } = {}) {
-  const entry = opts.forceHover ? `${ENTRY}\n@custom-variant hover (&[data-force-hover]);` : ENTRY;
+/**
+ * `forceFocusWithin` (6.20.0): a native date input or `<video controls>` hands
+ * focus to a control inside its user-agent shadow root (the calendar button,
+ * the play button). The host then matches `:focus-within` and NOT `:focus`,
+ * and jsdom has no such shadow root to focus. `&[data-force-focus-within]`
+ * stands in for the pseudo-class at the same specificity.
+ */
+type CompilerOpts = { forceHover?: boolean; forceFocusWithin?: boolean };
+
+async function compiler(opts: CompilerOpts = {}) {
+  let entry = ENTRY;
+  if (opts.forceHover) entry += "\n@custom-variant hover (&[data-force-hover]);";
+  if (opts.forceFocusWithin) entry += "\n@custom-variant focus-within (&[data-force-focus-within]);";
   return compile(entry, {
     base: process.cwd(),
     loadStylesheet: async (id: string, base: string) => {
@@ -155,7 +166,7 @@ function classesUnder(root: ParentNode): string[] {
 let installed: HTMLStyleElement | null = null;
 
 /** Compile and install the CSS for every class currently in the document. */
-export async function installRenderedCss(opts: { forceHover?: boolean } = {}): Promise<string> {
+export async function installRenderedCss(opts: CompilerOpts = {}): Promise<string> {
   const { build } = await compiler(opts);
   const css = flatten(build(classesUnder(document)));
   installed?.remove();

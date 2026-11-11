@@ -82,6 +82,7 @@ export type {
   CarouselPanelsProps,
   CarouselContextValue,
   CarouselVariant,
+  CarouselLabels,
 } from "./components/Carousel";
 
 export { ColorPicker } from "./components/ColorPicker";
@@ -182,6 +183,14 @@ export { StatList } from "./components/StatList";
 export type { StatListProps, StatListItem } from "./components/StatList";
 export { Kbd } from "./components/Kbd";
 export type { KbdProps } from "./components/Kbd";
+
+export { HotkeyCapture, formatHotkey, parseHotkey, comboFromEvent } from "./components/HotkeyCapture";
+export type {
+  HotkeyCaptureProps,
+  HotkeyCaptureLabels,
+  HotkeyCombo,
+  HotkeyModifier,
+} from "./components/HotkeyCapture";
 export { IndexList } from "./components/IndexList";
 export type { IndexListProps, IndexListItem } from "./components/IndexList";
 export { VirtualList } from "./components/VirtualList";
@@ -352,6 +361,8 @@ export type {
 export { Accordion, useAccordion } from "./components/Accordion";
 export type {
   AccordionProps,
+  AccordionSingleProps,
+  AccordionMultipleProps,
   AccordionItemProps,
   AccordionTriggerProps,
   AccordionContentProps,
@@ -466,7 +477,7 @@ export type {
 export { CodeView } from "./components/CodeView";
 export type { CodeViewProps } from "./components/CodeView";
 export { CodeBlock } from "./components/CodeBlock";
-export type { CodeBlockProps, CodeBlockCopyLabels, CodeBlockCopyEvent, CodeLanguage } from "./components/CodeBlock";
+export type { CodeBlockProps, CodeBlockCopyLabels, CodeBlockCopyEvent, CodeLanguage, CodeBlockLabels } from "./components/CodeBlock";
 
 export { ContentRenderer, registerExtension, registerExtensions } from "./components/ContentRenderer";
 export type {
@@ -612,6 +623,8 @@ export type { MoodMeterProps } from "./components/MoodMeter";
 export { PromptInput, promptFileToDataUrl, promptDataUrlToFile } from "./components/PromptInput";
 export type {
   PromptInputProps,
+  PromptInputLabels,
+  PromptSubmitKey,
   PromptCmd,
   PromptMention,
   PromptAttachment,

@@ -14,6 +14,7 @@ import {
 import { cn } from "../../utils/cn";
 import { isImeComposing } from "../../utils/ime";
 import { visuallyHidden } from "../../utils/visually-hidden";
+import { fillLabel } from "../../utils/label-template";
 import {
   useAcknowledgedSubmit,
   type SubmitResult,
@@ -114,6 +115,33 @@ export type PromptAttachment = {
 };
 
 /**
+ * Which key combination sends (CC-fancy-0022).
+ *
+ * - `"mod+enter"` (default, unchanged): Ctrl/⌘+Enter sends; plain Enter is a newline.
+ * - `"enter"`: Enter sends; Shift+Enter is a newline. The chat-box convention.
+ */
+export type PromptSubmitKey = "enter" | "mod+enter";
+
+/** Words PromptInput shows or announces about sending, for translation. */
+export interface PromptInputLabels {
+  /** Text of the label send button. @default "send" */
+  send?: string;
+  /** Tooltip of the icon send button. `{shortcut}` is the shortcut text. @default "Send · {shortcut}" */
+  sendTooltip?: string;
+  /** Accessible name of the icon send button. `{shortcut}` is the shortcut text. @default "Send ({shortcut})" */
+  sendAriaLabel?: string;
+  /**
+   * The shortcut text itself, replacing the derived one (`"Ctrl+Enter"`,
+   * `"⌘+Enter"`, `"Enter"`). Used in the tooltip and the accessible name.
+   */
+  shortcut?: string;
+  /** Name of the Enter key in the hint and the derived shortcut. @default "Enter" */
+  enterKey?: string;
+  /** Words after the keycaps in the inline hint. @default "to send" */
+  hint?: string;
+}
+
+/**
  * `...rest` reaches the root surface, so a consumer or a bridge can tag the
  * composer with its own `data-*` handle. The component named every prop it
  * used and had no rest spread, which means a `data-handle` put on it was
@@ -197,7 +225,16 @@ export interface PromptInputProps
    */
   platform?: FancyPlatform;
   /**
-   * Called on ⌘/Ctrl+Enter or send button.
+   * Which combination sends and which inserts a newline. `"mod+enter"`
+   * (default): Ctrl/⌘+Enter sends, Enter is a newline. `"enter"`: Enter sends,
+   * Shift+Enter is a newline. The hint, the default placeholder, and the icon
+   * send button's tooltip, name and `aria-keyshortcuts` all follow it.
+   */
+  submitKey?: PromptSubmitKey;
+  /** Words about sending, for translation. See {@link PromptInputLabels}. */
+  labels?: PromptInputLabels;
+  /**
+   * Called on the submit key (see `submitKey`) or the send button.
    *
    * **Return nothing and the draft empties at once, as it always has.**
    *
@@ -337,6 +374,8 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
   mentions = [],
   showHint = true,
   platform,
+  submitKey = "mod+enter",
+  labels,
   onSubmit,
   onSubmitError,
   disabled = false,
@@ -688,10 +727,21 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
     setDetected(detectPlatform(browserPlatformHints()));
   }, [platform]);
   const modKey = modifierKeyLabel(platform ?? detected);
+  const enterOnly = submitKey === "enter";
+  const enterKey = labels?.enterKey ?? "Enter";
+  // Derived from `submitKey`, so no surface can name a shortcut that does not send.
+  const shortcutText = labels?.shortcut ?? (enterOnly ? enterKey : `${modKey}+${enterKey}`);
+  const keyShortcuts = enterOnly
+    ? "Enter"
+    : modKey === "⌘"
+      ? "Meta+Enter Control+Enter"
+      : "Control+Enter Meta+Enter";
+  const sendTooltip = fillLabel(labels?.sendTooltip ?? "Send · {shortcut}", { shortcut: shortcutText });
+  const sendAriaLabel = fillLabel(labels?.sendAriaLabel ?? "Send ({shortcut})", { shortcut: shortcutText });
 
   const resolvedPlaceholder =
     placeholder ??
-    `Ask anything. Type / for commands, @ for mentions. ${modKey}+Enter to send.`;
+    `Ask anything. Type / for commands, @ for mentions. ${enterOnly ? "" : `${modKey}+`}Enter to send.`;
 
   // Estimated from what will actually be SENT — pills expanded — so a held
   // paste counts for its text, not for the few characters of its marker.
@@ -978,7 +1028,9 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
         return;
       }
     }
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+    // `"enter"`: Enter sends and Shift+Enter is left alone, so the textarea (or
+    // the inline editor) inserts the newline itself.
+    if (e.key === "Enter" && (enterOnly ? !e.shiftKey : e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       submit();
     }
@@ -1117,7 +1169,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
                 paste.prune(next);
               }}
               onSubmit={submit}
-              submitKey="mod-enter"
+              submitKey={enterOnly ? "enter" : "mod-enter"}
               onKeyDown={onKeyDown}
               onPaste={paste.decidePaste}
               onHostsChange={paste.onHostsChange}
@@ -1318,25 +1370,30 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
               className="hidden text-[10px] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] sm:inline"
               data-react-fancy-prompt-input-hint={modKey === "⌘" ? "apple" : "generic"}
             >
+              {!enterOnly && (
+                <>
+                  <kbd className="rounded border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
+                    {modKey}
+                  </kbd>{" "}
+                  +{" "}
+                </>
+              )}
               <kbd className="rounded border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
-                {modKey}
+                {enterKey}
               </kbd>{" "}
-              +{" "}
-              <kbd className="rounded border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
-                Enter
-              </kbd>{" "}
-              to send
+              {labels?.hint ?? "to send"}
             </span>
           )}
           {sendButton === "icon" ? (
-            <Tooltip content={`Send · ${modKey}+Enter`}>
+            <Tooltip content={sendTooltip}>
               <Button
                 color="violet"
                 size="sm"
                 icon="arrow-up"
                 className="shrink-0"
                 data-react-fancy-prompt-input-send=""
-                aria-label="Send"
+                aria-label={sendAriaLabel}
+                aria-keyshortcuts={keyShortcuts}
                 disabled={disabled || sendDisabled}
                 loading={submitting}
                 aria-busy={submitting || undefined}
@@ -1356,7 +1413,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
               aria-busy={submitting || undefined}
               onClick={submit}
             >
-              send
+              {labels?.send ?? "send"}
             </Button>
           )}
           {ack.status === "error" && (
