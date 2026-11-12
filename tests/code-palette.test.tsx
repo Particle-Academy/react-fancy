@@ -5,10 +5,11 @@ import { readFile } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { compile } from "tailwindcss";
-import { DARK_COLORS, LIGHT_COLORS } from "@particle-academy/fancy-file-commons";
 import { CodeBlock } from "../src/components/CodeBlock";
 import { CodeView } from "../src/components/CodeView";
 import {
+  CODE_DARK_COLORS,
+  CODE_LIGHT_COLORS,
   CODE_PALETTE_ATTR,
   CODE_PALETTE_DARK_CLASS,
   CODE_PALETTE_KEYS,
@@ -74,8 +75,10 @@ describe.each([
     const root = rootOf();
     expect(root.hasAttribute(CODE_PALETTE_ATTR)).toBe(true);
     for (const key of CODE_PALETTE_KEYS) {
-      expect(root.style.getPropertyValue(`--fc-${key}-l`)).toBe(LIGHT_COLORS[key]);
-      expect(root.style.getPropertyValue(`--fc-${key}-d`)).toBe(DARK_COLORS[key]);
+      // The AA palettes (fancy-file-commons' with token contrast raised; see
+      // code-palette-contrast.test.ts).
+      expect(root.style.getPropertyValue(`--fc-${key}-l`)).toBe(CODE_LIGHT_COLORS[key]);
+      expect(root.style.getPropertyValue(`--fc-${key}-d`)).toBe(CODE_DARK_COLORS[key]);
       expect(root.classList.contains(darkClass(key))).toBe(true);
     }
   });

@@ -77,7 +77,32 @@ export const CODE_PALETTE_DARK_CLASS = [
 /** Marks the element that declares the palette; styles.css keys its dark rule on it. */
 export const CODE_PALETTE_ATTR = "data-react-fancy-code-palette";
 
-const ALL_VARIABLES = themeVariables(LIGHT_COLORS, DARK_COLORS);
+/**
+ * fancy-file-commons' palettes with the syntax tokens raised to WCAG AA
+ * (4.5:1 on the code background) where they fell short. Measured by the lab's
+ * full-kit benchmark (finding K9, 2026-11-11): eight light tokens were 2.56 to
+ * 4.23:1 on #ffffff, and the dark comment 3.67:1 on #18181b. Backgrounds and
+ * chrome are unchanged. tests/code-palette-contrast.test.ts measures every
+ * token in both palettes.
+ */
+export const CODE_LIGHT_COLORS = {
+  ...LIGHT_COLORS,
+  keyword: "#7c3aed", // 5.70:1 (was #8b5cf6, 4.23)
+  string: "#047857", // 5.48:1 (was #059669, 3.77)
+  comment: "#6b7280", // 4.83:1 (was #94a3b8, 2.56)
+  number: "#b45309", // 5.02:1 (was #d97706, 3.19)
+  operator: "#0e7490", // 5.36:1 (was #0891b2, 3.68)
+  type: "#b45309", // 5.02:1 (was #d97706, 3.19)
+  attribute: "#b45309", // 5.02:1 (was #d97706, 3.19)
+  attributeValue: "#047857", // 5.48:1 (was #059669, 3.77)
+} as const satisfies typeof LIGHT_COLORS;
+
+export const CODE_DARK_COLORS = {
+  ...DARK_COLORS,
+  comment: "#8e8e98", // 5.46:1 (was #71717a, 3.67); still dimmer than punctuation
+} as const satisfies typeof DARK_COLORS;
+
+const ALL_VARIABLES = themeVariables(CODE_LIGHT_COLORS, CODE_DARK_COLORS);
 
 /** Both palettes as custom properties, for the root's `style`. */
 export const CODE_PALETTE_STYLE: CSSProperties = Object.fromEntries(

@@ -140,6 +140,10 @@ const DATA_LITERALS: Record<string, { reason: string; values: string[] }> = {
     values: ["#a855f7", "#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#a1a1aa", "#71717a"],
   },
   "ReasonTag/ReasonTag.tsx": { reason: "confidence scale high / medium / low", values: ["#10b981", "#f59e0b", "#ef4444"] },
+  "CodeView/code-palette.ts": {
+    reason: "syntax-token colours (each encodes a token kind), raised to WCAG AA; measured in code-palette-contrast.test.ts",
+    values: ["#7c3aed", "#047857", "#6b7280", "#b45309", "#0e7490", "#8e8e98"],
+  },
   "Kanban/KanbanColumn.tsx": { reason: "drop-indicator glow, an accent not a surface", values: ["rgba(59,130,246,0.15)"] },
   "StickyNote/StickyNote.tsx": { reason: "paper shadow (black alpha)", values: ["rgba(0,0,0,0.12)", "rgba(0,0,0,0.08)"] },
   // A QR module's colour IS its bit: dark is 1, light is 0, and scanners need

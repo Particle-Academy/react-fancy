@@ -1,7 +1,8 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderToString } from "react-dom/server";
-import { DARK_COLORS, LIGHT_COLORS } from "@particle-academy/fancy-file-commons";
+// The AA palettes the components paint (code-palette-contrast.test.ts).
+import { CODE_DARK_COLORS as DARK_COLORS, CODE_LIGHT_COLORS as LIGHT_COLORS } from "../src/components/CodeView/code-palette";
 
 import { CodeBlock } from "../src/components/CodeBlock";
 import { CodeView } from "../src/components/CodeView";
