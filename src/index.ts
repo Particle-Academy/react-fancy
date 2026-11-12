@@ -196,6 +196,21 @@ export type { KbdProps } from "./components/Kbd";
 export { SkipLink } from "./components/SkipLink";
 export type { SkipLinkProps } from "./components/SkipLink";
 
+export { NotificationBell, DEFAULT_NOTIFICATION_BELL_LABELS } from "./components/NotificationBell";
+export type { NotificationBellProps, NotificationBellLabels } from "./components/NotificationBell";
+export {
+  NotificationInbox,
+  DEFAULT_NOTIFICATION_INBOX_LABELS,
+  formatRelativeTime,
+} from "./components/NotificationInbox";
+export type {
+  NotificationInboxProps,
+  NotificationInboxLabels,
+  NotificationItem,
+  RelativeTimeOptions,
+  TimeInput,
+} from "./components/NotificationInbox";
+
 export { HotkeyCapture, formatHotkey, parseHotkey, comboFromEvent } from "./components/HotkeyCapture";
 export type {
   HotkeyCaptureProps,

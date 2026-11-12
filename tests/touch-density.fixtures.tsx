@@ -41,6 +41,8 @@ import {
   MobileMenu,
   Modal,
   MultiSwitch,
+  NotificationBell,
+  NotificationInbox,
   Navbar,
   NumberField,
   OtpInput,
@@ -477,6 +479,18 @@ export const FIXTURES: DensityFixture[] = [
   })),
   { name: "PromptInput", render: () => <PromptInput budgetTokens={1000} platform="generic" onSubmit={noop} /> },
   { name: "Composer", render: () => <Composer onSubmit={noop} /> },
+  { name: "NotificationBell", render: () => <NotificationBell count={3} /> },
+  {
+    name: "NotificationInbox",
+    render: () => (
+      <NotificationInbox
+        now={0}
+        items={[{ id: "a", title: "Build passed", time: 0, read: false, href: "/b" }]}
+        onMarkRead={noop}
+        onMarkAllRead={noop}
+      />
+    ),
+  },
   {
     name: "Editor",
     render: () => (

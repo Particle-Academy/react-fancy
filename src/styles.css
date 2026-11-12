@@ -981,6 +981,7 @@
      become inline-flex under the opt-in: the same text, a box that can grow. */
   [data-fancy-density="touch"] :is([data-react-fancy-index-title], [data-react-fancy-pdf-viewer]) a[href],
   [data-fancy-density="touch"] [data-react-fancy-popover] li > a[href],
+  [data-fancy-density="touch"] [data-react-fancy-notification-inbox-action],
   [data-fancy-density="touch"] [data-react-fancy-skip-link] {
     display: inline-flex;
     align-items: center;

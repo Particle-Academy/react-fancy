@@ -81,7 +81,8 @@ password reveal), JsonEditor (rows + every action), Kanban cards, MagicWand,
 Menu (items + submenu), MobileMenu (flyout + bottom bar), Modal (close),
 MultiSwitch, Navbar (items + toggle), NumberField, OtpInput, Pagination,
 PdfViewer, PhoneInput (country button, number, country search + list), Pillbox,
-Popover content links, PromptInput (textarea, attach, send), QrCodePanel
+NotificationBell, NotificationInbox (action links + buttons), Popover content
+links, PromptInput (textarea, attach, send), QrCodePanel
 actions, RadioGroup, ReasonTag (follow-up + sources), ReorderableGrid items,
 ResizablePanels separator, Select (native, listbox, multiple, search), SetupWizard,
 Sidebar (items, submenu, toggle), SkipLink, Slider, Stepper (clickable steps),

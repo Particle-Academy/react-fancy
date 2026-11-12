@@ -673,6 +673,26 @@
         "default": "./dist/navbar.cjs"
       }
     },
+    "./notification-bell": {
+      "import": {
+        "types": "./dist/notification-bell.d.ts",
+        "default": "./dist/notification-bell.js"
+      },
+      "require": {
+        "types": "./dist/notification-bell.d.cts",
+        "default": "./dist/notification-bell.cjs"
+      }
+    },
+    "./notification-inbox": {
+      "import": {
+        "types": "./dist/notification-inbox.d.ts",
+        "default": "./dist/notification-inbox.js"
+      },
+      "require": {
+        "types": "./dist/notification-inbox.d.cts",
+        "default": "./dist/notification-inbox.cjs"
+      }
+    },
     "./number-field": {
       "import": {
         "types": "./dist/number-field.d.ts",

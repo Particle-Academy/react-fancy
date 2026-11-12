@@ -147,6 +147,8 @@ npx vite build                      # Build demo app (verifies imports work)
 | ContextMenu | Right-click triggered dropdown | [docs](docs/ContextMenu.md) |
 | Modal | Full-screen backdrop dialog with focus trap and scroll lock | [docs](docs/Modal.md) |
 | Toast | Notification stack with auto-dismiss, variants, and position options | [docs](docs/Toast.md) |
+| NotificationBell | Icon button with an unread-count badge and a polite "3 unread notifications" announcement; controlled `count` / `open` / `onOpenChange`, translatable `labels`, works as a Popover trigger | [docs](docs/NotificationBell.md) |
+| NotificationInbox | Controlled notification list from JSON items: relative times (`Intl`), read / unread in words, per-item action link through `linkComponent`, `onMarkRead` / `onMarkAllRead`, `dir="auto"`, empty state, AAA text via tokens | [docs](docs/NotificationInbox.md) |
 | Command | `Cmd+K` command palette with search and keyboard navigation | [docs](docs/Command.md) |
 
 ### Navigation & Layout

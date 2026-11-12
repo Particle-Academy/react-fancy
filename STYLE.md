@@ -201,6 +201,16 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-context-menu-separator]` | ContextMenu.Separator |
 | `[data-react-fancy-toast]` | Toast.Provider |
 | `[data-react-fancy-toast-item]` | Toast item |
+| `[data-react-fancy-notification-bell]` | NotificationBell button (`data-count`, `data-unread`) |
+| `[data-react-fancy-notification-bell-count]` | NotificationBell badge |
+| `[data-react-fancy-notification-bell-status]` | NotificationBell polite status region |
+| `[data-react-fancy-notification-inbox]` | NotificationInbox root (`data-unread` = count) |
+| `[data-react-fancy-notification-inbox-item]` | NotificationInbox item (VALUE is the id; `data-read`) |
+| `[data-react-fancy-notification-inbox-state]` | NotificationInbox state word (VALUE `read` / `unread`) |
+| `[data-react-fancy-notification-inbox-action]` | NotificationInbox action link |
+| `[data-react-fancy-notification-inbox-mark-read]` | NotificationInbox per-item "Mark as read" |
+| `[data-react-fancy-notification-inbox-mark-all-read]` | NotificationInbox "Mark all as read" |
+| `[data-react-fancy-notification-inbox-empty]` | NotificationInbox empty state |
 | `[data-react-fancy-command]` | Command |
 | `[data-react-fancy-command-input]` | Command.Input |
 | `[data-react-fancy-command-list]` | Command.List |
