@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.23.0] - 2026-11-12
+
 ### Added
 
 - **`Popover` `haspopup` prop**: the value of the trigger's `aria-haspopup`, one of `"dialog"` (default), `"menu"`, `"listbox"`, `"tree"` or `"grid"`. It is not set in `hover` mode, where activation opens nothing.
