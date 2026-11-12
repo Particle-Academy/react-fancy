@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { cn } from "../../utils/cn";
+import { SUCCESS_FILL } from "../../utils/success-fill";
 import { isImeComposing } from "../../utils/ime";
 import { Badge } from "../Badge/Badge";
 import { Button } from "../Button/Button";
@@ -227,6 +228,7 @@ export function JsonEditorRow({ node }: JsonEditorRowProps) {
           <Button
             size="xs"
             color="emerald"
+            className={SUCCESS_FILL}
             data-react-fancy-json-editor-accept=""
             data-id={edit.id}
             onClick={() => ctx.acceptPending(edit.id)}

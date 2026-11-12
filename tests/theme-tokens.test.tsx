@@ -116,8 +116,13 @@ const SAME_IN_BOTH_MODES = new Set([
  * class so a new one has to be argued for here.
  */
 const KEEPS_TODAYS_COLOUR = new Set<string>([
-  // Empty since 6.15.0: Switch's unchecked track, the one entry, moved to the
-  // `border-strong` role at its documented default (WCAG 1.4.11).
+  // Empty from 6.15.0 (Switch's unchecked track moved to `border-strong`).
+  // The success fill's border and hover read the fill token but keep the
+  // emerald-800 / emerald-700 border and hover the emerald button had.
+  "border-[color:var(--fancy-success,var(--color-emerald-800))]",
+  "dark:border-[color:var(--fancy-success-dark,var(--color-emerald-700))]",
+  "hover:bg-[color:var(--fancy-success,var(--color-emerald-800))]",
+  "dark:hover:bg-[color:var(--fancy-success-dark,var(--color-emerald-700))]",
 ]);
 
 describe("THEME_TOKENS — the table", () => {
@@ -125,9 +130,10 @@ describe("THEME_TOKENS — the table", () => {
     const roles = Object.keys(THEME_TOKENS);
     expect(roles.length).toBeGreaterThanOrEqual(8);
     // 13 since 6.18.0 (`accent`, CC-fancy-0015); 14 since 6.19.0 (`error`,
-    // CC-fancy-0018). Raise this only with a role the council has agreed; the
-    // table is meant to stay small.
-    expect(roles.length).toBeLessThanOrEqual(14);
+    // CC-fancy-0018); 16 with `success` + `on-success` (owner-approved, the
+    // positive / accept fill). Raise this only with a role the council has
+    // agreed; the table is meant to stay small.
+    expect(roles.length).toBeLessThanOrEqual(16);
     for (const role of roles) {
       const t = THEME_TOKENS[role as keyof typeof THEME_TOKENS];
       expect(t.light, role).toBeTruthy();

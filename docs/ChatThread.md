@@ -103,6 +103,10 @@ drafted reply, a field change, a page edit. Its `content` is the draft.
 - Stable handle `[data-chat-proposal="<proposal id>"]` with
   `data-chat-proposal-state`; buttons are
   `[data-chat-proposal-action="accept" | "reject"]`.
+- **Theming.** The accept button's fill is the `success` theme token and its
+  text `on-success` (`--fancy-success` / `--fancy-on-success`, each with a
+  `-dark` twin). Defaults are emerald-700 / white in light and emerald-800 /
+  white in dark, the colours it always had.
 - **It never acts on its own.** Nothing is called on render. The state is the
   host's: buttons show only while `state` is `"pending"` (the default) and only
   for the callbacks you pass. When the host moves the card to `accepted`,

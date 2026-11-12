@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - The active highlight uses the `surface-muted` and `accent` theme tokens in both modes.
   - Handles: `data-react-fancy-content-reaction` (root), `-trigger`, `-chip`, `-menu` and `-item` with `data-reaction-key` and `data-state="on|off"`.
   - Also exported: `DEFAULT_CONTENT_REACTIONS` (strongly agree, like, love, insightful, funny, sad, angry, dislike; the emoji come from the kit's emoji dataset by name) and `toggleReaction(value, key, mode)`, the toggle rule as a pure function. From the barrel and `@particle-academy/react-fancy/content-reaction`.
+- **Theme tokens for the positive / accept fill:** `--fancy-success` / `--fancy-success-dark` (the fill) and `--fancy-on-success` / `--fancy-on-success-dark` (the text on it). Defaults are today's ChatThread accept colours, emerald-700 / white in light and emerald-800 / white in dark (5.36:1 and 7.61:1), so nothing changes until a host sets them. Recorded in `THEME_TOKENS` (now 16 roles) and the README token table.
+
+### Changed
+
+- **ChatThread's proposal accept button and JsonEditor's staged-edit accept buttons read the `success` / `on-success` tokens** instead of a fixed emerald. Their border and hover follow the fill token too. Set nothing and they look exactly as before. The `data-chat-proposal-action="accept"` and `data-react-fancy-json-editor-accept` handles are unchanged, so browser tests and overrides that target them need no action.
 
 ### Fixed
 

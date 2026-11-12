@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
+import { SUCCESS_FILL } from "../../utils/success-fill";
 import { Button } from "../Button/Button";
 import { Callout } from "../Callout/Callout";
 import { Text } from "../Text/Text";
@@ -443,6 +444,7 @@ export const JsonEditor = forwardRef<HTMLDivElement, JsonEditorProps>(function J
                 <Button
                   size="xs"
                   color="emerald"
+                  className={SUCCESS_FILL}
                   data-react-fancy-json-editor-accept=""
                   data-id={edit.id}
                   onClick={() => acceptPending(edit.id)}

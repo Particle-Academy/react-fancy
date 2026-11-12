@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
+import { SUCCESS_FILL } from "../../utils/success-fill";
 import { sanitizeComponentHref } from "../../utils/sanitize";
 import { Avatar } from "../Avatar";
 import { Badge } from "../Badge";
@@ -153,6 +154,8 @@ function ProposalFooter({
           type="button"
           size="sm"
           color="emerald"
+          // The positive fill reads the success tokens (defaults: this emerald).
+          className={SUCCESS_FILL}
           disabled={busy}
           aria-busy={busy || undefined}
           data-chat-proposal-action="accept"

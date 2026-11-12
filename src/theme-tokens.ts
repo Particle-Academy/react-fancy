@@ -146,6 +146,24 @@ export const THEME_TOKENS = {
     description:
       "Validation text: the error message and required asterisk of Field (and every input that wraps it), Checkbox and Switch. Added 6.19.0 (CC-fancy-0018).",
   },
+  success: {
+    variable: "--fancy-success",
+    darkVariable: "--fancy-success-dark",
+    // The fill ChatThread's accept button already painted. White on it is
+    // 5.36:1 (emerald-700) and 7.61:1 (emerald-800), over 4.5:1 in both modes.
+    light: "var(--color-emerald-700)",
+    dark: "var(--color-emerald-800)",
+    description:
+      "The positive / accept fill: ChatThread's proposal accept button and JsonEditor's staged-edit accept. Its border and hover follow it. Pair with `on-success`. Added in Unreleased.",
+  },
+  "on-success": {
+    variable: "--fancy-on-success",
+    darkVariable: "--fancy-on-success-dark",
+    light: "var(--color-white)",
+    dark: "var(--color-white)",
+    description:
+      "Text and icons on the `success` fill. Keep it at 4.5:1 against `success` in each mode. Added in Unreleased.",
+  },
 } as const;
 
 export type ThemeTokenRole = keyof typeof THEME_TOKENS;
