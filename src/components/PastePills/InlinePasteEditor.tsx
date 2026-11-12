@@ -41,8 +41,10 @@ interface InlinePasteEditorProps {
   /**
    * Which key sends. `"enter"` (default): Enter sends, Shift+Enter is a newline.
    * `"mod-enter"`: Ctrl/⌘+Enter sends and a plain Enter is a newline.
+   * `"none"`: Enter never sends, it always breaks the line; the host claims its
+   * own send key in `onKeyDown` (PromptInput with a recorded `submitKey`).
    */
-  submitKey?: "enter" | "mod-enter";
+  submitKey?: "enter" | "mod-enter" | "none";
   /** Runs BEFORE the editor's own key handling; `preventDefault()` to claim the key. */
   onKeyDown?(e: React.KeyboardEvent<HTMLDivElement>): void;
   placeholderClassName?: string;
@@ -471,7 +473,8 @@ export const InlinePasteEditor = forwardRef<InlinePasteEditorHandle, InlinePaste
 
       e.preventDefault();
       const sends =
-        !multiline || (submitKey === "mod-enter" ? e.ctrlKey || e.metaKey : !e.shiftKey);
+        !multiline ||
+        (submitKey === "none" ? false : submitKey === "mod-enter" ? e.ctrlKey || e.metaKey : !e.shiftKey);
       if (sends) {
         onSubmit();
       } else {

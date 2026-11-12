@@ -346,7 +346,7 @@ describe("PromptInput — quieter footer", () => {
     expect(hover(button)?.textContent).toContain("Attach");
   });
 
-  it('sendButton="icon" carries the shortcut in its tooltip instead of the inline hint', () => {
+  it('sendButton="icon" carries the shortcut in its tooltip, and the row still shows the hint', () => {
     const { host } = mount(
       <PromptInput budgetTokens={1000} sendButton="icon" platform="windows" onSubmit={() => {}} />,
     );
@@ -355,7 +355,8 @@ describe("PromptInput — quieter footer", () => {
     expect(button.textContent?.trim()).toBe("");
     // The name carries the shortcut since CC-fancy-0022, derived from `submitKey`.
     expect(button.getAttribute("aria-label")).toBe("Send (Ctrl+Enter)");
-    expect(host.querySelector("[data-react-fancy-prompt-input-hint]")).toBeNull();
+    // Since Unreleased the hint is drawn for an icon send too; showHint={false} opts out.
+    expect(host.querySelector("[data-react-fancy-prompt-input-hint]")).not.toBeNull();
     expect(hover(button)?.textContent).toContain("Ctrl+Enter");
   });
 

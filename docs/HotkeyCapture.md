@@ -28,6 +28,14 @@ A normalised string: modifiers in the fixed order `ctrl`, `alt`, `shift`, `meta`
 
 A string rather than an object, because two equal shortcuts are then `===` equal, it stores in a settings row as-is, and an agent can read or write one directly. Letters and digits record the PHYSICAL key (`KeyboardEvent.code`), so Shift+1 is `shift+1`, not `!`, and an Option combination on a Mac records the letter rather than the symbol Option types.
 
+The value drops straight into [PromptInput](./PromptInput.md)'s `submitKey`: that combination then sends, and PromptInput's hint names it with the same key names shown here.
+
+```tsx
+const [sendKey, setSendKey] = useState("ctrl+enter");
+<HotkeyCapture label="Send with" value={sendKey} onChange={setSendKey} />
+<PromptInput budgetTokens={32000} submitKey={sendKey || "mod+enter"} onSubmit={send} />
+```
+
 Helpers:
 
 | Helper | Does |

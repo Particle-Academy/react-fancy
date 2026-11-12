@@ -38,7 +38,9 @@ import { PromptInput } from "@particle-academy/react-fancy";
   truncated with an ellipsis and kept whole in its `title`. The menu never
   scrolls sideways.
 - Drop files anywhere on the input to attach. Chip bar shows attachments.
-- ⌘+Enter (or Ctrl+Enter) submits. Plain Enter inserts a newline. An Enter
+- ⌘+Enter (or Ctrl+Enter) submits by default, or whatever key `submitKey`
+  names, including one the person recorded with HotkeyCapture. Plain Enter
+  inserts a newline. An Enter
   that confirms an IME composition neither submits nor picks from a menu.
 - Token-budget meter colours green → amber → red as headroom drops.
 - `onSubmit` may return a Promise: the draft is held until the send is
@@ -57,9 +59,10 @@ import { PromptInput } from "@particle-academy/react-fancy";
 | sendDisabled | `boolean` | `false` | Disables only the send. The text stays editable and attachable; ⌘/Ctrl+Enter does not send. |
 | name | `string` | — | Form field name for the text. On the textarea; with inline pills on, on a hidden input carrying the expanded text. |
 | inputId | `string` | — | `id` of the text field (textarea or inline editor). `id` still names the root. |
-| showHint | `boolean` | `true` | Show the "Ctrl + Enter to send" hint (`⌘` on Apple). |
-| submitKey | `"mod+enter" \| "enter"` | `"mod+enter"` | Which key sends. `"mod+enter"`: Ctrl/⌘+Enter sends, Enter is a newline. `"enter"`: Enter sends, Shift+Enter is a newline. The hint, default placeholder, and the icon send button's tooltip, accessible name and `aria-keyshortcuts` follow it. |
-| labels | `PromptInputLabels` | — | Words about sending: `send` (`"send"`), `sendTooltip` (`"Send · {shortcut}"`), `sendAriaLabel` (`"Send ({shortcut})"`), `shortcut` (replaces the derived `"Ctrl+Enter"` / `"Enter"`), `enterKey` (`"Enter"`), `hint` (`"to send"`). |
+| showHint | `boolean` | `true` | Show the send-key hint ("Ctrl + Enter to send", `⌘` on Apple) in the action row, left of Send. Drawn for the icon send button too; `false` opts out. |
+| submitKey | `"mod+enter" \| "enter" \| string` | `"mod+enter"` | Which key sends. `"mod+enter"`: Ctrl/⌘+Enter sends, Enter is a newline. `"enter"`: Enter sends, Shift+Enter is a newline. Any other [HotkeyCapture](./HotkeyCapture.md) string (`"ctrl+shift+enter"`, `"alt+s"`, `"f13"`): exactly that combination sends, and an Enter that is not it breaks the line; `mod` in it is the platform modifier. The hint, default placeholder, and the icon send button's tooltip, accessible name and `aria-keyshortcuts` follow it. |
+| beforeSend | `ReactNode` | — | Rendered in the action row immediately left of the send button (a model name, a mode). Truncates with an ellipsis and never moves or squeezes Send. Handle: `data-react-fancy-prompt-input-before-send`. |
+| labels | `PromptInputLabels` | — | Words about sending: `send` (`"send"`), `sendTooltip` (`"Send · {shortcut}"`), `sendAriaLabel` (`"Send ({shortcut})"`), `shortcut` (replaces the derived `"Ctrl+Enter"` / `"Enter"` everywhere, the hint included, as one keycap), `enterKey` (`"Enter"`), `keys` (key cap names by modifier or key, merged over the platform-aware defaults, e.g. `{ ctrl: "Strg", enter: "Eingabe" }`), `hint` (`"to send"`). |
 | placeholder | `string` | `"Ask anything…"` | Placeholder text. |
 | charsPerToken | `number` | `4` | Rough estimator for the token meter. |
 | mentionColor | `Record<string, string>` | sensible defaults | Override the chip colour per mention kind. |

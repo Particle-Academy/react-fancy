@@ -5,46 +5,16 @@ import { visuallyHidden } from "../../utils/visually-hidden";
 import { browserPlatformHints, detectPlatform, type FancyPlatform } from "../../utils/platform";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import { Kbd } from "../Kbd";
-import { comboFromEvent, formatHotkey, HOTKEY_MODIFIERS, parseHotkey, type HotkeyCombo } from "./hotkey";
+import {
+  APPLE_KEY_NAMES,
+  comboFromEvent,
+  DEFAULT_KEY_NAMES,
+  formatHotkey,
+  hotkeyCaps as capsFor,
+  parseHotkey,
+  type HotkeyCombo,
+} from "./hotkey";
 import type { HotkeyCaptureLabels, HotkeyCaptureProps } from "./HotkeyCapture.types";
-
-const DEFAULT_KEY_NAMES: Record<string, string> = {
-  ctrl: "Ctrl",
-  alt: "Alt",
-  shift: "Shift",
-  meta: "Meta",
-  space: "Space",
-  enter: "Enter",
-  escape: "Esc",
-  tab: "Tab",
-  backspace: "Backspace",
-  delete: "Delete",
-  arrowup: "Up",
-  arrowdown: "Down",
-  arrowleft: "Left",
-  arrowright: "Right",
-  pageup: "PgUp",
-  pagedown: "PgDn",
-  home: "Home",
-  end: "End",
-};
-
-/** Apple keyboards: the true key names. `⌘` is the one high glyph, and Apple-only. */
-const APPLE_KEY_NAMES: Record<string, string> = { meta: "⌘", alt: "Option" };
-
-function keyName(key: string, names: Record<string, string>): string {
-  if (names[key]) return names[key];
-  if (key.length === 1) return key.toUpperCase();
-  if (/^f\d{1,2}$/.test(key)) return key.toUpperCase();
-  return key.charAt(0).toUpperCase() + key.slice(1);
-}
-
-/** Cap names for a combination, modifiers first in the fixed order. */
-function capsFor(combo: Partial<HotkeyCombo>, names: Record<string, string>): string[] {
-  const caps: string[] = HOTKEY_MODIFIERS.filter((m) => combo[m]).map((m) => keyName(m, names));
-  if (combo.key) caps.push(keyName(combo.key, names));
-  return caps;
-}
 
 const DEFAULT_LABELS: Required<Omit<HotkeyCaptureLabels, "keys">> = {
   label: "Keyboard shortcut",

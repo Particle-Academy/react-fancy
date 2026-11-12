@@ -1,4 +1,5 @@
 import {
+  Fragment,
   forwardRef,
   useCallback,
   useEffect,
@@ -58,6 +59,7 @@ export type {
   PromptSetDraftOptions,
   PromptFocusOptions,
 } from "./prompt-draft";
+import { isSubmitKey, parseSubmitKey, submitKeyCaps, submitKeyShortcuts } from "./submit-key";
 import {
   browserPlatformHints,
   detectPlatform,
@@ -119,8 +121,11 @@ export type PromptAttachment = {
  *
  * - `"mod+enter"` (default, unchanged): Ctrl/⌘+Enter sends; plain Enter is a newline.
  * - `"enter"`: Enter sends; Shift+Enter is a newline. The chat-box convention.
+ * - Any other HotkeyCapture string (`"ctrl+shift+enter"`, `"alt+s"`, `"f13"`):
+ *   exactly that combination sends, and every Enter that is not it breaks the
+ *   line. `mod` in it is the platform modifier (`"mod+k"`: ⌘+K or Ctrl+K).
  */
-export type PromptSubmitKey = "enter" | "mod+enter";
+export type PromptSubmitKey = "enter" | "mod+enter" | (string & {});
 
 /** Words PromptInput shows or announces about sending, for translation. */
 export interface PromptInputLabels {
@@ -132,11 +137,18 @@ export interface PromptInputLabels {
   sendAriaLabel?: string;
   /**
    * The shortcut text itself, replacing the derived one (`"Ctrl+Enter"`,
-   * `"⌘+Enter"`, `"Enter"`). Used in the tooltip and the accessible name.
+   * `"⌘+Enter"`, `"Enter"`). Used in the tooltip, the accessible name, and the
+   * hint (as one keycap), so any recorded combination can be named in words.
    */
   shortcut?: string;
   /** Name of the Enter key in the hint and the derived shortcut. @default "Enter" */
   enterKey?: string;
+  /**
+   * Key cap names, by modifier (`ctrl`, `alt`, `shift`, `meta`) or by normalised
+   * key (`"enter"`, `"space"`, `"k"`), merged over the kit's platform-aware
+   * defaults (`⌘` and Option on Apple). Wins over `enterKey`.
+   */
+  keys?: Partial<Record<string, string>>;
   /** Words after the keycaps in the inline hint. @default "to send" */
   hint?: string;
 }
@@ -209,7 +221,11 @@ export interface PromptInputProps
   commands?: PromptCmd[];
   /** @-mentions. */
   mentions?: PromptMention[];
-  /** Show the keyboard hint ("Ctrl + Enter to send", "⌘ + Enter" on a Mac). */
+  /**
+   * Show the send-key hint ("Ctrl + Enter to send", "⌘ + Enter" on a Mac) in
+   * the action row, left of Send. Drawn for the icon send button too. `false`
+   * opts out. @default true
+   */
   showHint?: boolean;
   /**
    * Which modifier the hint and the default placeholder NAME. Omit it and the
@@ -227,10 +243,18 @@ export interface PromptInputProps
   /**
    * Which combination sends and which inserts a newline. `"mod+enter"`
    * (default): Ctrl/⌘+Enter sends, Enter is a newline. `"enter"`: Enter sends,
-   * Shift+Enter is a newline. The hint, the default placeholder, and the icon
-   * send button's tooltip, name and `aria-keyshortcuts` all follow it.
+   * Shift+Enter is a newline. Or any HotkeyCapture string, recorded by the
+   * person: exactly that combination sends. The hint, the default placeholder,
+   * and the icon send button's tooltip, name and `aria-keyshortcuts` all
+   * follow it.
    */
   submitKey?: PromptSubmitKey;
+  /**
+   * Rendered in the action row immediately left of the send button: a model
+   * name, a mode, a cost. It truncates with an ellipsis rather than moving or
+   * squeezing Send. Handle: `data-react-fancy-prompt-input-before-send`.
+   */
+  beforeSend?: ReactNode;
   /** Words about sending, for translation. See {@link PromptInputLabels}. */
   labels?: PromptInputLabels;
   /**
@@ -375,6 +399,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
   showHint = true,
   platform,
   submitKey = "mod+enter",
+  beforeSend,
   labels,
   onSubmit,
   onSubmitError,
@@ -726,22 +751,36 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
     if (platform) return;
     setDetected(detectPlatform(browserPlatformHints()));
   }, [platform]);
-  const modKey = modifierKeyLabel(platform ?? detected);
-  const enterOnly = submitKey === "enter";
-  const enterKey = labels?.enterKey ?? "Enter";
-  // Derived from `submitKey`, so no surface can name a shortcut that does not send.
-  const shortcutText = labels?.shortcut ?? (enterOnly ? enterKey : `${modKey}+${enterKey}`);
-  const keyShortcuts = enterOnly
-    ? "Enter"
-    : modKey === "⌘"
-      ? "Meta+Enter Control+Enter"
-      : "Control+Enter Meta+Enter";
+  const resolvedPlatform = platform ?? detected;
+  const modKey = modifierKeyLabel(resolvedPlatform);
+  const hasBeforeSend = beforeSend !== undefined && beforeSend !== null && beforeSend !== false;
+  /*
+   * Everything that names the submit key is derived from ONE parse of it, so no
+   * surface can name a shortcut that does not send. `"enter"` and `"mod+enter"`
+   * name exactly what they always did; any other recorded combination is named
+   * with the kit's platform-aware key names (HotkeyCapture's), under the host's
+   * `labels.keys` / `labels.enterKey`.
+   */
+  const submitCombo = useMemo(() => parseSubmitKey(submitKey), [submitKey]);
+  const keyCaps = submitKeyCaps(submitCombo, resolvedPlatform, {
+    ...(labels?.enterKey !== undefined ? { enter: labels.enterKey } : {}),
+    ...labels?.keys,
+  });
+  // `labels.shortcut` names the whole combination in words, as one keycap.
+  const hintCaps = labels?.shortcut !== undefined ? [labels.shortcut] : keyCaps;
+  const derivedShortcut = keyCaps.join("+");
+  const shortcutText = labels?.shortcut ?? derivedShortcut;
+  const keyShortcuts = submitKeyShortcuts(submitCombo, resolvedPlatform) || undefined;
   const sendTooltip = fillLabel(labels?.sendTooltip ?? "Send · {shortcut}", { shortcut: shortcutText });
   const sendAriaLabel = fillLabel(labels?.sendAriaLabel ?? "Send ({shortcut})", { shortcut: shortcutText });
+  // The inline editor handles Enter itself; for a recorded combination it must
+  // never send on its own, so `onKeyDown` below is the one place that decides.
+  const editorSubmitKey =
+    submitKey === "enter" ? "enter" : submitKey === "mod+enter" ? "mod-enter" : "none";
 
   const resolvedPlaceholder =
     placeholder ??
-    `Ask anything. Type / for commands, @ for mentions. ${enterOnly ? "" : `${modKey}+`}Enter to send.`;
+    `Ask anything. Type / for commands, @ for mentions. ${derivedShortcut} to send.`;
 
   // Estimated from what will actually be SENT — pills expanded — so a held
   // paste counts for its text, not for the few characters of its marker.
@@ -1029,8 +1068,9 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
       }
     }
     // `"enter"`: Enter sends and Shift+Enter is left alone, so the textarea (or
-    // the inline editor) inserts the newline itself.
-    if (e.key === "Enter" && (enterOnly ? !e.shiftKey : e.metaKey || e.ctrlKey)) {
+    // the inline editor) inserts the newline itself. A recorded combination is
+    // matched exactly; any other key is left alone the same way.
+    if (isSubmitKey(e.nativeEvent, submitKey, submitCombo)) {
       e.preventDefault();
       submit();
     }
@@ -1169,7 +1209,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
                 paste.prune(next);
               }}
               onSubmit={submit}
-              submitKey={enterOnly ? "enter" : "mod-enter"}
+              submitKey={editorSubmitKey}
               onKeyDown={onKeyDown}
               onPaste={paste.decidePaste}
               onHostsChange={paste.onHostsChange}
@@ -1363,26 +1403,45 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
             </span>
           </div>
         )}
-        <div className="ms-auto flex shrink-0 items-center gap-2">
-          {/* With an icon send button the shortcut lives in its tooltip instead. */}
-          {showHint && sendButton !== "icon" && (
+        <div
+          className={
+            // With `beforeSend` the group may shrink, so the slot can truncate.
+            // Without it the group is exactly what it was.
+            hasBeforeSend
+              ? "ms-auto flex min-w-0 items-center gap-2"
+              : "ms-auto flex shrink-0 items-center gap-2"
+          }
+        >
+          {/*
+            The hint is drawn in the row for BOTH send buttons. It used to be
+            hidden for the icon button, leaving the shortcut in a tooltip that
+            only a hover reveals. `showHint={false}` opts out.
+          */}
+          {showHint && hintCaps.length > 0 && (
             <span
-              className="hidden text-[10px] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] sm:inline"
+              className={cn(
+                "hidden text-[10px] text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] sm:inline",
+                hasBeforeSend && "shrink-0 whitespace-nowrap",
+              )}
               data-react-fancy-prompt-input-hint={modKey === "⌘" ? "apple" : "generic"}
             >
-              {!enterOnly && (
-                <>
+              {hintCaps.map((cap, i) => (
+                <Fragment key={i}>
+                  {i > 0 && " + "}
                   <kbd className="rounded border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
-                    {modKey}
-                  </kbd>{" "}
-                  +{" "}
-                </>
-              )}
-              <kbd className="rounded border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-zinc-50 px-1 py-0.5 font-mono text-[9px] text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800 dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]">
-                {enterKey}
-              </kbd>{" "}
+                    {cap}
+                  </kbd>
+                </Fragment>
+              ))}{" "}
               {labels?.hint ?? "to send"}
             </span>
+          )}
+          {hasBeforeSend && (
+            // min-w-0 lets it shrink below its content; truncate draws the
+            // ellipsis. Send is shrink-0, so it is never the one that gives way.
+            <div data-react-fancy-prompt-input-before-send="" className="min-w-0 truncate">
+              {beforeSend}
+            </div>
           )}
           {sendButton === "icon" ? (
             <Tooltip content={sendTooltip}>

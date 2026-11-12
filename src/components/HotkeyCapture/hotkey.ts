@@ -68,6 +68,49 @@ export function parseHotkey(value: string | null | undefined): HotkeyCombo | nul
   return combo.key ? combo : null;
 }
 
+/**
+ * Key cap names every keyboard has. Shared by HotkeyCapture and PromptInput's
+ * send hint, so a combination recorded in one is named the same in the other.
+ */
+export const DEFAULT_KEY_NAMES: Record<string, string> = {
+  ctrl: "Ctrl",
+  alt: "Alt",
+  shift: "Shift",
+  meta: "Meta",
+  space: "Space",
+  enter: "Enter",
+  escape: "Esc",
+  tab: "Tab",
+  backspace: "Backspace",
+  delete: "Delete",
+  arrowup: "Up",
+  arrowdown: "Down",
+  arrowleft: "Left",
+  arrowright: "Right",
+  pageup: "PgUp",
+  pagedown: "PgDn",
+  home: "Home",
+  end: "End",
+};
+
+/** Apple keyboards: the true key names. `⌘` is the one high glyph, and Apple-only. */
+export const APPLE_KEY_NAMES: Record<string, string> = { meta: "⌘", alt: "Option" };
+
+/** The cap name of one normalised key, from `names` or derived from the key. */
+export function hotkeyKeyName(key: string, names: Record<string, string>): string {
+  if (names[key]) return names[key];
+  if (key.length === 1) return key.toUpperCase();
+  if (/^f\d{1,2}$/.test(key)) return key.toUpperCase();
+  return key.charAt(0).toUpperCase() + key.slice(1);
+}
+
+/** Cap names for a combination, modifiers first in the fixed order. */
+export function hotkeyCaps(combo: Partial<HotkeyCombo>, names: Record<string, string>): string[] {
+  const caps: string[] = HOTKEY_MODIFIERS.filter((m) => combo[m]).map((m) => hotkeyKeyName(m, names));
+  if (combo.key) caps.push(hotkeyKeyName(combo.key, names));
+  return caps;
+}
+
 /** Whether a keydown is a modifier pressed on its own. */
 export function isModifierOnly(event: Pick<KeyboardEvent, "key">): boolean {
   return MODIFIER_KEYS.has(event.key);
