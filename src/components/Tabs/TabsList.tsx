@@ -5,9 +5,16 @@ import { TabsListContext, useTabs } from "./Tabs.context";
 import type { TabsListProps } from "./Tabs.types";
 
 export function TabsList({ children, className }: TabsListProps) {
-  const { variant, activeTab } = useTabs();
+  // Reads the context so an activeTab change re-renders the list and re-derives.
+  const { variant } = useTabs();
   const listRef = useRef<HTMLDivElement>(null);
   const [fallback, setFallback] = useState<HTMLElement | null>(null);
+  // The last value handed to setFallback. Compared BEFORE setting, so nothing
+  // is dispatched when nothing changed: an updater that returns `prev` still
+  // makes React schedule a render whenever it cannot bail out eagerly, and from
+  // a layout effect that render is a synchronous nested update (error #185 in
+  // a host that re-renders often).
+  const fallbackRef = useRef<HTMLElement | null>(null);
 
   // Which tab holds the stop when none is active. Read from the rendered
   // tablist, the same source the arrow keys use, so "first" means first in
@@ -22,12 +29,19 @@ export function TabsList({ children, className }: TabsListProps) {
     const next = anyActive
       ? null
       : (own.find((el) => !(el as HTMLButtonElement).disabled) ?? null);
-    setFallback((prev) => (prev === next ? prev : next));
+    if (next === fallbackRef.current) return;
+    fallbackRef.current = next;
+    setFallback(next);
   }, []);
 
+  // No dependency array on purpose, and in particular not `children`, whose
+  // identity is new on every parent render that maps its tabs. Re-deriving
+  // after each commit of the list covers reordering, which no tab reports
+  // itself. It terminates by construction: a second pass over an unchanged
+  // DOM finds the same tab and sets nothing.
   useLayoutEffect(() => {
     refresh();
-  }, [refresh, activeTab, children]);
+  });
 
   const listCtx = useMemo(() => ({ fallback, refresh }), [fallback, refresh]);
 

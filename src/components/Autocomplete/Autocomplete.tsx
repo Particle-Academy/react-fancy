@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
 import { isImeComposing } from "../../utils/ime";
 import { Portal } from "../Portal";
@@ -73,9 +73,17 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
       [setValue, options, close],
     );
 
+    // Fires when the QUERY changes, never because the callback's identity did.
+    // An inline `onSearch` that sets the options (the documented usage) is a new
+    // function every render; in the dependency array it re-fired the effect on
+    // each render it caused, an update loop (React error #185).
+    const onSearchRef = useRef(onSearch);
+    useLayoutEffect(() => {
+      onSearchRef.current = onSearch;
+    });
     useEffect(() => {
-      onSearch?.(query);
-    }, [query, onSearch]);
+      onSearchRef.current?.(query);
+    }, [query]);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (!open) {
