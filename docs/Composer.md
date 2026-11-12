@@ -26,13 +26,48 @@ import { Composer } from "@particle-academy/react-fancy";
 | onChange | `(value: string) => void` | - | Callback on input change |
 | onSubmit | `(value, extras) => void \| Promise<SubmitResult>` | - | Called on Enter (without Shift, and not while an IME composition is being confirmed) or the send button. Return a Promise to hold the message until the send is acknowledged; see [Acknowledged send](#acknowledged-send) |
 | onSubmitError | `(error: unknown) => void` | - | Called when a Promise from `onSubmit` rejects (with the reason) or resolves `{ ok: false }` (with its `error`). The message is kept |
-| placeholder | `string` | `"Type a message..."` | Textarea placeholder |
+| placeholder | `string` | `labels.placeholder`, else `"Type a message..."` | Textarea placeholder |
+| labels | `ComposerLabels` | English | Every built-in word, for translation. See [Labels](#labels) |
 | actions | `ReactNode` | - | Custom action buttons rendered in the bottom toolbar |
 | disabled | `boolean` | `false` | Disable the text, the pills and the send |
 | sendDisabled | `boolean` | `false` | Disable only the send. The text stays editable; Enter does not send |
 | name | `string` | - | Form field name for the text. On the textarea; with `pastePlacement="inline"`, on a hidden input carrying the expanded text |
 | inputId | `string` | - | `id` of the text field, in either placement |
 | className | `string` | - | Additional CSS classes |
+
+## Labels
+
+Every word the Composer draws or announces comes from `labels`. Each key falls
+back to its English default on its own, so pass only what you translate.
+Templates fill `{name}` slots literally.
+
+| Key | Default | Where |
+|-----|---------|-------|
+| `placeholder` | `"Type a message..."` | The text field. An explicit `placeholder` prop wins |
+| `send` | `"Send"` | The send button's visible text |
+| `sendAriaLabel` | unset | The send button's accessible name, when it should differ from the visible text. Keep the visible words in it (WCAG 2.5.3). Unset, the visible text names the button |
+| `sending` | the `send` text | The send button's visible text while a send is in flight (`aria-busy`) |
+| `notSent` | `"Message not sent. Your message has been kept."` | Announced when a send rejects |
+| `notSentDetail` | `"Message not sent: {error}"` | Announced when the host resolves `{ ok: false, error }` |
+| `pastedText` | `"Pasted text · {count} characters"` | A text pill's visible text. `{count}` has thousands separators |
+| `insertPaste` | `"Insert this pasted text, {count} characters"` | A text pill's accessible name |
+| `insertNamedPaste` | `"Insert this pasted text: {label}, {count} characters"` | The same, for a pill the host named |
+| `discardPaste` | `"Discard this pasted text"` | The x on a pill above the input |
+| `pastedImage` | `"Pasted image {n}"` | A pasted image's label, on its pill and in the sent text (`[Pasted image 1]`). Stored with the image when it is pasted |
+| `imagePreviewLoading` | `"Loading preview…"` | An image pill's preview while it loads |
+| `imagePreviewError` | `"Preview unavailable"` | An image pill's preview when it cannot be shown |
+
+```tsx
+<Composer
+  labels={{
+    placeholder: "Escribe un mensaje…",
+    send: "Enviar",
+    sending: "Enviando…",
+    notSent: "Mensaje no enviado. Se ha conservado.",
+    pastedText: "Texto pegado · {count} caracteres",
+  }}
+/>
+```
 
 ## Acknowledged send
 

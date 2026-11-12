@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { fillLabel } from "../utils/label-template";
 
 /** What an `onSubmit` Promise resolves to when the host refuses the send. */
 export type SubmitRejection = { ok: false; error?: string };
@@ -46,13 +47,29 @@ function isRejection(value: unknown): value is SubmitRejection {
  * `busy()` reads a ref, not state, so two sends in the same tick (a double
  * Enter, Enter then a click) are refused before React has re-rendered.
  */
-export function useAcknowledgedSubmit(onSubmitError?: (error: unknown) => void) {
+/**
+ * The words announced when a send fails, for translation. `{error}` is the
+ * host's `{ ok: false, error }` text.
+ */
+export interface SubmitMessages {
+  /** @default "Message not sent. Your message has been kept." */
+  notSent?: string;
+  /** @default "Message not sent: {error}" */
+  notSentDetail?: string;
+}
+
+export function useAcknowledgedSubmit(
+  onSubmitError?: (error: unknown) => void,
+  messages?: SubmitMessages,
+) {
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [message, setMessage] = useState("");
   const inFlight = useRef(false);
   const alive = useRef(true);
   const onErrorRef = useRef(onSubmitError);
   onErrorRef.current = onSubmitError;
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
 
   useEffect(() => {
     alive.current = true;
@@ -64,7 +81,12 @@ export function useAcknowledgedSubmit(onSubmitError?: (error: unknown) => void) 
   const fail = useCallback((error: unknown, detail: string | undefined) => {
     if (alive.current) {
       setStatus("error");
-      setMessage(detail ? `Message not sent: ${detail}` : "Message not sent. Your message has been kept.");
+      const words = messagesRef.current;
+      setMessage(
+        detail
+          ? fillLabel(words?.notSentDetail ?? "Message not sent: {error}", { error: detail })
+          : (words?.notSent ?? "Message not sent. Your message has been kept."),
+      );
     }
     onErrorRef.current?.(error);
   }, []);

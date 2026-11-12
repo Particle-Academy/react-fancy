@@ -449,6 +449,8 @@ export type {
 export { Composer, pasteMarker } from "./components/Composer";
 export type {
   ComposerProps,
+  ComposerLabels,
+  PastePillLabels,
   ComposerPasteClassNames,
   ComposerPastePreview,
   ComposerSubmitExtras,

@@ -9,12 +9,39 @@ import type {
   ComposerPastePreview,
   HeldImage,
   HeldPaste,
+  PastePillLabels,
 } from "../PastePills/PastePills.types";
 
 import type { SubmitRejection, SubmitResult } from "../../hooks/use-acknowledged-submit";
 
-export type { ComposerPasteClassNames, ComposerPastePreview, HeldImage, HeldPaste };
+export type { ComposerPasteClassNames, ComposerPastePreview, HeldImage, HeldPaste, PastePillLabels };
 export type { SubmitRejection, SubmitResult };
+
+/**
+ * Every word the Composer draws or announces, for translation. Each key falls
+ * back to its English default on its own, so a partial object is fine.
+ * Templates use `{name}` slots: `{count}` is a character count with thousands
+ * separators, `{label}` a host's pill label, `{n}` an image's arrival number,
+ * `{error}` the host's refusal text.
+ */
+export interface ComposerLabels extends PastePillLabels {
+  /** The text field's placeholder. An explicit `placeholder` prop wins. @default "Type a message..." */
+  placeholder?: string;
+  /** The send button's visible text. @default "Send" */
+  send?: string;
+  /**
+   * The send button's accessible name, when it should differ from its visible
+   * text. Keep the visible words in it (WCAG 2.5.3). Unset: no `aria-label`,
+   * and the visible text names the button.
+   */
+  sendAriaLabel?: string;
+  /** The send button's visible text while a send is in flight. @default the `send` text */
+  sending?: string;
+  /** Announced when a send fails with no reason. @default "Message not sent. Your message has been kept." */
+  notSent?: string;
+  /** Announced when the host refuses with `{ ok: false, error }`. @default "Message not sent: {error}" */
+  notSentDetail?: string;
+}
 
 export interface ComposerSubmitExtras {
   /**
@@ -58,6 +85,8 @@ export interface ComposerProps {
    */
   onSubmitError?: (error: unknown) => void;
   placeholder?: string;
+  /** Every built-in word, for translation. See {@link ComposerLabels}. */
+  labels?: ComposerLabels;
   actions?: ReactNode;
   /** Disables the text, the pills and the send. */
   disabled?: boolean;

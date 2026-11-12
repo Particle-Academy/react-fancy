@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **`Checkbox` `labelHidden`**: keeps the label for screen readers (it still names the checkbox through `for`) and does not draw it, as `Switch`, `Input` and the group components already did. `Checkbox` accepted the prop in its types but ignored it, so it reached the root `<div>` as an unknown DOM attribute and the label stayed visible.
+- **`Composer` `labels`**: every word the Composer draws or announces is now overridable, as in `PromptInput`, `ContentReaction` and `ImagePill`. Keys: `placeholder`, `send` (the send button's visible text), `sendAriaLabel` (its accessible name, when it should differ; unset by default, so the visible text names it), `sending` (the button's text while a send is in flight; defaults to the `send` text, so nothing changes visually unless you set it), `notSent` / `notSentDetail` (the failure announcement, `{error}` slot), `pastedText` / `insertPaste` / `insertNamedPaste` / `discardPaste` (paste pills, `{count}` and `{label}` slots), `pastedImage` (`{n}`; the label is stored with the image, so it is also what the sent text carries as `[Pasted image 1]`), and `imagePreviewLoading` / `imagePreviewError`. Each falls back to its English default on its own. An explicit `placeholder` prop still wins over `labels.placeholder`. New exported types `ComposerLabels` and `PastePillLabels`. Defaults are unchanged, so there is nothing to do.
 
 ### Fixed
 

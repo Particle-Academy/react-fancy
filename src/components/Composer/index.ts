@@ -1,6 +1,8 @@
 export { Composer } from "./Composer";
 export type {
   ComposerProps,
+  ComposerLabels,
+  PastePillLabels,
   ComposerPasteClassNames,
   ComposerPastePreview,
   ComposerSubmitExtras,

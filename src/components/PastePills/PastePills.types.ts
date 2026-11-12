@@ -27,6 +27,39 @@ export interface ComposerPasteClassNames {
   input?: string;
 }
 
+/**
+ * The words on paste pills, for translation. `{count}` is the character count
+ * with thousands separators (`2,036`), `{label}` a host-supplied pill label,
+ * `{n}` an image's arrival number.
+ */
+export interface PastePillLabels {
+  /** A text pill's visible text. @default "Pasted text · {count} characters" */
+  pastedText?: string;
+  /** A text pill's accessible name: clicking it inserts the text. @default "Insert this pasted text, {count} characters" */
+  insertPaste?: string;
+  /** The same, for a pill the host named with `label`. @default "Insert this pasted text: {label}, {count} characters" */
+  insertNamedPaste?: string;
+  /** The x that discards a pill above the input. @default "Discard this pasted text" */
+  discardPaste?: string;
+  /**
+   * A pasted image's label, on its pill and in the sent text (`[Pasted image 1]`).
+   * Stored with the image when it is pasted. @default "Pasted image {n}"
+   */
+  pastedImage?: string;
+  /** An image pill's preview while its thumbnail loads. @default "Loading preview…" */
+  imagePreviewLoading?: string;
+  /** An image pill's preview when its thumbnail cannot be shown. @default "Preview unavailable" */
+  imagePreviewError?: string;
+}
+
+export const DEFAULT_PASTE_PILL_LABELS = {
+  pastedText: "Pasted text · {count} characters",
+  insertPaste: "Insert this pasted text, {count} characters",
+  insertNamedPaste: "Insert this pasted text: {label}, {count} characters",
+  discardPaste: "Discard this pasted text",
+  pastedImage: "Pasted image {n}",
+} as const;
+
 /** The same shapes under the names they have outside `Composer`. */
 export type PastePreview = ComposerPastePreview;
 export type PasteClassNames = ComposerPasteClassNames;

@@ -2,11 +2,13 @@ import { forwardRef, useCallback, useMemo, useRef } from "react";
 import { cn } from "../../utils/cn";
 import { isImeComposing } from "../../utils/ime";
 import { visuallyHidden } from "../../utils/visually-hidden";
+import { fillLabel } from "../../utils/label-template";
 import { useAcknowledgedSubmit } from "../../hooks/use-acknowledged-submit";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import {
   endsOf,
   InlinePasteEditor,
+  DEFAULT_PASTE_PILL_LABELS,
   PastedFilesInput,
   useInlinePaste,
   withSeparators,
@@ -27,7 +29,8 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       onChange,
       onSubmit,
       onSubmitError,
-      placeholder = "Type a message...",
+      placeholder: placeholderProp,
+      labels,
       actions,
       disabled = false,
       sendDisabled = false,
@@ -49,6 +52,9 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
     ref,
   ) {
     const inline = pastePlacement === "inline";
+    const placeholder = placeholderProp ?? labels?.placeholder ?? "Type a message...";
+    const pillWords = { ...DEFAULT_PASTE_PILL_LABELS, ...labels };
+    const sendText = labels?.send ?? "Send";
     const [value, setValue] = useControllableState(
       controlledValue,
       defaultValue,
@@ -74,6 +80,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       heldImages: controlledHeldImages,
       onHeldImagesChange,
       editorRef,
+      labels,
     });
     const pills = paste.pills;
     const heldPastes = paste.heldPastes;
@@ -113,7 +120,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
       else textareaRef.current?.focus();
     }, [inline]);
 
-    const ack = useAcknowledgedSubmit(onSubmitError);
+    const ack = useAcknowledgedSubmit(onSubmitError, labels);
     const submitting = ack.status === "submitting";
 
     /*
@@ -235,7 +242,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   // The label says what clicking does; the preview says what the
                   // text is, and it is linked rather than merely adjacent so a
                   // screen reader reaches it too.
-                  aria-label={`Insert this pasted text, ${withSeparators(paste.text.length)} characters`}
+                  aria-label={fillLabel(pillWords.insertPaste, { count: withSeparators(paste.text.length) })}
                   aria-describedby={`${paste.id}-preview`}
                   // `pr-7` leaves room for the absolutely-positioned × that sits
                   // over this button's right edge. With a smaller right padding the
@@ -247,7 +254,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   )}
                 >
                   <span>
-                    Pasted text · {withSeparators(paste.text.length)} characters
+                    {fillLabel(pillWords.pastedText, { count: withSeparators(paste.text.length) })}
                   </span>
                 </button>
 
@@ -256,7 +263,7 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
                   data-react-fancy-composer-paste-pill-remove={paste.id}
                   onClick={() => pills.remove(paste.id)}
                   disabled={disabled}
-                  aria-label="Discard this pasted text"
+                  aria-label={pillWords.discardPaste}
                   className={cn(
                     "absolute end-1 top-1/2 -translate-y-1/2 rounded-full px-1 text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] transition-colors hover:text-[color:var(--fancy-text-soft,var(--color-zinc-700))] dark:hover:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]",
                     classNames?.remove,
@@ -346,9 +353,10 @@ export const Composer = forwardRef<HTMLDivElement, ComposerProps>(
             onClick={handleSubmit}
             disabled={disabled || sendDisabled || submitting || !hasContent}
             aria-busy={submitting || undefined}
+            aria-label={labels?.sendAriaLabel}
             className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
           >
-            Send
+            {submitting ? (labels?.sending ?? sendText) : sendText}
           </button>
         </div>
       </div>

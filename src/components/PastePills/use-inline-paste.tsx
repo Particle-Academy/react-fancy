@@ -5,7 +5,13 @@ import { usePastePills, type HeldPaste } from "./use-paste-pills";
 import { InlinePill } from "./InlinePill";
 import type { InlinePasteEditorHandle, PillToInsert } from "./InlinePasteEditor";
 import { expandMarkers, markedIds, type HeldImage } from "./paste-markers";
-import type { ComposerPasteClassNames, ComposerPastePreview } from "./PastePills.types";
+import { fillLabel } from "../../utils/label-template";
+import {
+  DEFAULT_PASTE_PILL_LABELS,
+  type ComposerPasteClassNames,
+  type ComposerPastePreview,
+  type PastePillLabels,
+} from "./PastePills.types";
 
 export interface UseInlinePasteOptions {
   pasteThreshold?: number;
@@ -24,6 +30,8 @@ export interface UseInlinePasteOptions {
    * (`Input`) has no lines to give, so its pills sit in the text.
    */
   blockText?: boolean;
+  /** The words on the pills, for translation. */
+  labels?: PastePillLabels;
 }
 
 /**
@@ -49,7 +57,9 @@ export function useInlinePaste({
   onHeldImagesChange,
   editorRef,
   blockText = true,
+  labels,
 }: UseInlinePasteOptions) {
+  const imageLabel = labels?.pastedImage ?? DEFAULT_PASTE_PILL_LABELS.pastedImage;
   const pills = usePastePills({
     threshold: pasteThreshold,
     heldPastes: controlledHeldPastes,
@@ -76,12 +86,12 @@ export function useInlinePaste({
         id = `image-${imageCount.current}`;
       } while (heldImages.some((i) => i.id === id));
 
-      const image = { id, file, label: `Pasted image ${imageCount.current}` };
+      const image = { id, file, label: fillLabel(imageLabel, { n: imageCount.current }) };
       setHeldImages((current) => [...current, image]);
 
       return id;
     },
-    [heldImages, setHeldImages],
+    [heldImages, setHeldImages, imageLabel],
   );
 
   /** What a paste becomes. `null` means "just text". */
@@ -183,6 +193,7 @@ export function useInlinePaste({
             classNames={classNames}
             disabled={disabled}
             onExpand={expandPill}
+            labels={labels}
           />,
           host,
           id,

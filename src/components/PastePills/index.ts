@@ -25,5 +25,7 @@ export type {
   ComposerPasteClassNames,
   ComposerPastePreview,
   PasteClassNames,
+  PastePillLabels,
   PastePreview,
 } from "./PastePills.types";
+export { DEFAULT_PASTE_PILL_LABELS } from "./PastePills.types";

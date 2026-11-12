@@ -2,7 +2,13 @@ import { useState, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
 import { Popover } from "../Popover";
 import { ImagePill } from "../ImagePill";
-import type { ComposerPasteClassNames, ComposerPastePreview } from "./PastePills.types";
+import { fillLabel } from "../../utils/label-template";
+import {
+  DEFAULT_PASTE_PILL_LABELS,
+  type ComposerPasteClassNames,
+  type ComposerPastePreview,
+  type PastePillLabels,
+} from "./PastePills.types";
 
 /**
  * Thousands separators, written out rather than left to `toLocaleString()`.
@@ -75,6 +81,7 @@ interface InlinePillProps {
   classNames?: ComposerPasteClassNames;
   disabled: boolean;
   onExpand: (id: string) => void;
+  labels?: PastePillLabels;
 }
 
 /**
@@ -92,7 +99,9 @@ export function InlinePill({
   classNames,
   disabled,
   onExpand,
+  labels,
 }: InlinePillProps) {
+  const words = { ...DEFAULT_PASTE_PILL_LABELS, ...labels };
   const [open, setOpen] = useState(false);
 
   // An image pill IS the exported ImagePill, so a thread showing a sent image
@@ -108,6 +117,7 @@ export function InlinePill({
         previewProps={{ "data-react-fancy-composer-paste-pill-preview": imageId }}
         className={cn(classNames?.pill, classNames?.imagePill)}
         previewClassName={classNames?.preview}
+        labels={{ loading: labels?.imagePreviewLoading, error: labels?.imagePreviewError }}
       />
     );
   }
@@ -124,7 +134,7 @@ export function InlinePill({
   };
 
   const textLabel = textPillLabel(preview.paste.label);
-  const textSize = `${withSeparators(preview.paste.text.length)} characters`;
+  const count = withSeparators(preview.paste.text.length);
 
   const pill = (
     <button
@@ -134,13 +144,13 @@ export function InlinePill({
       disabled={disabled}
       aria-label={
         textLabel === null
-          ? `Insert this pasted text, ${textSize}`
-          : `Insert this pasted text: ${textLabel}, ${textSize}`
+          ? fillLabel(words.insertPaste, { count })
+          : fillLabel(words.insertNamedPaste, { count, label: textLabel })
       }
       {...focusOpen}
       className={cn(PILL_BASE, TEXT_PILL, classNames?.pill, classNames?.textPill)}
     >
-      {textLabel ?? `Pasted text · ${textSize}`}
+      {textLabel ?? fillLabel(words.pastedText, { count })}
     </button>
   );
 
