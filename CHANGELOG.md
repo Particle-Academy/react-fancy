@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`ContentReaction`'s trigger name contains its visible text when counts show (K19, WCAG 2.5.3 Label in Name).** With two or more counts the trigger failed axe `label-content-name-mismatch` (serious): the visible text was "18 7 4", the accessible name "React: Like 18, Insightful 7, Love 4". The name now starts with the visible counts in order ("18 7 4, React"), from the new `labels.triggerCounts` (`"{counts}, {trigger}"`), and the per-reaction details move to the trigger's `aria-describedby` description (`labels.triggerActive`, handle `data-react-fancy-content-reaction-description`). Without counts the name is unchanged, and a `renderTrigger` trigger keeps the old naming because its visible text is the host's. ContentReaction has not been released yet, so there is nothing to do on upgrade.
 - **A popup placed `left` or `right` now flips to the other side when there is no room**, as `top` and `bottom` already did. Before, it was clamped back into the viewport on top of its own trigger. This applies to every popup on the shared floating position: Tooltip, Popover, Dropdown, Autocomplete, PhoneInput and the listbox Select. Nothing to do on upgrade; a popup with room on its side is unchanged.
 
 ## [6.20.0] - 2026-11-11

@@ -15,6 +15,7 @@ const DEFAULT_LABELS = {
   trigger: "React",
   menu: "Reactions",
   triggerActive: "{trigger}: {reactions}",
+  triggerCounts: "{counts}, {trigger}",
   itemCount: "{label} ({count})",
 };
 
@@ -202,7 +203,7 @@ export function ContentReaction({
     ? reactions.filter((r) => countOf(r.key) > 0 || mineSet.has(r.key))
     : reactions.filter((r) => valueSet.has(r.key));
 
-  const triggerName =
+  const details =
     shown.length === 0
       ? label
       : fillLabel(labels.triggerActive, {
@@ -211,6 +212,24 @@ export function ContentReaction({
             .map((r) => (counts && countOf(r.key) > 0 ? `${r.label} ${countOf(r.key)}` : r.label))
             .join(", "),
         });
+
+  /*
+   * K19 (WCAG 2.5.3, Label in Name). With counts showing, the visible text is
+   * the counts ("18 7 4"); the emoji are aria-hidden. A name of "React: Like 18,
+   * Insightful 7, Love 4" does not contain that text, so a speech-input user
+   * saying what they see matched nothing. The name now STARTS with the visible
+   * counts, in order, and the per-reaction details move to the description.
+   * Without counts the only visible content is emoji, so the name is unchanged.
+   * `renderTrigger` content is the host's, so its naming is too.
+   */
+  const visibleCounts = renderTrigger
+    ? []
+    : shown.filter((r) => counts && countOf(r.key) > 0).map((r) => String(countOf(r.key)));
+  const namedByCounts = visibleCounts.length > 0;
+  const triggerName = namedByCounts
+    ? fillLabel(labels.triggerCounts, { counts: visibleCounts.join(" "), trigger: label })
+    : details;
+  const descriptionId = `${baseId}-description`;
 
   let triggerContent: ReactNode;
   if (renderTrigger) {
@@ -268,6 +287,7 @@ export function ContentReaction({
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
         aria-label={triggerName}
+        aria-describedby={namedByCounts ? descriptionId : undefined}
         disabled={disabled}
         onClick={() => {
           if (disabled) return;
@@ -289,6 +309,13 @@ export function ContentReaction({
       >
         {triggerContent}
       </button>
+      {namedByCounts && (
+        // `hidden` keeps it out of the reading order; aria-describedby still
+        // reads a hidden element, so it is announced once, as the description.
+        <span id={descriptionId} hidden data-react-fancy-content-reaction-description="">
+          {details}
+        </span>
+      )}
 
       {open && (
         <Portal>

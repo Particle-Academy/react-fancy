@@ -28,11 +28,20 @@ export interface ContentReactionLabels {
   /** Accessible name of the picker. @default "Reactions" */
   menu?: string;
   /**
-   * Accessible name of the trigger while reactions are shown. `{trigger}` is the
-   * trigger label, `{reactions}` the shown reactions ("Like 3, Love 1").
+   * Accessible name of the trigger while reactions are shown without counts.
+   * With counts it is the trigger's DESCRIPTION instead (see `triggerCounts`).
+   * `{trigger}` is the trigger label, `{reactions}` the shown reactions
+   * ("Like 3, Love 1").
    * @default "{trigger}: {reactions}"
    */
   triggerActive?: string;
+  /**
+   * Accessible name of the trigger while counts show. `{counts}` is the visible
+   * counts in order ("18 7 4"), `{trigger}` the trigger label. Keep `{counts}`
+   * first and unchanged: WCAG 2.5.3 needs the visible text inside the name.
+   * @default "{counts}, {trigger}"
+   */
+  triggerCounts?: string;
   /** An item's accessible name when `counts` is given. `{label}`, `{count}`. @default "{label} ({count})" */
   itemCount?: string;
 }

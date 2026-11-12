@@ -104,7 +104,8 @@ Other props reach the root `<div>`.
 |------|------|
 | `trigger` | `"React"` |
 | `menu` | `"Reactions"` (the picker's accessible name) |
-| `triggerActive` | `"{trigger}: {reactions}"` (the trigger's accessible name while reactions show, for example "React: Like 3, Love 1") |
+| `triggerActive` | `"{trigger}: {reactions}"` (the trigger's accessible name while reactions show without counts, for example "React: Like, Love"; with counts it is the trigger's description, for example "React: Like 3, Love 1") |
+| `triggerCounts` | `"{counts}, {trigger}"` (the trigger's accessible name while counts show, for example "3 1, React". Keep `{counts}` first: WCAG 2.5.3 needs the visible text in the name) |
 | `itemCount` | `"{label} ({count})"` (an item's accessible name when `counts` is given) |
 
 ## Behavior
@@ -113,7 +114,7 @@ Other props reach the root `<div>`.
 - **No hover behaviour at all.** It opens on click or from the keyboard, never on hover, and it never closes on mouse-leave, so there is no dead zone between the trigger and the picker. It closes only on an outside click, Escape, or a select when `closeOnSelect` is on.
 - **Escape returns focus to the trigger.** An outside click leaves focus where the click put it.
 - **Keyboard:** Enter, Space or ArrowDown on the trigger opens the picker on the first item; ArrowUp opens it on the last. Inside, the arrow keys move between items with roving focus and wrap (ArrowLeft and ArrowRight follow the screen, so in RTL ArrowLeft is next). Home and End jump to the ends. Enter and Space toggle the focused item. Tab hands focus back to the trigger and continues from there; the picker stays open.
-- **ARIA:** the trigger is a `<button>` with `aria-haspopup="menu"`, `aria-expanded` and `aria-controls`. The picker is `role="menu"`, and each item is `role="menuitemcheckbox"` with `aria-checked`. The emoji glyphs are `aria-hidden`; the labels carry the names.
+- **ARIA:** the trigger is a `<button>` with `aria-haspopup="menu"`, `aria-expanded` and `aria-controls`. The picker is `role="menu"`, and each item is `role="menuitemcheckbox"` with `aria-checked`. The emoji glyphs are `aria-hidden`; the labels carry the names. With counts showing, the trigger's name starts with the visible counts in order ("18 7 4, React"), so it contains the visible text (WCAG 2.5.3, Label in Name), and the per-reaction details ("React: Like 18, Insightful 7, Love 4") are its `aria-describedby` description.
 - **Theming:** the active highlight is the `surface-muted` fill with an `accent` ring (`--fancy-surface-muted` / `--fancy-accent`, and their `-dark` pair). Surfaces, borders, text and the focus ring read their usual tokens too. No literal colours.
 - SSR-safe: the picker only mounts on the client after it is opened.
 
@@ -124,6 +125,7 @@ Other props reach the root `<div>`.
 | `data-react-fancy-content-reaction` | Root, with `data-value` (active keys, comma-separated), `data-mode`, `data-size`, `data-open` and `data-disabled` |
 | `data-react-fancy-content-reaction-trigger` | The trigger button |
 | `data-react-fancy-content-reaction-chip` | A reaction shown on the trigger, with `data-reaction-key` and `data-mine` |
+| `data-react-fancy-content-reaction-description` | The hidden description of the trigger while counts show (its `aria-describedby` target) |
 | `data-react-fancy-content-reaction-menu` | The picker (portalled), with `data-placement` (the side it actually opened on) |
 | `data-react-fancy-content-reaction-item` | A picker item, with `data-reaction-key` and `data-state="on" \| "off"` |
 

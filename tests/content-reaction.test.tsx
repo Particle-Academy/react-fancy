@@ -183,7 +183,11 @@ describe("trigger", () => {
     expect(chips[0]!.textContent).toContain("3");
     expect(chips[0]!.getAttribute("data-mine")).toBe("false");
     expect(chips[1]!.getAttribute("data-mine")).toBe("true");
-    expect(trigger().getAttribute("aria-label")).toBe("React: Like 3, Love 1");
+    // K19: the name starts with the visible counts; the details are the description.
+    expect(trigger().getAttribute("aria-label")).toBe("3 1, React");
+    expect(document.getElementById(trigger().getAttribute("aria-describedby")!)!.textContent).toBe(
+      "React: Like 3, Love 1",
+    );
   });
 
   it("mine defaults to value", () => {
@@ -514,10 +518,13 @@ describe("ARIA", () => {
       <Controlled
         initial={["like"]}
         counts={{ like: 2 }}
-        labels={{ trigger: "Reagieren", menu: "Reaktionen", itemCount: "{label}: {count}", triggerActive: "{trigger} - {reactions}" }}
+        labels={{ trigger: "Reagieren", menu: "Reaktionen", itemCount: "{label}: {count}", triggerActive: "{trigger} - {reactions}", triggerCounts: "{counts} - {trigger}" }}
       />,
     );
-    expect(trigger().getAttribute("aria-label")).toBe("Reagieren - Like 2");
+    expect(trigger().getAttribute("aria-label")).toBe("2 - Reagieren");
+    expect(document.getElementById(trigger().getAttribute("aria-describedby")!)!.textContent).toBe(
+      "Reagieren - Like 2",
+    );
     click(trigger());
     expect(menu()!.getAttribute("aria-label")).toBe("Reaktionen");
     expect(item("like").getAttribute("aria-label")).toBe("Like: 2");
