@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { cn } from "../../utils/cn";
+import { Portal } from "../Portal";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import { EMOJI_CATEGORY_ORDER, EMOJI_DATA, type EmojiCategoryKey, type EmojiEntry } from "../../data/emoji-data";
 import { applyTone, SKIN_TONES, type SkinTone } from "../../data/emoji-utils";
@@ -172,17 +172,15 @@ export function EmojiSelect({ value, defaultValue, onChange, placeholder = "Sear
         </div>
       )}
 
-      {toneTarget && typeof document !== "undefined" &&
-        createPortal(
-          <TonePopover
-            target={toneTarget}
-            onPickBase={() => pick(toneTarget.emoji)}
-            onPickTone={(t) => pickTone(toneTarget.emoji, t)}
-            onMouseEnter={cancelClose}
-            onMouseLeave={scheduleClose}
-          />,
-          document.body,
-        )}
+      {toneTarget?.emoji.skinTones && (
+        <TonePopover
+          target={toneTarget}
+          onPickBase={() => pick(toneTarget.emoji)}
+          onPickTone={(t) => pickTone(toneTarget.emoji, t)}
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
+        />
+      )}
     </div>
   );
 }
@@ -311,9 +309,13 @@ type PopoverProps = {
   onMouseLeave: () => void;
 };
 
+/**
+ * Portalled to <body> (or the host's portal container). The dialog is the
+ * Portal's only child, a host element, so it is the element in <body> and
+ * carries the portal handle and its own role, with no role-less wrapper.
+ */
 function TonePopover({ target, onPickBase, onPickTone, onMouseEnter, onMouseLeave }: PopoverProps) {
   const { emoji, rect } = target;
-  if (!emoji.skinTones) return null;
 
   const centerX = rect.left + rect.width / 2;
   const top = rect.top;
@@ -325,31 +327,36 @@ function TonePopover({ target, onPickBase, onPickTone, onMouseEnter, onMouseLeav
     : { position: "fixed", left: centerX, top: top - 4, transform: "translate(-50%, -100%)" };
 
   return (
-    <div
-      style={{ ...style, zIndex: 9999 }}
-      className="flex gap-0.5 rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-white p-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800"
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-    >
-      <button
-        type="button"
-        onClick={onPickBase}
-        className="rounded p-1 text-lg hover:bg-zinc-100 dark:hover:bg-zinc-700"
-        aria-label={`${emoji.name} (no tone)`}
+    <Portal>
+      <div
+        role="dialog"
+        aria-label={`${emoji.name} skin tones`}
+        data-react-fancy-emoji-select-tones=""
+        style={{ ...style, zIndex: 9999 }}
+        className="flex gap-0.5 rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-white p-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-zinc-800"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
-        {emoji.char}
-      </button>
-      {SKIN_TONES.map((t, i) => (
         <button
-          key={t}
           type="button"
-          onClick={() => onPickTone(t)}
+          onClick={onPickBase}
           className="rounded p-1 text-lg hover:bg-zinc-100 dark:hover:bg-zinc-700"
-          aria-label={`${emoji.name} ${t} skin tone`}
+          aria-label={`${emoji.name} (no tone)`}
         >
-          {emoji.skinTones![i]}
+          {emoji.char}
         </button>
-      ))}
-    </div>
+        {SKIN_TONES.map((t, i) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => onPickTone(t)}
+            className="rounded p-1 text-lg hover:bg-zinc-100 dark:hover:bg-zinc-700"
+            aria-label={`${emoji.name} ${t} skin tone`}
+          >
+            {emoji.skinTones![i]}
+          </button>
+        ))}
+      </div>
+    </Portal>
   );
 }

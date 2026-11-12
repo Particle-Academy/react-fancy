@@ -51,6 +51,10 @@ export function PopoverContent({ children, className, style, ...rest }: PopoverC
     <Portal>
       <div
         {...rest}
+        // The panel is the element in <body>, so it carries the popup's role
+        // itself (axe "region" exempts a dialog). A caller's own role wins:
+        // pass role="menu" with haspopup="menu" on the Popover for a menu.
+        role={rest.role ?? "dialog"}
         id={contentId}
         ref={(node) => {
           outsideRef.current = node;

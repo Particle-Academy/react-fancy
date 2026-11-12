@@ -54,6 +54,9 @@ With `hover`, activation does not open the popover, so the trigger sets no popup
 |------|------|---------|-------------|
 | children | `ReactNode` | - | Content to display |
 | className | `string` | - | Additional CSS classes |
+| role | `string` | `"dialog"` | The panel's role. It is the element portalled into `<body>`, so it carries the popup role itself. Pass `"menu"` (with `haspopup="menu"` on the Popover) for a menu. Name a dialog with `aria-label` or `aria-labelledby` |
+
+Every other attribute (`id`, `aria-*`, `data-*`) reaches the panel.
 
 ## Hover Mode
 

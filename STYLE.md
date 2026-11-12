@@ -232,6 +232,7 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-fullscreen-toggle]` | FullScreen.Toggle (any full-screen toggle) |
 | `[data-react-fancy-emoji]` | Emoji |
 | `[data-react-fancy-emoji-select]` | EmojiSelect |
+| `[data-react-fancy-emoji-select-tones]` | EmojiSelect skin-tone picker, portalled (`role="dialog"`) |
 | `[data-react-fancy-content-reaction]` | ContentReaction (`data-value` = active keys, comma-separated; `data-mode`, `data-size`, `data-open`, `data-disabled`) |
 | `[data-react-fancy-content-reaction-trigger]` | ContentReaction trigger button |
 | `[data-react-fancy-content-reaction-chip]` | ContentReaction reaction shown on the trigger (`data-reaction-key`, `data-mine`) |
@@ -553,7 +554,7 @@ A full "Indigo" dark theme:
 
 - Always provide both light and dark variants when theming (use `.dark` parent selector)
 - Use CSS custom properties (`--fancy-*`) for consistent color tokens across components
-- The `data-react-fancy-portal` attribute is on the Portal wrapper — use it to theme all portaled content (modals, dropdowns, tooltips) at once
-- Components inside portals inherit the `dark` class automatically via the Portal component
+- The `data-react-fancy-portal` attribute marks portalled content. A single-element popup (a menu, listbox, dialog or tooltip) carries it on ITSELF, so match both the element and its descendants: `[data-react-fancy-portal], [data-react-fancy-portal] *`. Content that is not one element sits in a `display: contents` wrapper with the attribute
+- Components inside portals get the `dark` class automatically: on the popup element itself, or on the wrapper
 - Avoid `!important` — the data attribute selectors have sufficient specificity to override component defaults
 - For ECharts integration, use `@particle-academy/react-echarts` which handles dark mode automatically via `prefers-color-scheme` detection

@@ -1,5 +1,14 @@
 import { createPortal } from "react-dom";
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  cloneElement,
+  createContext,
+  isValidElement,
+  useContext,
+  useEffect,
+  useState,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 
 /**
  * Where a `<Portal>` without an explicit `container` renders. `null` means
@@ -10,15 +19,25 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
  * a menu, tooltip or dialog portalled to `<body>` from inside a full-screen
  * editor would open invisibly. Redirecting keeps every react-fancy overlay a
  * descendant of the surface without the components inside knowing.
+ *
+ * A host can provide it too, around the whole app, to portal every popup into
+ * a landmark (`<main>`) rather than `<body>`.
  */
 export const PortalContainerContext = createContext<HTMLElement | null>(null);
 
 export interface PortalProps {
   children: ReactNode;
+  /**
+   * The element to portal into, such as a landmark (`<main>`), so the popup is
+   * inside it rather than loose in `<body>`. Wins over `container` and over a
+   * `PortalContainerContext` provider. Default: `document.body`.
+   */
+  portalContainer?: HTMLElement | null;
+  /** The same as `portalContainer`, under its original name. */
   container?: HTMLElement;
 }
 
-export function Portal({ children, container }: PortalProps) {
+export function Portal({ children, container, portalContainer }: PortalProps) {
   // Render nothing on the server AND on the client's first (hydration) render,
   // then portal after mount. Without the `mounted` gate the client would render
   // the portal immediately while the server rendered null — a hydration
@@ -31,49 +50,60 @@ export function Portal({ children, container }: PortalProps) {
     setMounted(true);
   }, []);
 
+  const dark = useRootDark(mounted);
+
   if (!mounted || typeof document === "undefined") return null;
 
-  const target = container ?? contextContainer ?? document.body;
+  const target = portalContainer ?? container ?? contextContainer ?? document.body;
 
-  return createPortal(
-    <PortalDarkWrapper>{children}</PortalDarkWrapper>,
-    target,
-  );
+  return createPortal(<PortalRoot dark={dark}>{children}</PortalRoot>, target);
 }
 
 /**
- * Wrapper that propagates the `dark` class from <html> into the portal subtree.
- * This ensures Tailwind `dark:` utilities work even though Portal renders
- * outside the React component tree.
+ * Whether `<html>` is in dark mode (`class="dark"` or `data-theme="dark"`),
+ * followed live. Tailwind's `dark:` variant then applies inside the portal
+ * even when the app's variant is keyed on an ancestor the portal is not under.
  */
-function PortalDarkWrapper({ children }: { children: ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
+function useRootDark(enabled: boolean): boolean {
+  const [dark, setDark] = useState(false);
 
   useEffect(() => {
+    if (!enabled) return;
     const root = document.documentElement;
-    const wrapper = ref.current;
-    if (!wrapper) return;
-
-    const sync = () => {
-      const isDark =
-        root.classList.contains("dark") ||
-        root.getAttribute("data-theme") === "dark";
-      wrapper.classList.toggle("dark", isDark);
-    };
-
+    const sync = () =>
+      setDark(root.classList.contains("dark") || root.getAttribute("data-theme") === "dark");
     sync();
-
     const observer = new MutationObserver(sync);
-    observer.observe(root, {
-      attributes: true,
-      attributeFilter: ["class", "data-theme"],
-    });
-
+    observer.observe(root, { attributes: true, attributeFilter: ["class", "data-theme"] });
     return () => observer.disconnect();
-  }, []);
+  }, [enabled]);
+
+  return dark;
+}
+
+/**
+ * The portalled content, carrying the `data-react-fancy-portal` handle and the
+ * synced `dark` class.
+ *
+ * One host element (the usual case: a menu, listbox or dialog) carries them
+ * itself, so the popup is the element in `<body>` and keeps its own role there.
+ * A role-less wrapper around it is what axe's "region" rule reports as page
+ * content outside every landmark; a `menu`, `listbox` or `dialog` it does not.
+ * Anything else (several nodes, text, a component) keeps a
+ * `display: contents` wrapper, as every Portal had before.
+ */
+function PortalRoot({ children, dark }: { children: ReactNode; dark: boolean }) {
+  if (isValidElement(children) && typeof children.type === "string") {
+    const element = children as ReactElement<{ className?: string }>;
+    const own = element.props.className;
+    return cloneElement(element, {
+      "data-react-fancy-portal": "",
+      className: dark ? (own ? `${own} dark` : "dark") : own,
+    } as Record<string, unknown>);
+  }
 
   return (
-    <div ref={ref} data-react-fancy-portal="" style={{ display: "contents" }}>
+    <div data-react-fancy-portal="" className={dark ? "dark" : undefined} style={{ display: "contents" }}>
       {children}
     </div>
   );

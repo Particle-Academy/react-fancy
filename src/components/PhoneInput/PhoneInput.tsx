@@ -417,6 +417,10 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(function
           <div
             ref={popupRef}
             dir={popupDir}
+            // A labelled dialog holding the search box and the country list: it
+            // is the element in <body>, so it carries its own popup role.
+            role="dialog"
+            aria-label={msg.chooseCountry}
             data-react-fancy-phone-input-popup=""
             className="fixed z-50 flex min-w-[16rem] flex-col gap-1 rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:shadow-zinc-950/50 fancy-scale-in"
             style={{ left: position.x, top: position.y, width: rowRef.current?.offsetWidth }}
