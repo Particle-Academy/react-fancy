@@ -20,12 +20,13 @@ import { Tooltip } from "@particle-academy/react-fancy";
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| children | `ReactElement` | **required** | Trigger element (must accept ref, onMouseEnter, onMouseLeave, onFocus, onBlur) |
+| children | `ReactElement` | **required** | Trigger element (must accept ref, onMouseEnter, onMouseLeave, onFocus, onBlur, aria-describedby). While the tooltip is shown, its `aria-describedby` names the `role="tooltip"` element, added to any description it already names |
 | content | `ReactNode` | **required** | Tooltip content |
 | placement | `Placement` | `"top"` | Position relative to trigger. One of: `"top"`, `"bottom"`, `"left"`, `"right"`, `"top-start"`, `"top-end"`, `"bottom-start"`, `"bottom-end"` |
 | delay | `number` | `200` | Delay in ms before showing |
 | offset | `number` | `8` | Distance in px from the trigger |
 | className | `string` | - | Additional CSS classes for the tooltip |
+| describe | `boolean` | `true` | Name the tooltip in the trigger's `aria-describedby` while shown. Turn off only when the tooltip repeats words already in the trigger's accessible name |
 
 ## Examples
 

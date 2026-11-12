@@ -5,6 +5,7 @@ import {
   classifyTriggerChild,
   cloneTriggerChild,
   composeRefs,
+  popupTriggerAria,
   triggerChildRef,
 } from "../../utils/trigger-child";
 import type { DropdownTriggerProps } from "./Dropdown.types";
@@ -72,11 +73,7 @@ export function DropdownTrigger({ children }: DropdownTriggerProps) {
     setOpen(!open);
   };
 
-  const aria = {
-    "aria-haspopup": "menu" as const,
-    "aria-expanded": open,
-    "aria-controls": open ? menuId : undefined,
-  };
+  const aria = popupTriggerAria("menu", open, menuId);
 
   if (target.mode === "clone") {
     return cloneTriggerChild(target.element, {

@@ -1,5 +1,8 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import type { Placement } from "../../utils/types";
+import type { PopupKind } from "../../utils/trigger-child";
+
+export type { PopupKind };
 
 export interface PopoverContextValue {
   open: boolean;
@@ -13,6 +16,8 @@ export interface PopoverContextValue {
   onHoverLeave: () => void;
   /** The content panel's id, which the trigger's `aria-controls` names. */
   contentId: string;
+  /** The trigger's `aria-haspopup` value. */
+  haspopup: PopupKind;
   /** Popover.Content registers an `id` its caller passed, so the trigger names it. @internal */
   setContentId: (id: string | undefined) => void;
 }
@@ -35,6 +40,13 @@ export interface PopoverProps {
   hoverDelay?: number;
   /** Delay in ms before closing after hover leaves. Default: 300 */
   hoverCloseDelay?: number;
+  /**
+   * What the trigger's `aria-haspopup` announces the panel as. Default
+   * `"dialog"`; pass `"menu"` when the content is a menu, `"listbox"` for a
+   * list of options, and so on. Not set in `hover` mode, where activation
+   * opens nothing.
+   */
+  haspopup?: PopupKind;
 }
 
 /**

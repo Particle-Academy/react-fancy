@@ -8,4 +8,10 @@ export interface TooltipProps {
   delay?: number;
   offset?: number;
   className?: string;
+  /**
+   * Name the tooltip in the trigger's `aria-describedby` while it is shown.
+   * Default `true`. Turn it off only when the tooltip repeats words the
+   * trigger's accessible name already carries, so they are not read twice.
+   */
+  describe?: boolean;
 }

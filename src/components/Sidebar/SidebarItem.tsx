@@ -231,6 +231,7 @@ export function SidebarItem({
   return (
     <Tooltip
       placement="right"
+      describe={false}
       content={
         // aria-hidden, and deliberately NOT linked with aria-describedby:
         // the same words are already in the item's accessible name via

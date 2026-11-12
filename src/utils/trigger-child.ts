@@ -23,6 +23,21 @@ export type TriggerChild =
   | { mode: "clone"; element: ReactElement<Record<string, unknown>>; aria: boolean; role?: "button" }
   | { mode: "wrap" };
 
+/** The `aria-haspopup` values that name a kind of popup (WAI-ARIA 1.2). */
+export type PopupKind = "menu" | "listbox" | "tree" | "grid" | "dialog";
+
+/**
+ * The ARIA a popup trigger carries: what it opens, whether it is open, and,
+ * while it is, the id of the popup (which exists in the DOM only then).
+ */
+export function popupTriggerAria(kind: PopupKind, open: boolean, popupId: string) {
+  return {
+    "aria-haspopup": kind,
+    "aria-expanded": open,
+    "aria-controls": open ? popupId : undefined,
+  };
+}
+
 /** Roles that allow both `aria-expanded` and `aria-haspopup` (WAI-ARIA 1.2). */
 const POPUP_ROLES = new Set([
   "button",

@@ -102,6 +102,8 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-tabs-panel]` | Tabs.Panel |
 | `[data-react-fancy-breadcrumbs]` | Breadcrumbs |
 | `[data-react-fancy-breadcrumbs-item]` | Breadcrumbs.Item |
+| `[data-react-fancy-breadcrumbs-dropdown]` | Breadcrumbs collapsed (below `md`) dropdown |
+| `[data-react-fancy-breadcrumbs-dropdown-menu]` | Its open panel, which the button's `aria-controls` names |
 | `[data-react-fancy-pagination]` | Pagination |
 | `[data-react-fancy-skip-link]` | SkipLink (also `[data-skip-link]`) |
 | `[data-react-fancy-resizable-panels]` | ResizablePanels (`data-orientation`, `data-dragging`, `data-disabled`) |

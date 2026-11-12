@@ -35,6 +35,7 @@ import { Popover } from "@particle-academy/react-fancy";
 | hover | `boolean` | `false` | Open on hover instead of click |
 | hoverDelay | `number` | `200` | Delay in ms before opening on hover |
 | hoverCloseDelay | `number` | `300` | Delay in ms before closing after hover leaves |
+| haspopup | `"dialog" \| "menu" \| "listbox" \| "tree" \| "grid"` | `"dialog"` | The trigger's `aria-haspopup`: what a screen reader announces the panel as. Pass `"menu"` when the content is a menu. Not set with `hover` |
 
 ### Popover.Trigger
 

@@ -2,6 +2,7 @@ import {
   cloneElement,
   forwardRef,
   useCallback,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -17,10 +18,11 @@ import type { TooltipProps } from "./Tooltip.types";
 
 export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
   function Tooltip(
-    { children, content, placement = "top", delay = 200, offset = 8, className },
+    { children, content, placement = "top", delay = 200, offset = 8, className, describe = true },
     _ref,
   ) {
     const [open, setOpen] = useState(false);
+    const tooltipId = useId();
     const anchorRef = useRef<HTMLElement>(null);
     const floatingRef = useRef<HTMLDivElement>(null);
     const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -58,8 +60,17 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
         if (typeof own === "function") own(event);
         ours();
       };
+    // While the tooltip is shown the trigger is described by it, added to any
+    // description the child already names. Not before: the id only exists in
+    // the DOM while the tooltip does.
+    const ownDescribedBy =
+      typeof childProps["aria-describedby"] === "string" ? childProps["aria-describedby"] : undefined;
+    const describedBy = open && describe
+      ? [ownDescribedBy, tooltipId].filter(Boolean).join(" ")
+      : ownDescribedBy;
     const trigger = cloneElement(child, {
       ref: triggerRef,
+      "aria-describedby": describedBy,
       onMouseEnter: chain(childProps.onMouseEnter, show),
       onMouseLeave: chain(childProps.onMouseLeave, hide),
       onFocus: chain(childProps.onFocus, show),
@@ -73,6 +84,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
           <Portal>
             <div
               ref={floatingRef}
+              id={tooltipId}
               data-react-fancy-tooltip=""
               role="tooltip"
               className={cn(

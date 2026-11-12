@@ -14,6 +14,7 @@ function PopoverRoot({
   hover = false,
   hoverDelay = 200,
   hoverCloseDelay = 300,
+  haspopup = "dialog",
 }: PopoverProps) {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const isControlled = controlledOpen !== undefined;
@@ -61,8 +62,9 @@ function PopoverRoot({
       onHoverLeave,
       contentId,
       setContentId,
+      haspopup,
     }),
-    [open, setOpen, placement, offset, hover, onHoverEnter, onHoverLeave, contentId],
+    [open, setOpen, placement, offset, hover, onHoverEnter, onHoverLeave, contentId, haspopup],
   );
 
   return (

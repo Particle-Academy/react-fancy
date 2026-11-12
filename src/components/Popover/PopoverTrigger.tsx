@@ -4,6 +4,7 @@ import {
   classifyTriggerChild,
   cloneTriggerChild,
   composeRefs,
+  popupTriggerAria,
   triggerChildRef,
   type TriggerChild,
 } from "../../utils/trigger-child";
@@ -11,7 +12,8 @@ import { usePopover } from "./Popover.context";
 import type { PopoverTriggerProps } from "./Popover.types";
 
 /**
- * The popover's anchor. Its ARIA (`aria-haspopup`, `aria-expanded`,
+ * The popover's anchor. Its ARIA (`aria-haspopup`, from the Popover's
+ * `haspopup` prop and `"dialog"` by default, `aria-expanded`,
  * `aria-controls`) and the `data-react-fancy-popover-trigger` handle go on the
  * focusable child itself, merged with the props it already has. A child
  * nothing can focus is wrapped in a `<button>` that carries them instead.
@@ -22,7 +24,7 @@ import type { PopoverTriggerProps } from "./Popover.types";
  * element (plain text) is wrapped in a `<span>` there, with no ARIA on it.
  */
 export function PopoverTrigger({ children, className, ...rest }: PopoverTriggerProps) {
-  const { setOpen, open, anchorRef, hover, onHoverEnter, onHoverLeave, contentId } = usePopover();
+  const { setOpen, open, anchorRef, hover, onHoverEnter, onHoverLeave, contentId, haspopup } = usePopover();
 
   const classified = classifyTriggerChild(children);
   // Hover mode leaves a non-focusable element as it is: it is a preview, and
@@ -39,13 +41,7 @@ export function PopoverTrigger({ children, className, ...rest }: PopoverTriggerP
     ? { onMouseEnter: onHoverEnter, onMouseLeave: onHoverLeave }
     : { onClick: toggle };
 
-  const aria = hover
-    ? {}
-    : {
-        "aria-haspopup": true,
-        "aria-expanded": open,
-        "aria-controls": open ? contentId : undefined,
-      };
+  const aria = hover ? {} : popupTriggerAria(haspopup, open, contentId);
 
   if (target.mode === "clone") {
     // A focusable host element given role="button" here (a `<span tabIndex>`)

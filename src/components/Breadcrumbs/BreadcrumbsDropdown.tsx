@@ -1,6 +1,7 @@
-import { useState, useRef, type ElementType, type ReactNode } from "react";
+import { useId, useState, useRef, type ElementType, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "../../utils/cn";
+import { popupTriggerAria } from "../../utils/trigger-child";
 import { useOutsideClick } from "../../hooks/use-outside-click";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 
@@ -21,6 +22,7 @@ interface BreadcrumbsDropdownProps {
 export function BreadcrumbsDropdown({ items, activeLabel }: BreadcrumbsDropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const menuId = useId();
 
   useOutsideClick(ref, () => setOpen(false), open);
   useEscapeKey(() => setOpen(false), open);
@@ -29,6 +31,7 @@ export function BreadcrumbsDropdown({ items, activeLabel }: BreadcrumbsDropdownP
     <div ref={ref} data-react-fancy-breadcrumbs-dropdown="" className="relative flex md:hidden">
       <button
         type="button"
+        {...popupTriggerAria("menu", open, menuId)}
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-zinc-900 hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:text-white dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
       >
@@ -36,7 +39,10 @@ export function BreadcrumbsDropdown({ items, activeLabel }: BreadcrumbsDropdownP
         <ChevronDown size={14} className={cn("transition-transform", open && "rotate-180")} />
       </button>
       {open && (
-        <div className="absolute top-full start-0 z-50 mt-1 min-w-[180px] rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] py-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]">
+        <div
+          id={menuId}
+          data-react-fancy-breadcrumbs-dropdown-menu=""
+          className="absolute top-full start-0 z-50 mt-1 min-w-[180px] rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] py-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]">
           {items.map((item, i) => {
             const cls = cn(
               "block w-full px-3 py-1.5 text-start text-sm",
