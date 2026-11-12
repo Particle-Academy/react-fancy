@@ -1,6 +1,12 @@
-import type { KeyboardEvent, MouseEvent } from "react";
+import { useMemo, type KeyboardEvent, type MouseEvent } from "react";
 import { useDropdown } from "./Dropdown.context";
 import { focusMenuItem } from "./dropdown-focus";
+import {
+  classifyTriggerChild,
+  cloneTriggerChild,
+  composeRefs,
+  triggerChildRef,
+} from "../../utils/trigger-child";
 import type { DropdownTriggerProps } from "./Dropdown.types";
 
 /**
@@ -20,22 +26,34 @@ function activatesNatively(el: EventTarget | null): boolean {
   return false;
 }
 
+/**
+ * The menu button. Its ARIA (`aria-haspopup="menu"`, `aria-expanded`,
+ * `aria-controls`) and the `data-react-fancy-dropdown-trigger` handle go on
+ * the focusable child itself, merged with the props it already has. A child
+ * nothing can focus (plain text, a bare `<span>`) is wrapped in a `<button>`
+ * that carries them instead. A component child must forward its props and ref
+ * to the element it renders, as `Button` does.
+ */
 export function DropdownTrigger({ children }: DropdownTriggerProps) {
-  const { setOpen, open, anchorRef, pendingFocusRef, menuRef } = useDropdown();
+  const { setOpen, open, anchorRef, pendingFocusRef, menuRef, menuId } = useDropdown();
+
+  const target = classifyTriggerChild(children);
+  const childRef = triggerChildRef(target);
+  const ref = useMemo(() => composeRefs(childRef, anchorRef), [childRef, anchorRef]);
 
   // WAI-ARIA menu button: Enter / Space / ArrowDown open the menu on its first
   // item, ArrowUp on its last.
-  const onKeyDown = (e: KeyboardEvent<HTMLSpanElement>) => {
+  const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     if (e.defaultPrevented) return;
 
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
-      const target = e.key === "ArrowDown" ? "first" : "last";
+      const focusTarget = e.key === "ArrowDown" ? "first" : "last";
       if (open && menuRef.current) {
-        focusMenuItem(menuRef.current, target);
+        focusMenuItem(menuRef.current, focusTarget);
         return;
       }
-      pendingFocusRef.current = target;
+      pendingFocusRef.current = focusTarget;
       setOpen(true);
       return;
     }
@@ -49,23 +67,42 @@ export function DropdownTrigger({ children }: DropdownTriggerProps) {
     }
   };
 
-  const onClick = (_e: MouseEvent<HTMLSpanElement>) => {
+  const onClick = (_e: MouseEvent<HTMLElement>) => {
     if (open) pendingFocusRef.current = null;
     setOpen(!open);
   };
 
+  const aria = {
+    "aria-haspopup": "menu" as const,
+    "aria-expanded": open,
+    "aria-controls": open ? menuId : undefined,
+  };
+
+  if (target.mode === "clone") {
+    return cloneTriggerChild(target.element, {
+      owned: {
+        "data-react-fancy-dropdown-trigger": "",
+        onClick,
+        onKeyDown,
+        ...(target.role ? { role: target.role } : {}),
+        ...(target.aria ? aria : {}),
+      },
+      ref,
+    });
+  }
+
   return (
-    <span
-      ref={anchorRef as React.RefObject<HTMLSpanElement>}
+    <button
+      ref={ref as React.Ref<HTMLButtonElement>}
+      type="button"
       data-react-fancy-dropdown-trigger=""
       className="inline-flex"
       onClick={onClick}
       onKeyDown={onKeyDown}
-      aria-expanded={open}
-      aria-haspopup="menu"
+      {...aria}
     >
       {children}
-    </span>
+    </button>
   );
 }
 

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import { DropdownContext } from "./Dropdown.context";
 import { DropdownTrigger } from "./DropdownTrigger";
 import { DropdownItems } from "./DropdownItems";
@@ -19,6 +19,7 @@ function DropdownRoot({
   const anchorRef = useRef<HTMLElement>(null);
   const pendingFocusRef = useRef<"first" | "last" | null>(null);
   const menuRef = useRef<HTMLElement | null>(null);
+  const menuId = useId();
 
   const focusTrigger = useCallback(() => {
     const anchor = anchorRef.current;
@@ -40,8 +41,9 @@ function DropdownRoot({
       pendingFocusRef,
       menuRef,
       focusTrigger,
+      menuId,
     }),
-    [open, anchorRef, activeIndex, placement, offset, focusTrigger],
+    [open, anchorRef, activeIndex, placement, offset, focusTrigger, menuId],
   );
 
   return (

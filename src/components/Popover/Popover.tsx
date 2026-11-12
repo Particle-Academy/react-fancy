@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import { PopoverContext } from "./Popover.context";
 import { PopoverTrigger } from "./PopoverTrigger";
 import { PopoverContent } from "./PopoverContent";
@@ -43,9 +43,26 @@ function PopoverRoot({
     hoverTimeoutRef.current = setTimeout(() => setOpen(false), hoverCloseDelay);
   }, [hover, hoverCloseDelay, setOpen]);
 
+  // The content's id: generated, unless Popover.Content was given its own.
+  const autoContentId = useId();
+  const [customContentId, setContentId] = useState<string | undefined>(undefined);
+  const contentId = customContentId ?? autoContentId;
+
   const ctx = useMemo(
-    () => ({ open, setOpen, anchorRef, floatingRef, placement, offset, hover, onHoverEnter, onHoverLeave }),
-    [open, setOpen, placement, offset, hover, onHoverEnter, onHoverLeave],
+    () => ({
+      open,
+      setOpen,
+      anchorRef,
+      floatingRef,
+      placement,
+      offset,
+      hover,
+      onHoverEnter,
+      onHoverLeave,
+      contentId,
+      setContentId,
+    }),
+    [open, setOpen, placement, offset, hover, onHoverEnter, onHoverLeave, contentId],
   );
 
   return (

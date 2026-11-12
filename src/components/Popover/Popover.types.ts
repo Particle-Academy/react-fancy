@@ -11,6 +11,10 @@ export interface PopoverContextValue {
   hover: boolean;
   onHoverEnter: () => void;
   onHoverLeave: () => void;
+  /** The content panel's id, which the trigger's `aria-controls` names. */
+  contentId: string;
+  /** Popover.Content registers an `id` its caller passed, so the trigger names it. @internal */
+  setContentId: (id: string | undefined) => void;
 }
 
 export interface PopoverProps {
@@ -34,10 +38,13 @@ export interface PopoverProps {
 }
 
 /**
- * The trigger renders a `<span>` — it extends its attributes so consumers can
- * forward `aria-*`, `data-*`, `id`, `title`, etc. onto the actual anchor node
- * (e.g. `aria-label` for an icon-only trigger). Popover-owned props (ref,
- * onClick, aria-expanded/haspopup) always win over forwarded ones.
+ * The trigger merges onto its child (the focusable control) rather than
+ * wrapping it, so attributes passed here (`aria-*`, `data-*`, `id`, `title`,
+ * e.g. `aria-label` for an icon-only trigger) land on that child, filling only
+ * what it leaves unset; `className` is joined. A child nothing can focus is
+ * wrapped in a `<button>` (a `<span>` in `hover` mode) that takes them instead.
+ * Popover-owned props (ref, onClick, aria-expanded / haspopup / controls)
+ * always win over forwarded ones.
  */
 export interface PopoverTriggerProps extends HTMLAttributes<HTMLSpanElement> {
   children: ReactNode;

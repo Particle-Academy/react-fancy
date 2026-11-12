@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { cn } from "../../utils/cn";
 import { Portal } from "../Portal";
 import { usePopover } from "./Popover.context";
@@ -8,8 +8,29 @@ import { useEscapeKey } from "../../hooks/use-escape-key";
 import type { PopoverContentProps } from "./Popover.types";
 
 export function PopoverContent({ children, className, style, ...rest }: PopoverContentProps) {
-  const { open, setOpen, anchorRef, floatingRef, placement, offset, hover, onHoverEnter, onHoverLeave } = usePopover();
+  const {
+    open,
+    setOpen,
+    anchorRef,
+    floatingRef,
+    placement,
+    offset,
+    hover,
+    onHoverEnter,
+    onHoverLeave,
+    contentId,
+    setContentId,
+  } = usePopover();
   const outsideRef = useRef<HTMLDivElement>(null);
+
+  // An id the caller gave the panel is the one the trigger's aria-controls
+  // must name.
+  const ownId = rest.id;
+  useEffect(() => {
+    if (ownId === undefined) return;
+    setContentId(ownId);
+    return () => setContentId(undefined);
+  }, [ownId, setContentId]);
 
   const position = useFloatingPosition(anchorRef, floatingRef, {
     placement,
@@ -30,6 +51,7 @@ export function PopoverContent({ children, className, style, ...rest }: PopoverC
     <Portal>
       <div
         {...rest}
+        id={contentId}
         ref={(node) => {
           outsideRef.current = node;
           (floatingRef as React.MutableRefObject<HTMLDivElement | null>).current = node;

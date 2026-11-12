@@ -20,6 +20,7 @@ export function DropdownItems({ children, className }: DropdownItemsProps) {
     pendingFocusRef,
     menuRef,
     focusTrigger,
+    menuId,
   } = useDropdown();
   const floatingRef = useRef<HTMLDivElement>(null);
   const outsideRef = useRef<HTMLDivElement>(null);
@@ -116,6 +117,7 @@ export function DropdownItems({ children, className }: DropdownItemsProps) {
     <Portal>
       <div
         ref={setMenuRef}
+        id={menuId}
         data-react-fancy-dropdown=""
         role="menu"
         onKeyDown={onKeyDown}

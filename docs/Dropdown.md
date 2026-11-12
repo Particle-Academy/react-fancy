@@ -39,6 +39,8 @@ import { Dropdown } from "@particle-academy/react-fancy";
 |------|------|---------|-------------|
 | children | `ReactNode` | - | Trigger element |
 
+The trigger renders no element of its own around an element child. It merges onto that child (keeping the child's own props, handlers and ref): `aria-haspopup="menu"`, `aria-expanded`, `aria-controls` (the menu's id, while it is open) and the `data-react-fancy-dropdown-trigger` handle. Pass the focusable control itself, such as a `<Button>` or `<button>`; a component child must forward its props and ref to the element it renders. A focusable `<span tabIndex={0}>` also gets `role="button"`. A child nothing can focus, such as plain text, is wrapped in a `<button type="button">` that carries the ARIA and the handle.
+
 ### Dropdown.Items
 
 | Prop | Type | Default | Description |

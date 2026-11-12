@@ -19,6 +19,8 @@ export interface DropdownContextValue {
   menuRef: React.MutableRefObject<HTMLElement | null>;
   /** Move focus back to the trigger (its first focusable element). */
   focusTrigger: () => void;
+  /** The menu element's id, which the trigger's `aria-controls` names. */
+  menuId: string;
 }
 
 export interface DropdownProps {
