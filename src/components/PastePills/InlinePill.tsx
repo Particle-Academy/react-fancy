@@ -1,6 +1,7 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
 import { Popover } from "../Popover";
+import { ImagePill } from "../ImagePill";
 import type { ComposerPasteClassNames, ComposerPastePreview } from "./PastePills.types";
 
 /**
@@ -64,42 +65,8 @@ const PILL_BASE =
   "inline-flex select-none items-center rounded-md px-2 py-0.5 text-xs leading-5 transition-colors";
 const TEXT_PILL =
   "cursor-pointer bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] text-zinc-700 hover:bg-zinc-200 dark:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))] dark:text-zinc-200 dark:hover:bg-zinc-700";
-const IMAGE_PILL =
-  "bg-rose-100 font-medium text-rose-600 dark:bg-rose-500/20 dark:text-rose-300";
 /** Merged onto the Popover panel's own defaults: tighter padding for a preview. */
 const PREVIEW_BASE = "max-w-xs whitespace-pre-wrap break-all p-2 text-xs";
-
-/**
- * An image's thumbnail, made from the File only while the preview is open.
- *
- * If the image cannot be shown — a Content-Security-Policy without `blob:` in
- * `img-src` is the usual reason — the label is shown instead. A broken `<img>`
- * with an empty `alt` renders as nothing at all, which is how a preview ends up
- * as an empty box.
- */
-function ImageThumb({ file, label }: { file: File; label: string }) {
-  const [url, setUrl] = useState<string | null>(null);
-  const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    if (typeof URL.createObjectURL !== "function") return;
-    const made = URL.createObjectURL(file);
-    setUrl(made);
-    setFailed(false);
-    return () => URL.revokeObjectURL(made);
-  }, [file]);
-
-  return url && !failed ? (
-    <img
-      src={url}
-      alt={label}
-      onError={() => setFailed(true)}
-      className="block max-h-40 max-w-[16rem] rounded"
-    />
-  ) : (
-    <span>{label}</span>
-  );
-}
 
 interface InlinePillProps {
   preview: ComposerPastePreview;
@@ -127,15 +94,28 @@ export function InlinePill({
   onExpand,
 }: InlinePillProps) {
   const [open, setOpen] = useState(false);
-  const id = preview.kind === "text" ? preview.paste.id : preview.image.id;
+
+  // An image pill IS the exported ImagePill, so a thread showing a sent image
+  // draws exactly the pill the composer drew. The composer's handles ride along.
+  if (preview.kind === "image") {
+    const imageId = preview.image.id;
+    return (
+      <ImagePill
+        data-react-fancy-composer-image-pill={imageId}
+        label={preview.image.label}
+        file={preview.image.file}
+        preview={renderPastePreview?.(preview) ?? undefined}
+        previewProps={{ "data-react-fancy-composer-paste-pill-preview": imageId }}
+        className={cn(classNames?.pill, classNames?.imagePill)}
+        previewClassName={classNames?.preview}
+      />
+    );
+  }
+
+  const id = preview.paste.id;
   const content = (
     <span data-react-fancy-composer-paste-pill-preview={id}>
-      {renderPastePreview?.(preview) ??
-        (preview.kind === "text" ? (
-          endsOf(preview.paste.text, previewChars)
-        ) : (
-          <ImageThumb file={preview.image.file} label={preview.image.label} />
-        ))}
+      {renderPastePreview?.(preview) ?? endsOf(preview.paste.text, previewChars)}
     </span>
   );
   const focusOpen = {
@@ -143,39 +123,26 @@ export function InlinePill({
     onBlur: () => setOpen(false),
   };
 
-  const textLabel = preview.kind === "text" ? textPillLabel(preview.paste.label) : null;
-  const textSize =
-    preview.kind === "text" ? `${withSeparators(preview.paste.text.length)} characters` : "";
+  const textLabel = textPillLabel(preview.paste.label);
+  const textSize = `${withSeparators(preview.paste.text.length)} characters`;
 
-  const pill =
-    preview.kind === "image" ? (
-      <span
-        data-react-fancy-composer-image-pill={id}
-        role="img"
-        tabIndex={0}
-        aria-label={preview.image.label}
-        {...focusOpen}
-        className={cn(PILL_BASE, IMAGE_PILL, classNames?.pill, classNames?.imagePill)}
-      >
-        {preview.image.label}
-      </span>
-    ) : (
-      <button
-        type="button"
-        data-react-fancy-composer-paste-pill={id}
-        onClick={() => onExpand(id)}
-        disabled={disabled}
-        aria-label={
-          textLabel === null
-            ? `Insert this pasted text, ${textSize}`
-            : `Insert this pasted text: ${textLabel}, ${textSize}`
-        }
-        {...focusOpen}
-        className={cn(PILL_BASE, TEXT_PILL, classNames?.pill, classNames?.textPill)}
-      >
-        {textLabel ?? `Pasted text · ${textSize}`}
-      </button>
-    );
+  const pill = (
+    <button
+      type="button"
+      data-react-fancy-composer-paste-pill={id}
+      onClick={() => onExpand(id)}
+      disabled={disabled}
+      aria-label={
+        textLabel === null
+          ? `Insert this pasted text, ${textSize}`
+          : `Insert this pasted text: ${textLabel}, ${textSize}`
+      }
+      {...focusOpen}
+      className={cn(PILL_BASE, TEXT_PILL, classNames?.pill, classNames?.textPill)}
+    >
+      {textLabel ?? `Pasted text · ${textSize}`}
+    </button>
+  );
 
   return (
     <Popover hover open={open} onOpenChange={setOpen} placement="top">

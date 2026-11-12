@@ -463,6 +463,16 @@
         "default": "./dist/icons.cjs"
       }
     },
+    "./image-pill": {
+      "import": {
+        "types": "./dist/image-pill.d.ts",
+        "default": "./dist/image-pill.js"
+      },
+      "require": {
+        "types": "./dist/image-pill.d.cts",
+        "default": "./dist/image-pill.cjs"
+      }
+    },
     "./image-viewer": {
       "import": {
         "types": "./dist/image-viewer.d.ts",

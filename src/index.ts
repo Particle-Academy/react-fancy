@@ -695,6 +695,8 @@ export type { MagicWandProps, MagicWandAction, MagicWandSelection, MagicWandAppe
 export { MediaViewer } from "./components/MediaViewer";
 export type { MediaViewerProps } from "./components/MediaViewer";
 
+export { ImagePill } from "./components/ImagePill";
+export type { ImagePillProps, ImagePillLabels, ImagePillThumbnailState } from "./components/ImagePill";
 export { ImageViewer } from "./components/ImageViewer";
 export type { ImageViewerProps, ImageViewerViewport } from "./components/ImageViewer";
 
