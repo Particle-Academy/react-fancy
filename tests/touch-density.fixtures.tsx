@@ -125,6 +125,9 @@ export const FIXTURES: DensityFixture[] = [
   })),
   { name: "Textarea", render: () => <Textarea label="Bio" /> },
   ...SIZES.map((size) => ({ name: `Checkbox size=${size}`, render: () => <Checkbox size={size} label="Agree" /> })),
+  // No visible label, so no row to tap: the input itself is the target.
+  { name: "Checkbox labelHidden", render: () => <Checkbox label="Agree" labelHidden /> },
+  { name: "Checkbox no label", render: () => <Checkbox aria-label="Agree" /> },
   {
     name: "CheckboxGroup",
     render: () => <CheckboxGroup label="Pick" list={["A", "B"]} value={[]} onValueChange={noop} />,

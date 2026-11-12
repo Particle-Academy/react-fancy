@@ -13,6 +13,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       dirty,
       error,
       label,
+      labelHidden,
       description,
       required,
       disabled,
@@ -132,6 +133,8 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                 className={cn(
                   "cursor-pointer text-sm text-zinc-700 dark:text-zinc-100",
                   disabled && "cursor-not-allowed opacity-50",
+                  // Still names the input for assistive tech; drawn nowhere.
+                  labelHidden && "sr-only",
                 )}
               >
                 {label}

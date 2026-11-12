@@ -31,6 +31,7 @@ import { Checkbox, CheckboxGroup } from "@particle-academy/react-fancy";
 | `onCheckedChange` | `(checked: boolean) => void` | - | Callback when checked state changes |
 | `indeterminate` | `boolean` | `false` | Sets the indeterminate visual state |
 | `label` | `string` | - | Label text next to the checkbox |
+| `labelHidden` | `boolean` | `false` | Keep the label for screen readers (it still names the checkbox) but do not draw it. Under touch density the checkbox itself is then the 44px target |
 | `description` | `string` | - | Helper text below the label |
 | `error` | `string` | - | Error message |
 | `size` | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"md"` | Checkbox size |

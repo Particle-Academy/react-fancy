@@ -57,8 +57,9 @@ around it. The measured element is still 44px:
 | Control | Measure | What you see |
 |---|---|---|
 | Switch (`button[role="switch"]`) | the button | The track and knob keep their default size. The extra size is a transparent border the track's background does not paint, so the knob's travel is unchanged. The focus ring follows the larger box. |
-| Checkbox, CheckboxGroup, RadioGroup (`input`) | the native input | The browser draws native checkboxes and radios itself, so it draws the box at the target size (Chromium, Firefox). Safari keeps the drawn glyph small and centres it in a 44px box. Either way, the input is the target. |
-| A labelled Switch, Checkbox, CheckboxGroup option or RadioGroup option (the row) | the control, plus the `<label>` | The whole row beside the control is the label, so a tap anywhere in it toggles the control once. The label column stretches to the row's height and takes its free width, the label fills it, and the `gap-2` before it becomes the label's own `0.5rem` start padding. The control is not stretched, and description and error lines keep their indent. A `labelHidden` label is not a target, so that row keeps its gap. |
+| A labelled Checkbox, CheckboxGroup option or RadioGroup option | the labelled **row**, not the input | The row (`[data-react-fancy-checkbox]`, or the option's `div` inside the group) and its `<label>` are at least 44px tall; the label fills the row beside the input, so a tap anywhere in it toggles the input once. The native checkbox or radio keeps its normal drawn size (14 to 24px by `size`) and is centred on the label's 44px line; the label's text is vertically centred in that line. The browser draws a native checkbox or radio at its box size, which is why the input itself is not grown. A description or error line sits below the 44px line, at its usual indent. |
+| A Checkbox with no visible label (`labelHidden`, or no `label`), or an option row without one | the native input | There is no row to tap, so the input itself is at least 44 x 44. Chromium and Firefox draw the box at that size; Safari keeps the glyph small and centres it in a 44px box. |
+| A labelled Switch (the row) | the switch, plus the `<label>` | The whole row beside the control is the label, so a tap anywhere in it toggles the control once. The label column stretches to the row's height and takes its free width, the label fills it, and the `gap-2` before it becomes the label's own `0.5rem` start padding. The track is not stretched, and description and error lines keep their indent. A `labelHidden` label is not a target, so that row keeps its gap. |
 | IndexList title, PdfViewer download link, links listed in a Popover (`a[href]`), SkipLink | the link | These are inline text. An inline box ignores `min-height`, so under the opt-in they become `inline-flex`: the same text in a box that can grow. |
 | Textarea, Composer, PromptInput, CodeView, Editor content, Kanban card | the surface | These are raised to the floor and never lowered. PromptInput (5.5rem) and Editor (120px) are already taller and keep their own minimum. |
 
@@ -107,7 +108,12 @@ cascade instead of a bounding box: it compiles Tailwind for the classes the
 component rendered, installs `styles.css` after it, and reads
 `getComputedStyle` `min-height` and `min-width` on every tappable element. It
 finds those elements itself (buttons, links, inputs, and every tappable ARIA
-role), so a control added later is measured the day it appears. It also fails a
+role), so a control added later is measured the day it appears. A checkbox or
+radio whose row has a visible label is measured by that row, not by the input
+(see the table above); with no visible label, the input is measured.
+`tests/touch-density-label-rows.test.tsx` also checks that such an input has
+no 44px minimum, that the row and label do, that the label's text is centred,
+and that the input's block-start margin centres it on the label's line. It also fails a
 target that computes to `display: inline`, because an inline box ignores
 `min-height`.
 

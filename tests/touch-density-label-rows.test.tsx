@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { Checkbox, CheckboxGroup, RadioGroup, Switch } from "../src/components/inputs";
-import { flatten, installRenderedCss, removeRenderedCss } from "./rendered-css";
+import { flatten, installRenderedCss, removeRenderedCss, resolveVars } from "./rendered-css";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -138,6 +138,117 @@ describe("touch density: the label fills the labelled row", () => {
     expect(rowGap(label.parentElement!.parentElement!)).toBe(GAP_2);
     expect(cs(label).flexGrow).toBe("0");
     expect(remPx(cs(label).paddingInlineStart || "0px")).toBe(0);
+  }, SLOW);
+});
+
+/**
+ * 6.23.x: the CHECKBOX and RADIO look. Under the opt-in the native input was
+ * itself sized to 44 x 44, and Chromium and Firefox draw a native checkbox or
+ * radio at its box size, so every labelled option showed an oversized glyph
+ * with its label top-aligned beside it. In a labelled row the ROW is the
+ * target (6.22.1 made the label fill it), so:
+ *   - the input keeps its own size (no 44px minimum on it);
+ *   - the row, and the label inside it, are at least 44px tall;
+ *   - the label's text is vertically centred (flex, align-items: center);
+ *   - the input is centred on the label's 44px line: its block-start margin is
+ *     (44px - its height) / 2.
+ * A row with no visible label (no `label`, or `labelHidden`) has no row to
+ * tap, so its input keeps the 44px minimum.
+ */
+const TARGET = 44;
+const SIZE_PX = { xs: 14, sm: 16, md: 18, lg: 20, xl: 24 } as const;
+
+/** A computed length as px: resolves `var()`, then evaluates `calc()` over px and rem. */
+function lengthPx(el: Element, raw: string): number {
+  const v = resolveVars(el, raw).trim();
+  if (v === "" || v === "auto" || v === "none" || v === "normal") return 0;
+  const expr = v
+    .replace(/calc\(/g, "(")
+    .replace(/(-?[\d.]+)rem/g, (_m, n: string) => String(Number(n) * 16))
+    .replace(/(-?[\d.]+)px/g, "$1");
+  if (!/^[\d.\s()+\-*/]+$/.test(expr)) return Number.NaN;
+  return Number(new Function(`return (${expr});`)());
+}
+const minH = (el: Element) => lengthPx(el, cs(el).getPropertyValue("min-height"));
+const minW = (el: Element) => lengthPx(el, cs(el).getPropertyValue("min-width"));
+
+function assertLabelledRow(input: HTMLInputElement, size: keyof typeof SIZE_PX, name: string) {
+  const label = [...document.querySelectorAll("label")].find((l) => l.htmlFor === input.id)!;
+  expect(label, `${name}: label for the input`).toBeTruthy();
+  const row = label.parentElement!.parentElement!;
+  expect(row.contains(input), `${name}: the row holds the input`).toBe(true);
+
+  expect(minH(input), `${name}: the input is not drawn at the target size`).toBeLessThan(TARGET);
+  expect(minW(input), `${name}: the input is not drawn at the target size`).toBeLessThan(TARGET);
+
+  expect(minH(row), `${name}: the row is the 44px target`).toBe(TARGET);
+  expect(minW(row), `${name}: the row is the 44px target`).toBe(TARGET);
+  expect(minH(label), `${name}: the label fills a 44px line`).toBe(TARGET);
+
+  expect(cs(label).display, `${name}: label display`).toBe("flex");
+  expect(cs(label).alignItems, `${name}: label text is vertically centred`).toBe("center");
+
+  const margin = lengthPx(input, cs(input).getPropertyValue("margin-block-start"));
+  expect(margin, `${name}: the input is centred on the 44px line`).toBe((TARGET - SIZE_PX[size]) / 2);
+}
+
+describe("touch density: a labelled checkbox or radio keeps its look; the row is the target", () => {
+  for (const size of ["xs", "sm", "md", "lg", "xl"] as const) {
+    it(`Checkbox size=${size}`, async () => {
+      await mount(<Checkbox size={size} label="Agree" />);
+      assertLabelledRow(document.querySelector("[data-react-fancy-checkbox] input")!, size, `Checkbox ${size}`);
+    }, SLOW);
+  }
+
+  it("Checkbox with a description: the label line is still 44px, the input centred on it", async () => {
+    await mount(<Checkbox label="Agree" description="Required" />);
+    assertLabelledRow(document.querySelector("[data-react-fancy-checkbox] input")!, "md", "Checkbox + description");
+  }, SLOW);
+
+  it("CheckboxGroup: every option row", async () => {
+    await mount(<CheckboxGroup size="sm" list={["A", { value: "B", label: "B", description: "Second" }]} />);
+    const inputs = [...document.querySelectorAll<HTMLInputElement>("[data-react-fancy-checkbox-group] input")];
+    expect(inputs.length).toBe(2);
+    inputs.forEach((input, i) => assertLabelledRow(input, "sm", `CheckboxGroup option ${i}`));
+  }, SLOW);
+
+  for (const size of ["xs", "md", "xl"] as const) {
+    it(`RadioGroup size=${size}: every option row`, async () => {
+      await mount(<RadioGroup size={size} list={["Free", "Pro"]} orientation="horizontal" />);
+      const inputs = [...document.querySelectorAll<HTMLInputElement>("[data-react-fancy-radio-group] input")];
+      expect(inputs.length).toBe(2);
+      inputs.forEach((input, i) => assertLabelledRow(input, size, `RadioGroup ${size} option ${i}`));
+    }, SLOW);
+  }
+
+  it("Checkbox labelHidden: the label is for screen readers only and the INPUT is the 44px target", async () => {
+    await mount(<Checkbox label="Agree" labelHidden />);
+    const root = document.querySelector("[data-react-fancy-checkbox]")!;
+    const label = root.querySelector("label")!;
+    const input = root.querySelector("input")!;
+    expect(label.classList.contains("sr-only"), "labelHidden hides the label visually").toBe(true);
+    expect(label.textContent).toBe("Agree");
+    expect(label.htmlFor).toBe(input.id);
+    expect(root.hasAttribute("labelhidden"), "labelHidden does not leak to the DOM").toBe(false);
+    expect(minH(input)).toBe(TARGET);
+    expect(minW(input)).toBe(TARGET);
+    expect(rowGap(root)).toBe(GAP_2);
+  }, SLOW);
+
+  it("Checkbox with no label: the input is the 44px target", async () => {
+    await mount(<Checkbox aria-label="Agree" />);
+    const input = document.querySelector("[data-react-fancy-checkbox] input")!;
+    expect(minH(input)).toBe(TARGET);
+    expect(minW(input)).toBe(TARGET);
+  }, SLOW);
+
+  it("without the opt-in nothing changes: no minimum, no margin, the label stays inline text", async () => {
+    await mount(<Checkbox label="Agree" />, false);
+    const input = document.querySelector("[data-react-fancy-checkbox] input")!;
+    const label = document.querySelector("[data-react-fancy-checkbox] label")!;
+    expect(minH(input)).toBe(0);
+    expect(lengthPx(input, cs(input).getPropertyValue("margin-block-start") || "0px")).toBe(0);
+    expect(cs(label).display).not.toBe("flex");
   }, SLOW);
 });
 

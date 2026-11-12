@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`Checkbox` `labelHidden`**: keeps the label for screen readers (it still names the checkbox through `for`) and does not draw it, as `Switch`, `Input` and the group components already did. `Checkbox` accepted the prop in its types but ignored it, so it reached the root `<div>` as an unknown DOM attribute and the label stayed visible.
+
+### Fixed
+
+- **Touch density: a labelled Checkbox, CheckboxGroup option or RadioGroup option no longer draws an oversized box, and its label is centred.** Under `data-fancy-density="touch"` the native input itself was sized to 44 x 44, and Chromium and Firefox draw a native checkbox or radio at its box size, so every option showed a 44px glyph with its label top-aligned beside it. Now the labelled ROW is the target: the row and its `<label>` are at least `--fancy-target-min` (44px) tall, the label still fills the row beside the input (6.22.1) so a tap anywhere in it toggles the input once, the label's text is vertically centred, and the input keeps its normal size (14 to 24px by `size`) and is centred on the label's 44px line. A description or error line sits below that line. A row with no visible label (`labelHidden`, or no `label`) has nothing else to tap, so its input is still 44 x 44. The kit-wide density test now measures the labelled row for these, not the input; see `docs/TouchDensity.md`. **CSS only, inside the opt-in: nothing changes without the attribute, and there is nothing to do.**
+
 ## [6.23.0] - 2026-11-12
 
 ### Added

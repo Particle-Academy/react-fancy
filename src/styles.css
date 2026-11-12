@@ -935,9 +935,6 @@
     [data-react-fancy-autocomplete],
     [data-react-fancy-command-input],
     [data-react-fancy-multi-switch],
-    [data-react-fancy-checkbox],
-    [data-react-fancy-checkbox-group],
-    [data-react-fancy-radio-group],
     [data-react-fancy-input],
     [data-react-fancy-number-field],
     [data-react-fancy-slider],
@@ -1056,6 +1053,48 @@
     :is([data-react-fancy-checkbox-group], [data-react-fancy-radio-group]) > div:has(> input:is([type="checkbox"], [type="radio"]))
   ) > div > label:not(.sr-only) {
     flex-grow: 1;
+  }
+
+  /* Checkbox, CheckboxGroup and RadioGroup: the native input is NOT the target
+     when its row has a visible label. Chromium and Firefox draw a native
+     checkbox or radio at its box size, so a 44px input looked oversized. The
+     labelled ROW is the target instead (the label fills it, see above): the
+     row and the label are at least 44px tall, the label's text is centred in
+     that line, and the input keeps its own size and is centred on the line by
+     its block-start margin, (44px - its height) / 2, per size class. */
+  [data-fancy-density="touch"] :is(
+    [data-react-fancy-checkbox]:has(> div > input[type="checkbox"]),
+    :is([data-react-fancy-checkbox-group], [data-react-fancy-radio-group]) > div:has(> input:is([type="checkbox"], [type="radio"]))
+  ):has(> div > label:not(.sr-only)) {
+    min-height: var(--fancy-target-min, 44px);
+    min-width: var(--fancy-target-min, 44px);
+  }
+  [data-fancy-density="touch"] :is(
+    [data-react-fancy-checkbox]:has(> div > input[type="checkbox"]),
+    :is([data-react-fancy-checkbox-group], [data-react-fancy-radio-group]) > div:has(> input:is([type="checkbox"], [type="radio"]))
+  ) > div > label:not(.sr-only) {
+    display: flex;
+    align-items: center;
+    min-height: var(--fancy-target-min, 44px);
+  }
+  [data-fancy-density="touch"] :is(
+    [data-react-fancy-checkbox]:has(> div > label:not(.sr-only)) > div > input[type="checkbox"],
+    :is([data-react-fancy-checkbox-group], [data-react-fancy-radio-group]) > div:has(> div > label:not(.sr-only)) > input:is([type="checkbox"], [type="radio"])
+  ) {
+    align-self: flex-start;
+  }
+  [data-fancy-density="touch"] :is([data-react-fancy-checkbox], [data-react-fancy-checkbox-group] > div, [data-react-fancy-radio-group] > div):has(> div > label:not(.sr-only)) input:is([type="checkbox"], [type="radio"])[class~="h-3.5"] { margin-block-start: calc((var(--fancy-target-min, 44px) - 0.875rem) / 2); }
+  [data-fancy-density="touch"] :is([data-react-fancy-checkbox], [data-react-fancy-checkbox-group] > div, [data-react-fancy-radio-group] > div):has(> div > label:not(.sr-only)) input:is([type="checkbox"], [type="radio"])[class~="h-4"] { margin-block-start: calc((var(--fancy-target-min, 44px) - 1rem) / 2); }
+  [data-fancy-density="touch"] :is([data-react-fancy-checkbox], [data-react-fancy-checkbox-group] > div, [data-react-fancy-radio-group] > div):has(> div > label:not(.sr-only)) input:is([type="checkbox"], [type="radio"])[class~="h-[18px]"] { margin-block-start: calc((var(--fancy-target-min, 44px) - 18px) / 2); }
+  [data-fancy-density="touch"] :is([data-react-fancy-checkbox], [data-react-fancy-checkbox-group] > div, [data-react-fancy-radio-group] > div):has(> div > label:not(.sr-only)) input:is([type="checkbox"], [type="radio"])[class~="h-5"] { margin-block-start: calc((var(--fancy-target-min, 44px) - 1.25rem) / 2); }
+  [data-fancy-density="touch"] :is([data-react-fancy-checkbox], [data-react-fancy-checkbox-group] > div, [data-react-fancy-radio-group] > div):has(> div > label:not(.sr-only)) input:is([type="checkbox"], [type="radio"])[class~="h-6"] { margin-block-start: calc((var(--fancy-target-min, 44px) - 1.5rem) / 2); }
+
+  /* No visible label (none, or `labelHidden`): there is no row to tap, so the
+     input itself is the 44px target, as before. */
+  [data-fancy-density="touch"] [data-react-fancy-checkbox]:not(:has(> div > label:not(.sr-only))) > div > input[type="checkbox"],
+  [data-fancy-density="touch"] :is([data-react-fancy-checkbox-group], [data-react-fancy-radio-group]) > div:not(:has(> div > label:not(.sr-only))) > input:is([type="checkbox"], [type="radio"]) {
+    min-height: var(--fancy-target-min, 44px);
+    min-width: var(--fancy-target-min, 44px);
   }
 }
 

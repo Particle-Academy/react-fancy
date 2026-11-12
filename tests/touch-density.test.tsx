@@ -205,8 +205,27 @@ function targets(): Element[] {
   return [...document.body.querySelectorAll(TAPPABLE)].filter((el) => !hidden(el) && !exempt(el));
 }
 
+/**
+ * The element whose box is the target. For a native checkbox or radio in a
+ * Checkbox, CheckboxGroup or RadioGroup row with a VISIBLE label, that is the
+ * labelled ROW, not the input: the label fills the row and toggles the input,
+ * and the input keeps its own drawn size so it does not look oversized. A row
+ * whose label is visually hidden (or that has none) has no row to tap, so its
+ * input is still the target.
+ */
+const LABELLED_ROW = "[data-react-fancy-checkbox], [data-react-fancy-checkbox-group] > div, [data-react-fancy-radio-group] > div";
+
+function measured(el: Element): Element {
+  if (!el.matches("input[type=checkbox], input[type=radio]")) return el;
+  const label = [...document.querySelectorAll("label")].find((l) => l.htmlFor === el.id);
+  if (!label || hidden(label)) return el;
+  const row = label.parentElement?.parentElement;
+  return row && row.contains(el) && row.matches(LABELLED_ROW) ? row : el;
+}
+
 function undersized(min: number): string[] {
   return targets()
+    .map(measured)
     .map((el) => ({
       el,
       h: px(el, "min-height"),
