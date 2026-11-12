@@ -913,6 +913,16 @@
         "default": "./dist/skeleton.cjs"
       }
     },
+    "./skip-link": {
+      "import": {
+        "types": "./dist/skip-link.d.ts",
+        "default": "./dist/skip-link.js"
+      },
+      "require": {
+        "types": "./dist/skip-link.d.cts",
+        "default": "./dist/skip-link.cjs"
+      }
+    },
     "./slider": {
       "import": {
         "types": "./dist/slider.d.ts",

@@ -193,6 +193,8 @@ export { StatList } from "./components/StatList";
 export type { StatListProps, StatListItem } from "./components/StatList";
 export { Kbd } from "./components/Kbd";
 export type { KbdProps } from "./components/Kbd";
+export { SkipLink } from "./components/SkipLink";
+export type { SkipLinkProps } from "./components/SkipLink";
 
 export { HotkeyCapture, formatHotkey, parseHotkey, comboFromEvent } from "./components/HotkeyCapture";
 export type {

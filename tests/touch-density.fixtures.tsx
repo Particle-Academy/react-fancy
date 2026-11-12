@@ -58,6 +58,7 @@ import {
   Select,
   SetupWizard,
   Sidebar,
+  SkipLink,
   Slider,
   Stepper,
   StreamingAudio,
@@ -113,6 +114,7 @@ export const FIXTURES: DensityFixture[] = [
     render: () => <Button size={size} icon="x" aria-label="Close" />,
   })),
   { name: "Button as link", render: () => <Button href="#x">Docs</Button> },
+  { name: "SkipLink", render: () => <SkipLink /> },
 
   // ─── Inputs ───────────────────────────────────────────────────────────────
   ...SIZES.map((size) => ({ name: `Input size=${size}`, render: () => <Input size={size} label="Email" /> })),

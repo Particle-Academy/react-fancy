@@ -58,7 +58,7 @@ around it. The measured element is still 44px:
 |---|---|---|
 | Switch (`button[role="switch"]`) | the button | The track and knob keep their default size. The extra size is a transparent border the track's background does not paint, so the knob's travel is unchanged. The focus ring follows the larger box. |
 | Checkbox, CheckboxGroup, RadioGroup (`input`) | the native input | The browser draws native checkboxes and radios itself, so it draws the box at the target size (Chromium, Firefox). Safari keeps the drawn glyph small and centres it in a 44px box. Either way, the input is the target. |
-| IndexList title, PdfViewer download link, links listed in a Popover (`a[href]`) | the link | These are inline text. An inline box ignores `min-height`, so under the opt-in they become `inline-flex`: the same text in a box that can grow. |
+| IndexList title, PdfViewer download link, links listed in a Popover (`a[href]`), SkipLink | the link | These are inline text. An inline box ignores `min-height`, so under the opt-in they become `inline-flex`: the same text in a box that can grow. |
 | Textarea, Composer, PromptInput, CodeView, Editor content, Kanban card | the surface | These are raised to the floor and never lowered. PromptInput (5.5rem) and Editor (120px) are already taller and keep their own minimum. |
 
 ## Covered
@@ -82,7 +82,7 @@ PdfViewer, PhoneInput (country button, number, country search + list), Pillbox,
 Popover content links, PromptInput (textarea, attach, send), QrCodePanel
 actions, RadioGroup, ReasonTag (follow-up + sources), ReorderableGrid items,
 ResizablePanels separator, Select (native, listbox, multiple, search), SetupWizard,
-Sidebar (items, submenu, toggle), Slider, Stepper (clickable steps),
+Sidebar (items, submenu, toggle), SkipLink, Slider, Stepper (clickable steps),
 StreamingAudio, Switch, Table (search, sort, row expand, pagination), Tabs,
 Textarea, TimeGrid cells, TimePicker, Toast (action + dismiss), TreeNav.
 

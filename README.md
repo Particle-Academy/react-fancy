@@ -158,6 +158,7 @@ npx vite build                      # Build demo app (verifies imports work)
 | Breadcrumbs | Navigation breadcrumb trail with separator | [docs](docs/Breadcrumbs.md) |
 | Navbar | Responsive navigation bar with hamburger collapse | [docs](docs/Navbar.md) |
 | Pagination | Page navigation with prev/next and ellipsis | [docs](docs/Pagination.md) |
+| SkipLink | "Skip to content" link, hidden until focused; moves focus to the main content (WCAG 2.4.1) | [docs](docs/SkipLink.md) |
 | TreeNav | Hierarchical file/folder tree with expand/collapse, selection, and extension-based icons | [docs](docs/TreeNav.md) |
 | FileBrowser | Remote-capable file/folder browser + directory picker — lazy async provider and/or streamed snapshot tree, breadcrumb + editable path, sorting, name filter | [docs](docs/FileBrowser.md) |
 

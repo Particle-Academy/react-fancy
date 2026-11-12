@@ -786,6 +786,60 @@
 }
 }
 
+/* ─── SkipLink — hidden until focused ────────────────────────────────────────
+   Real CSS keyed on the handle, not Tailwind classes on the element: an app
+   that has not @sourced the kit gets no generated `sr-only`, and a skip link
+   that never compiled its hiding is a stray link at the top of every page.
+   Hidden the screen-reader-safe way (clipped to nothing, not display:none), so
+   it stays in the tab order and the accessibility tree. Focused, it sits at the
+   top-start corner over everything, in the surface / text / focus tokens. In
+   `base`, so a className passed to <SkipLink> still wins. */
+@layer base {
+  [data-react-fancy-skip-link] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+  [data-react-fancy-skip-link]:focus {
+    position: fixed;
+    inset-block-start: 0.75rem;
+    inset-inline-start: 0.75rem;
+    z-index: 100;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0.625rem 1rem;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    white-space: normal;
+    border: 1px solid var(--fancy-border-strong, var(--color-zinc-500));
+    border-radius: 0.5rem;
+    background-color: var(--fancy-surface, var(--color-white));
+    color: var(--fancy-text, var(--color-zinc-900));
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    text-decoration: underline;
+    outline: 2px solid var(--fancy-focus, var(--color-blue-500));
+    outline-offset: 2px;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  }
+  :where(.dark, [data-theme="dark"]) [data-react-fancy-skip-link]:focus {
+    border-color: var(--fancy-border-strong-dark, var(--color-zinc-500));
+    background-color: var(--fancy-surface-dark, var(--color-zinc-900));
+    color: var(--fancy-text-dark, var(--color-zinc-100));
+    outline-color: var(--fancy-focus-dark, var(--color-blue-400));
+  }
+}
+
 /* fancy-density:start */
 /* ─── Touch density (WCAG 2.5.5 Target Size, 44 x 44) — OPT-IN ───────────────
    Off unless the app sets it, once, at the root:
@@ -929,7 +983,8 @@
   /* Links that are text in a line. An inline box ignores min-height, so these
      become inline-flex under the opt-in: the same text, a box that can grow. */
   [data-fancy-density="touch"] :is([data-react-fancy-index-title], [data-react-fancy-pdf-viewer]) a[href],
-  [data-fancy-density="touch"] [data-react-fancy-popover] li > a[href] {
+  [data-fancy-density="touch"] [data-react-fancy-popover] li > a[href],
+  [data-fancy-density="touch"] [data-react-fancy-skip-link] {
     display: inline-flex;
     align-items: center;
     min-height: var(--fancy-target-min, 44px);

@@ -103,6 +103,7 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-breadcrumbs]` | Breadcrumbs |
 | `[data-react-fancy-breadcrumbs-item]` | Breadcrumbs.Item |
 | `[data-react-fancy-pagination]` | Pagination |
+| `[data-react-fancy-skip-link]` | SkipLink (also `[data-skip-link]`) |
 | `[data-react-fancy-resizable-panels]` | ResizablePanels (`data-orientation`, `data-dragging`, `data-disabled`) |
 | `[data-react-fancy-resizable-panels-panel]` | ResizablePanels panel (value `first` / `second`) |
 | `[data-react-fancy-resizable-panels-separator]` | ResizablePanels separator (`role="separator"`) |
