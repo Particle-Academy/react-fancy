@@ -1015,6 +1015,48 @@
   [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="w-9"] { border-inline-width: max(0px, calc((var(--fancy-target-min, 44px) - 2.25rem) / 2)); }
   [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="w-11"] { border-inline-width: max(0px, calc((var(--fancy-target-min, 44px) - 2.75rem) / 2)); }
   [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="w-[52px]"] { border-inline-width: max(0px, calc((var(--fancy-target-min, 44px) - 52px) / 2)); }
+
+  /* Label rows: Switch, Checkbox, and each CheckboxGroup / RadioGroup option.
+     The control above is 44px, so the row is, but the label is text-height in
+     a column beside it, after a gap-2. Tapping the gap or the rest of the
+     column hit a div and did nothing. So the label column stretches to the
+     row's height and takes the free width, the label fills that column, and
+     the gap becomes the label's own padding: every point of the row beside
+     the control is the <label>, which toggles its control once. The control
+     keeps align-self: flex-start, so a Switch track is not stretched.
+     Description and error lines keep their old indent. A visually hidden
+     label (labelHidden) is not a hit target, so those rows are left alone,
+     and so are view-mode rows, which render no control. `gap` is the
+     shorthand on purpose: a single-line row has no row gap. */
+  [data-fancy-density="touch"] :is(
+    [data-react-fancy-switch]:has(> button[role="switch"]),
+    [data-react-fancy-checkbox]:has(> div > input[type="checkbox"]),
+    :is([data-react-fancy-checkbox-group], [data-react-fancy-radio-group]) > div:has(> input:is([type="checkbox"], [type="radio"]))
+  ):has(> div > label:not(.sr-only)) {
+    gap: 0;
+  }
+  [data-fancy-density="touch"] :is(
+    [data-react-fancy-switch]:has(> button[role="switch"]),
+    [data-react-fancy-checkbox]:has(> div > input[type="checkbox"]),
+    :is([data-react-fancy-checkbox-group], [data-react-fancy-radio-group]) > div:has(> input:is([type="checkbox"], [type="radio"]))
+  ) > div:has(> label:not(.sr-only)) {
+    align-self: stretch;
+    flex-grow: 1;
+  }
+  [data-fancy-density="touch"] :is(
+    [data-react-fancy-switch]:has(> button[role="switch"]),
+    [data-react-fancy-checkbox]:has(> div > input[type="checkbox"]),
+    :is([data-react-fancy-checkbox-group], [data-react-fancy-radio-group]) > div:has(> input:is([type="checkbox"], [type="radio"]))
+  ) > div:has(> label:not(.sr-only)) > * {
+    padding-inline-start: 0.5rem;
+  }
+  [data-fancy-density="touch"] :is(
+    [data-react-fancy-switch]:has(> button[role="switch"]),
+    [data-react-fancy-checkbox]:has(> div > input[type="checkbox"]),
+    :is([data-react-fancy-checkbox-group], [data-react-fancy-radio-group]) > div:has(> input:is([type="checkbox"], [type="radio"]))
+  ) > div > label:not(.sr-only) {
+    flex-grow: 1;
+  }
 }
 
 @layer base {

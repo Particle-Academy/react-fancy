@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Touch density: a labelled Switch, Checkbox, CheckboxGroup option or RadioGroup option toggles from anywhere in its row.** Under `data-fancy-density="touch"` (6.22.0) the control made the row 44px tall, but the label stayed text-height in a column beside it, after a `gap-2`. A tap on the gap, or on the label column above or below the text, hit a `<div>` and did nothing. Now the label column stretches to the row's height and takes the row's free width, the `<label>` fills it, and the gap is the label's own `0.5rem` start padding, so every point of the row beside the control is the label. The control itself is not stretched (a Switch track keeps its size), description and error lines keep their indent, and a `labelHidden` label is not made a target. Accessibility is unchanged: `role="switch"`, the `for` association, and one toggle per click on the label. **CSS only, inside the opt-in: nothing changes without the attribute, and there is nothing to do.**
+
 ## [6.22.0] - 2026-11-12
 
 ### Added
