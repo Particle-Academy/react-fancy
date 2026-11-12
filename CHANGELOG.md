@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.24.0] - 2026-11-12
+
 ### Added
 
 - **`NotificationBell`** (CC-fancy-0033): an icon button with an unread count, built on the kit's `Button` (so touch density makes it 44 x 44). Controlled: `count` and `open` are data in, `onOpenChange(!open)` is the event out, and with `open` unset it sets no `aria-expanded`, so it works as the child of `Popover.Trigger` / `Dropdown.Trigger` (props and `ref` reach the `<button>`). The count is drawn in an `aria-hidden` badge capped at `max` (default 99, then "99+"), white on red-800 (8:1 or better, both modes), and said in words in a polite `role="status"` region beside the button that also describes it: "3 unread notifications". `labels`: `button`, `unread`, `unreadOne`, `none`, `overflow`. Handles `data-react-fancy-notification-bell` (with `data-count`, `data-unread`), `-count`, `-status`. Subpath `@particle-academy/react-fancy/notification-bell`. See `docs/NotificationBell.md`.
