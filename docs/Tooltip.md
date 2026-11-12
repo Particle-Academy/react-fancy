@@ -27,6 +27,27 @@ import { Tooltip } from "@particle-academy/react-fancy";
 | offset | `number` | `8` | Distance in px from the trigger |
 | className | `string` | - | Additional CSS classes for the tooltip |
 | describe | `boolean` | `true` | Name the tooltip in the trigger's `aria-describedby` while shown. Turn off only when the tooltip repeats words already in the trigger's accessible name |
+| ...rest | attributes and handlers | - | Forwarded to the child, with the `ref`. The child's own value wins on a clash; handlers run both, the child's first. `className` is not forwarded (it styles the bubble) |
+
+## Inside a Dropdown or Popover trigger
+
+`Dropdown.Trigger` and `Popover.Trigger` merge their click and key handlers,
+popup ARIA, stable handle and ref onto their child. A Tooltip passes all of
+them on to its own child, so it can sit between the trigger and the button:
+
+```tsx
+<Dropdown>
+  <Dropdown.Trigger>
+    <Tooltip content="More actions">
+      <Button icon="ellipsis" aria-label="Options" />
+    </Tooltip>
+  </Dropdown.Trigger>
+  <Dropdown.Items>…</Dropdown.Items>
+</Dropdown>
+```
+
+The button carries `aria-haspopup`, `aria-expanded` and the trigger handle,
+opens the menu, and is still described by the tooltip while it is shown.
 
 ## Examples
 

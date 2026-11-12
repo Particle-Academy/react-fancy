@@ -16,10 +16,10 @@ import { useFloatingPosition } from "../../hooks/use-floating-position";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import type { TooltipProps } from "./Tooltip.types";
 
-export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
+export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
   function Tooltip(
-    { children, content, placement = "top", delay = 200, offset = 8, className, describe = true },
-    _ref,
+    { children, content, placement = "top", delay = 200, offset = 8, className, describe = true, ...forwarded },
+    forwardedRef,
   ) {
     const [open, setOpen] = useState(false);
     const tooltipId = useId();
@@ -53,28 +53,56 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
     const child = children as ReactElement<Record<string, unknown>>;
     const childProps = child.props;
     const childRef = childProps.ref as Ref<HTMLElement> | undefined;
-    const triggerRef = useMemo(() => composeRefs(childRef, anchorRef), [childRef]);
+    const triggerRef = useMemo(
+      () => composeRefs(childRef, forwardedRef as Ref<HTMLElement> | undefined, anchorRef),
+      [childRef, forwardedRef],
+    );
     const chain =
       (own: unknown, ours: () => void) =>
       (event: unknown) => {
         if (typeof own === "function") own(event);
         ours();
       };
+
+    /*
+     * Props the Tooltip does not use go to its child, so it composes inside a
+     * trigger: `Dropdown.Trigger` / `Popover.Trigger` merge their onClick,
+     * onKeyDown, popup ARIA and handle onto THEIR child, which is this Tooltip,
+     * and before this the Tooltip dropped them all. The child's own value wins
+     * on a clash (the asChild rule), except handlers, where both run: the
+     * child's first, then the forwarded one.
+     */
+    const merged: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(forwarded)) {
+      const own = childProps[key];
+      if (/^on[A-Z]/.test(key) && typeof value === "function" && typeof own === "function") {
+        merged[key] = (...args: unknown[]) => {
+          (own as (...a: unknown[]) => void)(...args);
+          (value as (...a: unknown[]) => void)(...args);
+        };
+      } else if (own === undefined) {
+        merged[key] = value;
+      }
+    }
+    const handler = (name: string) => merged[name] ?? childProps[name];
     // While the tooltip is shown the trigger is described by it, added to any
     // description the child already names. Not before: the id only exists in
     // the DOM while the tooltip does.
     const ownDescribedBy =
-      typeof childProps["aria-describedby"] === "string" ? childProps["aria-describedby"] : undefined;
+      [childProps["aria-describedby"], forwarded["aria-describedby"]]
+        .filter((v): v is string => typeof v === "string" && v !== "")
+        .join(" ") || undefined;
     const describedBy = open && describe
       ? [ownDescribedBy, tooltipId].filter(Boolean).join(" ")
       : ownDescribedBy;
     const trigger = cloneElement(child, {
+      ...merged,
       ref: triggerRef,
       "aria-describedby": describedBy,
-      onMouseEnter: chain(childProps.onMouseEnter, show),
-      onMouseLeave: chain(childProps.onMouseLeave, hide),
-      onFocus: chain(childProps.onFocus, show),
-      onBlur: chain(childProps.onBlur, hide),
+      onMouseEnter: chain(handler("onMouseEnter"), show),
+      onMouseLeave: chain(handler("onMouseLeave"), hide),
+      onFocus: chain(handler("onFocus"), show),
+      onBlur: chain(handler("onBlur"), hide),
     });
 
     return (

@@ -1,12 +1,23 @@
-import type { ReactNode, ReactElement } from "react";
+import type { HTMLAttributes, ReactNode, ReactElement } from "react";
 import type { Placement } from "../../utils/types";
 
-export interface TooltipProps {
+/**
+ * Every attribute and handler the Tooltip does not use itself (`data-*`,
+ * `aria-*`, `onClick`, `onKeyDown`, …) is forwarded to its child, and so is its
+ * `ref`, so a Tooltip works as the child of `Dropdown.Trigger` or
+ * `Popover.Trigger`. The child's own value wins on a clash; handlers run both,
+ * the child's first. `className` is NOT forwarded: it styles the bubble.
+ */
+export interface TooltipProps
+  extends Omit<HTMLAttributes<HTMLElement>, "content" | "children" | "className"> {
   children: ReactElement;
   content: ReactNode;
+  /** Forwarded to the child, like every attribute the Tooltip does not use. */
+  [key: `data-${string}`]: unknown;
   placement?: Placement;
   delay?: number;
   offset?: number;
+  /** Classes for the tooltip bubble (not the trigger). */
   className?: string;
   /**
    * Name the tooltip in the trigger's `aria-describedby` while it is shown.
