@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.22.0] - 2026-11-12
+
 ### Added
 
 - **`SkipLink`**: a "Skip to content" link (WCAG 2.4.1, Bypass Blocks). Render it first in the page. It is visually hidden until focused (clipped, not `display: none`, so it stays in the tab order and the accessibility tree), then shown at the top-start corner in the `surface`, `text`, `border-strong` and `focus` tokens with their dark pairs. Activating it moves focus to the target, giving a target that cannot take focus `tabIndex=-1` if it has no tabindex of its own; a target that already has one, or is natively focusable, is left alone. The click is handled by the link, so a hash router never sees the fragment; with no such element, the browser's own navigation runs. Props: `targetId` (default `"main"`), `href` (wins over `targetId`), `label` (default `"Skip to content"`), plus every anchor attribute and a `ref`. Its hidden and focused looks ship in `styles.css` in the `base` layer, so it is hidden without the kit `@source`d and a `className` still wins. Handles: `data-skip-link` and `data-react-fancy-skip-link`. Subpath `@particle-academy/react-fancy/skip-link`. Covered by touch density.
