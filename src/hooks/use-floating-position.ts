@@ -77,6 +77,14 @@ function getPosition(
   } else if (base === "top" && y < 0) {
     y = anchor.bottom + offset;
     finalPlacement = placement.replace("top", "bottom") as Placement;
+  } else if (base === "left" && x < 0) {
+    // The sides flip too, so a `left` / `right` popup is not clamped back on
+    // top of its own anchor when the viewport edge is close.
+    x = anchor.right + offset;
+    finalPlacement = placement.replace("left", "right") as Placement;
+  } else if (base === "right" && x + floating.width > vw) {
+    x = anchor.left - floating.width - offset;
+    finalPlacement = placement.replace("right", "left") as Placement;
   }
 
   x = Math.max(4, Math.min(x, vw - floating.width - 4));

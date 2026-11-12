@@ -90,6 +90,7 @@ npx vite build                      # Build demo app (verifies imports work)
 | ColorPicker | Native color input with swatch preview, hex display, presets | [docs](docs/ColorPicker.md) |
 | Emoji | Emoji renderer from slugs | [docs](docs/Emoji.md) |
 | EmojiSelect | Emoji search and selection dropdown | [docs](docs/EmojiSelect.md) |
+| ContentReaction | Emoji reactions on a comment, post or message: controlled `value` + `onChange`, multi or single mode, aggregate counts, portalled keyboard-accessible picker that never closes on mouse-leave | [docs](docs/ContentReaction.md) |
 | Table | Data table with sorting, pagination, search, and tray | [docs](docs/Table.md) |
 
 ### Form Inputs

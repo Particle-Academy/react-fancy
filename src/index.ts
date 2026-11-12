@@ -94,6 +94,16 @@ export type { EmojiProps } from "./components/Emoji";
 export { EmojiSelect } from "./components/EmojiSelect";
 export type { EmojiSelectProps } from "./components/EmojiSelect";
 
+export { ContentReaction, DEFAULT_CONTENT_REACTIONS, toggleReaction } from "./components/ContentReaction";
+export type {
+  ContentReactionProps,
+  ContentReactionItem,
+  ContentReactionMode,
+  ContentReactionChangeMeta,
+  ContentReactionLabels,
+  ContentReactionTriggerState,
+} from "./components/ContentReaction";
+
 export { Table } from "./components/Table";
 export type {
   TableProps,

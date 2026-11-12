@@ -263,6 +263,16 @@
         "default": "./dist/container.cjs"
       }
     },
+    "./content-reaction": {
+      "import": {
+        "types": "./dist/content-reaction.d.ts",
+        "default": "./dist/content-reaction.js"
+      },
+      "require": {
+        "types": "./dist/content-reaction.d.cts",
+        "default": "./dist/content-reaction.cjs"
+      }
+    },
     "./content-renderer": {
       "import": {
         "types": "./dist/content-renderer.d.ts",

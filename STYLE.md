@@ -229,6 +229,11 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-fullscreen-toggle]` | FullScreen.Toggle (any full-screen toggle) |
 | `[data-react-fancy-emoji]` | Emoji |
 | `[data-react-fancy-emoji-select]` | EmojiSelect |
+| `[data-react-fancy-content-reaction]` | ContentReaction (`data-value` = active keys, comma-separated; `data-mode`, `data-size`, `data-open`, `data-disabled`) |
+| `[data-react-fancy-content-reaction-trigger]` | ContentReaction trigger button |
+| `[data-react-fancy-content-reaction-chip]` | ContentReaction reaction shown on the trigger (`data-reaction-key`, `data-mine`) |
+| `[data-react-fancy-content-reaction-menu]` | ContentReaction picker, portalled (`role="menu"`, `data-placement`) |
+| `[data-react-fancy-content-reaction-item]` | ContentReaction picker item (`data-reaction-key`, `data-state` = `on` / `off`) |
 | `[data-react-fancy-content-renderer]` | ContentRenderer |
 
 #### Data Visualization

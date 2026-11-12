@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`ContentReaction`**: emoji reactions on a comment, post or message, built to the component contract. Controlled `value: string[]` of active keys and `onChange(next, { key, on })`. A compact trigger shows the active reactions, or a "React" placeholder, and opens a picker in which each reaction toggles. `mode="multi"` (default) or `"single"`, where choosing one replaces the others and choosing the active one clears it. `counts` and `mine` for multi-user apps: the trigger shows aggregate counts and each item's accessible name includes its count. Also `reactions`, `size`, `disabled`, `placement` (default `top-start`, flips when there is no room), `closeOnSelect` (default off in multi mode, on in single), `triggerLabel`, `renderTrigger`, `labels` and `id`.
+  - The picker is portalled, so overflow containers do not clip it. It has no hover behaviour: it never closes on mouse-leave, so there is no dead zone between trigger and picker. It closes on an outside click, Escape (which returns focus to the trigger), or a select with `closeOnSelect`.
+  - Keyboard: Enter, Space and ArrowDown open it; arrow keys move between items with roving focus; Home and End; Enter and Space toggle. ARIA: the trigger has `aria-haspopup="menu"` and `aria-expanded`; the picker is `role="menu"` with `menuitemcheckbox` items carrying `aria-checked`.
+  - The active highlight uses the `surface-muted` and `accent` theme tokens in both modes.
+  - Handles: `data-react-fancy-content-reaction` (root), `-trigger`, `-chip`, `-menu` and `-item` with `data-reaction-key` and `data-state="on|off"`.
+  - Also exported: `DEFAULT_CONTENT_REACTIONS` (strongly agree, like, love, insightful, funny, sad, angry, dislike; the emoji come from the kit's emoji dataset by name) and `toggleReaction(value, key, mode)`, the toggle rule as a pure function. From the barrel and `@particle-academy/react-fancy/content-reaction`.
+
+### Fixed
+
+- **A popup placed `left` or `right` now flips to the other side when there is no room**, as `top` and `bottom` already did. Before, it was clamped back into the viewport on top of its own trigger. This applies to every popup on the shared floating position: Tooltip, Popover, Dropdown, Autocomplete, PhoneInput and the listbox Select. Nothing to do on upgrade; a popup with room on its side is unchanged.
+
 ## [6.20.0] - 2026-11-11
 
 Fixes the react-fancy defects the lab's full-kit site benchmark found (K1 to
