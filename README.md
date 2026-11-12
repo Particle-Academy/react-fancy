@@ -365,8 +365,10 @@ px (WCAG 2.5.5, Target Size Enhanced):
   days, popup options, ContentReaction, PromptInput and Composer controls, and
   the rest.
 - **Some visuals stay small inside a 44px box.** A Switch keeps its track and
-  knob (the extra size is unpainted border); native checkboxes and radios are
-  drawn by the browser at the box size. The measured element is 44px either way.
+  knob (the extra size is unpainted border). A labelled checkbox or radio keeps
+  its normal size, centred on its label's line: the labelled ROW is the 44px
+  target. One with no visible label is itself 44px, drawn by the browser at
+  that size.
 - Put it on `<html>`: popups are portalled to `<body>`, outside any wrapper.
 - Needs `styles.css`. Not covered: ChatDrawer (it has no handle to target yet)
   and the browser's own `<video controls>` / `<audio controls>`.
