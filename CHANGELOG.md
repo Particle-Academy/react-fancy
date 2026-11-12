@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.21.0] - 2026-11-12
+
 ### Added
 
 - **`ContentReaction`**: emoji reactions on a comment, post or message, built to the component contract. Controlled `value: string[]` of active keys and `onChange(next, { key, on })`. A compact trigger shows the active reactions, or a "React" placeholder, and opens a picker in which each reaction toggles. `mode="multi"` (default) or `"single"`, where choosing one replaces the others and choosing the active one clears it. `counts` and `mine` for multi-user apps: the trigger shows aggregate counts and each item's accessible name includes its count. Also `reactions`, `size`, `disabled`, `placement` (default `top-start`, flips when there is no room), `closeOnSelect` (default off in multi mode, on in single), `triggerLabel`, `renderTrigger`, `labels` and `id`.
