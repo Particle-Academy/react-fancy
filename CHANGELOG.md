@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Modal theme tokens.** `--fancy-radius-modal` sets the panel's corner radius; its default is `var(--radius-2xl)`, exactly what `rounded-2xl` produced. `--fancy-modal-header-bg` / `--fancy-modal-header-bg-dark` set the header's fill (default transparent, so the panel's surface shows through as before), and `--fancy-modal-header-text` / `--fancy-modal-header-text-dark` colour the title and the close button, at rest and on hover. Unset, the title keeps the `text` token and the close button keeps `text-muted`, hovering to `text-soft` on `surface-muted`, so a host that already set those sees no change. With a header fill set, the close button's hover fill follows it. The default pair clears 4.5:1 for the title and 3:1 for the close icon in both modes. Recorded in `THEME_TOKENS` (now 18 roles), the new `SHAPE_TOKENS` export, the README token tables and `docs/Modal.md`. Every `data-react-fancy-modal*` handle is unchanged.
+
 ## [6.21.0] - 2026-11-12
 
 ### Added

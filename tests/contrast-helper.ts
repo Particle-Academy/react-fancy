@@ -115,7 +115,14 @@ export function defaultColourOf(className: string, prefix: "" | "dark:" | "hover
     // `dark:hover:` must not be read as `dark:`.
     if (rest.includes(":") && !rest.startsWith("[")) continue;
     const arb = rest.match(/^\[color:var\(--fancy-[a-z-]+,(.+)\)\]$/);
-    if (arb) return arb[1];
+    if (arb) {
+      // A component token can fall back to a general one
+      // (`var(--fancy-modal-header-text,var(--fancy-text-muted,var(--color-zinc-500)))`):
+      // with neither set, the innermost fallback is what paints.
+      let v = arb[1];
+      for (let m = v.match(/^var\(--fancy-[a-z-]+,(.+)\)$/); m; m = v.match(/^var\(--fancy-[a-z-]+,(.+)\)$/)) v = m[1];
+      return v;
+    }
     if (/^[a-z]+-\d{2,3}$/.test(rest) || rest === "white" || rest === "black") return rest;
   }
   return null;

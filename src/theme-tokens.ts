@@ -164,6 +164,46 @@ export const THEME_TOKENS = {
     description:
       "Text and icons on the `success` fill. Keep it at 4.5:1 against `success` in each mode. Added in Unreleased.",
   },
+  "modal-header-bg": {
+    variable: "--fancy-modal-header-bg",
+    darkVariable: "--fancy-modal-header-bg-dark",
+    // The header never painted a fill of its own: the panel's `surface` shows
+    // through. A surface-coloured default would paint over a host's panel
+    // `className` background, so the default stays transparent.
+    light: "transparent",
+    dark: "transparent",
+    description:
+      "The Modal header's fill. Transparent by default, so the panel's `surface` shows through. The close button's hover fill follows it when set. Pair with `modal-header-text`. Added in Unreleased.",
+  },
+  "modal-header-text": {
+    variable: "--fancy-modal-header-text",
+    darkVariable: "--fancy-modal-header-text-dark",
+    // Falls back to the `text` token, which the title read before, so a host
+    // that set `--fancy-text` keeps its title colour. The close button reads
+    // this token too, with `text-muted` (rest) and `text-soft` (hover) as its
+    // fallbacks, the colours it had.
+    light: "var(--fancy-text,var(--color-zinc-900))",
+    dark: "var(--fancy-text-dark,var(--color-zinc-100))",
+    description:
+      "The Modal header's title and close button, at rest and on hover. Defaults to the `text` token on the title and `text-muted` / `text-soft` on the close button. Keep the title at 4.5:1 and the close icon at 3:1 against `modal-header-bg`. Added in Unreleased.",
+  },
 } as const;
 
 export type ThemeTokenRole = keyof typeof THEME_TOKENS;
+
+/**
+ * Shape tokens: values that are not colours, so they have one variable for
+ * both modes. Components read them through a var() fallback that is the value
+ * they used before, exactly like the colour roles above.
+ */
+export const SHAPE_TOKENS = {
+  "radius-modal": {
+    variable: "--fancy-radius-modal",
+    // Tailwind's `rounded-2xl` is `border-radius: var(--radius-2xl)` (1rem), so
+    // a host that retuned `--radius-2xl` keeps that too.
+    value: "var(--radius-2xl)",
+    description: "The Modal panel's corner radius. Defaults to `rounded-2xl` (1rem). Added in Unreleased.",
+  },
+} as const;
+
+export type ShapeTokenRole = keyof typeof SHAPE_TOKENS;

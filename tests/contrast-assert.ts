@@ -114,9 +114,12 @@ export function fg(el: Element | null | undefined, variant: Variant = "rest", ut
 export function surface(el: Element | null | undefined, fallback: Pair = DEFAULT_SURFACE): Pair {
   let light: string | null = null;
   let dark: string | null = null;
+  // A token whose default is `transparent` (the Modal header) paints nothing:
+  // what is under it is the surface.
+  const painted = (v: string | null) => (v === "transparent" ? null : v);
   for (let n = el ?? null; n; n = n.parentElement) {
-    light ??= defaultColourOf(cls(n), "", "bg");
-    dark ??= defaultColourOf(cls(n), "dark:", "bg");
+    light ??= painted(defaultColourOf(cls(n), "", "bg"));
+    dark ??= painted(defaultColourOf(cls(n), "dark:", "bg"));
     if (light && dark) break;
   }
   return { light: light ?? fallback.light, dark: dark ?? fallback.dark };

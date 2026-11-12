@@ -110,7 +110,7 @@ function ModalRoot({
             aria-modal="true"
             {...rest}
             className={cn(
-              "relative flex w-full flex-col overflow-hidden rounded-2xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-xl dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
+              "relative flex w-full flex-col overflow-hidden rounded-[var(--fancy-radius-modal,var(--radius-2xl))] border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-xl dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
               SIZE_MAP[size],
               animClass,
               className,

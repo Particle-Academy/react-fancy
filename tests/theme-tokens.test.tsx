@@ -123,6 +123,15 @@ const KEEPS_TODAYS_COLOUR = new Set<string>([
   "dark:border-[color:var(--fancy-success-dark,var(--color-emerald-700))]",
   "hover:bg-[color:var(--fancy-success,var(--color-emerald-800))]",
   "dark:hover:bg-[color:var(--fancy-success-dark,var(--color-emerald-700))]",
+  // The Modal close button reads `modal-header-text`, but rests on the
+  // `text-muted` and hovers to the `text-soft` it had. Its hover fill reads
+  // `modal-header-bg` but falls back to the `surface-muted` chip it had.
+  "text-[color:var(--fancy-modal-header-text,var(--fancy-text-muted,var(--color-zinc-500)))]",
+  "dark:text-[color:var(--fancy-modal-header-text-dark,var(--fancy-text-muted-dark,var(--color-zinc-400)))]",
+  "hover:text-[color:var(--fancy-modal-header-text,var(--fancy-text-soft,var(--color-zinc-700)))]",
+  "dark:hover:text-[color:var(--fancy-modal-header-text-dark,var(--fancy-text-soft-dark,var(--color-zinc-300)))]",
+  "hover:bg-[color:var(--fancy-modal-header-bg,var(--fancy-surface-muted,var(--color-zinc-100)))]",
+  "dark:hover:bg-[color:var(--fancy-modal-header-bg-dark,var(--fancy-surface-muted-dark,var(--color-zinc-800)))]",
 ]);
 
 describe("THEME_TOKENS — the table", () => {
@@ -131,9 +140,10 @@ describe("THEME_TOKENS — the table", () => {
     expect(roles.length).toBeGreaterThanOrEqual(8);
     // 13 since 6.18.0 (`accent`, CC-fancy-0015); 14 since 6.19.0 (`error`,
     // CC-fancy-0018); 16 with `success` + `on-success` (owner-approved, the
-    // positive / accept fill). Raise this only with a role the council has
-    // agreed; the table is meant to stay small.
-    expect(roles.length).toBeLessThanOrEqual(16);
+    // positive / accept fill); 18 with `modal-header-bg` + `modal-header-text`
+    // (owner-approved, the Modal header). Raise this only with a role the
+    // council has agreed; the table is meant to stay small.
+    expect(roles.length).toBeLessThanOrEqual(18);
     for (const role of roles) {
       const t = THEME_TOKENS[role as keyof typeof THEME_TOKENS];
       expect(t.light, role).toBeTruthy();

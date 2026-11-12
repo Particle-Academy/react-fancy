@@ -287,7 +287,7 @@ is the one they hit first.
 ## Semantic tokens
 
 The kit's neutral chrome -- surfaces, outlines, text, form fields, focus -- reads
-sixteen semantic tokens, so you can repaint it with your own palette without
+eighteen semantic tokens, so you can repaint it with your own palette without
 remapping Tailwind's `zinc`. Each role is two variables: one per mode.
 
 | Role | Light variable | Dark variable | Default (light / dark) | Used for |
@@ -308,6 +308,14 @@ remapping Tailwind's `zinc`. Each role is two variables: one per mode.
 | `error` | `--fancy-error` | `--fancy-error-dark` | red-600 / red-400 | validation text: error message + required asterisk of Field, Checkbox, Switch (4.5:1, WCAG 1.4.3; since 6.19.0) |
 | `success` | `--fancy-success` | `--fancy-success-dark` | emerald-700 / emerald-800 | the positive / accept fill: ChatThread's proposal accept, JsonEditor's staged-edit accept; border and hover follow it |
 | `on-success` | `--fancy-on-success` | `--fancy-on-success-dark` | white / white | text on the `success` fill (5.36:1 / 7.61:1 by default; keep 4.5:1) |
+| `modal-header-bg` | `--fancy-modal-header-bg` | `--fancy-modal-header-bg-dark` | transparent / transparent | the Modal header's fill (the panel's `surface` shows through by default); the close button's hover fill follows it when set |
+| `modal-header-text` | `--fancy-modal-header-text` | `--fancy-modal-header-text-dark` | the `text` token (zinc-900 / zinc-100) | the Modal header's title and close button, at rest and on hover; unset, the close button keeps `text-muted`, hovering to `text-soft` (keep 4.5:1 for the title, 3:1 for the close icon) |
+
+One shape token, a single variable for both modes:
+
+| Token | Variable | Default | Used for |
+|---|---|---|---|
+| `radius-modal` | `--fancy-radius-modal` | `var(--radius-2xl)` (`rounded-2xl`, 1rem) | the Modal panel's corner radius |
 
 ```css
 /* A cream/terracotta light theme and a blue-grey dark one. */
@@ -327,7 +335,7 @@ remapping Tailwind's `zinc`. Each role is two variables: one per mode.
   wrapper to theme one region. There is no selector or specificity to beat.
 - **Both modes are stated, not derived.** Which variable applies is decided by
   your `dark:` variant (see Dark Mode below).
-- The table is exported as `THEME_TOKENS` for docs and tooling.
+- The tables are exported as `THEME_TOKENS` and `SHAPE_TOKENS` for docs and tooling.
 - **Not covered, on purpose:** colours that encode data (chart series,
   file-type marks, mood and confidence scales, event kinds) and the hues you
   pick with a `color` prop. Some neutral pairs no single token reproduces

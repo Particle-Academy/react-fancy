@@ -774,8 +774,8 @@ export {
   THEME_STORAGE_KEY,
 } from "./theme";
 export type { ThemePreference, ResolvedTheme } from "./theme";
-export { THEME_TOKENS } from "./theme-tokens";
-export type { ThemeTokenRole } from "./theme-tokens";
+export { THEME_TOKENS, SHAPE_TOKENS } from "./theme-tokens";
+export type { ThemeTokenRole, ShapeTokenRole } from "./theme-tokens";
 export { usePastePills, useInlinePaste, InlinePasteEditor, PastedFilesInput } from "./components/PastePills";
 export type {
   UsePastePillsOptions,
