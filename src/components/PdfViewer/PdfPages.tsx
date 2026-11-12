@@ -25,11 +25,12 @@ function scaleBucket(zoom: number): number {
 
 /*
  * Print is blanked from CSS, because a page can print without our key handler
- * ever seeing it (the browser menu, window.print()). `*` as well as the root, so
- * no descendant can set itself visible again.
+ * ever seeing it (the browser menu, window.print()). The rule lives in
+ * styles.css, keyed on the root's `data-print-blocked="true"`. It used to be a
+ * `<style>` rendered inside the root `<div>`, which the HTML content model does
+ * not allow (html-validate: "<style> element is not permitted as content under
+ * <div>").
  */
-const PRINT_BLOCK_CSS =
-  '@media print{[data-react-fancy-pdf-viewer][data-print-blocked="true"],[data-react-fancy-pdf-viewer][data-print-blocked="true"] *{visibility:hidden!important}}';
 
 export interface PdfPagesProps {
   pages: PdfPageSource;
@@ -265,8 +266,6 @@ export const PdfPages = forwardRef<HTMLDivElement, PdfPagesProps>(
         )}
         style={copy ? style : { ...style, userSelect: "none", WebkitUserSelect: "none" }}
       >
-        {!print && <style>{PRINT_BLOCK_CSS}</style>}
-
         <div
           data-react-fancy-pdf-viewer-toolbar=""
           className="flex shrink-0 items-center gap-1 border-b border-zinc-200 bg-[color:var(--fancy-surface,var(--color-white))] px-2 py-1 text-xs text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:border-zinc-800 dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]"

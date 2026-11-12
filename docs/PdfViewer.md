@@ -80,7 +80,7 @@ mode the app never serves the PDF, and page images are all a viewer ever gets.
 | Flag | Does | Does not |
 |------|------|----------|
 | `download: false` | Suppresses the context menu ("Save image as…") on the pages, and makes the images non-draggable. There is no download control in this mode at all, whatever the flag. | Stop the page images being captured: they are ordinary images the browser has fetched, visible in devtools and the browser's cache. |
-| `print: false` | Print CSS blanks the viewer, so printing (Ctrl/Cmd+P, the browser menu, `window.print()`) produces an empty frame. Ctrl/Cmd+P is also intercepted while focus is inside the viewer. | Stop a screenshot, a "save page", or a user who edits the CSS in devtools. |
+| `print: false` | Print CSS blanks the viewer, so printing (Ctrl/Cmd+P, the browser menu, `window.print()`) produces an empty frame. The print CSS ships in `@particle-academy/react-fancy/styles.css`, keyed on the root's `data-print-blocked="true"`, so import that stylesheet (every app already should). Ctrl/Cmd+P is also intercepted while focus is inside the viewer. | Stop a screenshot, a "save page", or a user who edits the CSS in devtools. |
 | `copy: false` | Turns user selection off. (There is no text layer to copy anyway.) | Anything else; the images can still be captured. |
 | `screenshot: "deter"` | Blurs the pages while the tab is hidden or the window has lost focus. On a PrintScreen key it blurs them for 1.5 s and tries to clear the clipboard, best effort. | **Prevent screenshots. A web page cannot.** OS tools, other apps and phone cameras are all out of its reach, and PrintScreen usually captures before the page hears the key. |
 

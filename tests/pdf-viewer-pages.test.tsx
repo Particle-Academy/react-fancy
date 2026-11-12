@@ -193,7 +193,8 @@ describe("PdfViewer policy", () => {
     images(host)[0].dispatchEvent(ev);
     expect(ev.defaultPrevented).toBe(false);
     expect(images(host)[0].getAttribute("draggable")).not.toBe("false");
-    expect(host.querySelector("style")?.textContent ?? "").not.toContain("@media print");
+    // The print block is keyed on this attribute (the rule is in styles.css).
+    expect(host.querySelector("[data-react-fancy-pdf-viewer]")!.hasAttribute("data-print-blocked")).toBe(false);
   });
 
   it("download: false blocks the context menu and dragging the images", () => {
@@ -207,10 +208,10 @@ describe("PdfViewer policy", () => {
   it("print: false blanks the viewer in print CSS and intercepts Ctrl/Cmd+P", () => {
     const host = mountPolicy({ print: false });
     const root = host.querySelector<HTMLElement>("[data-react-fancy-pdf-viewer]")!;
+    // The `@media print` rule that blanks it ships in styles.css, keyed on this
+    // attribute; tests/no-style-in-div.test.tsx pins the rule itself.
     expect(root.dataset.printBlocked).toBe("true");
-    const css = host.querySelector("style")!.textContent!;
-    expect(css).toContain("@media print");
-    expect(css).toContain('[data-print-blocked="true"]');
+    expect(host.querySelector("style")).toBeNull();
 
     for (const mod of [{ ctrlKey: true }, { metaKey: true }]) {
       const ev = new KeyboardEvent("keydown", { key: "p", bubbles: true, cancelable: true, ...mod });

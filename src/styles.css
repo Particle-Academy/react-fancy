@@ -345,6 +345,20 @@
     linear-gradient(45deg, transparent 75%, #27272a 75%),
     linear-gradient(-45deg, transparent 75%, #27272a 75%);
 }
+
+/* ─── PdfViewer — print block ────────────────────────────────────────────────
+   policy.print === false sets data-print-blocked="true" on the viewer root. A
+   page can print without the viewer's key handler seeing it (the browser menu,
+   window.print()), so print is blanked here. `*` as well as the root, so no
+   descendant can set itself visible again; !important inside a layer outranks
+   every normal declaration, layered or not. This was a <style> rendered inside
+   the viewer's <div> until it moved here: <style> is not allowed there. */
+@media print {
+  [data-react-fancy-pdf-viewer][data-print-blocked="true"],
+  [data-react-fancy-pdf-viewer][data-print-blocked="true"] * {
+    visibility: hidden !important;
+  }
+}
 }
 
 
