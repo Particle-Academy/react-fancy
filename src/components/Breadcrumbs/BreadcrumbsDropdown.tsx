@@ -1,7 +1,7 @@
 import { useId, useState, useRef, type ElementType, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "../../utils/cn";
-import { popupTriggerAria } from "../../utils/trigger-child";
+import { disclosureAria } from "../../utils/trigger-child";
 import { useOutsideClick } from "../../hooks/use-outside-click";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 
@@ -31,7 +31,9 @@ export function BreadcrumbsDropdown({ items, activeLabel }: BreadcrumbsDropdownP
     <div ref={ref} data-react-fancy-breadcrumbs-dropdown="" className="relative flex md:hidden">
       <button
         type="button"
-        {...popupTriggerAria("menu", open, menuId)}
+        // A disclosure, not a menu button: the panel is a plain list of links
+        // with no menu roles or menu keyboard model.
+        {...disclosureAria(open, menuId)}
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-zinc-900 hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:text-white dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
       >

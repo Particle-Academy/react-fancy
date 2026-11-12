@@ -103,8 +103,11 @@ describe("Tooltip: the trigger is described by the tooltip while it is shown", (
   });
 });
 
-describe("Breadcrumbs collapsed dropdown: a menu button", () => {
-  it("carries aria-haspopup=menu, a toggling aria-expanded and aria-controls naming the panel", () => {
+describe("Breadcrumbs collapsed dropdown: a disclosure button", () => {
+  // A disclosure, not a menu button: the panel is a plain list of links, with
+  // no role="menu" and no menu keyboard model, so announcing "menu" would
+  // promise screen-reader users semantics that are not there.
+  it("carries a toggling aria-expanded and aria-controls naming the panel, and NO aria-haspopup", () => {
     mount(
       <Breadcrumbs>
         <Breadcrumbs.Item href="/">Home</Breadcrumbs.Item>
@@ -115,7 +118,7 @@ describe("Breadcrumbs collapsed dropdown: a menu button", () => {
     const dropdown = document.querySelector<HTMLElement>("[data-react-fancy-breadcrumbs-dropdown]")!;
     const button = dropdown.querySelector<HTMLButtonElement>("button")!;
 
-    expect(button.getAttribute("aria-haspopup")).toBe("menu");
+    expect(button.hasAttribute("aria-haspopup")).toBe(false);
     expect(button.getAttribute("aria-expanded")).toBe("false");
     expect(button.hasAttribute("aria-controls")).toBe(false);
     // The wrapper it sits in carries none of it.
@@ -124,6 +127,8 @@ describe("Breadcrumbs collapsed dropdown: a menu button", () => {
 
     act(() => button.click());
     expect(button.getAttribute("aria-expanded")).toBe("true");
+    expect(button.hasAttribute("aria-haspopup")).toBe(false);
+    expect(document.querySelector("[aria-haspopup]")).toBeNull();
     const panel = document.querySelector<HTMLElement>("[data-react-fancy-breadcrumbs-dropdown-menu]")!;
     expect(panel).not.toBeNull();
     expect(panel.id).not.toBe("");

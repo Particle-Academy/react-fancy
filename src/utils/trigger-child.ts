@@ -33,8 +33,19 @@ export type PopupKind = "menu" | "listbox" | "tree" | "grid" | "dialog";
 export function popupTriggerAria(kind: PopupKind, open: boolean, popupId: string) {
   return {
     "aria-haspopup": kind,
+    ...disclosureAria(open, popupId),
+  };
+}
+
+/**
+ * The ARIA of a disclosure button: whether the region it shows is open and,
+ * while it is, that region's id. No `aria-haspopup`, which would promise a
+ * menu, listbox or dialog the region is not (a plain panel of links).
+ */
+export function disclosureAria(open: boolean, regionId: string) {
+  return {
     "aria-expanded": open,
-    "aria-controls": open ? popupId : undefined,
+    "aria-controls": open ? regionId : undefined,
   };
 }
 
