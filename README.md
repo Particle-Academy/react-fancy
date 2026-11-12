@@ -341,6 +341,37 @@ One shape token, a single variable for both modes:
   pick with a `color` prop. Some neutral pairs no single token reproduces
   exactly in both modes still use zinc; see CHANGELOG 5.52.0.
 
+## Touch density (44 x 44 targets)
+
+Opt in once, on the root, and every interactive control is at least 44 x 44 CSS
+px (WCAG 2.5.5, Target Size Enhanced):
+
+```html
+<html data-fancy-density="touch">
+```
+
+```css
+:root { --fancy-target-min: 48px; } /* optional; default 44px */
+```
+
+- **Off by default.** Without the attribute nothing changes, markup or size, and
+  nothing turns it on for you: there is no coarse-pointer media query. To follow
+  the pointer, set the attribute from `matchMedia("(pointer: coarse)")`.
+- **The control itself grows.** `min-height` / `min-width` go on the element a
+  person taps, the one `getBoundingClientRect()` measures, never on a
+  pseudo-element hit area. Buttons at every size, icon buttons, inputs, selects,
+  checkboxes, radios, switches, tabs, menu and list items, pagination, calendar
+  days, popup options, ContentReaction, PromptInput and Composer controls, and
+  the rest.
+- **Some visuals stay small inside a 44px box.** A Switch keeps its track and
+  knob (the extra size is unpainted border); native checkboxes and radios are
+  drawn by the browser at the box size. The measured element is 44px either way.
+- Put it on `<html>`: popups are portalled to `<body>`, outside any wrapper.
+- Needs `styles.css`. Not covered: ChatDrawer (it has no handle to target yet)
+  and the browser's own `<video controls>` / `<audio controls>`.
+
+Details, the full component list and what to measure: [docs/TouchDensity.md](docs/TouchDensity.md).
+
 ## Dark Mode
 
 Dark mode works via Tailwind's `dark:` class strategy. The library's `Portal` component automatically detects the `dark` class (or `data-theme="dark"`) on `<html>` and propagates it into portaled content (modals, dropdowns, tooltips, toasts, etc.).

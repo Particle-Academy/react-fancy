@@ -786,3 +786,196 @@
 }
 }
 
+/* fancy-density:start */
+/* ─── Touch density (WCAG 2.5.5 Target Size, 44 x 44) — OPT-IN ───────────────
+   Off unless the app sets it, once, at the root:
+
+     <html data-fancy-density="touch">
+
+   Then every interactive react-fancy control is at least --fancy-target-min
+   (default 44px) tall AND wide. Set the token to change the size:
+
+     :root { --fancy-target-min: 48px; }
+
+   Sizing is min-height / min-width on the element a person taps, the element
+   a bounding-box sweep measures, never a pseudo-element hit area. A minimum
+   beats height, width, max-height and max-width, so the box really is that big.
+
+   Nothing here matches without the attribute: every selector starts from it,
+   and there is no coarse-pointer media query. To follow the pointer, set the
+   attribute from script (matchMedia("(pointer: coarse)")).
+
+   LAYERS. The control rules are in `utilities`, at a higher specificity than
+   any one utility class, because several controls carry their own smaller
+   minimum (Pagination's min-w-9, HotkeyCapture's min-h-8, a Button's label
+   min-w-0) and the opt-in has to beat those. A consumer's own `!` utility
+   still wins. The multi-line surface rule is in `base`, so a surface that is
+   already taller (PromptInput's 5.5rem, the Editor's 120px) keeps its own
+   minimum and only a shorter one is raised to the floor.
+   ──────────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Controls that carry their own handle. */
+  [data-fancy-density="touch"] :is(
+    [data-react-fancy-action],
+    [data-react-fancy-tabs-tab],
+    [data-react-fancy-accordion-trigger],
+    [data-react-fancy-dropdown-item],
+    [data-react-fancy-context-menu-item],
+    [data-react-fancy-menu-item],
+    [data-react-fancy-sidebar-item],
+    [data-react-fancy-sidebar-toggle],
+    [data-react-fancy-navbar-item],
+    [data-react-fancy-navbar-toggle],
+    [data-react-fancy-mobile-menu-item],
+    [data-react-fancy-command-item],
+    [data-react-fancy-modal-close],
+    [data-react-fancy-drawer-close],
+    [data-react-fancy-stepper-trigger],
+    [data-react-fancy-content-reaction-trigger],
+    [data-react-fancy-content-reaction-item],
+    [data-react-fancy-calendar-day],
+    [data-react-fancy-timegrid-cell],
+    [data-react-fancy-hotkey-capture-trigger],
+    [data-react-fancy-hotkey-capture-clear],
+    [data-react-fancy-phone-input-country],
+    [data-react-fancy-phone-input-number],
+    [data-react-fancy-phone-input-search],
+    [data-react-fancy-file-upload-browse],
+    [data-react-fancy-fullscreen-toggle],
+    [data-react-fancy-composer-send],
+    [data-react-fancy-editor-source-toggle],
+    [data-react-fancy-image-pill],
+    [data-react-fancy-reorderable-grid-item],
+    [data-react-fancy-resizable-panels-separator],
+    [data-react-fancy-file-browser-node],
+    [data-react-fancy-file-browser-path-segment],
+    [data-react-fancy-json-editor-row],
+    [data-react-fancy-faux-client-zoom-in],
+    [data-react-fancy-faux-client-zoom-out],
+    [data-react-fancy-faux-client-zoom-reset],
+    [data-react-fancy-faux-client-fullscreen],
+    [data-react-fancy-display][role="button"],
+    [data-react-fancy-select],
+    [data-react-fancy-date-picker],
+    [data-react-fancy-table-search]
+  ) {
+    min-height: var(--fancy-target-min, 44px);
+    min-width: var(--fancy-target-min, 44px);
+  }
+
+  /* Components that render only their own controls (no consumer content), so
+     every control inside them is one of ours, handle or not. Popups portalled
+     to <body> sit in the kit's Portal wrapper; only their items are matched. */
+  [data-fancy-density="touch"] :is(
+    [data-react-fancy-pagination],
+    [data-react-fancy-calendar],
+    [data-react-fancy-time-picker],
+    [data-react-fancy-color-picker],
+    [data-react-fancy-editor-toolbar],
+    [data-react-fancy-file-browser-path],
+    [data-react-fancy-file-browser-sort],
+    [data-react-fancy-file-browser-filter],
+    [data-react-fancy-tree-node],
+    [data-react-fancy-otp-input],
+    [data-react-fancy-pillbox],
+    [data-react-fancy-autocomplete],
+    [data-react-fancy-command-input],
+    [data-react-fancy-multi-switch],
+    [data-react-fancy-checkbox],
+    [data-react-fancy-checkbox-group],
+    [data-react-fancy-radio-group],
+    [data-react-fancy-input],
+    [data-react-fancy-number-field],
+    [data-react-fancy-slider],
+    [data-react-fancy-streaming-audio],
+    [data-react-fancy-carousel-controls],
+    [data-react-fancy-carousel-steps],
+    [data-react-fancy-image-viewer-controls],
+    [data-react-fancy-emoji-select],
+    [data-react-fancy-breadcrumbs],
+    [data-react-fancy-breadcrumbs-dropdown],
+    [data-react-fancy-menu-submenu],
+    [data-react-fancy-table-pagination],
+    [data-react-fancy-toast-item]
+  ) :is(
+    button,
+    a[href],
+    input:not([type="hidden"]):not([type="file"]),
+    select,
+    [role="option"],
+    [role="radio"],
+    [role="checkbox"],
+    [role="menuitem"],
+    [role="treeitem"],
+    [role="button"],
+    [role="slider"],
+    [role="spinbutton"]
+  ),
+  [data-fancy-density="touch"] [data-react-fancy-portal] :is(
+    [role="option"],
+    [role="menuitem"],
+    [role="menuitemcheckbox"],
+    [role="menuitemradio"],
+    input:not([type="hidden"]):not([type="file"])
+  ),
+  [data-fancy-density="touch"] [data-react-fancy-callout] > button,
+  [data-fancy-density="touch"] [data-react-fancy-sidebar-submenu] > button,
+  [data-fancy-density="touch"] [data-react-fancy-table-row] > td > button:is([aria-label="Expand row"], [aria-label="Collapse row"]),
+  [data-fancy-density="touch"] [data-react-fancy-mobile-menu-flyout] button:not([data-react-fancy-mobile-menu-item]) {
+    min-height: var(--fancy-target-min, 44px);
+    min-width: var(--fancy-target-min, 44px);
+  }
+
+  /* Links that are text in a line. An inline box ignores min-height, so these
+     become inline-flex under the opt-in: the same text, a box that can grow. */
+  [data-fancy-density="touch"] :is([data-react-fancy-index-title], [data-react-fancy-pdf-viewer]) a[href],
+  [data-fancy-density="touch"] [data-react-fancy-popover] li > a[href] {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--fancy-target-min, 44px);
+    min-width: var(--fancy-target-min, 44px);
+  }
+
+  /* Switch: the track is the button's own background, so growing the button
+     would grow the pill and strand the knob. Instead the extra size is a
+     transparent border the background does not paint (padding-box clip), and
+     the 2px band the old transparent border showed is now padding. The
+     content box, so the knob and its travel, stays exactly the default size.
+     The focus ring follows the larger box. */
+  [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"] {
+    min-height: var(--fancy-target-min, 44px);
+    min-width: var(--fancy-target-min, 44px);
+    padding: 2px;
+    border-style: solid;
+    border-color: transparent;
+    background-clip: padding-box;
+  }
+  [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="h-3.5"] { border-block-width: max(0px, calc((var(--fancy-target-min, 44px) - 0.875rem) / 2)); }
+  [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="h-4"] { border-block-width: max(0px, calc((var(--fancy-target-min, 44px) - 1rem) / 2)); }
+  [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="h-5"] { border-block-width: max(0px, calc((var(--fancy-target-min, 44px) - 1.25rem) / 2)); }
+  [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="h-6"] { border-block-width: max(0px, calc((var(--fancy-target-min, 44px) - 1.5rem) / 2)); }
+  [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="h-7"] { border-block-width: max(0px, calc((var(--fancy-target-min, 44px) - 1.75rem) / 2)); }
+  [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="w-6"] { border-inline-width: max(0px, calc((var(--fancy-target-min, 44px) - 1.5rem) / 2)); }
+  [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="w-7"] { border-inline-width: max(0px, calc((var(--fancy-target-min, 44px) - 1.75rem) / 2)); }
+  [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="w-9"] { border-inline-width: max(0px, calc((var(--fancy-target-min, 44px) - 2.25rem) / 2)); }
+  [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="w-11"] { border-inline-width: max(0px, calc((var(--fancy-target-min, 44px) - 2.75rem) / 2)); }
+  [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="w-[52px]"] { border-inline-width: max(0px, calc((var(--fancy-target-min, 44px) - 52px) / 2)); }
+}
+
+@layer base {
+  /* Multi-line surfaces: raised to the floor, never lowered. A component's own
+     larger minimum is a utility, and utilities outrank this layer. */
+  [data-fancy-density="touch"] :is(
+    [data-react-fancy-textarea],
+    [data-react-fancy-composer-textarea],
+    [data-react-fancy-prompt-input-textarea],
+    [data-react-fancy-code-view-input],
+    [data-react-fancy-editor-content],
+    [data-react-fancy-kanban-card]
+  ) {
+    min-height: var(--fancy-target-min, 44px);
+    min-width: var(--fancy-target-min, 44px);
+  }
+}
+/* fancy-density:end */
+
