@@ -457,7 +457,13 @@ export function VirtualList<T extends VirtualListRow>({
       data-react-fancy-virtual-list-rows={items.length}
       role="log"
       tabIndex={0}
-      className={cn("relative overflow-y-auto overflow-x-hidden outline-none", className)}
+      className={cn(
+        "relative overflow-y-auto overflow-x-hidden outline-none",
+        // Lab run 651: the region is a Tab stop (so the keyboard can scroll
+        // it) and showed no focus. The kit ring, inset, as ChatThread does.
+        "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]",
+        className,
+      )}
       // While following, the list owns the position. Left on, scroll anchoring
       // answers rows reflowing above it by moving scrollTop up, which reaches
       // onScroll looking exactly like a scrollbar drag.

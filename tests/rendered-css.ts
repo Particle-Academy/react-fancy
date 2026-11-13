@@ -45,12 +45,19 @@ const ENTRY = [
  * and jsdom has no such shadow root to focus. `&[data-force-focus-within]`
  * stands in for the pseudo-class at the same specificity.
  */
-type CompilerOpts = { forceHover?: boolean; forceFocusWithin?: boolean };
+/**
+ * `forceFocusVisible` (unreleased, lab run 651): jsdom never matches `:focus-visible`,
+ * which is the state a keyboard Tab produces and the one the full-kit
+ * benchmark reads. `&[data-force-focus-visible]` stands in for it at the same
+ * specificity, so a test can measure the ring a real Tab would paint.
+ */
+type CompilerOpts = { forceHover?: boolean; forceFocusWithin?: boolean; forceFocusVisible?: boolean };
 
 async function compiler(opts: CompilerOpts = {}) {
   let entry = ENTRY;
   if (opts.forceHover) entry += "\n@custom-variant hover (&[data-force-hover]);";
   if (opts.forceFocusWithin) entry += "\n@custom-variant focus-within (&[data-force-focus-within]);";
+  if (opts.forceFocusVisible) entry += "\n@custom-variant focus-visible (&[data-force-focus-visible]);";
   return compile(entry, {
     base: process.cwd(),
     loadStylesheet: async (id: string, base: string) => {

@@ -107,6 +107,8 @@ export function CodeView({
           aria-label={label ?? placeholder ?? "Code"}
           className={cn(
             "relative block w-full resize-none border-none bg-transparent text-transparent outline-none",
+            // Lab run 651: the textarea is the Tab stop and showed no focus.
+            "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]",
             TEXT_METRICS,
           )}
           style={{

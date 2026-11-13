@@ -38,7 +38,7 @@ export function FileBrowserToolbar({ filterPlaceholder = "Filter", className }: 
           placeholder={filterPlaceholder}
           aria-label="Filter by name"
           spellCheck={false}
-          className="min-w-0 flex-1 bg-transparent py-1 text-xs text-[color:var(--fancy-text-soft,var(--color-zinc-700))] outline-none placeholder:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:placeholder:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
+          className="min-w-0 flex-1 rounded-sm bg-transparent py-1 text-xs text-[color:var(--fancy-text-soft,var(--color-zinc-700))] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))] placeholder:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:placeholder:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-soft-dark,var(--color-zinc-300))]"
         />
         {filter !== "" && (
           <button

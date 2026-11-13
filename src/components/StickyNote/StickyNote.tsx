@@ -95,7 +95,9 @@ export const StickyNote = forwardRef<HTMLDivElement, StickyNoteProps>(
           // A textbox needs a name (axe `aria-input-field-name`); its text is
           // its value, not its name.
           aria-label={label}
-          className="outline-none whitespace-pre-wrap break-words min-h-[1.4em]"
+          // Lab run 651: a Tab stop with `outline-none` and nothing in its
+          // place showed no focus at all. The kit ring, inset, on the text.
+          className="rounded-sm outline-none whitespace-pre-wrap break-words min-h-[1.4em] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]"
           onBlur={commit}
           onKeyDown={(e) => {
             if (e.key === "Escape") e.currentTarget.blur();

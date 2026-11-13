@@ -57,7 +57,15 @@ export const AudioViewer = forwardRef<HTMLDivElement, AudioViewerProps>(
               setErrored(true);
               onError?.();
             }}
-            className="w-full"
+            className={cn(
+              "w-full",
+              // Lab run 651, the K8 fix VideoViewer already has: Tab lands on
+              // the play / timeline / volume controls inside the user-agent
+              // shadow root, where `<audio>` matches `:focus-within` but not
+              // `:focus-visible`, so the UA outline did not draw. An inset
+              // outline on `:focus-within` covers every stop.
+              "focus-within:outline-2 focus-within:outline-solid focus-within:-outline-offset-2 focus-within:outline-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-within:outline-[color:var(--fancy-focus-dark,var(--color-blue-400))]",
+            )}
           />
         )}
       </div>

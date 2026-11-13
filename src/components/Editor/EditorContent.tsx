@@ -82,6 +82,8 @@ export function EditorContent({ className, maxHeight: maxHeightProp, sourceClass
       className={cn(
         "min-h-[120px] flex-auto overflow-y-auto px-4 py-3 text-sm outline-none",
         "focus:outline-none",
+        // Lab run 651: the editing surface is the Tab stop and showed no focus.
+        "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]",
         proseClasses,
         extClasses,
         "empty:before:content-[attr(data-placeholder)] empty:before:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:empty:before:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] empty:before:pointer-events-none",
