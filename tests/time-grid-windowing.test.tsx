@@ -3,6 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, type ReactElement } from "react";
 import { createRoot } from "react-dom/client";
 
+// ~1s alone, but the full suite now compiles Tailwind in several files and the
+// 5s default timed out here under that load. Not a behaviour change.
+vi.setConfig({ testTimeout: 20_000 });
+
 import { TimeGrid } from "../src/components/TimeGrid/TimeGrid";
 import type { TimeGridCell, TimeGridSelection } from "../src/components/TimeGrid/TimeGrid.types";
 
