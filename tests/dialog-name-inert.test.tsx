@@ -6,6 +6,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { Modal } from "../src/components/Modal";
 import { Drawer } from "../src/components/Drawer";
 import { PortalContainerContext } from "../src/components/Portal";
+import { Toast, useToast } from "../src/components/Toast";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -242,6 +243,46 @@ describe("stacked dialogs", () => {
     expect(app.hasAttribute("inert"), "the page stays inert under the Modal").toBe(true);
 
     rerender(tree(false, false));
+    expectNoneInert();
+  });
+});
+
+describe.each<Kind>(["Modal", "Drawer"])("%s leaves the toast layer live", (kind) => {
+  /**
+   * A toast is a live status region. Made inert, a status that arrives while
+   * the dialog is open (a toast fired from inside it) is never announced. A
+   * native modal <dialog> avoids this because toasts usually sit in the top
+   * layer. The toast container is marked by its own data attribute.
+   */
+  it("a toast region mounted before the dialog stays non-inert, and a later toast in it is reachable", () => {
+    const app = Object.assign(document.createElement("div"), { id: "app" });
+    document.body.append(app);
+    let fire: ((title: string) => void) | null = null;
+    function Fire() {
+      const { toast } = useToast();
+      fire = (title) => toast({ title, duration: 0 });
+      return null;
+    }
+    const tree = (open: boolean) => (
+      <Toast.Provider>
+        <Fire />
+        <Dialog kind={kind} open={open} />
+      </Toast.Provider>
+    );
+    const rerender = render(app, tree(false));
+    const layer = document.querySelector<HTMLElement>("[data-react-fancy-toast]")!;
+    expect(layer, "the toast layer is mounted before the dialog").not.toBeNull();
+
+    rerender(tree(true));
+    expect(app.hasAttribute("inert"), "the page behind is inert").toBe(true);
+    expect(layer.closest("[inert]"), "the toast layer is not inert").toBeNull();
+
+    act(() => fire!("Saved"));
+    const item = layer.querySelector<HTMLElement>("[data-react-fancy-toast-item]")!;
+    expect(item.textContent).toContain("Saved");
+    expect(item.closest("[inert]"), "the new toast is reachable").toBeNull();
+
+    rerender(tree(false));
     expectNoneInert();
   });
 });
