@@ -7,6 +7,7 @@ import path from "node:path";
 
 import { FIXTURES, type DensityFixture } from "./touch-density.fixtures";
 import { flatten, installRenderedCss, removeRenderedCss, resolveVars } from "./rendered-css";
+import { separatorGrab } from "./pseudo-before";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -16,7 +17,10 @@ import { flatten, installRenderedCss, removeRenderedCss, resolveVars } from "./r
  * `<html data-fancy-density="touch">` makes every interactive react-fancy
  * control at least `--fancy-target-min` (default 44px) on both axes, by
  * min-height / min-width on the element a person taps (the element a
- * bounding-box sweep measures), never on a pseudo-element hit area.
+ * bounding-box sweep measures), never on a pseudo-element hit area. The one
+ * exception is the ResizablePanels separator: it is a visible 1px line, so
+ * across the line it is measured by its `::before` grab area (GRAB_AREA), and
+ * no thin line may be grown at all (`thickened`).
  *
  * HOW THIS MEASURES. jsdom does no layout, so a bounding box is always 0x0 and
  * proves nothing. What it does do is the cascade. So each fixture gets the CSS
@@ -223,17 +227,54 @@ function measured(el: Element): Element {
   return row && row.contains(el) && row.matches(LABELLED_ROW) ? row : el;
 }
 
+/**
+ * The ResizablePanels separator is its own visible 1px line, so it is the one
+ * target sized by its `::before` grab area across the line (its min-size along
+ * the line is on the element, as usual). See `tests/touch-density-thin-elements.test.tsx`.
+ */
+const GRAB_AREA = "[data-react-fancy-resizable-panels-separator]";
+
 function undersized(min: number): string[] {
   return targets()
     .map(measured)
-    .map((el) => ({
-      el,
-      h: px(el, "min-height"),
-      w: px(el, "min-width"),
-      inline: !el.matches(ATOMIC) && getComputedStyle(el).display === "inline",
-    }))
+    .map((el) => {
+      let h = px(el, "min-height");
+      let w = px(el, "min-width");
+      if (el.matches(GRAB_AREA)) {
+        const across = separatorGrab(el).across;
+        if (el.getAttribute("aria-orientation") === "vertical") w = across;
+        else h = across;
+      }
+      return { el, h, w, inline: !el.matches(ATOMIC) && getComputedStyle(el).display === "inline" };
+    })
     .filter(({ h, w, inline }) => h < min || w < min || inline)
     .map(({ el, h, w, inline }) => `${describeEl(el)} min ${w}x${h}${inline ? " (display: inline ignores min sizes)" : ""}`);
+}
+
+/**
+ * Anything drawn as a thin line (`w-px`, `h-px`, `w-0.5`, `h-0.5`) must keep
+ * that thickness under the opt-in. A min-size rule that caught one (the
+ * ResizablePanels separator, up to 6.24.0) painted a 44px bar where a 1px line
+ * belonged. Returns every element whose thin axis a minimum raised.
+ */
+const THIN: Record<string, { prop: "min-width" | "min-height"; px: number }> = {
+  "w-px": { prop: "min-width", px: 1 },
+  "h-px": { prop: "min-height", px: 1 },
+  "w-0.5": { prop: "min-width", px: 2 },
+  "h-0.5": { prop: "min-height", px: 2 },
+};
+
+function thickened(): string[] {
+  const out: string[] = [];
+  for (const el of document.body.querySelectorAll("[class]")) {
+    for (const token of (el.getAttribute("class") ?? "").split(/\s+/)) {
+      const thin = THIN[token];
+      if (!thin) continue;
+      const min = px(el, thin.prop);
+      if (min > thin.px) out.push(`${describeEl(el)} ${token} has ${thin.prop} ${min}px`);
+    }
+  }
+  return out;
 }
 
 /** Mount under the opt-in with the page's CSS: Tailwind for its classes, then the kit sheet. */
@@ -252,6 +293,7 @@ describe('data-fancy-density="touch": every control is at least 44 x 44', () => 
     it(f.name, async () => {
       await mountTouch(f);
       expect(targets().length, `${f.name} rendered no tappable element`).toBeGreaterThan(0);
+      expect(thickened(), `${f.name}: a thin line was grown to a target`).toEqual([]);
       const short = undersized(44);
       if (f.gap) {
         // Still a gap. If this fails, it was fixed: delete `gap` from the fixture.

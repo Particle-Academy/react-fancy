@@ -51,6 +51,13 @@ bounding-box sweep measures (`getBoundingClientRect()`): the size is on the
 control itself, never on a `::before` / `::after` hit area. A minimum beats
 `height`, `width`, `max-height` and `max-width`, so the box really is that big.
 
+**One exception: the ResizablePanels separator.** It is a visible 1px line, and
+the element is the line (its background is the line colour, and hover and focus
+recolour it), so it cannot grow without becoming a 44px bar. Across the line it
+grows through its transparent `::before` grab area instead; along the line the
+element itself is at least 44px. **For this control, measure the `::before`**
+across the line, not the element. See [Thin lines](#thin-lines).
+
 Where a control's visual would not survive growing, it keeps its look and grows
 around it. The measured element is still 44px:
 
@@ -62,6 +69,66 @@ around it. The measured element is still 44px:
 | A labelled Switch (the row) | the switch, plus the `<label>` | The whole row beside the control is the label, so a tap anywhere in it toggles the control once. The label column stretches to the row's height and takes its free width, the label fills it, and the `gap-2` before it becomes the label's own `0.5rem` start padding. The track is not stretched, and description and error lines keep their indent. A `labelHidden` label is not a target, so that row keeps its gap. |
 | IndexList title, PdfViewer download link, links listed in a Popover (`a[href]`), SkipLink | the link | These are inline text. An inline box ignores `min-height`, so under the opt-in they become `inline-flex`: the same text in a box that can grow. |
 | Textarea, Composer, PromptInput, CodeView, Editor content, Kanban card | the surface | These are raised to the floor and never lowered. PromptInput (5.5rem) and Editor (120px) are already taller and keep their own minimum. |
+| ResizablePanels separator (`[data-react-fancy-resizable-panels-separator]`) | across the line: its **`::before`** grab area. Along the line: the separator | The line stays 1px, and hover and focus colour only the line. The transparent grab area around it (12px by default) is the target size across the line, centred unless you place it (below). |
+| Slider, single | the native `input[type=range]` | The browser draws the track and thumb at their own size, centred in the 44px input. |
+| Slider, `range` | each of its two inputs | The 6px track is a div centred in the inputs' wrapper, so the wrapper grows to 44px with them: the thumbs stay centred on the track, and the track stays 6px. |
+
+## Thin lines
+
+Anything the kit draws as a line (`w-px`, `h-px`, `w-0.5`, `h-0.5`) keeps its
+thickness under the opt-in; the test suite fails if a min-size rule catches one.
+The only such line that is also a control is the ResizablePanels separator.
+
+### Place the separator's grab area
+
+Two custom properties set how far the grab area reaches past the line, on each
+side. For side-by-side panels (a vertical line) the sides are inline-start and
+inline-end; for stacked panels (a horizontal line), block-start and block-end.
+
+| Property | Default |
+|---|---|
+| `--fancy-separator-grab-start` | `(var(--fancy-target-min) - 1px) / 2` (21.5px) |
+| `--fancy-separator-grab-end` | the same |
+
+Unset, the area is centred on the line. The grab area sits above the panels'
+content, so a centred one covers the first 21.5px of the neighbouring panel,
+including a scrollbar at that edge. To keep it off the first panel's scrollbar,
+put it all on the other side:
+
+```css
+[data-react-fancy-resizable-panels] {
+  --fancy-separator-grab-start: 0px;
+  --fancy-separator-grab-end: 43px;
+}
+```
+
+- The area is never smaller than the target. If `start + end + 1px` is less
+  than `--fancy-target-min`, the end side grows to make up the difference, so
+  setting only `--fancy-separator-grab-start: 0px` already gives `0px` / `43px`.
+- Use a length (`0px`, not `0`): the values are used inside `calc()`, where a
+  bare `0` is not a length.
+- They apply under the opt-in only. Without it the grab area is the default
+  6px each side, as before.
+
+**What to measure.** In a browser, `getBoundingClientRect()` on the separator
+gives the 1px line. The grab area is the separator's `::before`: read its
+`getComputedStyle(separator, "::before")` insets (`inset-inline-start` /
+`inset-inline-end`, or the block pair), or hit-test a point inside it with
+`document.elementFromPoint`, which returns the separator.
+
+### Audited
+
+Checked against the opt-in, with what each needed:
+
+| Element | Result |
+|---|---|
+| ResizablePanels separator | **Fixed** (it was caught by the 44px rule): grows through `::before`, see above. Its focus ring is now opaque (the focus token, 3.8:1 on white, 6.7:1 on zinc-900 by default); it was the token at 40% opacity, 1.6:1 on white and 2.1:1 on zinc-900. |
+| Slider track and thumb | Single slider: unchanged, the browser keeps both their size. Range slider: **fixed**, the wrapper grows so the thumbs stay on the track. |
+| Separator, Dropdown / ContextMenu separators, Editor toolbar separator | Not controls, not caught. Unchanged. |
+| Progress | Not a control (`role="progressbar"`), not caught. Unchanged. |
+| Kanban column handle, ReorderableGrid handle | Kanban's handle wraps your column header; ReorderableGrid's handle is your markup (`data-reorderable-handle`) inside a cell, and the cell is the 44px target. Neither is a line. Unchanged. |
+| Sidebar, Drawer, Table | Have no resize handles or column resizers. |
+| Other `w-px` / `h-px` lines (Card and CardSection dividers, ChatThread, Stepper connectors, Timeline, AccordionPanel, PdfViewer, SidebarGroup) | Decorative, not caught. Unchanged. |
 
 ## Covered
 
@@ -118,7 +185,17 @@ and that the input's block-start margin centres it on the label's line. It also 
 target that computes to `display: inline`, because an inline box ignores
 `min-height`.
 
-The same file proves the default is unchanged: for every component, the markup
+The ResizablePanels separator is measured by its `::before` across the line
+(jsdom does not compute pseudo-elements, so `tests/pseudo-before.ts` mirrors the
+`::before` rules onto a stand-in element), and every fixture fails if an element
+drawn `w-px`, `h-px`, `w-0.5` or `h-0.5` gets a larger minimum on that axis.
+`tests/touch-density-thin-elements.test.tsx` checks that the separator stays
+1px, that its grab area is at least 44px across and centred, that
+`--fancy-target-min` and the two grab properties are honoured, that the grab
+area paints nothing, that the focus ring is opaque and 3:1, and that without the
+opt-in the separator and its 12px grab area are unchanged.
+
+`tests/touch-density.test.tsx` also proves the default is unchanged: for every component, the markup
 and every computed property of every element are identical with and without the
 density rules in the sheet, and every density selector starts from
 `[data-fancy-density="touch"]`.

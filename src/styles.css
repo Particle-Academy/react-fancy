@@ -854,6 +854,10 @@
    Sizing is min-height / min-width on the element a person taps, the element
    a bounding-box sweep measures, never a pseudo-element hit area. A minimum
    beats height, width, max-height and max-width, so the box really is that big.
+   ONE exception: the ResizablePanels separator is a visible 1px line, so it
+   grows through its ::before grab area instead (see its rule below). Anything
+   drawn as a thin line (w-px, h-px) must never be caught by the min-size
+   rules; tests/touch-density.test.tsx fails if one is.
 
    Nothing here matches without the attribute: every selector starts from it,
    and there is no coarse-pointer media query. To follow the pointer, set the
@@ -900,7 +904,6 @@
     [data-react-fancy-editor-source-toggle],
     [data-react-fancy-image-pill],
     [data-react-fancy-reorderable-grid-item],
-    [data-react-fancy-resizable-panels-separator],
     [data-react-fancy-file-browser-node],
     [data-react-fancy-file-browser-path-segment],
     [data-react-fancy-json-editor-row],
@@ -1013,6 +1016,53 @@
   [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="w-9"] { border-inline-width: max(0px, calc((var(--fancy-target-min, 44px) - 2.25rem) / 2)); }
   [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="w-11"] { border-inline-width: max(0px, calc((var(--fancy-target-min, 44px) - 2.75rem) / 2)); }
   [data-fancy-density="touch"] [data-react-fancy-switch] button[role="switch"][class~="w-[52px]"] { border-inline-width: max(0px, calc((var(--fancy-target-min, 44px) - 52px) / 2)); }
+
+  /* ResizablePanels separator: the one target measured by its ::before. The
+     separator IS its visible 1px line (its background, hover and focus
+     colour), so a 44px minimum on it painted a 44px bar over the neighbouring
+     panel and its scrollbar. The line keeps its 1px; the transparent ::before
+     grab area that already surrounds it (12px by default) grows to the target
+     size across the line. Along the line it is 44px or more, like any target.
+
+     Placement: --fancy-separator-grab-start and --fancy-separator-grab-end
+     are how far the grab area reaches past the line on its inline-start and
+     inline-end sides (block-start / block-end for a stacked layout's
+     horizontal line). Unset, both are (target - 1px) / 2: centred. Set them to
+     keep the area off a scrollbar, e.g. start 0px and end 43px. The end side
+     grows when start + end + 1px is less than the target, so the area is never
+     smaller than the target. Use a length (0px, not 0): they go inside calc().
+     The area paints nothing and sits above panel content (z-index 1), so a tap
+     anywhere in it reaches the separator. */
+  [data-fancy-density="touch"] [data-react-fancy-resizable-panels-separator][aria-orientation="vertical"] {
+    min-height: var(--fancy-target-min, 44px);
+  }
+  [data-fancy-density="touch"] [data-react-fancy-resizable-panels-separator][aria-orientation="horizontal"] {
+    min-width: var(--fancy-target-min, 44px);
+  }
+  [data-fancy-density="touch"] [data-react-fancy-resizable-panels-separator]::before {
+    --_fancy-grab-start: var(--fancy-separator-grab-start, calc((var(--fancy-target-min, 44px) - 1px) / 2));
+    --_fancy-grab-end: max(var(--fancy-separator-grab-end, calc((var(--fancy-target-min, 44px) - 1px) / 2)), calc(var(--fancy-target-min, 44px) - 1px - var(--_fancy-grab-start)));
+    z-index: 1;
+    background-color: transparent;
+  }
+  [data-fancy-density="touch"] [data-react-fancy-resizable-panels-separator][aria-orientation="vertical"]::before {
+    inset-inline-start: calc(-1 * var(--_fancy-grab-start));
+    inset-inline-end: calc(-1 * var(--_fancy-grab-end));
+  }
+  [data-fancy-density="touch"] [data-react-fancy-resizable-panels-separator][aria-orientation="horizontal"]::before {
+    inset-block-start: calc(-1 * var(--_fancy-grab-start));
+    inset-block-end: calc(-1 * var(--_fancy-grab-end));
+  }
+
+  /* Range Slider: its two inputs are absolutely placed over a track drawn by
+     a div centred in their wrapper (24px tall). Growing the inputs to 44px
+     left the wrapper at 24px, so the thumbs (centred in their 44px input) sat
+     10px below the track and the inputs overhung the marks. The wrapper grows
+     to the target too: track and thumbs share a centre again, and the track
+     itself stays its 6px. */
+  [data-fancy-density="touch"] [data-react-fancy-slider] div:has(> input[type="range"] ~ input[type="range"]) {
+    min-height: var(--fancy-target-min, 44px);
+  }
 
   /* Label rows: Switch, Checkbox, and each CheckboxGroup / RadioGroup option.
      The control above is 44px, so the row is, but the label is text-height in

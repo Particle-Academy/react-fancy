@@ -365,7 +365,9 @@ px (WCAG 2.5.5, Target Size Enhanced):
   pseudo-element hit area. Buttons at every size, icon buttons, inputs, selects,
   checkboxes, radios, switches, tabs, menu and list items, pagination, calendar
   days, popup options, ContentReaction, PromptInput and Composer controls, and
-  the rest.
+  the rest. The one exception is the ResizablePanels separator, a visible 1px
+  line: it stays 1px and its `::before` grab area grows instead, placed with
+  `--fancy-separator-grab-start` / `--fancy-separator-grab-end`.
 - **Some visuals stay small inside a 44px box.** A Switch keeps its track and
   knob (the extra size is unpainted border). A labelled checkbox or radio keeps
   its normal size, centred on its label's line: the labelled ROW is the 44px

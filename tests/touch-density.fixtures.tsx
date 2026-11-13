@@ -142,6 +142,7 @@ export const FIXTURES: DensityFixture[] = [
   { name: "MultiSwitch", render: () => <MultiSwitch list={["Daily", "Weekly"]} defaultValue="Daily" /> },
   { name: "NumberField", render: () => <NumberField label="Qty" value={1} onValueChange={noop} /> },
   { name: "Slider", render: () => <Slider label="Volume" defaultValue={50} showValue /> },
+  { name: "Slider range", render: () => <Slider range label="Price" defaultValue={[20, 80]} showValue /> },
   { name: "DatePicker", render: () => <DatePicker label="Start" /> },
   { name: "TimePicker", render: () => <TimePicker /> },
   { name: "ColorPicker", render: () => <ColorPicker /> },
@@ -599,6 +600,15 @@ export const FIXTURES: DensityFixture[] = [
       <ResizablePanels value={30} onValueChange={noop} label="Resize">
         <nav>Side</nav>
         <main>Main</main>
+      </ResizablePanels>
+    ),
+  },
+  {
+    name: "ResizablePanels vertical",
+    render: () => (
+      <ResizablePanels orientation="vertical" value={30} onValueChange={noop} label="Resize">
+        <section>Top</section>
+        <section>Bottom</section>
       </ResizablePanels>
     ),
   },

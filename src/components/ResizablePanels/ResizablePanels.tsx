@@ -17,7 +17,10 @@ const SEPARATOR_BASE =
   "relative shrink-0 touch-none select-none outline-none transition-colors " +
   "bg-[color:var(--fancy-border,var(--color-zinc-200))] dark:bg-[color:var(--fancy-border-dark,var(--color-zinc-700))] " +
   "focus-visible:bg-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-visible:bg-[color:var(--fancy-focus-dark,var(--color-blue-400))] " +
-  "focus-visible:ring-2 focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))]/40 dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]/40";
+  // An opaque ring: at /40 it measured 1.6:1 on white (2.1:1 on zinc-900),
+  // under the 3:1 a focus indicator needs. Opaque, it is the focus token itself
+  // (blue-500 on white 3.8:1, blue-400 on zinc-900 6.7:1).
+  "focus-visible:ring-2 focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]";
 
 const SEPARATOR_ACTIVE =
   "hover:bg-[color:var(--fancy-focus,var(--color-blue-500))] dark:hover:bg-[color:var(--fancy-focus-dark,var(--color-blue-400))]";
@@ -217,6 +220,8 @@ export const ResizablePanels = forwardRef<HTMLDivElement, ResizablePanelsProps>(
           className={cn(
             SEPARATOR_BASE,
             // A 1px line with a 12px hit area, so it is easy to grab by touch.
+            // Under touch density the hit area (not the line) grows to the
+            // target size: see the separator rule in styles.css.
             horizontal
               ? "w-px before:absolute before:inset-y-0 before:-left-1.5 before:-right-1.5"
               : "h-px before:absolute before:inset-x-0 before:-top-1.5 before:-bottom-1.5",

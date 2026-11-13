@@ -71,7 +71,23 @@ Right-to-left: side by side, the first panel sits at the inline start, which is 
 
 ## Accessibility
 
-The separator is `role="separator"`, `tabIndex=0`, with `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-orientation`, `aria-label` and `aria-controls` pointing at the primary panel. It shows a focus ring from the `--fancy-focus` token. Pointer and touch drags use pointer capture (`touch-action: none` on the separator), and the separator has a 12px hit area around its 1px line.
+The separator is `role="separator"`, `tabIndex=0`, with `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-orientation`, `aria-label` and `aria-controls` pointing at the primary panel. It shows an opaque 2px focus ring in the `--fancy-focus` token (3:1 or better on the default surfaces). Pointer and touch drags use pointer capture (`touch-action: none` on the separator), and the separator has a 12px hit area (its `::before`) around its 1px line.
+
+## Touch density
+
+Under `<html data-fancy-density="touch">` (see [TouchDensity](./TouchDensity.md)) the line stays 1px: the separator element is the line, and hover and focus colour only it. The transparent `::before` grab area grows to `--fancy-target-min` (44px) across the line, and the separator is at least 44px along it. Measure the `::before` for the target size, not the separator's bounding box.
+
+The grab area is centred on the line by default, so it reaches 21.5px into each panel, over a scrollbar at that edge. Place it with two custom properties, the reach past the line on its start and end side (inline-start / inline-end for side-by-side panels, block-start / block-end for stacked ones):
+
+```css
+/* Keep it off the first panel's scrollbar: all of it on the second panel's side. */
+[data-react-fancy-resizable-panels] {
+  --fancy-separator-grab-start: 0px;
+  --fancy-separator-grab-end: 43px;
+}
+```
+
+The end side grows if `start + end + 1px` would be under the target, so the area is never smaller than it. Use lengths (`0px`, not `0`). Both apply under the opt-in only.
 
 ## Data attributes
 
