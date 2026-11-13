@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.25.0] - 2026-11-13
+
 ### Added
 
 - **`Table.Foot`**: footer rows in a `<tfoot>` (totals, summaries), with the handle `data-react-fancy-table-foot`, a top border on the `border` token and medium weight. It is always placed after the body, wherever it is written; other attributes reach the `<tfoot>`. Type `TableFootProps`. See `docs/Table.md`.
@@ -19,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Every table part goes inside Table's `<table>`.** Only `Table.Head` and `Table.Body` did: a `<tfoot>`, `<caption>` or `<colgroup>` child landed in the wrapper `<div>` outside the table, which is invalid markup (axe and React's DOM-nesting check both report it). `Table.Foot` and raw `caption`, `colgroup`, `thead`, `tbody` and `tfoot` elements now go inside, in the order HTML requires: caption, colgroups, head, bodies, foot. Anything else (`Table.Search`, `Table.Pagination`, a toolbar) still sits before or after the table where you wrote it. Consumers: if you put a totals row in a second `Table.Body` to keep it inside the table, it still works; `Table.Foot` is the right home for it.
 
-Accessibility findings from the lab's every-component brief (fancy-labs `docs/kit-site-findings.md`, K22 to K27), each in the component's own markup, plus two consumer reports against 6.24.1. Each has a test in `tests/every-component-a11y.test.tsx` or `tests/dialog-name-inert.test.tsx` that fails on 6.25.0.
+Accessibility findings from the lab's every-component brief (fancy-labs `docs/kit-site-findings.md`, K22 to K27), each in the component's own markup, plus two consumer reports against 6.24.1. Each has a test in `tests/every-component-a11y.test.tsx` or `tests/dialog-name-inert.test.tsx` that fails on 6.24.1.
 
 - **Modal and Drawer name their dialog** (axe `aria-dialog-name`). `Modal.Header` / `Drawer.Header` give their title an id (`data-react-fancy-modal-title` / `-drawer-title`), and the dialog points `aria-labelledby` at it while a header is mounted. An `aria-label` or `aria-labelledby` you pass to `Modal` / `Drawer` wins, and then none is set. Consumers: nothing to do.
 - **The page behind an open Modal or viewport Drawer is `inert`**, and restored on close or unmount. Everything outside the dialog's ancestor chain is made inert, so it also works when the dialog portals into a landmark through `PortalContainerContext` (the landmark stays live; its other children and its siblings do not). `aria-modal` alone only asked assistive tech to ignore the page; a pointer and a screen reader's virtual cursor could still reach it. Stacked dialogs (a Drawer over a Modal) and elements the host had already made inert are handled: nothing is restored while another open dialog still needs it, and nothing the host made inert is un-inerted. A container-attached Drawer is a panel, not a modal, and changes nothing. **Behaviour change:** anything outside the dialog that was there when it opened is inert while it is open, as it would be under a native modal `<dialog>`. Popups opened from inside the dialog are added later and stay live. **Toast layers stay live** (`[data-react-fancy-toast]`, and a portalled `Toast.Stack`): a toast is a live status region, and an inert one would never announce a status that arrives while the dialog is open (a native modal dialog avoids this because toasts usually sit in the top layer). An inline `Toast.Stack` inside page content goes inert with that content.
@@ -33,10 +35,6 @@ Accessibility findings from the lab's every-component brief (fancy-labs `docs/ki
 - **ImagePill's text reaches AA contrast** (K26): rose-800 on rose-100, from rose-600 (3.77:1). This is the composer's image pill too.
 - **CodeView's textarea is named** (K26, axe `label`). New **`label`** prop. Default: `placeholder` (what named it before), else `"Code"`.
 - **PdfViewer no longer aborts its own request** (K27, `net::ERR_ABORTED` on every load). It nested an `<iframe>` of the same URL inside its `<object>`. Measured in Chromium: with a PDF viewer the PDF was fetched twice, and without one (headless) the iframe's load became a cancelled download. The `<object>` alone fetches it once, or, where nothing can show a PDF, requests nothing and shows the download link. The `<object>` is named by `title`.
-
-## [6.25.0] - 2026-11-13
-
-### Fixed
 
 - **A `Popover.Trigger` / `Dropdown.Trigger` `className` reaches the button when the child is a `Tooltip`, not the tooltip bubble.** Since 6.23.0 the triggers merge their props onto their child, and with a Tooltip as that child the merged `className` landed on the Tooltip, whose `className` styles its bubble. The class silently styled the bubble and the button never got it: an app lost `[-webkit-app-region:no-drag]` on a title-bar button this way, and every click on Windows went to the drag region. Tooltip has a new **`triggerClassName`** prop (classes for its child, joined in front of the child's own), and the triggers route their `className` into it. Components mark this with a static (`TRIGGER_CLASS_NAME_PROP`, internal), so the routing is not special-cased to Tooltip. Tooltip's `className` still means the bubble: not a breaking change. `style` already reached the button (the Tooltip forwards it) and is now covered by a test.
 - **`Dropdown.Trigger` accepts `className` and other attributes**, like `Popover.Trigger`: `className` is joined onto the child's, and other attributes fill only what the child leaves unset. Before, they were dropped.
