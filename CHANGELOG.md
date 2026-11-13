@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.24.1] - 2026-11-13
+
 ### Fixed
 
 - **`ResizablePanels`' separator stays a 1px line under touch density.** The 44px rule (`min-width` / `min-height: var(--fancy-target-min, 44px)`) caught `[data-react-fancy-resizable-panels-separator]`, and the separator IS its line: its background is the line colour and hover and focus recolour it. Under `data-fancy-density="touch"` a side-by-side layout drew a 44px bar, coloured all 44px of it on hover and focus, and covered the neighbouring panel's scrollbar; stacked panels did the same with `min-height`. The separator is out of that rule now. Across the line it reaches the target through its existing transparent `::before` grab area, which grows from 12px to `--fancy-target-min` and paints nothing; along the line the separator itself is at least 44px. The grab area is centred by default; place it with two new custom properties, **`--fancy-separator-grab-start`** and **`--fancy-separator-grab-end`** (the reach past the line on each side, inline for side-by-side panels and block for stacked ones), for example `0px` / `43px` to keep it off the first panel's scrollbar. The end side grows if the two would leave the area under the target. Both apply under the opt-in only. What to measure for this control is the `::before`, not the separator's box: see `docs/TouchDensity.md`. Nothing changes without the opt-in. Consumers: nothing to do, unless you measured this separator's bounding box as a 44px target, which it no longer is.
