@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **A `Popover.Trigger` / `Dropdown.Trigger` `className` reaches the button when the child is a `Tooltip`, not the tooltip bubble.** Since 6.23.0 the triggers merge their props onto their child, and with a Tooltip as that child the merged `className` landed on the Tooltip, whose `className` styles its bubble. The class silently styled the bubble and the button never got it: an app lost `[-webkit-app-region:no-drag]` on a title-bar button this way, and every click on Windows went to the drag region. Tooltip has a new **`triggerClassName`** prop (classes for its child, joined in front of the child's own), and the triggers route their `className` into it. Components mark this with a static (`TRIGGER_CLASS_NAME_PROP`, internal), so the routing is not special-cased to Tooltip. Tooltip's `className` still means the bubble: not a breaking change. `style` already reached the button (the Tooltip forwards it) and is now covered by a test.
+- **`Dropdown.Trigger` accepts `className` and other attributes**, like `Popover.Trigger`: `className` is joined onto the child's, and other attributes fill only what the child leaves unset. Before, they were dropped.
+- **Development warning when a trigger's `className` misses its element.** If none of a `Popover.Trigger` / `Dropdown.Trigger` `className`'s classes end up on the element the trigger anchors to (a child component that styles an inner or portalled element with `className`), a development build logs one `console.warn`. Nothing in production.
+
+Consumers: nothing to do. If you worked around this by putting the classes on the Tooltip's child yourself, that keeps working.
+
 ## [6.24.1] - 2026-11-13
 
 ### Fixed

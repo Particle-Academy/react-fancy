@@ -6,6 +6,7 @@ import {
   composeRefs,
   popupTriggerAria,
   triggerChildRef,
+  useTriggerClassNameCheck,
   type TriggerChild,
 } from "../../utils/trigger-child";
 import { usePopover } from "./Popover.context";
@@ -35,6 +36,7 @@ export function PopoverTrigger({ children, className, ...rest }: PopoverTriggerP
       : classified;
   const childRef = triggerChildRef(target);
   const ref = useMemo(() => composeRefs(childRef, anchorRef), [childRef, anchorRef]);
+  useTriggerClassNameCheck(anchorRef, className, "Popover.Trigger");
 
   const toggle = () => setOpen(!open);
   const handlers = hover

@@ -38,6 +38,10 @@ import { Dropdown } from "@particle-academy/react-fancy";
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | children | `ReactNode` | - | Trigger element |
+| className | `string` | - | Additional CSS classes, joined onto the child's. With a `Tooltip` child they reach the element the Tooltip wraps, not the bubble |
+| ...rest | attributes | - | Fill only what the child leaves unset |
+
+**Which element `className` reaches.** The trigger's own `<button>` when it wraps (text, a non-focusable child); otherwise the child. With a `Tooltip` child, the trigger passes it to the Tooltip's `triggerClassName`, so it lands on the button inside, not the tooltip bubble. Any other component child must apply `className` to the element its ref reaches; if none of the classes end up there, a development build logs a warning.
 
 The trigger renders no element of its own around an element child. It merges onto that child (keeping the child's own props, handlers and ref): `aria-haspopup="menu"`, `aria-expanded`, `aria-controls` (the menu's id, while it is open) and the `data-react-fancy-dropdown-trigger` handle. Pass the focusable control itself, such as a `<Button>` or `<button>`; a component child must forward its props and ref to the element it renders. A focusable `<span tabIndex={0}>` also gets `role="button"`. A child nothing can focus, such as plain text, is wrapped in a `<button type="button">` that carries the ARIA and the handle.
 

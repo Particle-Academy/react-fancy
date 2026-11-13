@@ -25,7 +25,8 @@ import { Tooltip } from "@particle-academy/react-fancy";
 | placement | `Placement` | `"top"` | Position relative to trigger. One of: `"top"`, `"bottom"`, `"left"`, `"right"`, `"top-start"`, `"top-end"`, `"bottom-start"`, `"bottom-end"` |
 | delay | `number` | `200` | Delay in ms before showing |
 | offset | `number` | `8` | Distance in px from the trigger |
-| className | `string` | - | Additional CSS classes for the tooltip |
+| className | `string` | - | Additional CSS classes for the tooltip **bubble**, not the trigger |
+| triggerClassName | `string` | - | Classes for the child (the trigger element), joined in front of its own `className` |
 | describe | `boolean` | `true` | Name the tooltip in the trigger's `aria-describedby` while shown. Turn off only when the tooltip repeats words already in the trigger's accessible name |
 | ...rest | attributes and handlers | - | Forwarded to the child, with the `ref`. The child's own value wins on a clash; handlers run both, the child's first. `className` is not forwarded (it styles the bubble) |
 
@@ -48,6 +49,12 @@ them on to its own child, so it can sit between the trigger and the button:
 
 The button carries `aria-haspopup`, `aria-expanded` and the trigger handle,
 opens the menu, and is still described by the tooltip while it is shown.
+
+A `className` on the trigger reaches the **button**, not the bubble: the
+trigger passes it to the Tooltip's `triggerClassName`, because the Tooltip's own
+`className` styles the bubble. So
+`<Popover.Trigger className="[-webkit-app-region:no-drag]">` around a Tooltip
+keeps the button clickable inside a title-bar drag region.
 
 ## Examples
 

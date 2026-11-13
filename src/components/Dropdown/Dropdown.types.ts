@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import type { Placement } from "../../utils/types";
 
 export interface DropdownContextValue {
@@ -29,7 +29,12 @@ export interface DropdownProps {
   offset?: number;
 }
 
-export interface DropdownTriggerProps {
+/**
+ * `className` is joined onto the child's (with a Tooltip child, onto the
+ * element the Tooltip wraps). Other attributes fill only what the child leaves
+ * unset, as on `Popover.Trigger`.
+ */
+export interface DropdownTriggerProps extends HTMLAttributes<HTMLElement> {
   children: ReactNode;
 }
 

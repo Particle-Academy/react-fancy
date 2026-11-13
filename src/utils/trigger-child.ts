@@ -1,4 +1,14 @@
-import { cloneElement, Fragment, isValidElement, type ReactElement, type ReactNode, type Ref } from "react";
+import {
+  cloneElement,
+  Fragment,
+  isValidElement,
+  useEffect,
+  useRef,
+  type ReactElement,
+  type ReactNode,
+  type Ref,
+  type RefObject,
+} from "react";
 import { cn } from "./cn";
 import { composeRefs } from "./compose-refs";
 
@@ -124,7 +134,10 @@ export function cloneTriggerChild(
     if (own[k] === undefined) merged[k] = v;
   }
   if (fallback.className !== undefined) {
-    merged.className = cn(fallback.className as string, own.className as string | undefined);
+    // A child whose `className` styles something other than the element it
+    // renders (Tooltip: the bubble) names the prop that reaches that element.
+    const key = triggerClassNameProp(element.type) ?? "className";
+    merged[key] = cn(fallback.className as string, own[key] as string | undefined);
   }
 
   for (const [k, v] of Object.entries(owned)) {
@@ -141,6 +154,61 @@ export function cloneTriggerChild(
 
   merged.ref = ref;
   return cloneElement(element, merged);
+}
+
+/**
+ * Static a component sets when its `className` does NOT style the element it
+ * renders, naming the prop that does. Tooltip sets it to `"triggerClassName"`:
+ * its `className` styles the bubble, so a trigger's classes go to its child.
+ */
+export const TRIGGER_CLASS_NAME_PROP = Symbol.for("react-fancy.triggerClassNameProp");
+
+function triggerClassNameProp(type: unknown): string | undefined {
+  if ((typeof type !== "function" && typeof type !== "object") || type === null) return undefined;
+  const value = (type as Record<symbol, unknown>)[TRIGGER_CLASS_NAME_PROP];
+  return typeof value === "string" ? value : undefined;
+}
+
+// Bundlers replace `process.env.NODE_ENV` textually; without one, the
+// reference throws and we read that as production.
+declare const process: { env: Record<string, string | undefined> };
+
+function isDev(): boolean {
+  try {
+    return process.env.NODE_ENV !== "production";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Development only: warn once when a trigger's `className` did not reach the
+ * element the trigger anchors to. The trigger merges `className` onto its
+ * child, and a child component decides where that goes; one that styles an
+ * inner or portalled element with it (a bubble, a label) leaves the control
+ * without the class, which fails silently. "None of the classes are on the
+ * element" is the test, so a class that tailwind-merge drops in favour of the
+ * child's own conflicting one does not trip it.
+ */
+export function useTriggerClassNameCheck(
+  anchorRef: RefObject<HTMLElement | null>,
+  className: string | undefined,
+  name: string,
+): void {
+  const warned = useRef(false);
+  useEffect(() => {
+    if (warned.current || !className || !isDev()) return;
+    const el = anchorRef.current;
+    if (!el) return;
+    const tokens = className.split(/\s+/).filter(Boolean);
+    if (tokens.length === 0 || tokens.some((t) => el.classList.contains(t))) return;
+    warned.current = true;
+    console.warn(
+      `[react-fancy] ${name} className="${className}" did not reach the element it anchors to ` +
+        `(<${el.tagName.toLowerCase()}>). The trigger merges className onto its child, and this child ` +
+        "styles something else with it. Put the classes on the child's own element instead.",
+    );
+  });
 }
 
 export { composeRefs };

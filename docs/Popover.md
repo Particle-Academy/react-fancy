@@ -42,7 +42,9 @@ import { Popover } from "@particle-academy/react-fancy";
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | children | `ReactNode` | - | Trigger element |
-| className | `string` | - | Additional CSS classes, joined onto the child's |
+| className | `string` | - | Additional CSS classes, joined onto the child's. With a `Tooltip` child they reach the element the Tooltip wraps, not the bubble |
+
+**Which element `className` reaches.** The trigger's own element when it wraps (text, a non-focusable child); otherwise the child. With a `Tooltip` child, the trigger passes it to the Tooltip's `triggerClassName`, so it lands on the button inside, not the tooltip bubble. Any other component child must apply `className` to the element its ref reaches; if none of the classes end up there, a development build logs a warning.
 
 The trigger renders no element of its own around an element child. It merges onto that child (keeping the child's own props, handlers and ref): `aria-haspopup`, `aria-expanded`, `aria-controls` (the content's id, or the `id` you gave `Popover.Content`, while it is open) and the `data-react-fancy-popover-trigger` handle. Other attributes passed to `Popover.Trigger` fill only what the child leaves unset. A component child must forward its props and ref to the element it renders. A focusable `<span tabIndex={0}>` also gets `role="button"` and opens on Enter / Space. A child nothing can focus, such as plain text, is wrapped in a `<button type="button">` that carries the ARIA.
 

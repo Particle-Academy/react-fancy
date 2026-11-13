@@ -11,6 +11,7 @@ import {
 } from "react";
 import { cn } from "../../utils/cn";
 import { composeRefs } from "../../utils/compose-refs";
+import { TRIGGER_CLASS_NAME_PROP } from "../../utils/trigger-child";
 import { Portal } from "../Portal";
 import { useFloatingPosition } from "../../hooks/use-floating-position";
 import { useEscapeKey } from "../../hooks/use-escape-key";
@@ -18,7 +19,17 @@ import type { TooltipProps } from "./Tooltip.types";
 
 export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
   function Tooltip(
-    { children, content, placement = "top", delay = 200, offset = 8, className, describe = true, ...forwarded },
+    {
+      children,
+      content,
+      placement = "top",
+      delay = 200,
+      offset = 8,
+      className,
+      triggerClassName,
+      describe = true,
+      ...forwarded
+    },
     forwardedRef,
   ) {
     const [open, setOpen] = useState(false);
@@ -49,7 +60,8 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
     // The trigger is the caller's element, so its own ref and handlers have to
     // survive the clone. Overwriting them broke any child that needs its ref:
     // a <MultiSwitch> measures its thumb from it, and rendered with none.
-    // className and every other prop are untouched — cloneElement keeps them.
+    // The child's own className and every other prop are kept by cloneElement;
+    // `triggerClassName` is joined in front of its className.
     const child = children as ReactElement<Record<string, unknown>>;
     const childProps = child.props;
     const childRef = childProps.ref as Ref<HTMLElement> | undefined;
@@ -97,6 +109,9 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
       : ownDescribedBy;
     const trigger = cloneElement(child, {
       ...merged,
+      ...(triggerClassName
+        ? { className: cn(triggerClassName, childProps.className as string | undefined) }
+        : {}),
       ref: triggerRef,
       "aria-describedby": describedBy,
       onMouseEnter: chain(handler("onMouseEnter"), show),
@@ -148,3 +163,8 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(
 );
 
 Tooltip.displayName = "Tooltip";
+
+// Tooltip's `className` styles the bubble, so `Popover.Trigger` /
+// `Dropdown.Trigger` route their `className` to `triggerClassName`, which
+// reaches the element the Tooltip wraps.
+(Tooltip as unknown as Record<symbol, unknown>)[TRIGGER_CLASS_NAME_PROP] = "triggerClassName";

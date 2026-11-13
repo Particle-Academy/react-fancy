@@ -7,7 +7,9 @@ import {
   composeRefs,
   popupTriggerAria,
   triggerChildRef,
+  useTriggerClassNameCheck,
 } from "../../utils/trigger-child";
+import { cn } from "../../utils/cn";
 import type { DropdownTriggerProps } from "./Dropdown.types";
 
 /**
@@ -35,12 +37,13 @@ function activatesNatively(el: EventTarget | null): boolean {
  * that carries them instead. A component child must forward its props and ref
  * to the element it renders, as `Button` does.
  */
-export function DropdownTrigger({ children }: DropdownTriggerProps) {
+export function DropdownTrigger({ children, className, ...rest }: DropdownTriggerProps) {
   const { setOpen, open, anchorRef, pendingFocusRef, menuRef, menuId } = useDropdown();
 
   const target = classifyTriggerChild(children);
   const childRef = triggerChildRef(target);
   const ref = useMemo(() => composeRefs(childRef, anchorRef), [childRef, anchorRef]);
+  useTriggerClassNameCheck(anchorRef, className, "Dropdown.Trigger");
 
   // WAI-ARIA menu button: Enter / Space / ArrowDown open the menu on its first
   // item, ArrowUp on its last.
@@ -84,16 +87,18 @@ export function DropdownTrigger({ children }: DropdownTriggerProps) {
         ...(target.role ? { role: target.role } : {}),
         ...(target.aria ? aria : {}),
       },
+      fallback: { ...rest, className },
       ref,
     });
   }
 
   return (
     <button
+      {...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)}
       ref={ref as React.Ref<HTMLButtonElement>}
       type="button"
       data-react-fancy-dropdown-trigger=""
-      className="inline-flex"
+      className={cn("inline-flex", className)}
       onClick={onClick}
       onKeyDown={onKeyDown}
       {...aria}
