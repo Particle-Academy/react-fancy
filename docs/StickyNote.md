@@ -33,6 +33,7 @@ const [text, setText] = useState("Remember the milk");
 | selected | `boolean` | `false` | Selected styling (focus ring) |
 | editable | `boolean` | `true` | Allow inline editing of the text |
 | autoFocus | `boolean` | `false` | Focus the editable region (caret at end) when it becomes editable |
+| label | `string` | `"Sticky note"` | Accessible name of the editable text |
 | id | `string` | — | Stable handle; also emitted as the element `id` |
 | children | `ReactNode` | — | Static content; overrides the editable text |
 

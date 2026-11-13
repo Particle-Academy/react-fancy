@@ -10,8 +10,13 @@ import type { ImagePillProps, ImagePillThumbnailState } from "./ImagePill.types"
  */
 const PILL_BASE =
   "inline-flex select-none items-center rounded-md px-2 py-0.5 text-xs leading-5 transition-colors";
+/*
+ * rose-800 on rose-100: rose-600 was 3.77:1 at the pill's 12px (axe
+ * `color-contrast`, every-component brief K26). rose-300 on the dark tint
+ * clears AA on the darkest surface under it.
+ */
 const IMAGE_PILL =
-  "bg-rose-100 font-medium text-rose-600 dark:bg-rose-500/20 dark:text-rose-300";
+  "bg-rose-100 font-medium text-rose-800 dark:bg-rose-500/20 dark:text-rose-300";
 /** Merged onto the Popover panel's own defaults: tighter padding for a preview. */
 const PREVIEW_BASE = "max-w-xs whitespace-pre-wrap break-all p-2 text-xs";
 

@@ -3,7 +3,7 @@
 A standalone PDF viewer with two modes:
 
 - **`src`**: embeds the document via the browser's native PDF plugin
-  (`<object>`), falling back to an `<iframe>`, then to a download link.
+  (`<object>`), falling back to a download link.
 - **`pages`** (page-image mode): shows page images your app rendered from the
   PDF, behind its own auth, under an access `policy`, with an optional
   `watermark`. The viewer never fetches or references the PDF.

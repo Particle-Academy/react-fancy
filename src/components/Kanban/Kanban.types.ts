@@ -57,6 +57,8 @@ export interface KanbanProps {
    * a column was actually dragged.
    */
   onColumnMove?: KanbanColumnMoveHandler;
+  /** Accessible name of the board (a focusable, scrollable region). Default `"Kanban board"`. */
+  label?: string;
   className?: string;
 }
 

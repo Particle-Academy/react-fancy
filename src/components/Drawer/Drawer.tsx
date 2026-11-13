@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { cn } from "../../utils/cn";
 import { Portal } from "../Portal";
 import { DrawerContext } from "./Drawer.context";
@@ -9,6 +9,7 @@ import { DrawerContainer } from "./DrawerContainer";
 import { useDialogFocusTrap } from "../../hooks/use-dialog-focus-trap";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import { useAnimation } from "../../hooks/use-animation";
+import { useInertOutside } from "../../hooks/use-inert-outside";
 import type { DrawerProps, DrawerSide } from "./Drawer.types";
 
 /**
@@ -117,7 +118,24 @@ function DrawerRoot({
     [animRef, attachTrap],
   );
 
-  const ctx = useMemo(() => ({ open, close, side }), [open, close, side]);
+  // Named by Drawer.Header's title unless the host names it; see Modal.
+  const titleId = useId();
+  const [hasTitle, setHasTitle] = useState(false);
+  const registerTitle = useCallback(() => {
+    setHasTitle(true);
+    return () => setHasTitle(false);
+  }, []);
+  const hostNamed = rest["aria-label"] != null || rest["aria-labelledby"] != null;
+
+  // A viewport drawer is modal: while open, everything outside its ancestor
+  // chain is inert. A container-attached drawer is a panel and leaves the page alone.
+  const [frameNode, setFrameNode] = useState<HTMLDivElement | null>(null);
+  useInertOutside(frameNode, open && isViewport);
+
+  const ctx = useMemo(
+    () => ({ open, close, side, titleId, registerTitle }),
+    [open, close, side, titleId, registerTitle],
+  );
 
   if (!mounted && !keepMounted) return null;
 
@@ -129,6 +147,7 @@ function DrawerRoot({
 
   const frame = (
     <div
+      ref={setFrameNode}
       data-react-fancy-drawer-frame=""
       hidden={concealed || undefined}
       inert={concealed || undefined}
@@ -154,6 +173,7 @@ function DrawerRoot({
         data-side={side}
         role="dialog"
         aria-modal={isViewport || undefined}
+        aria-labelledby={!hostNamed && hasTitle ? titleId : undefined}
         {...rest}
         className={cn(
           "pointer-events-auto absolute flex flex-col border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-xl dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",

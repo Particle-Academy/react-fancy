@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { cn } from "../../utils/cn";
 import { Portal } from "../Portal";
 import { ModalContext } from "./Modal.context";
@@ -8,6 +8,7 @@ import { ModalFooter } from "./ModalFooter";
 import { useDialogFocusTrap } from "../../hooks/use-dialog-focus-trap";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import { useAnimation } from "../../hooks/use-animation";
+import { useInertOutside } from "../../hooks/use-inert-outside";
 import type { ModalProps } from "./Modal.types";
 
 /**
@@ -78,7 +79,22 @@ function ModalRoot({
     [animRef, attachTrap],
   );
 
-  const ctx = useMemo(() => ({ open, close }), [open, close]);
+  // The dialog is named by Modal.Header's title (axe `aria-dialog-name`),
+  // unless the host names it. Only while a header is mounted, so the reference
+  // never points at an id that does not exist.
+  const titleId = useId();
+  const [hasTitle, setHasTitle] = useState(false);
+  const registerTitle = useCallback(() => {
+    setHasTitle(true);
+    return () => setHasTitle(false);
+  }, []);
+  const hostNamed = rest["aria-label"] != null || rest["aria-labelledby"] != null;
+
+  // While open, everything outside the dialog's ancestor chain is inert.
+  const [frame, setFrame] = useState<HTMLDivElement | null>(null);
+  useInertOutside(frame, open);
+
+  const ctx = useMemo(() => ({ open, close, titleId, registerTitle }), [open, close, titleId, registerTitle]);
 
   if (!mounted && !keepMounted) return null;
 
@@ -91,6 +107,7 @@ function ModalRoot({
     <ModalContext.Provider value={ctx}>
       <Portal>
         <div
+          ref={setFrame}
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           hidden={concealed || undefined}
           inert={concealed || undefined}
@@ -108,6 +125,7 @@ function ModalRoot({
             data-react-fancy-modal=""
             role="dialog"
             aria-modal="true"
+            aria-labelledby={!hostNamed && hasTitle ? titleId : undefined}
             {...rest}
             className={cn(
               "relative flex w-full flex-col overflow-hidden rounded-[var(--fancy-radius-modal,var(--radius-2xl))] border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-xl dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",

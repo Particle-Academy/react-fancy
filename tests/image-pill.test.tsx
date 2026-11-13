@@ -245,7 +245,7 @@ describe("PromptInput draws its image pill with ImagePill", () => {
     expect(el.hasAttribute("data-react-fancy-image-pill")).toBe(true);
     // The look the composer had before the export, class for class.
     expect(el.className).toBe(
-      "inline-flex select-none items-center rounded-md px-2 py-0.5 text-xs leading-5 transition-colors bg-rose-100 font-medium text-rose-600 dark:bg-rose-500/20 dark:text-rose-300",
+      "inline-flex select-none items-center rounded-md px-2 py-0.5 text-xs leading-5 transition-colors bg-rose-100 font-medium text-rose-800 dark:bg-rose-500/20 dark:text-rose-300",
     );
     expect(el.getAttribute("role")).toBe("img");
     expect(el.getAttribute("aria-label")).toBe("Pasted image 1");

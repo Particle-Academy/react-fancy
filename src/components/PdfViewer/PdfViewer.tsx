@@ -6,7 +6,7 @@ import type { PdfViewerProps } from "./PdfViewer.types";
 
 /**
  * A standalone PDF viewer — embeds the document via the browser's native PDF
- * plugin (`<object>`), falling back to an `<iframe>`, then to a download link.
+ * plugin (`<object>`), falling back to a download link.
  * Fills its container, so give it a height (a `min-h` floor is built in).
  * Renders for PDF sources inside `<MediaViewer>`.
  *
@@ -90,12 +90,16 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(
         )}
         style={style}
       >
-        <object data={src} type="application/pdf" className="h-full w-full">
-          <iframe
-            src={src}
-            title={title}
-            className="h-full w-full border-0"
-          />
+        {/*
+          One <object>, no fallback <iframe>. The iframe loaded the same URL a
+          second time: measured in Chromium (2026-11-13), a browser with a PDF
+          viewer fetched the PDF twice, and one without (headless) turned the
+          iframe's load into a download and cancelled it, `net::ERR_ABORTED` on
+          every load (every-component brief K27). The <object> alone fetches it
+          once, and where nothing can show a PDF it requests nothing and shows
+          the download link below.
+        */}
+        <object data={src} type="application/pdf" title={title} aria-label={title} className="h-full w-full">
           <div className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center text-sm text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
             <span>This browser can&apos;t display the PDF inline.</span>
             <a

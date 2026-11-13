@@ -22,6 +22,11 @@ export interface CodeViewProps {
   readOnly?: boolean;
   /** Placeholder shown when empty. */
   placeholder?: string;
+  /**
+   * Accessible name of the text area (a file name, "Request body"). Default:
+   * `placeholder`, else `"Code"`.
+   */
+  label?: string;
   /** Min height in px before the view grows with content. @default 120 */
   minHeight?: number;
   /** Max height in px before the view scrolls internally. */

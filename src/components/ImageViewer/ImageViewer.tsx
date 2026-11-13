@@ -221,7 +221,9 @@ export const ImageViewer = forwardRef<HTMLDivElement, ImageViewerProps>(
             </button>
             <button
               type="button"
-              aria-label="Reset zoom"
+              // Its visible text is the zoom level, so the name carries it too
+              // (WCAG 2.5.3 Label in Name): a speech user says what they see.
+              aria-label={`Reset zoom, ${Math.round(current.zoom * 100)}%`}
               onClick={reset}
               className="min-w-[3rem] rounded px-1 text-center text-xs tabular-nums hover:bg-[color:var(--fancy-surface-muted,var(--color-zinc-100))] dark:hover:bg-[color:var(--fancy-surface-muted-dark,var(--color-zinc-800))]"
             >

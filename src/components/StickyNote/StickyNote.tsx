@@ -37,6 +37,7 @@ export const StickyNote = forwardRef<HTMLDivElement, StickyNoteProps>(
       selected = false,
       editable = true,
       autoFocus = false,
+      label = "Sticky note",
       id,
       children,
       className,
@@ -91,6 +92,9 @@ export const StickyNote = forwardRef<HTMLDivElement, StickyNoteProps>(
           spellCheck={false}
           role="textbox"
           aria-multiline="true"
+          // A textbox needs a name (axe `aria-input-field-name`); its text is
+          // its value, not its name.
+          aria-label={label}
           className="outline-none whitespace-pre-wrap break-words min-h-[1.4em]"
           onBlur={commit}
           onKeyDown={(e) => {

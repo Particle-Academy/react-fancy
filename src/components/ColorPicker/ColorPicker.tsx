@@ -1,4 +1,4 @@
-import { forwardRef, useId, useRef } from "react";
+import { forwardRef, useId } from "react";
 import { cn } from "../../utils/cn";
 import { useControllableState } from "../../hooks/use-controllable-state";
 import { useFieldMode } from "../inputs/mode/FieldMode.context";
@@ -31,6 +31,10 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
       disabled = false,
       className,
       mode,
+      label = "Color",
+      "aria-label": ariaLabel,
+      "aria-labelledby": ariaLabelledBy,
+      "aria-describedby": ariaDescribedBy,
       ...rest
     },
     ref,
@@ -43,23 +47,19 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
     const resolvedMode = useFieldMode(mode);
     const { showControl, interactive, enterEdit, exitEdit } = useInlineEdit(resolvedMode, disabled);
 
-    const inputRef = useRef<HTMLInputElement>(null);
     const datalistId = useId();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setColor(e.target.value);
     };
 
-    const handleSwatchClick = () => {
-      if (!disabled) {
-        inputRef.current?.click();
-      }
-    };
-
     if (!showControl) {
       return (
         <div
           {...rest}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
           ref={ref}
           data-react-fancy-color-picker=""
           data-mode="view"
@@ -91,7 +91,8 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
               variant === "outline" && "ring-1 ring-zinc-300 dark:ring-zinc-600",
             )}
             style={{ backgroundColor: color }}
-            aria-label={`Color: ${color}`}
+            role="img"
+            aria-label={`${ariaLabel ?? label}: ${color}`}
           />
           <span
             className={cn(
@@ -116,11 +117,15 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
           if (interactive && !e.currentTarget.contains(e.relatedTarget as Node)) exitEdit();
         }}
       >
-        <button
-          type="button"
-          disabled={disabled}
-          autoFocus={interactive}
-          onClick={handleSwatchClick}
+        {/*
+          The swatch is paint, not a control: the native colour input inside it
+          is the one control, the tab stop and the thing that is named. Up to
+          6.25.0 the swatch was a <button> wrapping the input (axe
+          `nested-interactive`), and the input had no name (axe `label`): an
+          `aria-label` on the root named neither.
+        */}
+        <span
+          data-react-fancy-color-picker-swatch=""
           className={cn(
             "relative shrink-0 rounded-full transition-shadow",
             SWATCH_SIZES[size],
@@ -132,21 +137,27 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
             disabled
               ? "cursor-not-allowed opacity-50"
               : "cursor-pointer hover:ring-2 hover:ring-zinc-600 dark:hover:ring-zinc-400",
+            // The input is invisible, so its focus shows on the swatch.
+            "has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-[color:var(--fancy-focus,var(--color-blue-500))] dark:has-[:focus-visible]:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]",
           )}
           style={{ backgroundColor: color }}
-          aria-label={`Selected color: ${color}`}
         >
           <input
-            ref={inputRef}
             type="color"
             value={color}
             onChange={handleChange}
             disabled={disabled}
-            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-            tabIndex={-1}
+            autoFocus={interactive}
+            aria-label={ariaLabelledBy ? undefined : (ariaLabel ?? label)}
+            aria-labelledby={ariaLabelledBy}
+            aria-describedby={ariaDescribedBy}
+            className={cn(
+              "absolute inset-0 h-full w-full rounded-full opacity-0 outline-none",
+              disabled ? "cursor-not-allowed" : "cursor-pointer",
+            )}
             list={presets ? datalistId : undefined}
           />
-        </button>
+        </span>
 
         <span
           className={cn(

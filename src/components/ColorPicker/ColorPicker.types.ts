@@ -22,4 +22,10 @@ export interface ColorPickerProps
   className?: string;
   /** `"edit"` (default) renders the control; `"view"` renders the value as text. */
   mode?: FieldMode;
+  /**
+   * Accessible name of the colour input. Default `"Color"`. An `aria-label` or
+   * `aria-labelledby` (and `aria-describedby`) passed to the component lands on
+   * the input, not the wrapper, and wins over this.
+   */
+  label?: string;
 }

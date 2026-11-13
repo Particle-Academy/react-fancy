@@ -28,6 +28,12 @@ export interface StickyNoteProps {
    */
   autoFocus?: boolean;
   /**
+   * Accessible name of the editable text (`aria-label` on its `role="textbox"`).
+   * Default `"Sticky note"`; pass something that tells notes apart, or your
+   * locale's word.
+   */
+  label?: string;
+  /**
    * Stable handle — also emitted as the element `id`. Lets agents and
    * selectors target a specific note without guessing the DOM.
    */

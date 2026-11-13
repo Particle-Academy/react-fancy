@@ -8,6 +8,7 @@ import type { NotificationBellLabels, NotificationBellProps } from "./Notificati
 
 export const DEFAULT_NOTIFICATION_BELL_LABELS: Required<NotificationBellLabels> = {
   button: "Notifications",
+  buttonCount: "{button}, {count} unread",
   unread: "{count} unread notifications",
   unreadOne: "1 unread notification",
   none: "No unread notifications",
@@ -18,12 +19,12 @@ export const DEFAULT_NOTIFICATION_BELL_LABELS: Required<NotificationBellLabels> 
  * An icon button with an unread count, built on the kit's `Button` (so touch
  * density makes it 44 x 44 like every other Button).
  *
- * The count is drawn in a badge that is hidden from assistive tech, and said
- * in words in a polite `role="status"` region beside the button, which also
- * describes the button: a screen reader hears "Notifications, 3 unread
- * notifications" on focus, and "3 unread notifications" when the count
- * changes. The region sits OUTSIDE the button, because a button's content is
- * presentational and a live region inside one is not reliably announced.
+ * The count is drawn in a badge that is hidden from assistive tech and is part
+ * of the button's name ("Notifications, 3 unread"), because it is visible text
+ * (WCAG 2.5.3 Label in Name). A change of count is said in words in a polite
+ * `role="status"` region beside the button: "3 unread notifications". The
+ * region sits OUTSIDE the button, because a button's content is presentational
+ * and a live region inside one is not reliably announced.
  */
 export const NotificationBell = forwardRef<HTMLButtonElement, NotificationBellProps>(function NotificationBell(
   {
@@ -45,6 +46,9 @@ export const NotificationBell = forwardRef<HTMLButtonElement, NotificationBellPr
   const n = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
   const cap = Math.max(1, Math.floor(max));
   const shown = n > cap ? fillLabel(words.overflow, { max: cap }) : String(n);
+  // The badge is visible text, so its number is in the button's name (WCAG
+  // 2.5.3 Label in Name; axe reads visible text even when it is aria-hidden).
+  const name = n > 0 ? fillLabel(words.buttonCount, { button: words.button, count: shown }) : words.button;
   const announcement = n === 0 ? words.none : n === 1 ? words.unreadOne : fillLabel(words.unread, { count: n });
 
   return (
@@ -53,14 +57,14 @@ export const NotificationBell = forwardRef<HTMLButtonElement, NotificationBellPr
         ref={ref}
         type="button"
         variant={variant}
-        aria-label={words.button}
+        aria-label={name}
         aria-expanded={open}
         data-react-fancy-notification-bell=""
         data-count={n}
         data-unread={n > 0 ? "true" : "false"}
         className={cn("relative", className)}
         {...rest}
-        aria-describedby={[describedBy, statusId].filter(Boolean).join(" ")}
+        aria-describedby={describedBy}
         onClick={(e) => {
           onClick?.(e);
           if (!e.defaultPrevented) onOpenChange?.(!open);

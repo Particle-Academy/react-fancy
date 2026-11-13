@@ -29,6 +29,7 @@ function KanbanRoot({
   children,
   onCardMove,
   onColumnMove,
+  label = "Kanban board",
   className,
 }: KanbanProps) {
   const [draggedCard, setDraggedCard] = useState<string | null>(null);
@@ -125,9 +126,20 @@ function KanbanRoot({
         data-react-fancy-kanban=""
         onDragOver={handleDragOver}
         onDrop={handleDrop}
-        role="application"
+        // The board scrolls sideways once its columns outgrow it, and nothing in
+        // it is focusable, so the board itself is the tab stop a keyboard user
+        // scrolls with (axe `scrollable-region-focusable`), and a named region.
+        // It was `role="application"`, which tells a screen reader the page
+        // handles every key itself; the board handles none.
+        role="region"
+        aria-label={label}
         aria-roledescription="kanban board"
-        className={cn("flex gap-4 overflow-x-auto p-4", className)}
+        tabIndex={0}
+        className={cn(
+          "flex gap-4 overflow-x-auto p-4",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]",
+          className,
+        )}
       >
         {children}
       </div>

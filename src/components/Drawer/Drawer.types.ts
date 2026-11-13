@@ -33,6 +33,10 @@ export interface DrawerContextValue {
   open: boolean;
   close: () => void;
   side: DrawerSide;
+  /** The id `Drawer.Header` gives its title, which names the dialog. */
+  titleId: string;
+  /** Called by `Drawer.Header` while it is mounted; returns the unregister. */
+  registerTitle: () => () => void;
 }
 
 export interface DrawerProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {

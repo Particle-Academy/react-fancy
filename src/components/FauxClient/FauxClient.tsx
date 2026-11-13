@@ -156,7 +156,8 @@ export const FauxClient = forwardRef<HTMLDivElement, FauxClientProps>(
             <button
               type="button"
               data-react-fancy-faux-client-zoom-reset=""
-              aria-label="Reset zoom"
+              // The zoom level is its visible text, so it is in the name (WCAG 2.5.3).
+              aria-label={`Reset zoom, ${Math.round(zoom * 100)}%`}
               title="Reset zoom"
               onClick={() => setZoom(1)}
               className={cn(controlButton(isBrowser), "w-auto min-w-[2.25rem] px-1 font-sans text-[10.5px] tabular-nums")}

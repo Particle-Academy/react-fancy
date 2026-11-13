@@ -3,6 +3,10 @@ import type { HTMLAttributes, ReactNode } from "react";
 export interface ModalContextValue {
   open: boolean;
   close: () => void;
+  /** The id `Modal.Header` gives its title, which names the dialog. */
+  titleId: string;
+  /** Called by `Modal.Header` while it is mounted; returns the unregister. */
+  registerTitle: () => () => void;
 }
 
 export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {

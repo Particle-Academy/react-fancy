@@ -28,6 +28,7 @@ export function CodeView({
   language = "plaintext",
   readOnly = false,
   placeholder,
+  label,
   minHeight = 120,
   maxHeight,
   className,
@@ -101,7 +102,9 @@ export function CodeView({
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
-          aria-label={placeholder}
+          // Always named (axe `label`): the host's label, else the placeholder
+          // (what it named before), else "Code".
+          aria-label={label ?? placeholder ?? "Code"}
           className={cn(
             "relative block w-full resize-none border-none bg-transparent text-transparent outline-none",
             TEXT_METRICS,

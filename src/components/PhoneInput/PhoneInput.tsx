@@ -317,9 +317,13 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(function
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-controls={open ? listId : undefined}
+          // The dial code is the button's visible text, so it must be in the
+          // name (WCAG 2.5.3 Label in Name). Not in parentheses: speech input
+          // and axe's `label-content-name-mismatch` both drop bracketed text,
+          // so "(+1)" left the visible "+1" out of the name.
           aria-label={
             selected
-              ? `${msg.country}: ${selectedName} (+${selected.dialCode})`
+              ? `${msg.country}: ${selectedName}, +${selected.dialCode}`
               : msg.chooseCountry
           }
           onClick={() => (open ? close(null) : openPicker())}

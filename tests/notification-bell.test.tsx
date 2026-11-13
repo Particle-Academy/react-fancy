@@ -35,12 +35,12 @@ const badge = (host: ParentNode) => host.querySelector("[data-react-fancy-notifi
 const status = (host: ParentNode) => host.querySelector("[data-react-fancy-notification-bell-status]")!;
 
 describe("NotificationBell", () => {
-  it("is a button named Notifications, with stable handles", () => {
+  it("is a button named Notifications and its count, with stable handles", () => {
     const { host } = mount(<NotificationBell count={3} />);
     const b = bell(host);
     expect(b.tagName).toBe("BUTTON");
     expect(b.getAttribute("type")).toBe("button");
-    expect(b.getAttribute("aria-label")).toBe("Notifications");
+    expect(b.getAttribute("aria-label")).toBe("Notifications, 3 unread");
     expect(b.getAttribute("data-count")).toBe("3");
     expect(b.getAttribute("data-unread")).toBe("true");
     expect(b.hasAttribute("data-react-fancy-action"), "it is a kit Button, so touch density covers it").toBe(true);
@@ -59,30 +59,36 @@ describe("NotificationBell", () => {
     expect(bell(host).getAttribute("data-unread")).toBe("false");
   });
 
-  it("announces the count politely, and the button is described by it", () => {
+  it("announces the count politely, and the visible count is in the button's name", () => {
     const { host, rerender } = mount(<NotificationBell count={3} />);
     const s = status(host);
     expect(s.getAttribute("role")).toBe("status");
     expect(s.getAttribute("aria-live")).toBe("polite");
     expect(s.textContent).toBe("3 unread notifications");
-    expect(bell(host).getAttribute("aria-describedby")).toBe(s.id);
+    // The name already carries the count; describing it as well read it twice.
+    expect(bell(host).hasAttribute("aria-describedby")).toBe(false);
+    expect(bell(host).getAttribute("aria-label")).toBe("Notifications, 3 unread");
     expect(bell(host).contains(s), "a live region inside a button is not announced").toBe(false);
     rerender(<NotificationBell count={1} />);
     expect(status(host).textContent).toBe("1 unread notification");
     rerender(<NotificationBell count={0} />);
     expect(status(host).textContent).toBe("No unread notifications");
+    expect(bell(host).getAttribute("aria-label")).toBe("Notifications");
+    rerender(<NotificationBell count={250} />);
+    expect(bell(host).getAttribute("aria-label")).toBe("Notifications, 99+ unread");
   });
 
   it("takes every word from labels", () => {
     const labels = {
       button: "Notificaciones",
+      buttonCount: "{button}: {count} sin leer",
       unread: "{count} notificaciones sin leer",
       unreadOne: "1 notificación sin leer",
       none: "Sin notificaciones nuevas",
       overflow: "{max}+",
     };
     const { host, rerender } = mount(<NotificationBell count={4} labels={labels} />);
-    expect(bell(host).getAttribute("aria-label")).toBe("Notificaciones");
+    expect(bell(host).getAttribute("aria-label")).toBe("Notificaciones: 4 sin leer");
     expect(status(host).textContent).toBe("4 notificaciones sin leer");
     rerender(<NotificationBell count={1} labels={labels} />);
     expect(status(host).textContent).toBe("1 notificación sin leer");

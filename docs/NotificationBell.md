@@ -46,7 +46,8 @@ state, so leave `open` unset:
 
 | Key | Default |
 |-----|---------|
-| `button` | `"Notifications"` (the accessible name) |
+| `button` | `"Notifications"` (the accessible name with no count) |
+| `buttonCount` | `"{button}, {count} unread"` (the name while a count shows; `{count}` is the badge text) |
 | `unread` | `"{count} unread notifications"` |
 | `unreadOne` | `"1 unread notification"` |
 | `none` | `"No unread notifications"` |
@@ -54,12 +55,13 @@ state, so leave `open` unset:
 
 ## Accessibility
 
-- The button is named by `labels.button`. The count is drawn in a badge that
-  is `aria-hidden`, and said in words in a polite `role="status"` region next
-  to the button, which also describes the button (`aria-describedby`): focus
-  reads "Notifications, 3 unread notifications", and a change of count is
-  announced without moving focus. The region sits outside the button, because
-  a live region inside a button is not reliably announced.
+- The button is named "Notifications, 3 unread" while it shows a count
+  (`labels.buttonCount`) and "Notifications" without one (`labels.button`).
+  The badge is `aria-hidden`, but its number is visible text, so it is in the
+  name (WCAG 2.5.3 Label in Name). A change of count is said in words in a
+  polite `role="status"` region next to the button, without moving focus. The
+  region sits outside the button, because a live region inside a button is not
+  reliably announced.
 - The badge's number is white on red-800 in both modes, 8:1 or better (WCAG
   AAA).
 - Under touch density it is 44 x 44, like every kit `Button`.

@@ -354,7 +354,7 @@ describe("pickers and selects", () => {
 
   it("ColorPicker swatch (outline variant, the default)", async () => {
     mount(<ColorPicker value="#ffffff" />);
-    await expectStrongOutline("ColorPicker swatch", q("[data-react-fancy-color-picker] > button"), "ring");
+    await expectStrongOutline("ColorPicker swatch", q("[data-react-fancy-color-picker-swatch]"), "ring");
   });
 });
 

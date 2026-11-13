@@ -11,6 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+Accessibility findings from the lab's every-component brief (fancy-labs `docs/kit-site-findings.md`, K22 to K27), each in the component's own markup, plus two consumer reports against 6.24.1. Each has a test in `tests/every-component-a11y.test.tsx` or `tests/dialog-name-inert.test.tsx` that fails on 6.25.0.
+
+- **Modal and Drawer name their dialog** (axe `aria-dialog-name`). `Modal.Header` / `Drawer.Header` give their title an id (`data-react-fancy-modal-title` / `-drawer-title`), and the dialog points `aria-labelledby` at it while a header is mounted. An `aria-label` or `aria-labelledby` you pass to `Modal` / `Drawer` wins, and then none is set. Consumers: nothing to do.
+- **The page behind an open Modal or viewport Drawer is `inert`**, and restored on close or unmount. Everything outside the dialog's ancestor chain is made inert, so it also works when the dialog portals into a landmark through `PortalContainerContext` (the landmark stays live; its other children and its siblings do not). `aria-modal` alone only asked assistive tech to ignore the page; a pointer and a screen reader's virtual cursor could still reach it. Stacked dialogs (a Drawer over a Modal) and elements the host had already made inert are handled: nothing is restored while another open dialog still needs it, and nothing the host made inert is un-inerted. A container-attached Drawer is a panel, not a modal, and changes nothing. **Behaviour change:** anything outside the dialog that was there when it opened, including a Toast container, is inert while it is open, as it would be under a native modal `<dialog>`. Popups opened from inside the dialog are added later and stay live.
+- **StickyNote's editable text has a name** (K22, axe `aria-input-field-name`). New **`label`** prop, default `"Sticky note"`.
+- **ColorPicker's input is named, and not nested in another control** (K23, axe `label` and `nested-interactive`). The swatch was a `<button>` wrapping the colour input. It is a painted `<span>` (`data-react-fancy-color-picker-swatch`) now, and the input is the only control and the tab stop. `aria-label`, `aria-labelledby` and `aria-describedby` passed to the component land on the input rather than the wrapper. New **`label`** prop, default `"Color"`. The swatch shows the input's focus ring. In view mode the swatch is `role="img"`. **If you styled `[data-react-fancy-color-picker] > button`, target `[data-react-fancy-color-picker-swatch]` instead.**
+- **Visible text is part of the accessible name** (K24, WCAG 2.5.3, axe `label-content-name-mismatch`):
+  - PhoneInput's country button reads "Country: United States, +1". It was "… (+1)", and both speech input and axe drop text in parentheses, so the visible "+1" was missing.
+  - ImageViewer's (and so MediaViewer's) reset-zoom button reads "Reset zoom, 100%". FauxClient's and PdfViewer page mode's reset-zoom buttons had the same defect and are fixed the same way.
+  - NotificationBell is named "Notifications, 3 unread" while it shows a count (new label **`buttonCount`**, default `"{button}, {count} unread"`, where `{count}` is the badge text, such as "99+"). axe counts the badge's number although it is `aria-hidden`. The button is no longer `aria-describedby` its status region, which would read the count twice; the polite region still announces changes.
+- **Kanban's board is reachable from the keyboard** (K25, axe `scrollable-region-focusable`). It scrolls sideways once its columns outgrow it and nothing in it was focusable. The board is a focusable, named `role="region"` with a focus ring now. New **`label`** prop, default `"Kanban board"`. It was `role="application"`, which tells a screen reader the page handles every key; the board handles none.
+- **ImagePill's text reaches AA contrast** (K26): rose-800 on rose-100, from rose-600 (3.77:1). This is the composer's image pill too.
+- **CodeView's textarea is named** (K26, axe `label`). New **`label`** prop. Default: `placeholder` (what named it before), else `"Code"`.
+- **PdfViewer no longer aborts its own request** (K27, `net::ERR_ABORTED` on every load). It nested an `<iframe>` of the same URL inside its `<object>`. Measured in Chromium: with a PDF viewer the PDF was fetched twice, and without one (headless) the iframe's load became a cancelled download. The `<object>` alone fetches it once, or, where nothing can show a PDF, requests nothing and shows the download link. The `<object>` is named by `title`.
+
 ## [6.25.0] - 2026-11-13
 
 ### Fixed

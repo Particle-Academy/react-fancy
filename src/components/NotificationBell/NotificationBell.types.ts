@@ -4,6 +4,8 @@ import type { ButtonProps } from "../Button/Button.types";
 export interface NotificationBellLabels {
   /** The button's accessible name. @default "Notifications" */
   button?: string;
+  /** The name while there is a count: the badge's number must be in it. `{button}` is `button`, `{count}` the badge text ("3", "99+"). @default "{button}, {count} unread" */
+  buttonCount?: string;
   /** Announced, and describing the button, for two or more. `{count}` is the number. @default "{count} unread notifications" */
   unread?: string;
   /** The same for exactly one. @default "1 unread notification" */

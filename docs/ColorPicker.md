@@ -25,6 +25,7 @@ import { ColorPicker } from "@particle-academy/react-fancy";
 | size | `"sm" \| "md" \| "lg"` | `"md"` | Swatch and text size |
 | variant | `"outline" \| "filled"` | `"outline"` | Swatch border style |
 | disabled | `boolean` | `false` | Disable interaction |
+| label | `string` | `"Color"` | Accessible name of the colour input. An `aria-label` / `aria-labelledby` you pass lands on the input and wins |
 | className | `string` | - | Additional CSS classes |
 
 Supports both controlled (`value` + `onChange`) and uncontrolled (`defaultValue`) usage.

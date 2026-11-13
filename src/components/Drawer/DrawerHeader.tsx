@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { X } from "lucide-react";
 import { cn } from "../../utils/cn";
 import { useDrawer } from "./Drawer.context";
@@ -9,7 +10,9 @@ import type { DrawerHeaderProps } from "./Drawer.types";
  * look is unchanged; see ModalHeader for why this over a size option.
  */
 export function DrawerHeader({ children, closable = true, className, closeLabel = "Close" }: DrawerHeaderProps) {
-  const { close } = useDrawer();
+  const { close, titleId, registerTitle } = useDrawer();
+  // The title (not the whole header, which holds the close button) names the dialog.
+  useEffect(() => registerTitle(), [registerTitle]);
 
   return (
     <div
@@ -19,7 +22,7 @@ export function DrawerHeader({ children, closable = true, className, closeLabel 
         className,
       )}
     >
-      <div className="text-sm font-semibold text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]">{children}</div>
+      <div id={titleId} data-react-fancy-drawer-title="" className="text-sm font-semibold text-[color:var(--fancy-text,var(--color-zinc-900))] dark:text-[color:var(--fancy-text-dark,var(--color-zinc-100))]">{children}</div>
       {closable ? (
         <button
           type="button"

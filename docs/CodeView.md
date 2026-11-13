@@ -69,6 +69,7 @@ Read-only (omit `onChange` or pass `readOnly`):
 | language | `CodeLanguage` (any string) | `"plaintext"` | Language id or alias, case-insensitive (table above). Unknown values render plain. |
 | readOnly | `boolean` | `false` | Read-only even if `onChange` is passed. |
 | placeholder | `string` | — | Shown when empty. |
+| label | `string` | `placeholder`, else `"Code"` | Accessible name of the text area. |
 | minHeight | `number` | `120` | Min height (px) before growing with content. |
 | maxHeight | `number` | — | Max height (px) before scrolling internally. |
 | className | `string` | — | Classes on the scroll container (e.g. `h-full`, `flex-auto`). |

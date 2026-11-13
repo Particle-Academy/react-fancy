@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { X } from "lucide-react";
 import { cn } from "../../utils/cn";
 import { useModal } from "./Modal.context";
@@ -21,7 +22,9 @@ import type { ModalHeaderProps } from "./Modal.types";
  * header text never lands on the light hover chip.
  */
 export function ModalHeader({ children, className, closeLabel = "Close" }: ModalHeaderProps) {
-  const { close } = useModal();
+  const { close, titleId, registerTitle } = useModal();
+  // The title (not the whole header, which holds the close button) names the dialog.
+  useEffect(() => registerTitle(), [registerTitle]);
 
   return (
     <div
@@ -31,7 +34,7 @@ export function ModalHeader({ children, className, closeLabel = "Close" }: Modal
         className,
       )}
     >
-      <div className="text-lg font-semibold text-[color:var(--fancy-modal-header-text,var(--fancy-text,var(--color-zinc-900)))] dark:text-[color:var(--fancy-modal-header-text-dark,var(--fancy-text-dark,var(--color-zinc-100)))]">{children}</div>
+      <div id={titleId} data-react-fancy-modal-title="" className="text-lg font-semibold text-[color:var(--fancy-modal-header-text,var(--fancy-text,var(--color-zinc-900)))] dark:text-[color:var(--fancy-modal-header-text-dark,var(--fancy-text-dark,var(--color-zinc-100)))]">{children}</div>
       <button
         type="button"
         onClick={close}

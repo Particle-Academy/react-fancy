@@ -283,7 +283,7 @@ export const PdfPages = forwardRef<HTMLDivElement, PdfPagesProps>(
           <ToolButton attr="zoom-out" label="Zoom out" disabled={zoom <= MIN_ZOOM} onClick={() => zoomTo(zoom / ZOOM_STEP)}>
             <span aria-hidden="true">−</span>
           </ToolButton>
-          <ToolButton attr="zoom-reset" label="Reset zoom" wide onClick={() => zoomTo(1)}>
+          <ToolButton attr="zoom-reset" label={`Reset zoom, ${Math.round(zoom * 100)}%`} wide onClick={() => zoomTo(1)}>
             {Math.round(zoom * 100)}%
           </ToolButton>
           <ToolButton attr="zoom-in" label="Zoom in" disabled={zoom >= MAX_ZOOM} onClick={() => zoomTo(zoom * ZOOM_STEP)}>

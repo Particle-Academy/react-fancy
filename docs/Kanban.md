@@ -48,6 +48,7 @@ The board ships with a drop-position indicator (a thin blue line that appears wh
 |------|------|---------|-------------|
 | `onCardMove` | `(cardId, fromColumn, toColumn, toIndex) => void` | - | Fires on every card drop. `toIndex` is the destination position within `toColumn` (0-based; equal to current count means append). For a same-column reorder, `fromColumn === toColumn`. |
 | `onColumnMove` | `(columnId, toIndex) => void` | - | Fires when a column is dropped at a new position. Only fires if at least one column has a `<Kanban.ColumnHandle>` and a column was actually dragged. |
+| `label` | `string` | `"Kanban board"` | Accessible name of the board, a focusable `role="region"` so a keyboard user can scroll it |
 | `className` | `string` | - | Additional CSS classes |
 
 ### Kanban.Column
