@@ -4,6 +4,7 @@ import { cn } from "../../utils/cn";
 import { TableContext } from "./Table.context";
 import { TableHead } from "./TableHead";
 import { TableBody } from "./TableBody";
+import { TableFoot } from "./TableFoot";
 import { TableRow } from "./TableRow";
 import { TableCell } from "./TableCell";
 import { TableColumn } from "./TableColumn";
@@ -59,25 +60,45 @@ function TableRoot({ children, className, ...rest }: TableProps) {
   );
 }
 
+/**
+ * Where a child goes inside the `<table>`, in the order HTML requires
+ * (caption, colgroup, thead, tbody, tfoot), or `-1` for anything that is not a
+ * table part (Search, Pagination, a toolbar), which stays around the table.
+ * Up to 6.25.0 only Head and Body went inside: a `<tfoot>`, `<caption>` or
+ * `<colgroup>` landed in the wrapper `<div>`, which is invalid markup.
+ */
+function tablePartRank(child: ReactNode): number {
+  if (!isValidElement(child)) return -1;
+  const t = child.type;
+  if (t === "caption") return 0;
+  if (t === "colgroup") return 1;
+  if (t === TableHead || t === "thead") return 2;
+  if (t === TableBody || t === "tbody") return 3;
+  if (t === TableFoot || t === "tfoot") return 4;
+  return -1;
+}
+
 function splitTableChildren(children: ReactNode): ReactNode {
   const before: ReactNode[] = [];
-  const inside: ReactNode[] = [];
+  const inside: Array<{ rank: number; child: ReactNode }> = [];
   const after: ReactNode[] = [];
-  let seenTableContent = false;
 
   Children.forEach(children, (child) => {
-    if (isValidElement(child) && (child.type === TableHead || child.type === TableBody)) {
-      inside.push(child);
-      seenTableContent = true;
+    const rank = tablePartRank(child);
+    if (rank >= 0) {
+      inside.push({ rank, child });
       return;
     }
-    (seenTableContent ? after : before).push(child);
+    (inside.length > 0 ? after : before).push(child);
   });
+
+  // Stable: parts of one kind (several bodies) keep the order they were written in.
+  const parts = inside.map((p, i) => ({ ...p, i })).sort((a, b) => a.rank - b.rank || a.i - b.i);
 
   return (
     <>
       {before}
-      {inside.length > 0 && <table className="w-full border-collapse">{inside}</table>}
+      {parts.length > 0 && <table className="w-full border-collapse">{parts.map((p) => p.child)}</table>}
       {after}
     </>
   );
@@ -86,6 +107,7 @@ function splitTableChildren(children: ReactNode): ReactNode {
 export const Table = Object.assign(TableRoot, {
   Head: TableHead,
   Body: TableBody,
+  Foot: TableFoot,
   Row: TableRow,
   Cell: TableCell,
   Column: TableColumn,

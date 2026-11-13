@@ -1,6 +1,7 @@
 export { Table } from "./Table";
 export { TableHead } from "./TableHead";
 export { TableBody } from "./TableBody";
+export { TableFoot } from "./TableFoot";
 export { TableRow } from "./TableRow";
 export { TableCell } from "./TableCell";
 export { TableColumn } from "./TableColumn";
@@ -12,6 +13,7 @@ export type {
   TableProps,
   TableHeadProps,
   TableBodyProps,
+  TableFootProps,
   TableRowProps,
   TableCellProps,
   TableColumnProps,

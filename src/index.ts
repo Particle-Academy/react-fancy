@@ -109,6 +109,7 @@ export type {
   TableProps,
   TableHeadProps,
   TableBodyProps,
+  TableFootProps,
   TableRowProps,
   TableCellProps,
   TableColumnProps,

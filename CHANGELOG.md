@@ -11,7 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`Table.Foot`**: footer rows in a `<tfoot>` (totals, summaries), with the handle `data-react-fancy-table-foot`, a top border on the `border` token and medium weight. It is always placed after the body, wherever it is written; other attributes reach the `<tfoot>`. Type `TableFootProps`. See `docs/Table.md`.
+
 ### Fixed
+
+- **Every table part goes inside Table's `<table>`.** Only `Table.Head` and `Table.Body` did: a `<tfoot>`, `<caption>` or `<colgroup>` child landed in the wrapper `<div>` outside the table, which is invalid markup (axe and React's DOM-nesting check both report it). `Table.Foot` and raw `caption`, `colgroup`, `thead`, `tbody` and `tfoot` elements now go inside, in the order HTML requires: caption, colgroups, head, bodies, foot. Anything else (`Table.Search`, `Table.Pagination`, a toolbar) still sits before or after the table where you wrote it. Consumers: if you put a totals row in a second `Table.Body` to keep it inside the table, it still works; `Table.Foot` is the right home for it.
 
 Accessibility findings from the lab's every-component brief (fancy-labs `docs/kit-site-findings.md`, K22 to K27), each in the component's own markup, plus two consumer reports against 6.24.1. Each has a test in `tests/every-component-a11y.test.tsx` or `tests/dialog-name-inert.test.tsx` that fails on 6.25.0.
 

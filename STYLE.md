@@ -267,6 +267,7 @@ Every component renders a `data-react-fancy-*=""` attribute on its root element.
 | `[data-react-fancy-table]` | Table |
 | `[data-react-fancy-table-head]` | Table head |
 | `[data-react-fancy-table-body]` | Table body |
+| `[data-react-fancy-table-foot]` | Table.Foot (`<tfoot>`) |
 | `[data-react-fancy-table-row]` | Table row |
 | `[data-react-fancy-table-cell]` | Table cell |
 | `[data-react-fancy-table-column]` | Table column header |

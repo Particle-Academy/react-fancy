@@ -56,6 +56,31 @@ import { Table } from "@particle-academy/react-fancy";
 | children | `ReactNode` | - | Data rows |
 | className | `string` | - | Additional CSS classes |
 
+### Table.Foot
+
+Footer rows (`<tfoot>`): totals, summaries. Always rendered after the body, wherever it is written. Other attributes reach the `<tfoot>`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| children | `ReactNode` | - | Footer row(s) |
+| className | `string` | - | Additional CSS classes |
+
+```tsx
+<Table>
+  <caption className="sr-only">Commissions, March</caption>
+  <Table.Head>...</Table.Head>
+  <Table.Body>...</Table.Body>
+  <Table.Foot>
+    <Table.Row>
+      <Table.Cell header>Total</Table.Cell>
+      <Table.Cell>$1,240</Table.Cell>
+    </Table.Row>
+  </Table.Foot>
+</Table>
+```
+
+Every table part goes inside the `<table>` in the order HTML requires: a `<caption>`, then `<colgroup>`s, then the head, the bodies and the foot. `Table.Head` / `Table.Body` / `Table.Foot` and raw `caption`, `colgroup`, `thead`, `tbody` and `tfoot` elements all count. Anything else (`Table.Search`, `Table.Pagination`, your own toolbar) stays before or after the table, where you wrote it.
+
 ### Table.Row
 
 | Prop | Type | Default | Description |

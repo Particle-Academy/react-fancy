@@ -39,6 +39,11 @@ export interface TableBodyProps extends HTMLAttributes<HTMLTableSectionElement> 
   className?: string;
 }
 
+export interface TableFootProps extends HTMLAttributes<HTMLTableSectionElement> {
+  children: ReactNode;
+  className?: string;
+}
+
 export interface TableRowProps
   extends Omit<HTMLAttributes<HTMLTableRowElement>, "onClick"> {
   children: ReactNode;
