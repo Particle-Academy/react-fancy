@@ -108,14 +108,15 @@ describe("the source graph", () => {
 
 const built = existsSync(resolve(ROOT, "dist/index.js")) && existsSync(resolve(ROOT, "dist/channels/hls.js"));
 
-describe.runIf(built)("the build output", () => {
+/** Read lazily: a describe body runs even when runIf skips its tests, and CI tests before it builds. */
+function builtCode(): string[] {
   const files = readdirSync(resolve(ROOT, "dist"), { recursive: true, withFileTypes: false } as never) as unknown as string[];
-  const code = files
-    .map((f) => String(f).split("\\").join("/"))
-    .filter((f) => /\.(c?js)$/.test(f));
+  return files.map((f) => String(f).split("\\").join("/")).filter((f) => /\.(c?js)$/.test(f));
+}
 
+describe.runIf(built)("the build output", () => {
   it("mentions hls.js nowhere but the adapter's own entry", () => {
-    const offenders = code.filter((f) => !f.startsWith("channels/") && IMPORTS_HLS.test(readFileSync(resolve(ROOT, "dist", f), "utf8")));
+    const offenders = builtCode().filter((f) => !f.startsWith("channels/") && IMPORTS_HLS.test(readFileSync(resolve(ROOT, "dist", f), "utf8")));
     expect(offenders).toEqual([]);
   });
 
