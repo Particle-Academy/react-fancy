@@ -112,7 +112,7 @@ type ChannelSource =
 |---|---|
 | `file` (MP3, M4A, OGG, MP4, WebM...) | Everywhere, on `<audio>` / `<video>` |
 | `stream`, Icecast / Shoutcast | Everywhere, on `<audio>` |
-| `stream`, HLS (`.m3u8`) | Natively on Safari and iOS. Elsewhere, only once you register an adapter (below). Without one, the player says "This stream can't play in this browser" and reports `unsupported` |
+| `stream`, HLS (`.m3u8`) | Natively on Safari and iOS. Everywhere else once you import the opt-in hls.js adapter (below). Without it, the player says "This stream can't play in this browser" and reports `unsupported` |
 | `stream`, DASH (`.mpd`) | Only through an adapter you register |
 | `embed`: `youtube`, `vimeo`, `twitch` | In the provider's own iframe player |
 
@@ -123,27 +123,47 @@ refused, whatever an adapter says.
 and anything else is Icecast. Icecast is audio, HLS and DASH are video, and a
 file goes by its extension or `mime`.
 
-### HLS everywhere: register an adapter
+### HLS everywhere: the opt-in hls.js adapter
 
-react-fancy does not depend on an HLS library. An app that wants HLS in Chrome
-and Firefox registers one itself, for example around hls.js (approve it under
-your own third-party policy first):
+react-fancy does not depend on an HLS library. To play HLS in Chrome, Firefox,
+Edge and on Android, install hls.js (an optional peer, `^1.7.4`) and import
+the adapter once, anywhere on the client:
+
+```bash
+npm install hls.js
+```
 
 ```ts
-import Hls from "hls.js";
-import { registerMediaAdapter, streamProtocol } from "@particle-academy/react-fancy";
-
-registerMediaAdapter({
-  id: "hls.js",
-  canPlay: (s) => s.type === "stream" && streamProtocol(s) === "hls" && Hls.isSupported(),
-  attach: (el, s) => {
-    const hls = new Hls();
-    hls.loadSource(s.type === "stream" ? s.url : "");
-    hls.attachMedia(el);
-    return () => hls.destroy();
-  },
-});
+import "@particle-academy/react-fancy/channels/hls";
 ```
+
+That import registers the adapter, and every `ChannelPlayer` on the page then
+plays HLS through hls.js wherever `Hls.isSupported()`. Where it is not, the
+native HLS path (Safari, iOS) still plays it.
+
+- **Nothing else imports it.** Neither the main entry nor any other subpath
+  imports hls.js, so an app that never imports `./channels/hls` never installs,
+  bundles or loads it. A test fails if that changes.
+- **Errors.** hls.js recovers from non-fatal errors itself. A fatal media error
+  gets one `recoverMediaError()`. Any other fatal error destroys the instance
+  and fires the element's `error` event, so ChannelPlayer reconnects with its
+  usual backoff, on a fresh instance.
+- **Configuration and control.** `createHlsAdapter({ config })` builds an
+  adapter with your `HlsConfig`. `unregisterHlsAdapter()` removes the default
+  one, and `registerHlsAdapter()` puts it back. For example, for low-latency
+  streams:
+
+```ts
+import { createHlsAdapter, unregisterHlsAdapter } from "@particle-academy/react-fancy/channels/hls";
+import { registerMediaAdapter } from "@particle-academy/react-fancy";
+
+unregisterHlsAdapter();
+registerMediaAdapter(createHlsAdapter({ config: { lowLatencyMode: true } }));
+```
+
+The same seam takes any other library: DASH through dash.js, say. Write an
+adapter with `registerMediaAdapter` (approve the library under your own
+third-party policy first).
 
 Adapters you register are asked first, before the native ones, and the last
 one registered is asked first of all. `registerMediaAdapter` returns the

@@ -63,6 +63,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   played.
 
   Consumers: all of this is new; nothing existing changed.
+- **`@particle-academy/react-fancy/channels/hls`: an opt-in hls.js adapter**
+  (owner approval, 2026-11-14). It plays HLS live streams in Chrome, Firefox,
+  Edge and on Android. To use it, `npm install hls.js` and
+  `import "@particle-academy/react-fancy/channels/hls"` once.
+  - **Dependencies.** hls.js is an **optional peer** (`^1.7.4`), never a
+    dependency. Neither the main entry nor any other subpath imports it, and
+    tests pin both that and the build output.
+  - **Errors.** hls.js recovers from non-fatal errors itself. A fatal media
+    error gets one recovery attempt. Any other fatal error fires the element's
+    `error` event, so `ChannelPlayer` reconnects with backoff on a fresh
+    instance.
+  - **Exports.** `createHlsAdapter({ config })`, `hlsAdapter`,
+    `registerHlsAdapter` and `unregisterHlsAdapter`.
+
+  Consumers who do not import the subpath: nothing changes, and hls.js is not
+  installed.
 
 ## [6.25.0] - 2026-11-13
 

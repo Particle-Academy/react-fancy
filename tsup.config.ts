@@ -50,13 +50,17 @@ export default defineConfig({
     icons: "src/icons.ts",
     styles: "src/styles.css",
     "dark-variant": "src/dark-variant.css",
+    // Opt-in adapters: never imported by the barrel or a component.
+    "channels/hls": "src/channels/hls.ts",
     ...componentEntries(),
   },
   format: ["esm", "cjs"],
-  dts: { entry: { index: "src/index.ts", icons: "src/icons.ts", ...componentEntries() } },
+  dts: { entry: { index: "src/index.ts", icons: "src/icons.ts", "channels/hls": "src/channels/hls.ts", ...componentEntries() } },
   sourcemap: true,
   clean: true,
-  external: ["react", "react-dom"],
+  // hls.js is an OPTIONAL peer of the ./channels/hls adapter only (owner
+  // approval q_8d88f092): never bundled, so no consumer ships it unasked.
+  external: ["react", "react-dom", "hls.js"],
   treeshake: true,
   // Shared code goes to chunks instead of being copied into every entry.
   // Without this, per-component entries would trade one big download for a lot
