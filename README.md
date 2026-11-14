@@ -189,6 +189,14 @@ Standalone, read-only viewers for displaying media files — drop one in anywher
 | VideoViewer | Native video controls, poster, fit | [docs](docs/VideoViewer.md) |
 | AudioViewer | Themed card around the native audio player | [docs](docs/AudioViewer.md) |
 | StreamingAudio | Controlled player for server-hosted MP3s and Icecast/Shoutcast live streams on native `<audio>`: station picker, LIVE badge, reconnect with backoff, Media Session | [docs](docs/StreamingAudio.md) |
+| ChannelPlayer | One controlled player for every channel kind: a single track, a playlist (previous / next, shuffle, repeat) or a live stream, on audio, video or a provider embed. Overview: [Channels](docs/Channels.md) | [docs](docs/ChannelPlayer.md) |
+| ChannelGuide | The channel list, with each channel's kind, length or live status | [docs](docs/ChannelGuide.md) |
+| Playlist | A channel's tracks: play, reorder, remove, add, shuffle and repeat, and proposed edits held for Accept / Reject | [docs](docs/Playlist.md) |
+| MediaQueue | Up next, in play order | [docs](docs/MediaQueue.md) |
+| TrackItem | One track as a row | [docs](docs/TrackItem.md) |
+| NowPlaying | What is on: track, or live channel and what is on air | [docs](docs/NowPlaying.md) |
+| LiveBadge | LIVE / Starting / Offline / Ended | [docs](docs/LiveBadge.md) |
+| MediaEmbed | A YouTube, Vimeo, Twitch or host-registered player that loads nothing until played | [docs](docs/MediaEmbed.md) |
 | PdfViewer | Inline PDF via `<object>`/`<iframe>` with download fallback | [docs](docs/PdfViewer.md) |
 
 ### Human+ Primitives

@@ -153,6 +153,26 @@
         "default": "./dist/carousel.cjs"
       }
     },
+    "./channel-guide": {
+      "import": {
+        "types": "./dist/channel-guide.d.ts",
+        "default": "./dist/channel-guide.js"
+      },
+      "require": {
+        "types": "./dist/channel-guide.d.cts",
+        "default": "./dist/channel-guide.cjs"
+      }
+    },
+    "./channel-player": {
+      "import": {
+        "types": "./dist/channel-player.d.ts",
+        "default": "./dist/channel-player.js"
+      },
+      "require": {
+        "types": "./dist/channel-player.d.cts",
+        "default": "./dist/channel-player.cjs"
+      }
+    },
     "./chart": {
       "import": {
         "types": "./dist/chart.d.ts",
@@ -491,6 +511,66 @@
       "require": {
         "types": "./dist/activity-light.d.cts",
         "default": "./dist/activity-light.cjs"
+      }
+    },
+    "./live-badge": {
+      "import": {
+        "types": "./dist/live-badge.d.ts",
+        "default": "./dist/live-badge.js"
+      },
+      "require": {
+        "types": "./dist/live-badge.d.cts",
+        "default": "./dist/live-badge.cjs"
+      }
+    },
+    "./media-embed": {
+      "import": {
+        "types": "./dist/media-embed.d.ts",
+        "default": "./dist/media-embed.js"
+      },
+      "require": {
+        "types": "./dist/media-embed.d.cts",
+        "default": "./dist/media-embed.cjs"
+      }
+    },
+    "./media-queue": {
+      "import": {
+        "types": "./dist/media-queue.d.ts",
+        "default": "./dist/media-queue.js"
+      },
+      "require": {
+        "types": "./dist/media-queue.d.cts",
+        "default": "./dist/media-queue.cjs"
+      }
+    },
+    "./now-playing": {
+      "import": {
+        "types": "./dist/now-playing.d.ts",
+        "default": "./dist/now-playing.js"
+      },
+      "require": {
+        "types": "./dist/now-playing.d.cts",
+        "default": "./dist/now-playing.cjs"
+      }
+    },
+    "./playlist": {
+      "import": {
+        "types": "./dist/playlist.d.ts",
+        "default": "./dist/playlist.js"
+      },
+      "require": {
+        "types": "./dist/playlist.d.cts",
+        "default": "./dist/playlist.cjs"
+      }
+    },
+    "./track-item": {
+      "import": {
+        "types": "./dist/track-item.d.ts",
+        "default": "./dist/track-item.js"
+      },
+      "require": {
+        "types": "./dist/track-item.d.cts",
+        "default": "./dist/track-item.cjs"
       }
     },
     "./virtual-list": {

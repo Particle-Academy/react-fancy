@@ -11,6 +11,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Channels.** A channel is a single track, a playlist of tracks, or a live
+  stream from any service. Eight new components make up a channel UI, each with
+  its own subpath:
+  - **`ChannelPlayer`** plays all three kinds. Playlists get previous / next,
+    shuffle, repeat (off, all, one) and move on when a track ends. Live
+    channels have no seek, drop the connection on pause, and retry a dropped
+    stream three times with backoff. Media plays on `<audio>`, `<video>` or a
+    provider embed.
+  - **`ChannelGuide`** is the channel list.
+  - **`Playlist`** lets you play, reorder (Move up / Move down buttons), remove
+    and add from a `library`. Proposed edits (`pendingEdits`) wait in place
+    for Accept / Reject.
+  - **`MediaQueue`** is "up next", in play order.
+  - **`TrackItem`**, **`NowPlaying`**, **`LiveBadge`** and **`MediaEmbed`**.
+
+  Everything is controlled through ONE `ChannelPlayerValue`, so the whole UI
+  state is one JSON object a host or an agent can read and write. Moving
+  `value.position` seeks.
+
+  The moves are exported as pure functions, so a bridge or a server makes the
+  same move the UI would: `selectChannel`, `selectTrack`, `nextTrack`,
+  `previousTrack`, `trackEnded`, `toggleShuffle`, `cycleRepeat`, `playOrder`,
+  `upNext`, `moveTrack`, `addTrack`, `removeTrack`, `applyQueueEdit`,
+  `reconcileValue`, `createChannelValue`, `findChannel`, `channelTracks`,
+  `currentTrack` and `shuffleIds`. The data types are `Channel`,
+  `ChannelSource`, `MediaTrack`, `PendingQueueEdit` and the rest.
+  `formatMediaTime` is exported too.
+
+  See `docs/Channels.md`.
+- **Source registries, for "any streaming service".** With no runtime
+  dependency, these play natively:
+  - files
+  - Icecast / Shoutcast
+  - HLS where the browser has it (Safari, iOS)
+
+  YouTube (privacy-enhanced host), Vimeo and Twitch embeds are built in, and
+  YouTube and Vimeo play and pause through their postMessage APIs.
+
+  `registerMediaAdapter` plugs in a library such as hls.js for HLS or DASH in
+  other browsers; react-fancy does not depend on one. `registerEmbedProvider`
+  adds more embed providers. `resolveMediaAdapter`, `getEmbedProvider`,
+  `sourceMedia` and `streamProtocol` are exported too.
+
+  Without an adapter, an HLS stream in Chrome or Firefox reports `unsupported`
+  ("This stream can't play in this browser"). A source URL that is not http(s)
+  or same-origin relative is refused whatever an adapter says, and an embed URL
+  must be `https:`. An embed loads nothing from its provider until it is first
+  played.
+
+  Consumers: all of this is new; nothing existing changed.
+
 ## [6.25.0] - 2026-11-13
 
 ### Added

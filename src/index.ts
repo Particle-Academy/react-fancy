@@ -737,6 +737,72 @@ export type {
   StreamingStationKind,
 } from "./components/StreamingAudio";
 
+// Channels: a channel is a single track, a playlist, or a live stream from any
+// service. One shared ChannelPlayerValue drives every part; the pure helpers
+// are the moves the components (and an agent bridge) make. See docs/Channels.md.
+export { ChannelPlayer } from "./components/ChannelPlayer";
+export type { ChannelPlayerProps, ChannelPlayerLabels, ChannelPlayerErrorKind } from "./components/ChannelPlayer";
+export { ChannelGuide } from "./components/ChannelGuide";
+export type { ChannelGuideProps, ChannelGuideLabels } from "./components/ChannelGuide";
+export { Playlist } from "./components/Playlist";
+export type { PlaylistProps, PlaylistLabels } from "./components/Playlist";
+export { MediaQueue } from "./components/MediaQueue";
+export type { MediaQueueProps, MediaQueueLabels } from "./components/MediaQueue";
+export { TrackItem } from "./components/TrackItem";
+export type { TrackItemProps, TrackItemLabels } from "./components/TrackItem";
+export { NowPlaying } from "./components/NowPlaying";
+export type { NowPlayingProps, NowPlayingLabels } from "./components/NowPlaying";
+export { LiveBadge } from "./components/LiveBadge";
+export type { LiveBadgeProps, LiveBadgeLabels } from "./components/LiveBadge";
+export { MediaEmbed } from "./components/MediaEmbed";
+export type { MediaEmbedProps, MediaEmbedLabels } from "./components/MediaEmbed";
+export {
+  addTrack,
+  applyQueueEdit,
+  channelTracks,
+  createChannelValue,
+  currentTrack,
+  cycleRepeat,
+  findChannel,
+  moveTrack,
+  nextTrack,
+  playOrder,
+  previousTrack,
+  reconcileValue,
+  removeTrack,
+  selectChannel,
+  selectTrack,
+  shuffleIds,
+  toggleShuffle,
+  trackEnded,
+  upNext,
+} from "./utils/media-channel";
+export type {
+  Channel,
+  ChannelBase,
+  ChannelKind,
+  ChannelPlayerValue,
+  EmbedSource,
+  LiveChannel,
+  LiveStatus,
+  ChannelSource,
+  MediaTrack,
+  PendingQueueEdit,
+  PlaylistChannel,
+  RepeatMode,
+  TrackChannel,
+} from "./utils/media-channel";
+export {
+  getEmbedProvider,
+  registerEmbedProvider,
+  registerMediaAdapter,
+  resolveMediaAdapter,
+  sourceMedia,
+  streamProtocol,
+} from "./utils/media-sources";
+export type { EmbedContext, EmbedProvider, MediaElementAdapter } from "./utils/media-sources";
+export { formatMediaTime } from "./utils/format-media-time";
+
 export { PdfViewer } from "./components/PdfViewer";
 export type { PdfViewerProps, PdfPageSource, PdfViewerPolicy, PdfViewerWatermark, PdfPageErrorContext } from "./components/PdfViewer";
 
