@@ -11,18 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-
-- **Focus is visible on six more Tab stops** (fancy-labs run 651, test-81 "Every kit component"). A Tab walk reading the focused element's computed style found each of these showing nothing at 375, 768 and 1280 px: they carried `outline-none` and no ring in its place, and no ancestor or child painted one either. Each now has the kit ring on the focused element itself, inset, in the `--fancy-focus` / `--fancy-focus-dark` tokens (the ring ChatThread and CodeBlock already use):
-  - **StickyNote**: the editable text.
-  - **VirtualList**: the scrollable log region (it is a Tab stop so the keyboard can scroll it).
-  - **CodeView**: the editing textarea.
-  - **Editor**: `Editor.Content`, the contenteditable surface.
-  - **FileBrowser**: the "Filter by name" input in the toolbar.
-  - **AudioViewer**: Tab lands on the play, timeline and volume controls inside the `<audio>` element's user-agent shadow root, where it matches `:focus-within` but not `:focus-visible`, so the browser outline did not draw. It now has the inset `:focus-within` outline VideoViewer got for the same reason in 6.20.0 (K8).
-
-  Consumers: nothing to do. Tested in `tests/keyboard-focus-ring.test.tsx`, which fails on 6.25.0; the test harness gained a `forceFocusVisible` stand-in for `:focus-visible`, which jsdom never matches.
-
 ## [6.25.0] - 2026-11-13
 
 ### Added
@@ -53,6 +41,16 @@ Accessibility findings from the lab's every-component brief (fancy-labs `docs/ki
 - **Development warning when a trigger's `className` misses its element.** If none of a `Popover.Trigger` / `Dropdown.Trigger` `className`'s classes end up on the element the trigger anchors to (a child component that styles an inner or portalled element with `className`), a development build logs one `console.warn`. Nothing in production.
 
 Consumers: nothing to do. If you worked around this by putting the classes on the Tooltip's child yourself, that keeps working.
+
+- **Focus is visible on six more Tab stops** (fancy-labs run 651, test-81 "Every kit component"). A Tab walk reading the focused element's computed style found each of these showing nothing at 375, 768 and 1280 px: they carried `outline-none` and no ring in its place, and no ancestor or child painted one either. Each now has the kit ring on the focused element itself, inset, in the `--fancy-focus` / `--fancy-focus-dark` tokens (the ring ChatThread and CodeBlock already use):
+  - **StickyNote**: the editable text.
+  - **VirtualList**: the scrollable log region (it is a Tab stop so the keyboard can scroll it).
+  - **CodeView**: the editing textarea.
+  - **Editor**: `Editor.Content`, the contenteditable surface.
+  - **FileBrowser**: the "Filter by name" input in the toolbar.
+  - **AudioViewer**: Tab lands on the play, timeline and volume controls inside the `<audio>` element's user-agent shadow root, where it matches `:focus-within` but not `:focus-visible`, so the browser outline did not draw. It now has the inset `:focus-within` outline VideoViewer got for the same reason in 6.20.0 (K8).
+
+  Consumers: nothing to do. Tested in `tests/keyboard-focus-ring.test.tsx`, which fails on 6.24.1; the test harness gained a `forceFocusVisible` stand-in for `:focus-visible`, which jsdom never matches.
 
 ## [6.24.1] - 2026-11-13
 
