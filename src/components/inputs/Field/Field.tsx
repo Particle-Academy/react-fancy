@@ -22,7 +22,7 @@ export function Field({
   const resolvedErrorId = errorId ?? (htmlFor ? `${htmlFor}-error` : undefined);
   const resolvedDescriptionId = descriptionId ?? (htmlFor ? `${htmlFor}-description` : undefined);
   return (
-    <div {...rest} data-react-fancy-field="" className={cn("flex flex-col gap-2", className)}>
+    <div {...rest} data-react-fancy-field="" className={cn("relative flex flex-col gap-2", className)}>
       {label && (
         <label
           htmlFor={htmlFor}

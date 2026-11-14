@@ -191,10 +191,14 @@ export const ResizablePanels = forwardRef<HTMLDivElement, ResizablePanelsProps>(
           className,
         )}
       >
+        {/* `relative` is load-bearing on both panels: `overflow-auto` clips only
+            descendants whose containing block is inside it, so an unpositioned
+            panel let every `sr-only` (absolute) element in it escape the clip
+            and stretch the document. */}
         <div
           id={firstId}
           data-react-fancy-resizable-panels-panel="first"
-          className="min-h-0 min-w-0 overflow-auto"
+          className="relative min-h-0 min-w-0 overflow-auto"
           style={{ flexBasis: `${current}%`, flexGrow: 0, flexShrink: 0 }}
         >
           {items[0]}
@@ -232,7 +236,7 @@ export const ResizablePanels = forwardRef<HTMLDivElement, ResizablePanelsProps>(
         />
         <div
           data-react-fancy-resizable-panels-panel="second"
-          className="min-h-0 min-w-0 flex-1 overflow-auto"
+          className="relative min-h-0 min-w-0 flex-1 overflow-auto"
         >
           {items[1]}
         </div>

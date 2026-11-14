@@ -80,6 +80,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Consumers who do not import the subpath: nothing changes, and hls.js is not
   installed.
 
+### Fixed
+
+- **A `labelHidden` control inside a ResizablePanels panel no longer stretches
+  the page.** Reported by a consumer against 6.24.1. A `sr-only` label is
+  `position: absolute`, and a scroller only clips absolute descendants whose
+  containing block is inside it. The panels were `overflow-auto` but not
+  positioned, so every hidden label sat outside the panel's clip and extended
+  the document. In headless Chromium, 12 `labelHidden` Switches in an 800px
+  shell made a 1688px document; it is now 800px. Checkbox and RadioGroup did
+  the same.
+
+  The fix is in two places:
+  - The control: `Switch`, `Checkbox` and `Field` roots are `relative`, so the
+    hidden label stays inside the control in any scroller, ours or yours.
+    `Field` is the wrapper `RadioGroup`, `CheckboxGroup`, `Input`, `Select`
+    and the other fields use.
+  - The scroller: both ResizablePanels panels, `Modal.Body`, `Drawer.Body` and
+    the `Table` wrapper are `relative`, so they contain any absolute content.
+
+  The report blamed the Switch's hidden `<input>`. That input is
+  `type="hidden"`, so it has no box. The element that escaped was the hidden
+  label.
+
+  If you had absolutely positioned something inside one of these elements and
+  placed it against an ancestor further out, it now resolves against the
+  element. Otherwise you have nothing to do.
+
 ## [6.25.0] - 2026-11-13
 
 ### Added

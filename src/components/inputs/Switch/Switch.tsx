@@ -82,7 +82,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
         {...wrapperProps}
         // View mode has no switch to name, so its aria-* stay on the wrapper.
         {...(showControl ? undefined : controlAria)}
-        data-react-fancy-switch="" className={cn("flex items-start gap-2", className)}>
+        data-react-fancy-switch="" className={cn("relative flex items-start gap-2", className)}>
         {!showControl ? (
           <span
             data-react-fancy-display=""

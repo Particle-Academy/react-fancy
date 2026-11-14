@@ -52,7 +52,7 @@ function TableRoot({ children, className, ...rest }: TableProps) {
       <div
         {...rest}
         data-react-fancy-table=""
-        className={cn("overflow-hidden rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]", className)}
+        className={cn("relative overflow-hidden rounded-lg border border-[color:var(--fancy-border,var(--color-zinc-200))] dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))]", className)}
       >
         {splitTableChildren(children)}
       </div>
