@@ -206,6 +206,7 @@ export function ChatMessage({
   onActivity,
   onActionError,
   classNames,
+  body: bodySlot,
 }: ChatMessageProps) {
   const labels = mergeLabels(labelsProp);
   const [busy, run] = useAcknowledgedAction(onActionError);
@@ -235,8 +236,12 @@ export function ChatMessage({
     }, ctx);
   };
 
-  const body =
-    message.format === "text" ? (
+  const hasBodySlot = bodySlot !== undefined && bodySlot !== null && bodySlot !== false;
+  const body = hasBodySlot ? (
+    <div data-chat-content="" className="min-w-0 break-words">
+      {bodySlot}
+    </div>
+  ) : message.format === "text" ? (
       <div data-chat-content="" className="whitespace-pre-wrap break-words">
         {message.content}
       </div>

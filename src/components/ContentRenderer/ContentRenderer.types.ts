@@ -77,4 +77,19 @@ export interface ContentRendererProps {
    * @default false
    */
   streaming?: boolean | "progressive";
+  /**
+   * The host's own streaming hold-back, for an inline grammar the renderer does
+   * not know (pills such as `[file:a.ts|label]`). Called only while
+   * `streaming`, with the text as it arrived; return the index to cut at, or
+   * `null` to keep everything. The renderer cuts there FIRST, then applies its
+   * own fence and tag hold-back to what remains, so nothing past either cut is
+   * ever shown. A cut outside `0..length-1` is ignored.
+   */
+  holdBack?: (text: string) => number | null;
+  /**
+   * Rewrites the text before it renders (after `holdBack`): resolve pills,
+   * strip forbidden tags, and so on. `ctx.streaming` says whether more is still
+   * arriving. Output still goes through sanitisation unless `unsafe`.
+   */
+  transform?: (text: string, ctx: { streaming: boolean }) => string;
 }

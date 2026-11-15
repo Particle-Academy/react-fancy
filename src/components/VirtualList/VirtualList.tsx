@@ -69,6 +69,7 @@ export function VirtualList<T extends VirtualListRow>({
   onUnseenChange,
   scrollToId = null,
   onScrollToIdResolved,
+  anchorOnPrepend = false,
   className,
   ref,
   ...props
@@ -320,6 +321,51 @@ export function VirtualList<T extends VirtualListRow>({
 
   const reportedFollow = useRef(followTail);
   const programmatic = useRef(false);
+
+  // ------------------------------------------------------- prepend anchoring
+
+  /**
+   * The layout the viewport was last positioned against. When offsets change
+   * (rows prepended, or rows above the reader measured at a new height), the
+   * row that was at the top of the viewport in THAT layout is found in the new
+   * one and put back at the same offset, so nothing moves under the reader.
+   * Only with `anchorOnPrepend`, and never while following (the tail owns the
+   * position then) or while a deep link is resolving (the link does).
+   */
+  const prevLayout = useRef<{ items: readonly T[]; offsets: Float64Array } | null>(null);
+
+  useLayoutEffect(() => {
+    const prev = prevLayout.current;
+    prevLayout.current = { items, offsets };
+    if (!anchorOnPrepend || followTail || !prev || prev.offsets === offsets || prev.items.length === 0) return;
+    if (scrollToId !== null && resolved.current !== scrollToId) return;
+
+    const vp = viewportRef.current;
+    if (!vp) return;
+
+    const top = knownTop.current;
+    let lo = 0;
+    let hi = prev.items.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (prev.offsets[mid] <= top) lo = mid;
+      else hi = mid - 1;
+    }
+    const anchorId = prev.items[lo].id;
+    const delta = top - prev.offsets[lo];
+    // The common case (an append, a measurement below) keeps the index.
+    const index = items[lo]?.id === anchorId ? lo : items.findIndex((item) => item.id === anchorId);
+    if (index < 0) return;
+
+    const target = Math.max(0, offsets[index] + delta);
+    if (Math.abs(target - top) <= 0.5) return;
+
+    // The list's own move: its scroll event must not read as the reader's.
+    programmatic.current = true;
+    vp.scrollTop = target;
+    knownTop.current = target;
+    setScrollTop(target);
+  });
 
   useEffect(() => {
     // The prop is the truth, so adopt it rather than remembering what we asked

@@ -151,6 +151,8 @@ export interface PromptInputLabels {
   keys?: Partial<Record<string, string>>;
   /** Words after the keycaps in the inline hint. @default "to send" */
   hint?: string;
+  /** Accessible name (and tooltip) of the Stop control shown while `running`. @default "Stop" */
+  stop?: string;
 }
 
 /**
@@ -327,6 +329,31 @@ export interface PromptInputProps
    */
   aboveInput?: ReactNode;
   /**
+   * Something the composer started is still working (an agent's turn). With
+   * `onStop` set, the send control becomes a Stop control
+   * (`data-react-fancy-prompt-input-stop`, accessible name `labels.stop`) and
+   * the root carries `data-running="true"`. The send KEY still sends, so a host
+   * can queue or steer a message mid-turn. Without `onStop`, nothing changes.
+   */
+  running?: boolean;
+  /** Called when the Stop control is pressed. Needed for Stop to appear. */
+  onStop?: () => void;
+  /**
+   * Replaces the default Stop control while `running` (it is rendered inside
+   * the `data-react-fancy-prompt-input-stop` wrapper). The host wires its own
+   * click; `onStop` must still be set for the slot to show.
+   */
+  stopSlot?: ReactNode;
+  /**
+   * Whose draft is showing, for ONE composer serving many threads: swap
+   * `draft` and `draftKey` together. A new key drops everything that belonged
+   * to the previous draft: an open `/` or `@` picker, and a send still in
+   * flight (its result no longer shows or blocks the new draft, and it can no
+   * longer empty it; a failure still reaches `onSubmitError`). Omit it for a
+   * single-thread composer.
+   */
+  draftKey?: string;
+  /**
    * Hold a paste of at least this many characters as a pill IN the message,
    * where it was pasted: on a line of its own, its full text put back in place
    * when clicked, and expanded where it sits when sent. Omit it and paste is
@@ -412,6 +439,10 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
   mentionColor,
   maxHeight = 280,
   aboveInput,
+  running = false,
+  onStop,
+  stopSlot,
+  draftKey,
   className,
   pasteThreshold,
   pasteImages = false,
@@ -925,6 +956,24 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
 
   const ack = useAcknowledgedSubmit(onSubmitError);
   const submitting = ack.status === "submitting";
+  /** Stop replaces Send only when the host can actually stop something. */
+  const showStop = running && onStop !== undefined;
+  const stopLabel = labels?.stop ?? "Stop";
+
+  /*
+   * A new `draftKey` means another thread's draft is now showing. Nothing that
+   * belonged to the previous one may carry over: its open picker, or its send
+   * still in flight (which would otherwise show as "sending" on this draft,
+   * block its send, and could empty it on resolve). Before paint, so the new
+   * draft never flashes the old state.
+   */
+  const shownKey = useRef(draftKey);
+  useLayoutEffect(() => {
+    if (shownKey.current === draftKey) return;
+    shownKey.current = draftKey;
+    setPicker(null);
+    ack.detach();
+  }, [draftKey, ack.detach]);
 
   const submit = () => {
     if (disabled || sendDisabled || ack.busy()) return;
@@ -1141,6 +1190,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
       // Absent while idle; "submitting" while an onSubmit Promise is pending;
       // "error" after one was refused, until the next send.
       data-submit-state={ack.status === "idle" ? undefined : ack.status}
+      data-running={showStop ? "true" : undefined}
       onDragOver={(e) => {
         e.preventDefault();
         if (!disabled) setDragOver(true);
@@ -1443,7 +1493,26 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
               {beforeSend}
             </div>
           )}
-          {sendButton === "icon" ? (
+          {showStop ? (
+            stopSlot !== undefined ? (
+              <span data-react-fancy-prompt-input-stop="" className="shrink-0">
+                {stopSlot}
+              </span>
+            ) : (
+              <Tooltip content={stopLabel}>
+                <Button
+                  type="button"
+                  color="zinc"
+                  size="sm"
+                  icon="square"
+                  className="shrink-0"
+                  data-react-fancy-prompt-input-stop=""
+                  aria-label={stopLabel}
+                  onClick={() => onStop?.()}
+                />
+              </Tooltip>
+            )
+          ) : sendButton === "icon" ? (
             <Tooltip content={sendTooltip}>
               <Button
                 color="violet"

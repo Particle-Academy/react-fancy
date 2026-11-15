@@ -65,6 +65,16 @@ export interface VirtualListProps<T extends VirtualListRow>
    */
   onScrollToIdResolved?: (id: string, landed: boolean) => void;
 
+  /**
+   * Keep the reader's place when rows are added ABOVE them ("load earlier"):
+   * the row at the top of the viewport stays at the same on-screen offset
+   * across the prepend, and as the new rows are measured at heights other
+   * than the estimate. Off by default, so an existing list never moves. Has no
+   * effect while `followTail` is on or a `scrollToId` is resolving.
+   * @default false
+   */
+  anchorOnPrepend?: boolean;
+
   /** The scroll viewport element. */
   ref?: Ref<HTMLDivElement>;
 }

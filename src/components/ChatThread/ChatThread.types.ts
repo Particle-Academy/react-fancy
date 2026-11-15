@@ -172,6 +172,14 @@ export interface ChatMessageProps extends ChatMessageDisplayProps {
   /** A continuation of the previous message's group: the header is omitted. */
   grouped?: boolean;
   className?: string;
+  /**
+   * Rendered INSIDE the bubble in place of `message.content` (which is then not
+   * rendered at all), for a message made of typed parts rather than one
+   * markdown string. Still wrapped in `data-chat-content`; the header, status,
+   * attachments, actions, proposal and every handle are unchanged. The host
+   * owns its sanitising: nothing here passes through ContentRenderer.
+   */
+  body?: ReactNode;
 }
 
 export interface ChatThreadClassNames extends ChatMessageClassNames {

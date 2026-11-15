@@ -144,5 +144,18 @@ export function useAcknowledgedSubmit(
 
   const busy = useCallback(() => inFlight.current, []);
 
-  return { status, message, track, busy };
+  /**
+   * Let go of whatever is in flight: the draft it belonged to is no longer the
+   * one showing. The pending send can no longer acknowledge (its `accept` never
+   * runs) nor show its outcome; a failure still reaches `onSubmitError`, exactly
+   * as an older send's does.
+   */
+  const detach = useCallback(() => {
+    latest.current += 1;
+    inFlight.current = false;
+    setStatus("idle");
+    setMessage("");
+  }, []);
+
+  return { status, message, track, busy, detach };
 }

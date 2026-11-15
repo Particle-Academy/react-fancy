@@ -13,6 +13,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`PromptInput` Stop control: `running`, `onStop`, `stopSlot`, `labels.stop`.**
+  While `running` and `onStop` is set, Send becomes a Stop button
+  (`data-react-fancy-prompt-input-stop`, accessible name `labels.stop`,
+  default "Stop") and the root carries `data-running="true"`. `stopSlot`
+  replaces the default button inside the same handle. The send KEY still
+  sends, so a host can queue or steer mid-turn. Opt-in: without `onStop`
+  nothing changes, so there is nothing to do (CC-fancy-0042).
+- **`PromptInput` `draftKey`, for ONE composer serving many threads.** Swap
+  `draft` and `draftKey` together. A new key closes an open `/` or `@` picker
+  and lets go of a send still in flight: it no longer shows as sending on the
+  new draft, no longer blocks its send, and can no longer empty it; a failure
+  still reaches `onSubmitError`. Swapping `draft` alone already showed the new
+  text and attachments (now pinned by a test); what leaked was the picker and
+  the in-flight send. Opt-in; nothing to do if you do not swap drafts.
+- **`ContentRenderer` `holdBack` and `transform` hooks.** `holdBack(text)`
+  returns where to cut a streaming value for a grammar the renderer does not
+  know (pills such as `[file:a.ts|label]`); the renderer cuts there first and
+  then applies its own fence and tag hold-back, so nothing past either cut is
+  shown, tested at every prefix length. `transform(text, { streaming })`
+  rewrites the text before it renders, and its output is still sanitised.
+  Hosts that mirrored the renderer's partial-tag logic can drop it. Opt-in
+  (CC-fancy-0042).
+- **`VirtualList` `anchorOnPrepend`.** Rows added above the reader ("load
+  earlier") no longer push what they were reading down the screen: the row at
+  the top of the viewport keeps its on-screen offset across the prepend and
+  while the new rows are measured. Off by default; no effect while following
+  the tail or while a `scrollToId` resolves. Tests now also pin the touch
+  intent-break and that the list's own scrolls never ask to stop following,
+  which already held (CC-fancy-0042).
+- **`ChatMessage` `body`.** A host rendering a message made of typed parts
+  (text, code, a table, a card, tool rows) passes them as `body`; they render
+  INSIDE the bubble, still under `data-chat-content`, in place of
+  `message.content`. Header, author, time, status, attachments, actions,
+  proposal and every handle are unchanged. Opt-in (CC-fancy-0042).
 - **Channels.** A channel is a single track, a playlist of tracks, or a live
   stream from any service. Eight new components make up a channel UI, each with
   its own subpath:

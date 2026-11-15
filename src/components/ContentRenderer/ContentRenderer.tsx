@@ -19,6 +19,8 @@ export function ContentRenderer({
   onCopy,
   clipboardWriter,
   streaming = false,
+  holdBack,
+  transform,
 }: ContentRendererProps) {
   const extensions = useMemo(
     () => mergeExtensions(instanceExtensions),
@@ -28,10 +30,21 @@ export function ContentRenderer({
   // Guard nullish input: marked.parse throws "input parameter is undefined
   // or null", which during render would crash the whole React tree. Treat
   // missing content as empty.
-  const safe = value ?? "";
+  const raw = value ?? "";
+  const progressive = streaming === "progressive";
+  // The host's hold-back cuts first, on the text as it arrived (its grammar is
+  // written against that), then `transform` runs, then the renderer's own fence
+  // and tag cut runs on what remains. Nothing past either cut is ever visible.
+  const safe = useMemo(() => {
+    let text = raw;
+    if (streaming && holdBack) {
+      const cut = holdBack(text);
+      if (typeof cut === "number" && Number.isInteger(cut) && cut >= 0 && cut < text.length) text = text.slice(0, cut);
+    }
+    return transform ? transform(text, { streaming: Boolean(streaming) }) : text;
+  }, [raw, streaming, holdBack, transform]);
   const resolvedFormat = format === "auto" ? detectFormat(safe) : format;
 
-  const progressive = streaming === "progressive";
   const { source, openFence } = useMemo(() => {
     if (!streaming) return { source: safe, openFence: false };
     const tags = extensions.map((e) => e.tag);
