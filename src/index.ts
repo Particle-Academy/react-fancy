@@ -660,6 +660,8 @@ export type {
   PromptSubmitKey,
   PromptCmd,
   PromptMention,
+  PromptTrigger,
+  PromptTriggerItem,
   PromptAttachment,
   PromptDraft,
   PromptDraftFile,

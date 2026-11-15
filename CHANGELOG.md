@@ -18,6 +18,13 @@ A patch for the chart x-axis fix. It also carries two additive props and the git
 
 ### Added
 
+- **PromptInput `triggers`** (CC-fancy-0042): app-defined pickers beyond `/` and
+  `@`, one per character, each with its own source (sync or async; an answer for an
+  older query is dropped, and a source that throws shows nothing) and a `serialize`
+  for the text a chosen item inserts. A trigger for `@` or `/` takes that character
+  over from `mentions` / `commands`; `wordStart` (default true) opens it only at a
+  word start. The menu carries `data-react-fancy-prompt-input-menu="trigger"` and
+  `data-react-fancy-prompt-input-trigger`. Opt-in: without `triggers` nothing changes.
 - **Installable from git.** A `prepare` script builds `dist/`, which npm runs for a
   git dependency (with devDependencies installed), so
   `npm install github:Particle-Academy/react-fancy#<sha>` and an `npm ci` pinned to a

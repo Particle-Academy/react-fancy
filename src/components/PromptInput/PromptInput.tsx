@@ -94,6 +94,24 @@ export type PromptMention = {
   name: string;
   kind: "agent" | "file" | "person" | string;
 };
+/** One row in an app-defined picker. */
+export type PromptTriggerItem = { id: string; label: string; description?: string };
+/**
+ * An app-defined picker beyond `/` and `@`: a character, a (possibly async)
+ * source, and the text a chosen item serialises to.
+ */
+export type PromptTrigger = {
+  /** ONE character that opens the picker. A trigger for `@` or `/` replaces the built-in one. */
+  char: string;
+  /** The picker's accessible name and header. Defaults to the character. */
+  label?: string;
+  /** Items for the typed query. May be async; an answer for an older query is dropped. */
+  search: (query: string) => PromptTriggerItem[] | Promise<PromptTriggerItem[]>;
+  /** The text inserted for a chosen item (a space follows). Default: the character and the item id. */
+  serialize?: (item: PromptTriggerItem) => string;
+  /** Open only at the start of the input or after white space. Default true. */
+  wordStart?: boolean;
+};
 export type PromptAttachment = {
   id: string;
   name: string;
@@ -223,6 +241,12 @@ export interface PromptInputProps
   commands?: PromptCmd[];
   /** @-mentions. */
   mentions?: PromptMention[];
+  /**
+   * App-defined pickers: one per character, each with its own (possibly async)
+   * source and serialiser. A trigger for `@` or `/` takes that character over
+   * from `mentions` / `commands`. Without it nothing changes.
+   */
+  triggers?: PromptTrigger[];
   /**
    * Show the send-key hint ("Ctrl + Enter to send", "⌘ + Enter" on a Mac) in
    * the action row, left of Send. Drawn for the icon send button too. `false`
@@ -423,6 +447,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
   budgetTokens,
   commands = [],
   mentions = [],
+  triggers = [],
   showHint = true,
   platform,
   submitKey = "mod+enter",
@@ -756,11 +781,18 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
 
   const setText = (next: string) => commit((m) => (m.text === next ? m : { ...m, text: next }));
   const [picker, setPicker] = useState<null | {
-    kind: "cmd" | "mention";
+    kind: "cmd" | "mention" | "trigger";
     start: number;
     query: string;
     cursor: number;
+    /** The trigger character, for `kind: "trigger"`. */
+    char?: string;
   }>(null);
+  const triggerFor = (ch: string | undefined) =>
+    ch === undefined ? undefined : triggers.find((t) => t.char.length === 1 && t.char === ch);
+  const activeTrigger = picker?.kind === "trigger" ? triggerFor(picker.char) : undefined;
+  const [triggerItems, setTriggerItems] = useState<PromptTriggerItem[]>([]);
+  const triggerRequest = useRef(0);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -863,12 +895,43 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
         : [],
     [picker, mentions],
   );
-  const items: Array<PromptCmd | PromptMention> =
+  /*
+   * An app trigger's items. Each query gets a request number; an answer for an
+   * older one is dropped, so a slow first response never replaces a newer
+   * list. A source that throws or rejects shows nothing rather than breaking
+   * the input.
+   */
+  const triggerQuery = picker?.kind === "trigger" ? picker.query : null;
+  useEffect(() => {
+    const id = ++triggerRequest.current;
+    if (!activeTrigger || triggerQuery === null) {
+      setTriggerItems([]);
+      return;
+    }
+    let answer: PromptTriggerItem[] | Promise<PromptTriggerItem[]>;
+    try {
+      answer = activeTrigger.search(triggerQuery);
+    } catch {
+      setTriggerItems([]);
+      return;
+    }
+    Promise.resolve(answer).then(
+      (list) => {
+        if (triggerRequest.current === id) setTriggerItems(Array.isArray(list) ? list : []);
+      },
+      () => {
+        if (triggerRequest.current === id) setTriggerItems([]);
+      },
+    );
+  }, [activeTrigger, triggerQuery]);
+  const items: Array<PromptCmd | PromptMention | PromptTriggerItem> =
     picker?.kind === "cmd"
       ? filteredCmds
       : picker?.kind === "mention"
         ? filteredMentions
-        : [];
+        : picker?.kind === "trigger"
+          ? triggerItems
+          : [];
 
   /**
    * Keep the picker's active row in view.
@@ -905,9 +968,21 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
   const updateText = (next: string, caret: number) => {
     setText(next);
     let triggerIdx = -1;
-    let triggerKind: "cmd" | "mention" | null = null;
+    let triggerKind: "cmd" | "mention" | "trigger" | null = null;
+    let triggerChar: string | undefined;
     for (let i = caret - 1; i >= 0; i--) {
       const ch = next[i];
+      const app = triggerFor(ch);
+      if (app) {
+        // An app trigger owns its character: the built-in picker for it never opens.
+        if (app.wordStart === false || i === 0 || /\s/.test(next[i - 1] ?? "")) {
+          triggerKind = "trigger";
+          triggerChar = ch;
+          triggerIdx = i;
+          break;
+        }
+        continue;
+      }
       if (ch === "@") {
         triggerKind = "mention";
         triggerIdx = i;
@@ -922,7 +997,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
     }
     if (triggerKind !== null && triggerIdx >= 0) {
       const query = next.slice(triggerIdx + 1, caret);
-      setPicker({ kind: triggerKind, start: triggerIdx, query, cursor: 0 });
+      setPicker({ kind: triggerKind, start: triggerIdx, query, cursor: 0, ...(triggerChar !== undefined ? { char: triggerChar } : {}) });
     } else {
       setPicker(null);
     }
@@ -934,7 +1009,11 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
     const insert =
       picker.kind === "cmd"
         ? (choice as PromptCmd).name + " "
-        : `@${(choice as PromptMention).id} `;
+        : picker.kind === "trigger"
+          ? (activeTrigger?.serialize
+              ? activeTrigger.serialize(choice as PromptTriggerItem)
+              : `${picker.char ?? ""}${(choice as PromptTriggerItem).id}`) + " "
+          : `@${(choice as PromptMention).id} `;
     const before = text.slice(0, picker.start);
     const after = text.slice(picker.start + 1 + picker.query.length);
     const next = before + insert + after;
@@ -1310,9 +1389,10 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
         {picker && items.length > 0 && (
           <div
             data-react-fancy-prompt-input-menu={picker.kind}
+            data-react-fancy-prompt-input-trigger={picker.kind === "trigger" ? picker.char : undefined}
             className="absolute bottom-full start-2 z-10 mb-1 w-72 overflow-hidden rounded-md border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]">
             <div className="border-b border-zinc-100 bg-zinc-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] dark:border-zinc-800 dark:bg-zinc-950">
-              {picker.kind === "cmd" ? "Commands" : "Mention"} · {items.length}
+              {picker.kind === "cmd" ? "Commands" : picker.kind === "trigger" ? (activeTrigger?.label ?? picker.char) : "Mention"} · {items.length}
             </div>
             {/* Row text breaks or truncates long tokens rather than widening the
                 row: an unbroken name or hint (`/plugin:some-long-command`, a
@@ -1320,7 +1400,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
             <ul
               ref={menuListRef}
               role="listbox"
-              aria-label={picker.kind === "cmd" ? "Commands" : "Mentions"}
+              aria-label={picker.kind === "cmd" ? "Commands" : picker.kind === "trigger" ? (activeTrigger?.label ?? picker.char) : "Mentions"}
               className="max-h-56 overflow-y-auto"
             >
               {items.map((item, i) => {
@@ -1352,6 +1432,34 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
                         {c.name}
                       </div>
                       <div className="text-[11px] text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))] [overflow-wrap:anywhere]">{c.hint}</div>
+                    </li>
+                  );
+                }
+                if (picker.kind === "trigger") {
+                  const t = item as PromptTriggerItem;
+                  return (
+                    <li
+                      key={t.id}
+                      role="option"
+                      aria-selected={active}
+                      data-react-fancy-prompt-input-menu-item={t.id}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        insertChoice(i);
+                      }}
+                      onMouseEnter={hoverTo}
+                      className={`cursor-pointer px-2 py-1.5 text-[12px] ${
+                        active
+                          ? "bg-violet-100 dark:bg-violet-900/30"
+                          : "hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                      }`}
+                    >
+                      <div className="truncate font-medium" title={t.label}>
+                        {t.label}
+                      </div>
+                      {t.description ? (
+                        <div className="text-[11px] text-[color:var(--fancy-text-subtle,var(--color-zinc-600))] dark:text-[color:var(--fancy-text-subtle-dark,var(--color-zinc-400))] [overflow-wrap:anywhere]">{t.description}</div>
+                      ) : null}
                     </li>
                   );
                 }
