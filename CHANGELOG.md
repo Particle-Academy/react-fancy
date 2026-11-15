@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Installable from git.** A `prepare` script builds `dist/`, which npm runs for a
+  git dependency (with devDependencies installed), so
+  `npm install github:Particle-Academy/react-fancy#<sha>` and an `npm ci` pinned to a
+  commit now get a working package before a release is on the registry. A registry
+  install is unchanged: the tarball already ships `dist/`. Contributors: `npm install`
+  in a checkout now also builds.
+
 ## [6.26.0] - 2026-11-15
 
 ### Added
