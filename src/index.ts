@@ -491,6 +491,9 @@ export type {
   ChartSparklineProps,
   ChartHorizontalBarProps,
   ChartStackedBarProps,
+  ChartXLabelProps,
+  ChartXLabelInterval,
+  ChartXTickFormat,
 } from "./components/Chart";
 
 export { Editor, useEditor } from "./components/Editor";

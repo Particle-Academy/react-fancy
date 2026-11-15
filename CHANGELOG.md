@@ -19,6 +19,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   commit now get a working package before a release is on the registry. A registry
   install is unchanged: the tarball already ships `dist/`. Contributors: `npm install`
   in a checkout now also builds.
+- **X-axis label control on every chart with a category x-axis: `xLabelInterval`
+  and `xTickFormat`** (`Chart.Line`, `Chart.Area`, `Chart.StackedBar`, `Chart.Bar`).
+  `xLabelInterval` is a number (draw every Nth label; `1` draws all) or `"auto"`,
+  the default (see Fixed). `xTickFormat` changes the drawn tick only, as
+  `(label, index) => string` or the JSON-friendly preset `"date-short"` (`MM-DD`);
+  the tooltip, the bar key and the screen-reader list keep the full label. New
+  types: `ChartXLabelProps`, `ChartXLabelInterval`, `ChartXTickFormat`.
+- **Full x-axis labels for screen readers.** Each of those charts renders its
+  labels, in full, as a visually hidden list
+  (`data-react-fancy-chart-x-labels`), and hides the drawn tick text from
+  assistive tech so nothing is read twice.
+
+### Fixed
+
+- **Chart x-axis labels no longer overlap when there are many categories.**
+  Every category drew its own tick, so 30 daily labels on a `Chart.StackedBar`
+  ran together into an unreadable smear (reported by the Prism estate's lab).
+  The default `xLabelInterval="auto"` now thins the drawn labels so no two
+  overlap, from each label's estimated width against the room per category.
+  The estimate is deterministic, so the server and the browser draw the same
+  ticks. `Chart.Bar`, whose label row is HTML, thins against its measured width
+  once mounted and draws every label until then. Small charts are unchanged:
+  a year of month names or a week of day names still shows every label. To get
+  the old behaviour, pass `xLabelInterval={1}`.
 
 ## [6.26.0] - 2026-11-15
 

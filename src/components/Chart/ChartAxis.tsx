@@ -7,6 +7,25 @@ interface ChartAxisProps {
   length: number;
   label?: string;
   formatTick?: (value: number) => string;
+  /**
+   * Hide the tick text from assistive tech. Set when the full labels are read
+   * from a `ChartXLabelList` instead, so nothing is announced twice.
+   */
+  tickTextAriaHidden?: boolean;
+}
+
+/**
+ * The full category labels, for screen readers. The drawn ticks may be thinned
+ * or shortened; this list never is.
+ */
+export function ChartXLabelList({ labels }: { labels: readonly string[] }) {
+  return (
+    <ul data-react-fancy-chart-x-labels="" className="sr-only">
+      {labels.map((label, i) => (
+        <li key={i}>{label}</li>
+      ))}
+    </ul>
+  );
 }
 
 function defaultFormat(value: number): string {
@@ -24,6 +43,7 @@ export function ChartAxis({
   length,
   label,
   formatTick = defaultFormat,
+  tickTextAriaHidden = false,
 }: ChartAxisProps) {
   if (orientation === "x") {
     return (
@@ -34,7 +54,7 @@ export function ChartAxis({
           return (
             <g key={tick}>
               <line x1={tx} y1={y} x2={tx} y2={y + 4} stroke="currentColor" className="text-[color:var(--fancy-text-faint,var(--color-zinc-400))] dark:text-[color:var(--fancy-text-faint-dark,var(--color-zinc-500))]" />
-              <text x={tx} y={y + 16} textAnchor="middle" className="fill-[color:var(--fancy-text-muted,var(--color-zinc-500))] text-[10px] dark:fill-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
+              <text x={tx} y={y + 16} textAnchor="middle" aria-hidden={tickTextAriaHidden || undefined} className="fill-[color:var(--fancy-text-muted,var(--color-zinc-500))] text-[10px] dark:fill-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))]">
                 {formatTick(tick)}
               </text>
             </g>

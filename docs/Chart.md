@@ -29,11 +29,13 @@ import { Chart } from "@particle-academy/react-fancy";
 | data | `ChartBarData[]` | - | Array of `{ label, value, color? }` |
 | height | `number` | - | Chart height in px |
 | showValues | `boolean` | - | Display values above bars |
+| xLabelInterval | `number \| "auto"` | `"auto"` | See [X-axis labels](#x-axis-labels). `"auto"` thins against the measured width once mounted |
+| xTickFormat | `((label, index) => string) \| "date-short"` | - | See [X-axis labels](#x-axis-labels) |
 | className | `string` | - | Additional CSS classes |
 
 ### Chart.HorizontalBar
 
-Same props as `Chart.Bar`, rendered horizontally.
+`data`, `height`, `showValues` and `className` as `Chart.Bar`, rendered horizontally. Its labels sit on the y-axis, one row each, so it has no x-label props.
 
 ### Chart.Line
 
@@ -65,6 +67,8 @@ Same props as `Chart.Bar`, rendered horizontally.
 | tooltip | `boolean` | - | Show tooltip on hover |
 | animate | `boolean` | - | Enable animations |
 | responsive | `boolean` | - | Responsive width |
+| xLabelInterval | `number \| "auto"` | `"auto"` | See [X-axis labels](#x-axis-labels) |
+| xTickFormat | `((label, index) => string) \| "date-short"` | - | See [X-axis labels](#x-axis-labels) |
 | className | `string` | - | Additional CSS classes |
 
 ### Chart.Area
@@ -77,7 +81,34 @@ Same as `Chart.Line` without the `fill` prop (area fill is always enabled).
 |------|------|---------|-------------|
 | labels | `string[]` | - | X-axis labels |
 | series | `ChartSeries[]` | - | Stacked data series |
-| *(plus ChartCommonProps)* | | | height, xAxis, yAxis, grid, tooltip, animate, responsive |
+| *(plus ChartCommonProps)* | | | height, xAxis, yAxis, grid, tooltip, animate, responsive, xLabelInterval, xTickFormat |
+
+### X-axis labels
+
+`Chart.Line`, `Chart.Area`, `Chart.StackedBar` and `Chart.Bar` draw one category per label. With many categories, say 30 days, drawing every label makes them run together, so two props control what the x-axis draws:
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| xLabelInterval | `number \| "auto"` | `"auto"` | A number draws every Nth label, starting with the first (`1` draws all). `"auto"` draws as many as fit without overlapping, from each label's estimated width against the room per category; small charts show every label |
+| xTickFormat | `((label, index) => string) \| "date-short"` | - | Changes the drawn tick only. `"date-short"` draws a date as `MM-DD` (`2026-10-01` becomes `10-01`); a label that is not a date is left as is |
+
+The full label still heads the tooltip and keys the bar, so shorten the tick, not the data:
+
+```tsx
+<Chart.StackedBar
+  labels={days}              // "2026-10-01" ... "2026-10-30"
+  series={series}
+  xTickFormat="date-short"   // ticks read 10-01, 10-04, ...; the tooltip reads 2026-10-01
+/>
+
+<Chart.Line labels={days} series={series} xLabelInterval={7} />   // one label a week
+
+<Chart.Line labels={days} series={series} xTickFormat={(label, i) => (i === 0 ? label : label.slice(8))} />
+```
+
+`"auto"` thins against the width the formatted tick needs, so a shorter `xTickFormat` also means more labels fit. It uses an estimate rather than a measurement, so the server and the browser draw the same ticks. `Chart.Bar` lays its labels out in HTML; it measures its own width once mounted and draws every label until then.
+
+**Accessibility.** Each of these charts also renders its labels, in full and in order, as a visually hidden list (`[data-react-fancy-chart-x-labels]`), and hides the drawn ticks from assistive tech. A screen reader hears every full label once, whatever the axis draws.
 
 ### Chart.Pie
 

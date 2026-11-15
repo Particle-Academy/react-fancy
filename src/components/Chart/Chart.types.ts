@@ -1,10 +1,30 @@
+import type { ChartXLabelInterval, ChartXTickFormat } from "./chart.ticks";
+
+export type { ChartXLabelInterval, ChartXTickFormat };
+
+/** X-axis label control, shared by every chart with a category x-axis. */
+export interface ChartXLabelProps {
+  /**
+   * Which labels the x-axis draws: a number shows every Nth (`1` = all), and
+   * `"auto"` (the default) thins them so no two overlap, from each label's
+   * estimated width against the room per category. Small charts are unchanged.
+   */
+  xLabelInterval?: ChartXLabelInterval;
+  /**
+   * The drawn tick only, `(label, index) => string`, or `"date-short"` for
+   * `MM-DD`. The tooltip, the bar key and the screen-reader label list keep the
+   * full label.
+   */
+  xTickFormat?: ChartXTickFormat;
+}
+
 export interface ChartBarData {
   label: string;
   value: number;
   color?: string;
 }
 
-export interface ChartBarProps {
+export interface ChartBarProps extends ChartXLabelProps {
   data: ChartBarData[];
   height?: number;
   showValues?: boolean;
@@ -31,7 +51,7 @@ export interface ChartSeries {
   color?: string;
 }
 
-export interface ChartCommonProps {
+export interface ChartCommonProps extends ChartXLabelProps {
   className?: string;
   height?: number;
   xAxis?: boolean | { label?: string; tickCount?: number };

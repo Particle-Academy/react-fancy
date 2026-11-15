@@ -13,4 +13,7 @@ export type {
   ChartSparklineProps,
   ChartHorizontalBarProps,
   ChartStackedBarProps,
+  ChartXLabelProps,
+  ChartXLabelInterval,
+  ChartXTickFormat,
 } from "./Chart.types";

@@ -1,7 +1,8 @@
 import { useMemo, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
 import { DEFAULT_COLORS, createLinearScale, niceScale } from "./chart.utils";
-import { ChartAxis } from "./ChartAxis";
+import { ChartAxis, ChartXLabelList } from "./ChartAxis";
+import { formatXTick, visibleXTickIndexes, xLabelStep } from "./chart.ticks";
 import { ChartGrid } from "./ChartGrid";
 import { ChartTooltip } from "./ChartTooltip";
 import type { ChartStackedBarProps } from "./Chart.types";
@@ -17,6 +18,8 @@ export function ChartStackedBar({
   grid = true,
   tooltip = true,
   responsive = false,
+  xLabelInterval = "auto",
+  xTickFormat,
   className,
 }: ChartStackedBarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,6 +48,12 @@ export function ChartStackedBar({
 
   const barWidth = Math.max(8, (plotWidth / labels.length) * 0.6);
   const barGap = (plotWidth - barWidth * labels.length) / (labels.length + 1);
+
+  const tickTexts = useMemo(
+    () => labels.map((label, i) => formatXTick(label, i, xTickFormat)),
+    [labels, xTickFormat],
+  );
+  const xTicks = visibleXTickIndexes(labels.length, xLabelStep(tickTexts, barGap + barWidth, xLabelInterval, 10));
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!tooltip || !containerRef.current) return;
@@ -110,15 +119,17 @@ export function ChartStackedBar({
         {xAxis && (
           <ChartAxis
             orientation="x"
-            ticks={labels.map((_, i) => i)}
+            ticks={xTicks}
             scale={(i) => PADDING.left + barGap * (i + 1) + barWidth * i + barWidth / 2}
             x={PADDING.left}
             y={PADDING.top + plotHeight}
             length={plotWidth}
-            formatTick={(v) => labels[Math.round(v)] ?? ""}
+            formatTick={(v) => tickTexts[Math.round(v)] ?? ""}
+            tickTextAriaHidden
           />
         )}
       </svg>
+      {xAxis && <ChartXLabelList labels={labels} />}
 
       {tooltip && hoverIdx !== null && (
         <ChartTooltip

@@ -1,7 +1,8 @@
 import { useMemo, useRef, useState } from "react";
 import { cn } from "../../utils/cn";
 import { DEFAULT_COLORS, createLinearScale, linearPath, monotonePath, niceScale } from "./chart.utils";
-import { ChartAxis } from "./ChartAxis";
+import { ChartAxis, ChartXLabelList } from "./ChartAxis";
+import { formatXTick, visibleXTickIndexes, xLabelStep } from "./chart.ticks";
 import { ChartGrid } from "./ChartGrid";
 import { ChartTooltip } from "./ChartTooltip";
 import type { ChartLineProps } from "./Chart.types";
@@ -22,6 +23,8 @@ export function ChartLine({
   tooltip = true,
   animate = true,
   responsive = false,
+  xLabelInterval = "auto",
+  xTickFormat,
   className,
 }: ChartLineProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,6 +53,13 @@ export function ChartLine({
   );
 
   const pathFn = curve === "monotone" ? monotonePath : linearPath;
+
+  const tickTexts = useMemo(
+    () => labels.map((label, i) => formatXTick(label, i, xTickFormat)),
+    [labels, xTickFormat],
+  );
+  const xSlot = labels.length > 1 ? plotWidth / (labels.length - 1) : null;
+  const xTicks = visibleXTickIndexes(labels.length, xLabelStep(tickTexts, xSlot, xLabelInterval, 10));
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!tooltip || !containerRef.current) return;
@@ -132,12 +142,13 @@ export function ChartLine({
         {xAxis && (
           <ChartAxis
             orientation="x"
-            ticks={labels.map((_, i) => i)}
+            ticks={xTicks}
             scale={xScale}
             x={PADDING.left}
             y={PADDING.top + plotHeight}
             length={plotWidth}
-            formatTick={(v) => labels[Math.round(v)] ?? ""}
+            formatTick={(v) => tickTexts[Math.round(v)] ?? ""}
+            tickTextAriaHidden
           />
         )}
 
@@ -154,6 +165,7 @@ export function ChartLine({
           />
         )}
       </svg>
+      {xAxis && <ChartXLabelList labels={labels} />}
 
       {tooltip && hoverInfo !== null && (
         <ChartTooltip
