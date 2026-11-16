@@ -31,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`data-react-fancy-chart-x-labels`), and hides the drawn tick text from
   assistive tech so nothing is read twice.
 
+### Changed
+
+- Rebranded the display name to Fancy Dev Kit (for SaaSy Agents) in the README and badge. Package names, the npm scope and every URL are unchanged, so nothing to do.
+
 ### Fixed
 
 - **Chart x-axis labels no longer overlap when there are many categories.**
