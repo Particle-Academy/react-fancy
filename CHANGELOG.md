@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.28.0] - 2026-11-16
+
+### Added
+
+- **PromptInput `attachments`** (CC-fancy-0043), default `true`. `attachments={false}`
+  turns attaching off entirely, for a host whose backend cannot take files: no Attach
+  button, no hidden file input, no drop target (dragover is not claimed), no file
+  paste (left to the browser), and the draft's `attachments` stay empty. A restored,
+  default or controlled draft that carries attachments is shown and sent without
+  them. `pasteImages` is its own opt-in and is unaffected. Nothing changes unless
+  you pass `false`.
+
 ## [6.27.0] - 2026-11-15
 
 ### Added

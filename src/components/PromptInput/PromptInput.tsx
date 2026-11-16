@@ -404,6 +404,14 @@ export interface PromptInputProps
    * in message order. Needs `pasteImages`. They reach `onSubmit` either way.
    */
   pasteFilesName?: string;
+  /**
+   * Whether files can be attached at all. Default `true`. `false` removes every
+   * way in: no Attach button, no hidden file input, no drop target, no file
+   * paste, and the draft's `attachments` stay empty (a restored or controlled
+   * draft that carries some is shown and sent without them). For a host whose
+   * backend cannot take files. `pasteImages` is its own opt-in and is unaffected.
+   */
+  attachments?: boolean;
   /** `"icon"`: an icon-only attach button whose tooltip says what it does. Default `"label"`. */
   attachButton?: "label" | "icon";
   /**
@@ -475,6 +483,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
   renderPastePreview,
   pasteClassNames,
   pasteFilesName,
+  attachments: attachmentsEnabled = true,
   attachButton = "label",
   sendButton = "label",
   usedTokens,
@@ -505,7 +514,17 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
         text: defaultValue ?? "",
       },
   );
-  const baseDraft = draftControlled ? controlledDraft : innerDraft;
+  const rawDraft = draftControlled ? controlledDraft : innerDraft;
+  // With attachments off, a draft that arrives carrying some (a restore, a
+  // default, a controlled prop) is read without them, so they are neither shown
+  // nor sent. Memoised so a controlled draft does not become a new model per render.
+  const baseDraft = useMemo<PromptDraft>(
+    () =>
+      attachmentsEnabled || rawDraft.attachments.length === 0
+        ? rawDraft
+        : { ...rawDraft, attachments: [] },
+    [rawDraft, attachmentsEnabled],
+  );
   const model: PromptDraft =
     !draftControlled && controlledValue !== undefined && controlledValue !== baseDraft.text
       ? { ...baseDraft, text: controlledValue }
@@ -1213,7 +1232,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
    */
   const attach = (list: FileList | File[] | null) => {
     const files = Array.from(list ?? []);
-    if (files.length === 0 || disabled) return;
+    if (files.length === 0 || disabled || !attachmentsEnabled) return;
 
     const added = files.map((f) => {
       const id = crypto.randomUUID();
@@ -1245,6 +1264,8 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
    * prevented only then, and a text paste is never touched.
    */
   const onPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    // Attachments off: a file paste is left to the browser, like any field.
+    if (!attachmentsEnabled) return;
     const data = e.clipboardData;
     const files = Array.from(data?.files ?? []);
 
@@ -1270,12 +1291,18 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
       // "error" after one was refused, until the next send.
       data-submit-state={ack.status === "idle" ? undefined : ack.status}
       data-running={showStop ? "true" : undefined}
-      onDragOver={(e) => {
-        e.preventDefault();
-        if (!disabled) setDragOver(true);
-      }}
-      onDragLeave={() => setDragOver(false)}
-      onDrop={onDrop}
+      // Attachments off: no drop target. Not preventing dragover is what tells
+      // the browser so; a handler that merely ignored the drop would still claim it.
+      onDragOver={
+        attachmentsEnabled
+          ? (e) => {
+              e.preventDefault();
+              if (!disabled) setDragOver(true);
+            }
+          : undefined
+      }
+      onDragLeave={attachmentsEnabled ? () => setDragOver(false) : undefined}
+      onDrop={attachmentsEnabled ? onDrop : undefined}
       className={cn(
         "relative rounded-md border bg-[color:var(--fancy-surface,var(--color-white))] transition dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))]",
         dragOver
@@ -1505,21 +1532,23 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
       </div>
 
       <div className="flex items-center gap-2 border-t border-zinc-200 bg-zinc-50/60 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/40">
-        <Tooltip content={attachButton === "icon" ? "Attach files — or drop them here" : "Drop files here, or click"}>
-          <Button
-            variant="ghost"
-            size="sm"
-            icon="paperclip"
-            className="shrink-0"
-            data-react-fancy-prompt-input-attach=""
-            // An icon alone has no name; the tooltip is not one a screen reader reads.
-            aria-label={attachButton === "icon" ? "Attach files" : undefined}
-            disabled={disabled}
-            onClick={() => fileRef.current?.click()}
-          >
-            {attachButton === "icon" ? null : "attach"}
-          </Button>
-        </Tooltip>
+        {attachmentsEnabled && (
+          <Tooltip content={attachButton === "icon" ? "Attach files — or drop them here" : "Drop files here, or click"}>
+            <Button
+              variant="ghost"
+              size="sm"
+              icon="paperclip"
+              className="shrink-0"
+              data-react-fancy-prompt-input-attach=""
+              // An icon alone has no name; the tooltip is not one a screen reader reads.
+              aria-label={attachButton === "icon" ? "Attach files" : undefined}
+              disabled={disabled}
+              onClick={() => fileRef.current?.click()}
+            >
+              {attachButton === "icon" ? null : "attach"}
+            </Button>
+          </Tooltip>
+        )}
         {/*
           The button above shipped with a no-op onClick and a tooltip reading
           "Drop files here, or click" — an affordance that lied. Drop-only also
@@ -1532,18 +1561,20 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
           SVG from the kit's own icon layer, which is the same reason the rest of
           the suite does not hand-roll iconography.
         */}
-        <input
-          ref={fileRef}
-          type="file"
-          multiple
-          disabled={disabled}
-          className="hidden"
-          onChange={(e) => {
-            attach(e.target.files);
-            // Let the same file be picked twice in a row.
-            e.target.value = "";
-          }}
-        />
+        {attachmentsEnabled && (
+          <input
+            ref={fileRef}
+            type="file"
+            multiple
+            disabled={disabled}
+            className="hidden"
+            onChange={(e) => {
+              attach(e.target.files);
+              // Let the same file be picked twice in a row.
+              e.target.value = "";
+            }}
+          />
+        )}
         {meterLevel !== null && (
           <div
             data-react-fancy-prompt-input-meter=""
