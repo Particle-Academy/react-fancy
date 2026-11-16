@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.26.1] - 2026-11-15
+
+A patch for the chart x-axis fix. It also carries two additive props and the git
+`prepare` script, all opt-in, so there is nothing to do on upgrade.
+
 ### Added
 
 - **Installable from git.** A `prepare` script builds `dist/`, which npm runs for a
