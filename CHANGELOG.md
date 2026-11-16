@@ -11,10 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [6.26.1] - 2026-11-15
-
-A patch for the chart x-axis fix. It also carries two additive props and the git
-`prepare` script, all opt-in, so there is nothing to do on upgrade.
+## [6.27.0] - 2026-11-15
 
 ### Added
 
@@ -25,6 +22,14 @@ A patch for the chart x-axis fix. It also carries two additive props and the git
   over from `mentions` / `commands`; `wordStart` (default true) opens it only at a
   word start. The menu carries `data-react-fancy-prompt-input-menu="trigger"` and
   `data-react-fancy-prompt-input-trigger`. Opt-in: without `triggers` nothing changes.
+
+## [6.26.1] - 2026-11-15
+
+A patch for the chart x-axis fix. It also carries two additive props and the git
+`prepare` script, all opt-in, so there is nothing to do on upgrade.
+
+### Added
+
 - **Installable from git.** A `prepare` script builds `dist/`, which npm runs for a
   git dependency (with devDependencies installed), so
   `npm install github:Particle-Academy/react-fancy#<sha>` and an `npm ci` pinned to a
