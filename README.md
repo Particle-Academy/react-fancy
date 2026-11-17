@@ -5,10 +5,10 @@
 React UI component library for **Human+ UX** — controlled, agent-bridgeable primitives that humans and agents share. Every component exposes `value` / `onChange`, stable handles, and JSON-friendly props so MCP bridges can drive the UI without DOM scraping.
 
 <!-- fancy-agents-note:start -->
-> **For agents.** Every Fancy package, this one included, is listed on the
-> Fancy MCP catalog server at `https://ui.particle.academy/mcp` (streamable HTTP, no API key;
-> MCP id `fancy-ui`), with install commands and docs. How an agent installs
-> and uses this package is in [AGENTS.md](https://github.com/Particle-Academy/react-fancy/blob/main/AGENTS.md).
+> **For agents.** This package is listed on the Fancy MCP catalog server at
+> `https://ui.particle.academy/mcp` (streamable HTTP, no API key; MCP id `fancy-ui`),
+> with install commands and docs, alongside the rest of the kit. How an agent
+> installs and uses this package is in [AGENTS.md](https://github.com/Particle-Academy/react-fancy/blob/main/AGENTS.md).
 <!-- fancy-agents-note:end -->
 
 ## Inertia.js integration
