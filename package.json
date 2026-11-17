@@ -1220,7 +1220,8 @@
     "dist",
     "docs",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "AGENTS.md"
   ],
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/tsup/dist/cli-default.js",
