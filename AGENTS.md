@@ -70,6 +70,12 @@ Theming and colour overrides are in [STYLE.md](./STYLE.md). Live demos:
 - To let an agent drive a surface over MCP, pair it with
   `@particle-academy/agent-integrations` and its `register<Surface>Bridge`
   functions.
+- **Editor inline tokens (6.29.0).** `useEditor().insertToken({ id, label })`
+  puts an atomic chip at the caret: one `<span data-react-fancy-editor-token="<id>"
+  contenteditable="false">label</span>`. Arrow keys step over it in one press and
+  Backspace / Delete remove it whole. The chip survives `outputFormat="markdown"`
+  as inline HTML. To build a value with chips yourself, use `editorTokenHtml(token)`,
+  which escapes the id and label. Read tokens back from the value by that attribute.
 
 ## Traps
 

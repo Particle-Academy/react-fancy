@@ -3,6 +3,7 @@ import { cn } from "../../utils/cn";
 import { CodeView } from "../CodeView";
 import { useEditor } from "./Editor.context";
 import { proseClasses, extensionEditorClasses } from "./editor.utils";
+import { handleTokenKey, normalizeTokens, TOKEN_SURFACE_CLASSES } from "./editor.tokens";
 import type { EditorContentProps } from "./Editor.types";
 
 export function EditorContent({ className, maxHeight: maxHeightProp, sourceClassName }: EditorContentProps) {
@@ -39,6 +40,7 @@ export function EditorContent({ className, maxHeight: maxHeightProp, sourceClass
     const el = contentRef.current;
     if (el && seededHtml.current !== _initialHtml) {
       el.innerHTML = _initialHtml;
+      normalizeTokens(el);
       seededHtml.current = _initialHtml;
     }
   }, [contentRef, _initialHtml, showSource]);
@@ -75,6 +77,14 @@ export function EditorContent({ className, maxHeight: maxHeightProp, sourceClass
       data-react-fancy-editor-content=""
       data-placeholder={placeholder}
       onInput={_onInput}
+      onKeyDown={(e) => {
+        const el = contentRef.current;
+        if (!el || e.defaultPrevented) return;
+        const handled = handleTokenKey(el, e.key);
+        if (!handled) return;
+        e.preventDefault();
+        if (handled === "changed") _onInput();
+      }}
       style={{
         lineHeight: lineSpacing,
         maxHeight: maxHeight ? `${maxHeight}px` : undefined,
@@ -86,6 +96,7 @@ export function EditorContent({ className, maxHeight: maxHeightProp, sourceClass
         "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[color:var(--fancy-focus,var(--color-blue-500))] dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--color-blue-400))]",
         proseClasses,
         extClasses,
+        TOKEN_SURFACE_CLASSES,
         "empty:before:content-[attr(data-placeholder)] empty:before:text-[color:var(--fancy-text-muted,var(--color-zinc-500))] dark:empty:before:text-[color:var(--fancy-text-muted-dark,var(--color-zinc-400))] empty:before:pointer-events-none",
         className,
       )}

@@ -496,7 +496,7 @@ export type {
   ChartXTickFormat,
 } from "./components/Chart";
 
-export { Editor, useEditor } from "./components/Editor";
+export { Editor, useEditor, editorTokenHtml } from "./components/Editor";
 export type {
   EditorProps,
   EditorToolbarProps,
@@ -505,6 +505,7 @@ export type {
   EditorFullScreenToggleProps,
   EditorAction,
   EditorContextValue,
+  EditorToken,
 } from "./components/Editor";
 
 export { CodeView } from "./components/CodeView";

@@ -11,6 +11,7 @@ import { EditorToolbarSeparator } from "./EditorToolbarSeparator";
 import { EditorSourceToggle } from "./EditorSourceToggle";
 import { EditorContent } from "./EditorContent";
 import { EditorFullScreenToggle } from "./EditorFullScreenToggle";
+import { insertTokenAt, type EditorToken } from "./editor.tokens";
 import { htmlToMarkdown, detectFormat, markdownToEditorHtml, type MarkdownSource } from "./editor.utils";
 import { mergeExtensions } from "../ContentRenderer/extensions";
 import { ContentRenderer } from "../ContentRenderer/ContentRenderer";
@@ -163,6 +164,16 @@ function EditorRoot({
     [handleInput],
   );
 
+  const insertToken = useCallback(
+    (token: EditorToken) => {
+      const el = contentRef.current;
+      if (!el) return;
+      insertTokenAt(el, token);
+      handleInput();
+    },
+    [handleInput],
+  );
+
   // The source textarea edits `value` directly — it is already the canonical
   // source in `outputFormat` (html or markdown), so no conversion round-trip.
   const handleSourceInput = useCallback(
@@ -195,6 +206,7 @@ function EditorRoot({
     exec,
     insertText,
     wrapSelection,
+    insertToken,
     outputFormat,
     lineSpacing,
     placeholder,

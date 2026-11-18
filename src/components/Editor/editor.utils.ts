@@ -1,4 +1,5 @@
 import { marked, type Token, type Tokens } from "marked";
+import { TOKEN_ATTR, editorTokenHtml } from "./editor.tokens";
 import type { RenderExtension } from "../ContentRenderer/extensions";
 
 /**
@@ -722,6 +723,11 @@ function serializeInlineNode(node: Node): string {
   if (!isElement(node)) return "";
   const tag = tagOf(node);
   if (isCustomTag(tag)) return node.outerHTML;
+  // An atomic token has no markdown spelling; keep it as inline HTML, which
+  // markdown carries and the seed parses back into the same chip.
+  if (node.hasAttribute(TOKEN_ATTR)) {
+    return editorTokenHtml({ id: node.getAttribute(TOKEN_ATTR) ?? "", label: node.textContent ?? "" });
+  }
   if (BLOCK_TAGS.has(tag)) return serializeBlock(node);
   const inner = () => serializeInline(node);
   switch (tag) {

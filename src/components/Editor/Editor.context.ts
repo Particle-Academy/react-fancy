@@ -1,12 +1,19 @@
 import { createContext, useContext } from "react";
 import type { RefObject } from "react";
 import type { RenderExtension } from "../ContentRenderer/extensions";
+import type { EditorToken } from "./editor.tokens";
 
 export interface EditorContextValue {
   contentRef: RefObject<HTMLDivElement | null>;
   exec: (command: string, arg?: string) => void;
   insertText: (text: string) => void;
   wrapSelection: (before: string, after: string) => void;
+  /**
+   * Insert an atomic inline token (a chip) at the caret, or at the end when the
+   * caret is not in the editor. The caret steps over a chip in one arrow press
+   * and Backspace / Delete remove it whole. Emits through `onChange`.
+   */
+  insertToken: (token: EditorToken) => void;
   outputFormat: "html" | "markdown";
   lineSpacing: number;
   placeholder?: string;

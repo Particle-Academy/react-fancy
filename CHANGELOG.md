@@ -11,6 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.29.0] - 2026-11-17
+
+### Added
+
+- **Editor atomic inline tokens.** `useEditor().insertToken({ id, label })` inserts a
+  chip at the caret (or at the end when the caret is elsewhere): a
+  `<span data-react-fancy-editor-token="<id>" contenteditable="false">` holding its
+  label as text. The arrow keys step over a chip in one press and Backspace / Delete
+  remove it whole, handled by the editor rather than left to browsers that disagree.
+  Chips in a seeded value are made non-editable, and a chip survives
+  `outputFormat="markdown"` as inline HTML. `editorTokenHtml(token)` builds the chip
+  HTML for a host composing a value, with the id and label escaped. Styled from the
+  editing surface with the `surface-muted` and `text` theme tokens, so no class is
+  written into the value. Built for field chips in `fancy-template-ui`. Additive;
+  nothing to do.
+
 ### Changed
 
 - **CI: the lab-certificate gate verifies against the lab's rotated key list.**
