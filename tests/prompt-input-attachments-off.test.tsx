@@ -161,15 +161,87 @@ describe("PromptInput attachments={false}", () => {
     unmount();
   });
 
+  it("still accepts pasted text", () => {
+    let gotText: string | null = null;
+    let got: PromptAttachment[] | null = null;
+    const { host, unmount } = mount(
+      <PromptInput
+        budgetTokens={1000}
+        attachments={false}
+        onSubmit={(t, a) => {
+          gotText = t;
+          got = a;
+        }}
+      />,
+    );
+
+    // A text paste carrying an image rendition (Word, Excel) is text either way.
+    const ev = paste(host, [file("image.png", "image/png", 900)], "pasted words");
+
+    // The browser inserts the text; the component must not swallow it.
+    expect(ev.defaultPrevented).toBe(false);
+    expect(host.querySelector('[aria-label="Remove attachment"]')).toBeNull();
+
+    // jsdom does not perform the insertion, so do what the browser would.
+    type(host, "pasted words");
+    submitVia(host);
+    expect(gotText).toBe("pasted words");
+    expect(got).toEqual([]);
+
+    unmount();
+  });
+
   it("still attaches by default", () => {
-    const { host, unmount } = mount(<PromptInput budgetTokens={1000} onSubmit={() => {}} />);
+    let got: PromptAttachment[] | null = null;
+    const { host, unmount } = mount(
+      <PromptInput budgetTokens={1000} onSubmit={(_t, a) => (got = a)} />,
+    );
 
     expect(host.querySelector("[data-react-fancy-prompt-input-attach]")).not.toBeNull();
     expect(host.querySelector('input[type="file"]')).not.toBeNull();
+
+    const over = dragEvent(host, "dragover", [file("a.pdf", "application/pdf", 10)]);
+    expect(over.defaultPrevented).toBe(true);
+    const drop = dragEvent(host, "drop", [file("a.pdf", "application/pdf", 10)]);
+    expect(drop.defaultPrevented).toBe(true);
+    expect(host.querySelector('[data-react-fancy-prompt-input-attachment]')?.textContent).toContain("a.pdf");
+
     const ev = paste(host, [file("image.png", "image/png", 512)]);
     expect(ev.defaultPrevented).toBe(true);
-    expect(host.querySelector('[aria-label="Remove attachment"]')).not.toBeNull();
+    expect(host.querySelectorAll('[aria-label="Remove attachment"]')).toHaveLength(2);
+
+    type(host, "hello");
+    submitVia(host);
+    expect(got!.map((a) => a.name)).toEqual(["a.pdf", "image.png"]);
 
     unmount();
+  });
+
+  it('attachments={false} wins over attachButton="icon"', () => {
+    const { host, unmount } = mount(
+      <PromptInput budgetTokens={1000} attachments={false} attachButton="icon" onSubmit={() => {}} />,
+    );
+
+    expect(host.querySelector("[data-react-fancy-prompt-input-attach]")).toBeNull();
+    expect(host.querySelector('input[type="file"]')).toBeNull();
+
+    unmount();
+  });
+
+  it('attachButton="icon" is unchanged with attachments on', () => {
+    // Explicit true and the default must render the same icon button.
+    for (const props of [{ attachments: true }, {}]) {
+      const { host, unmount } = mount(
+        <PromptInput budgetTokens={1000} attachButton="icon" {...props} onSubmit={() => {}} />,
+      );
+
+      const button = host.querySelector("[data-react-fancy-prompt-input-attach]")!;
+      expect(button).not.toBeNull();
+      expect(button.getAttribute("aria-label")).toBe("Attach files");
+      expect(button.textContent).not.toContain("attach");
+      expect(host.querySelector('input[type="file"]')).not.toBeNull();
+
+      unmount();
+    }
   });
 });

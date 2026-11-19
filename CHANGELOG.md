@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Tests and docs for PromptInput `attachments` (CC-fancy-0043).** The prop shipped
+  in 6.28.0; this adds tests showing that with `attachments={false}` a text paste still
+  works and `attachButton="icon"` renders no button, that the default takes a dropped
+  file as well as a pasted one, and that `attachButton="icon"` with attachments on is
+  unchanged. `docs/PromptInput.md` gains the missing `attachButton` row and `AGENTS.md` a
+  prop table for both props. Additive; default unchanged, consumers do nothing.
+
 ## [6.29.0] - 2026-11-17
 
 ### Added

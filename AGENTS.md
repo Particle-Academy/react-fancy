@@ -70,6 +70,15 @@ Theming and colour overrides are in [STYLE.md](./STYLE.md). Live demos:
 - To let an agent drive a surface over MCP, pair it with
   `@particle-academy/agent-integrations` and its `register<Surface>Bridge`
   functions.
+- **PromptInput attachments (6.28.0).**
+
+  | prop | type | default | what it does |
+  |---|---|---|---|
+  | `attachments` | `boolean` | `true` | `false` turns attaching off for a backend that takes no files: no Attach button, no file input, no drop target, no file paste (text paste still works), and the draft's `attachments` stay empty |
+  | `attachButton` | `"label" \| "icon"` | `"label"` | the Attach button's look while attachments are on; ignored when `attachments={false}` |
+
+  The button's handle is `data-react-fancy-prompt-input-attach`; each attached
+  chip carries `data-react-fancy-prompt-input-attachment="<id>"`.
 - **Editor inline tokens (6.29.0).** `useEditor().insertToken({ id, label })`
   puts an atomic chip at the caret: one `<span data-react-fancy-editor-token="<id>"
   contenteditable="false">label</span>`. Arrow keys step over it in one press and

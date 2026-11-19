@@ -56,7 +56,8 @@ import { PromptInput } from "@particle-academy/react-fancy";
 | onSubmit | `(text, attachments) => void \| Promise<SubmitResult>` | — | Called on ⌘/Ctrl+Enter or send button. Return a Promise to hold the draft until the send is acknowledged. |
 | onSubmitError | `(error: unknown) => void` | — | Called when a Promise from `onSubmit` rejects (with the reason) or resolves `{ ok: false }` (with its `error`). The draft is kept. |
 | disabled | `boolean` | `false` | Disables the text, attaching, dropping and the send. |
-| attachments | `boolean` | `true` | `false` turns attaching off entirely: no Attach button, no hidden file input, no drop target, no file paste, and the draft's `attachments` stay empty (a restored or controlled draft carrying some is shown and sent without them). `pasteImages` is its own opt-in and is unaffected. Added in `6.28.0`. |
+| attachments | `boolean` | `true` | `false` turns attaching off entirely: no Attach button, no hidden file input, no drop target, no file paste, and the draft's `attachments` stay empty (a restored or controlled draft carrying some is shown and sent without them). `pasteImages` is its own opt-in and is unaffected. Pasting text still works. `attachButton` is ignored while this is `false`. Added in `6.28.0`. |
+| attachButton | `"label" \| "icon"` | `"label"` | How the Attach button looks while attachments are on: `"label"` shows the word "attach"; `"icon"` is icon-only, with the accessible name "Attach files" and a tooltip. Handle: `data-react-fancy-prompt-input-attach`. No button renders when `attachments={false}`. |
 | sendDisabled | `boolean` | `false` | Disables only the send. The text stays editable and attachable; ⌘/Ctrl+Enter does not send. |
 | name | `string` | — | Form field name for the text. On the textarea; with inline pills on, on a hidden input carrying the expanded text. |
 | inputId | `string` | — | `id` of the text field (textarea or inline editor). `id` still names the root. |
