@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   unchanged. `docs/PromptInput.md` gains the missing `attachButton` row and `AGENTS.md` a
   prop table for both props. Additive; default unchanged, consumers do nothing.
 
+### Changed
+
+- CI: re-pin org third-party allowlist to 2614224
+
 ## [6.29.0] - 2026-11-17
 
 ### Added
