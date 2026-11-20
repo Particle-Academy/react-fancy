@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.29.1] - 2026-11-19
+
 ### Added
 
 - **Tests and docs for PromptInput `attachments` (CC-fancy-0043).** The prop shipped
