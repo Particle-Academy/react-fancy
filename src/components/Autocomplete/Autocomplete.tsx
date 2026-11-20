@@ -54,7 +54,10 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
       setActiveIndex(-1);
     }, []);
 
-    useOutsideClick(wrapperRef, close, open);
+    // The list renders through a Portal, outside the wrapper, so it must count
+    // as inside too: otherwise pressing an option closes the list on
+    // `mousedown`/`touchstart` and the option's `click` never fires.
+    useOutsideClick(wrapperRef, close, open, listRef);
     useEscapeKey(close, open);
 
     const selected = value ? options.find((o) => o.value === value) : undefined;
@@ -186,6 +189,9 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
               ref={listRef}
               role="listbox"
               dir={position.dir}
+              // Keep focus in the field while an option is pressed, so the
+              // input does not blur mid-selection.
+              onMouseDown={(e) => e.preventDefault()}
               className="fixed z-50 max-h-60 min-w-[8rem] overflow-y-auto rounded-xl border border-[color:var(--fancy-border,var(--color-zinc-200))] bg-[color:var(--fancy-surface,var(--color-white))] p-1 shadow-lg dark:border-[color:var(--fancy-border-dark,var(--color-zinc-700))] dark:bg-[color:var(--fancy-surface-dark,var(--color-zinc-900))] dark:shadow-zinc-950/50 fancy-scale-in"
               style={{
                 left: position.x,

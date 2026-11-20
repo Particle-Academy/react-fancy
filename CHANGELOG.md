@@ -24,6 +24,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - CI: re-pin org third-party allowlist to 2614224
 
+### Fixed
+
+- **Autocomplete: picking an option with a mouse or a tap did nothing.** The option
+  list renders through a Portal, outside the component's wrapper, and the
+  outside-press guard only counted the wrapper as inside. Pressing an option was
+  therefore an outside press: `mousedown` / `touchstart` closed the list, the option
+  unmounted, and its `click` (which selects) never fired. Only the keyboard worked.
+  The portalled list now counts as inside, and pressing it keeps focus in the field.
+  An outside press still closes the list. Consumers do nothing.
+- Audited every other component that portals a popup and closes it on an outside
+  press (Select listbox, Dropdown, ContextMenu, Popover, PhoneInput, ContentReaction):
+  none had the bug, because each already points the guard at the popup itself. A new
+  test pins mouse and touch selection for each, so a refactor that moves the guard to
+  a wrapper fails the build.
+
 ## [6.29.0] - 2026-11-17
 
 ### Added
