@@ -8,11 +8,13 @@ export function DropdownItem({
   disabled = false,
   danger = false,
   className,
+  ...rest
 }: DropdownItemProps) {
   const { setOpen, focusTrigger } = useDropdown();
 
   return (
     <button
+      {...rest}
       data-react-fancy-dropdown-item=""
       type="button"
       role="menuitem"

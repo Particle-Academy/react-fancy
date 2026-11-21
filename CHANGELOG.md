@@ -11,6 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`Popover.Content` no longer discards the caller's `onMouseEnter` / `onMouseLeave`.**
+  The panel set its own mouse handlers after spreading the caller's props, so with
+  `hover` off a consumer's handlers were replaced with `undefined`, and with `hover`
+  on they were replaced by the hover handlers. Both now compose: the caller's handler
+  always runs, and the hover open/close is added only in `hover` mode, with the same
+  delays as before. Consumers do nothing.
+- **`Dropdown.Item` forwards `data-*`, `id`, `aria-*`, `title` and other button
+  attributes to its `<button>`.** It used to spread nothing, so a `data-*` handle
+  typechecked and was nowhere in the DOM, and items could not carry the stable handle
+  the Human+ contract requires. `DropdownItemProps` now extends the button's attributes.
+  The item's own `type`, `role`, `disabled`, `aria-disabled`, marker and click-then-close
+  behaviour still win over forwarded props. Additive; consumers do nothing.
+
 ## [6.29.1] - 2026-11-19
 
 ### Added

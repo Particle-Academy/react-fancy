@@ -7,7 +7,14 @@ import { useOutsideClick } from "../../hooks/use-outside-click";
 import { useEscapeKey } from "../../hooks/use-escape-key";
 import type { PopoverContentProps } from "./Popover.types";
 
-export function PopoverContent({ children, className, style, ...rest }: PopoverContentProps) {
+export function PopoverContent({
+  children,
+  className,
+  style,
+  onMouseEnter,
+  onMouseLeave,
+  ...rest
+}: PopoverContentProps) {
   const {
     open,
     setOpen,
@@ -68,8 +75,16 @@ export function PopoverContent({ children, className, style, ...rest }: PopoverC
         )}
         dir={rest.dir ?? position.dir}
         style={{ ...style, left: position.x, top: position.y }}
-        onMouseEnter={hover ? onHoverEnter : undefined}
-        onMouseLeave={hover ? onHoverLeave : undefined}
+        // The caller's handlers always run; the hover handlers are added only
+        // in hover mode. Set after the spread, these used to replace them.
+        onMouseEnter={(e) => {
+          onMouseEnter?.(e);
+          if (hover) onHoverEnter();
+        }}
+        onMouseLeave={(e) => {
+          onMouseLeave?.(e);
+          if (hover) onHoverLeave();
+        }}
       >
         {children}
       </div>

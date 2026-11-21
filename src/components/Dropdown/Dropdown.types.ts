@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
 import type { Placement } from "../../utils/types";
 
 export interface DropdownContextValue {
@@ -43,7 +43,14 @@ export interface DropdownItemsProps {
   className?: string;
 }
 
-export interface DropdownItemProps {
+/**
+ * The item renders a `<button role="menuitem">`. Other button attributes
+ * (`data-*`, `id`, `aria-*`, `title`, ...) are forwarded onto it, so an item
+ * can carry a stable handle. The item's own `type`, `role`, `disabled`,
+ * `aria-disabled`, marker and click handling always win over forwarded ones.
+ */
+export interface DropdownItemProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" | "children" | "disabled" | "className"> {
   children: ReactNode;
   onClick?: () => void;
   disabled?: boolean;
