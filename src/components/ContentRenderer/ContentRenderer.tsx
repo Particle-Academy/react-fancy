@@ -3,7 +3,7 @@ import { cn } from "../../utils/cn";
 import { visuallyHidden } from "../../utils/visually-hidden";
 import { proseClasses, detectFormat } from "../Editor/editor.utils";
 import { mergeExtensions } from "./extensions";
-import { ContentBody } from "./RenderedContent";
+import { ContentBody, normalizeFences } from "./RenderedContent";
 import { CopyContext, useCopyPipeline, type CopyContextValue } from "./copy";
 import { streamingCut, streamingProgressive } from "./markdown-blocks";
 import type { ContentRendererProps } from "./ContentRenderer.types";
@@ -14,6 +14,7 @@ export function ContentRenderer({
   lineSpacing = 1.6,
   className,
   extensions: instanceExtensions,
+  fences,
   unsafe = false,
   copyButtons = true,
   onCopy,
@@ -26,6 +27,7 @@ export function ContentRenderer({
     () => mergeExtensions(instanceExtensions),
     [instanceExtensions],
   );
+  const fenceMap = useMemo(() => normalizeFences(fences), [fences]);
 
   // Guard nullish input: marked.parse throws "input parameter is undefined
   // or null", which during render would crash the whole React tree. Treat
@@ -92,6 +94,7 @@ export function ContentRenderer({
           source={source}
           format={resolvedFormat}
           extensions={extensions}
+          fences={fenceMap}
           unsafe={unsafe}
           tail
         />

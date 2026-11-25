@@ -85,6 +85,12 @@ Theming and colour overrides are in [STYLE.md](./STYLE.md). Live demos:
   Backspace / Delete remove it whole. The chip survives `outputFormat="markdown"`
   as inline HTML. To build a value with chips yourself, use `editorTokenHtml(token)`,
   which escapes the id and label. Read tokens back from the value by that attribute.
+- **ContentRenderer code-fence renderers (Unreleased).** `fences={{ mermaid: Component }}`
+  renders each ```` ```mermaid ```` block with `Component` (props `{ code, language, info }`)
+  inside `<div data-render-fence="mermaid">`. Generic: any language, no
+  dependency. For Mermaid diagrams use `MermaidFence` from
+  `@particle-academy/fancy-flow`. Without `fences`, every fence is a code block
+  as before. Details in `docs/ContentRenderer.md`.
 
 ## Traps
 

@@ -5,6 +5,8 @@ export type {
   ContentCopyEvent,
   ContentClipboardPayload,
   ContentClipboardWriter,
+  ContentFenceProps,
+  ContentFenceRenderer,
 } from "./ContentRenderer.types";
 export { registerExtension, registerExtensions } from "./extensions";
 export type {

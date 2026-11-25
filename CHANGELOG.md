@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`ContentRenderer` code-fence renderers: `fences`** (CC-fancy-0060).
+  `fences={{ mermaid: MermaidFence }}` renders each ```` ```mermaid ```` block with
+  the host's component instead of a code block; the component receives
+  `{ code, language, info }` (new types `ContentFenceProps`,
+  `ContentFenceRenderer`) inside `<div data-render-fence="<language>">`. Generic
+  and additive: no diagram code and no dependency here, keys match any case,
+  markdown only, fences inside markdown-body extension tags included. While
+  streaming, a fence reaches its renderer only once it has closed
+  (`"progressive"` shows it as code while it fills). **Nothing to do:** without
+  `fences`, and for every language not listed, a fence renders as a code block
+  exactly as before, copy button included.
+
 ### Fixed
 
 - **`Popover.Content` no longer discards the caller's `onMouseEnter` / `onMouseLeave`.**

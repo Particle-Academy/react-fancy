@@ -1,10 +1,26 @@
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import { markdownToRawHtml } from "../../utils/markdown";
 import { sanitizeHtml } from "../../utils/sanitize";
 import type { RenderExtension } from "./extensions";
 import { parseSegments, tagAttributes } from "./extensions";
-import { splitMarkdownBlocks } from "./markdown-blocks";
-import { HtmlChunk } from "./copy";
+import { splitFences, splitMarkdownBlocks, type FencePiece, type MarkdownBlock } from "./markdown-blocks";
+import { CopyContext, HtmlChunk } from "./copy";
+import type { ContentFenceRenderer } from "./ContentRenderer.types";
+
+/** Fence renderers keyed by lower-cased language; `null` when there are none. */
+export type FenceMap = ReadonlyMap<string, ContentFenceRenderer> | null;
+
+/** `fences` prop -> a lookup by lower-cased language, or `null` for none. */
+export function normalizeFences(fences: Record<string, ContentFenceRenderer> | undefined): FenceMap {
+  if (!fences) return null;
+  const map = new Map<string, ContentFenceRenderer>();
+  for (const [language, component] of Object.entries(fences)) {
+    if (component) map.set(language.toLowerCase(), component);
+  }
+  return map.size > 0 ? map : null;
+}
+
+type BodyPiece = MarkdownBlock | Extract<FencePiece, { type: "fence" }>;
 
 /**
  * Markdown-body tags nest; past this depth a body is rendered as plain
@@ -17,6 +33,8 @@ interface ContentBodyProps {
   source: string;
   format: "html" | "markdown";
   extensions: RenderExtension[];
+  /** Fence renderers by language. Markdown only. */
+  fences?: FenceMap;
   unsafe: boolean;
   depth?: number;
   /**
@@ -38,13 +56,24 @@ function lastIndexWith<T>(items: T[], renders: (item: T) => boolean): number {
  * other piece is converted, sanitised, and then searched for the remaining
  * extension tags as before.
  */
-export function ContentBody({ source, format, extensions, unsafe, depth = 0, tail = false }: ContentBodyProps) {
+export function ContentBody({ source, format, extensions, fences = null, unsafe, depth = 0, tail = false }: ContentBodyProps) {
   const active = depth >= MAX_DEPTH ? [] : extensions;
-  const blocks = useMemo(() => {
+  // Progressive streaming closed a still-open fence at the end: it must not
+  // reach a fence renderer until it really closes.
+  const holdTailCode = Boolean(useContext(CopyContext)?.holdTailCode) && tail;
+  const blocks = useMemo((): BodyPiece[] | null => {
     if (format !== "markdown") return null;
     const mdTags = active.filter((e) => e.markdown).map((e) => e.tag);
-    return splitMarkdownBlocks(source, mdTags);
-  }, [source, format, active]);
+    const tagged = splitMarkdownBlocks(source, mdTags);
+    if (!fences) return tagged;
+    const languages = [...fences.keys()];
+    const tagLast = lastIndexWith(tagged, (b) => b.type === "tag" || b.source.trim() !== "");
+    return tagged.flatMap((block, i): BodyPiece[] =>
+      block.type === "markdown"
+        ? (splitFences(block.source, languages, holdTailCode && i === tagLast) as BodyPiece[])
+        : [block],
+    );
+  }, [source, format, active, fences, holdTailCode]);
 
   if (!blocks) {
     const html = unsafe ? source : sanitizeHtml(source);
@@ -61,12 +90,21 @@ export function ContentBody({ source, format, extensions, unsafe, depth = 0, tai
   }
 
   const last = tail
-    ? lastIndexWith(blocks, (b) => b.type === "tag" || b.source.trim() !== "")
+    ? lastIndexWith(blocks, (b) => b.type !== "markdown" || b.source.trim() !== "")
     : -1;
 
   return (
     <>
       {blocks.map((block, i) => {
+        if (block.type === "fence") {
+          const Fence = fences?.get(block.language);
+          if (!Fence) return null;
+          return (
+            <div key={i} data-render-fence={block.language}>
+              <Fence code={block.code} language={block.language} info={block.info} />
+            </div>
+          );
+        }
         if (block.type === "markdown") {
           const raw = markdownToRawHtml(block.source);
           const html = unsafe ? raw : sanitizeHtml(raw);
@@ -93,6 +131,7 @@ export function ContentBody({ source, format, extensions, unsafe, depth = 0, tai
                 source={block.body}
                 format="markdown"
                 extensions={active}
+                fences={fences}
                 unsafe={unsafe}
                 depth={depth + 1}
                 tail={i === last}

@@ -22,6 +22,7 @@ import { ContentRenderer } from "@particle-academy/react-fancy";
 | format | `"html" \| "markdown" \| "auto"` | `"auto"` | Content format. `"auto"` detects based on content |
 | lineSpacing | `number` | `1.6` | Line height |
 | extensions | `RenderExtension[]` | - | Per-instance render extensions (merged with global) |
+| fences | `Record<string, ContentFenceRenderer>` | - | Per-language code-fence renderers, e.g. `{ mermaid: MermaidFence }`. Markdown only. See **Code fence renderers**. |
 | className | `string` | - | Additional CSS classes |
 | unsafe | `boolean` | `false` | Skip HTML sanitization. See **Sanitization** below. |
 | copyButtons | `boolean \| { code?: boolean; table?: boolean }` | `true` | Copy buttons on code blocks and tables. See **Copy buttons**. |
@@ -277,6 +278,39 @@ body, is converted and then run through `sanitizeHtml` before it is injected,
 and the tag's attributes lose `on*`, `srcdoc` and unsafe URLs before the
 component sees them. Unknown tags stay in the markdown and are sanitised like
 any HTML. `unsafe` turns all of this off, as it always has.
+
+## Code fence renderers
+
+`fences` renders a fenced code block of a given language with your component
+instead of a code block. The hook is generic: react-fancy has no diagram code
+and no dependency for it. fancy-flow's `MermaidFence` draws Mermaid flowcharts:
+
+````tsx
+import { MermaidFence } from "@particle-academy/fancy-flow";
+
+<ContentRenderer value={reply} format="markdown" fences={{ mermaid: MermaidFence }} />
+````
+
+Each lifted fence renders as `<div data-render-fence="<language>"><YourComponent /></div>`,
+and the component receives `ContentFenceProps`:
+
+| Prop | Type | Description |
+|------|------|-------------|
+| code | `string` | The code between the fences, exactly as written: no trailing newline, the fence's indentation removed. Untrusted: render as text or parse it, never inject it as HTML. |
+| language | `string` | First word of the info string, lower-cased (`mermaid`) |
+| info | `string` | The whole info string (`mermaid title="Flow"`) |
+
+- **Without `fences`**, and for every language not listed, a fence renders as a
+  code block exactly as before, copy button included.
+- Keys match case-insensitively. Backtick and tilde fences indented up to three
+  spaces are lifted; a fence inside another fence, an unclosed fence, indented
+  code and a fence inside a blockquote are not.
+- Markdown only: `format="html"` content is untouched.
+- Fences inside a markdown-body extension tag are lifted too.
+- **Streaming:** with `streaming`, an open fence is held back as before. With
+  `streaming="progressive"`, an open fence shows as a plain code block while it
+  fills and reaches your component only once its closing fence arrives, so a
+  renderer never sees half a diagram.
 
 ## Markdown Rendering
 

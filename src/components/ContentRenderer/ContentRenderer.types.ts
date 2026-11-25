@@ -1,4 +1,22 @@
+import type { ComponentType } from "react";
 import type { RenderExtension } from "./extensions";
+
+/** What a fence renderer receives for one lifted code fence. */
+export interface ContentFenceProps {
+  /**
+   * The code between the fences, exactly as written: no trailing newline, the
+   * opening fence's indentation removed. Untrusted: render it as text, or parse
+   * it, never inject it as HTML.
+   */
+  code: string;
+  /** The first word of the info string, lower-cased (`mermaid`). */
+  language: string;
+  /** The whole info string after the fence marker (`mermaid title="Flow"`). */
+  info: string;
+}
+
+/** Renders one code fence of a given language in place of a code block. */
+export type ContentFenceRenderer = ComponentType<ContentFenceProps>;
 
 /** What a copy button copies. */
 export type ContentCopyKind = "code" | "table";
@@ -39,6 +57,14 @@ export interface ContentRendererProps {
   className?: string;
   /** Per-instance render extensions. Merged with any globally-registered extensions. */
   extensions?: RenderExtension[];
+  /**
+   * Per-language code-fence renderers, keyed by language (case-insensitive):
+   * `fences={{ mermaid: MermaidFence }}` renders each ```mermaid block with that
+   * component instead of a code block. Markdown only. Every language not listed
+   * renders as a code block exactly as without this prop. While streaming, a
+   * fence reaches its renderer only once it has closed.
+   */
+  fences?: Record<string, ContentFenceRenderer>;
   /**
    * Skip HTML sanitization. By default, rendered output is sanitized to remove
    * `<script>`, `<iframe>`, event handlers, and `javascript:` URIs. Pass

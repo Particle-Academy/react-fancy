@@ -229,6 +229,86 @@ export function splitMarkdownBlocks(src: string, tags: string[]): MarkdownBlock[
   return blocks;
 }
 
+/** A piece of markdown source after fence lifting: markdown, or one lifted code fence. */
+export type FencePiece =
+  | { type: "markdown"; source: string }
+  | { type: "fence"; language: string; info: string; code: string };
+
+/**
+ * Lift top-level code fences whose language is in `languages` out of markdown
+ * source, so a host renderer can draw them (`fences={{ mermaid: ... }}`).
+ *
+ * Follows CommonMark for what a fence is: three or more backticks or tildes,
+ * indented at most three spaces, closed by a run of the same character at
+ * least as long. The language is the first word of the info string, lower-cased.
+ * A fence inside another fence is content, not a fence. An unclosed fence is
+ * never lifted: it runs to the end of the document as code, exactly as it
+ * renders without the hook. Blockquoted and list-indented-by-four fences are
+ * left alone.
+ *
+ * `holdLast`: the last fence in the source was still open and has been closed
+ * by progressive streaming, so it is not lifted yet. A host component never
+ * sees half a diagram; it shows as code until the real closing fence arrives.
+ */
+export function splitFences(src: string, languages: string[], holdLast = false): FencePiece[] {
+  const wanted = new Set(languages.map((l) => l.toLowerCase()));
+  if (wanted.size === 0 || !src) return src ? [{ type: "markdown", source: src }] : [];
+
+  type Found = { start: number; end: number; language: string; info: string; code: string };
+  const found: Found[] = [];
+  let open: { char: string; len: number; indent: number; start: number; info: string; body: string[] } | null = null;
+
+  let pos = 0;
+  while (pos < src.length) {
+    const nl = src.indexOf("\n", pos);
+    const lineEnd = nl < 0 ? src.length : nl;
+    const next = nl < 0 ? src.length : nl + 1;
+    const line = src.slice(pos, lineEnd).replace(/\r$/, "");
+
+    if (open) {
+      const close = new RegExp(`^ {0,3}${open.char === "`" ? "`" : "~"}{${open.len},}\\s*$`);
+      if (close.test(line)) {
+        const language = (open.info.split(/\s+/)[0] ?? "").toLowerCase();
+        found.push({ start: open.start, end: next, language, info: open.info, code: open.body.join("\n") });
+        open = null;
+      } else {
+        // CommonMark: strip up to the opening fence's indentation from each line.
+        let k = 0;
+        while (k < open.indent && line[k] === " ") k++;
+        open.body.push(line.slice(k));
+      }
+      pos = next;
+      continue;
+    }
+
+    const m = FENCE_OPEN.exec(line);
+    if (m && !(m[1][0] === "`" && m[2].includes("`"))) {
+      open = {
+        char: m[1][0],
+        len: m[1].length,
+        indent: line.length - line.trimStart().length,
+        start: pos,
+        info: m[2].trim(),
+        body: [],
+      };
+    }
+    pos = next;
+  }
+
+  const lift = found.filter((f, i) => wanted.has(f.language) && !(holdLast && !open && i === found.length - 1));
+  if (lift.length === 0) return [{ type: "markdown", source: src }];
+
+  const pieces: FencePiece[] = [];
+  let cursor = 0;
+  for (const f of lift) {
+    if (f.start > cursor) pieces.push({ type: "markdown", source: src.slice(cursor, f.start) });
+    pieces.push({ type: "fence", language: f.language, info: f.info, code: f.code });
+    cursor = f.end;
+  }
+  if (cursor < src.length) pieces.push({ type: "markdown", source: src.slice(cursor) });
+  return pieces;
+}
+
 /**
  * Where to cut a still-streaming source so nothing unfinished shows: an open
  * custom tag (from its opening tag), an open code fence (from its fence line),

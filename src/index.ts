@@ -520,6 +520,8 @@ export type {
   ContentCopyEvent,
   ContentClipboardPayload,
   ContentClipboardWriter,
+  ContentFenceProps,
+  ContentFenceRenderer,
   RenderExtension,
   RenderExtensionProps,
 } from "./components/ContentRenderer";
