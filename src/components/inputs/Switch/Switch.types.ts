@@ -8,6 +8,11 @@ export interface SwitchProps
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
+  /**
+   * The checked track's colour. Unset, it follows the kit accent
+   * (`--fancy-accent` / `--fancy-accent-dark`), falling back to the blue-500 it
+   * has always been. An explicit colour always wins.
+   */
   color?: Color;
   label?: string;
 }

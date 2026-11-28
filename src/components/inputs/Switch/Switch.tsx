@@ -7,6 +7,19 @@ import { dirtyRingClasses, ERROR_TEXT } from "../inputs.utils";
 import type { SwitchProps } from "./Switch.types";
 import { switchTrack } from "./Switch.colors";
 
+// No `color`: the checked track reads the kit accent. Its fallback is the
+// blue-500 the default `color="blue"` painted, in BOTH modes, so a host that
+// sets nothing sees no change (the accent's own defaults are blue-600 / 500).
+const SWITCH_ACCENT_TRACK =
+  "bg-[color:var(--fancy-accent,var(--color-blue-500))] dark:bg-[color:var(--fancy-accent-dark,var(--color-blue-500))]";
+
+// The focus ring reads the focus token first, like every other form control,
+// then the accent, then the blue-500/40 it always was. So a host that sets only
+// `--fancy-accent` gets an accent ring; one that sets `--fancy-focus` gets the
+// same ring as its inputs.
+const SWITCH_FOCUS_RING =
+  "focus-visible:ring-[color:var(--fancy-focus,var(--fancy-accent,var(--color-blue-500)))]/40 dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--fancy-accent-dark,var(--color-blue-500)))]/40";
+
 export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
   (
     {
@@ -24,20 +37,22 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
       checked: controlledChecked,
       defaultChecked = false,
       onCheckedChange,
-      color = "blue",
+      color,
       mode,
       ...rest
     },
     ref,
   ) => {
-    // `aria-*` names and describes the CONTROL, so it goes on the role="switch"
-    // button; everything else (className, style, data-*, handlers) stays on the
-    // wrapper, where it has always gone. On the wrapper, an `aria-label` named a
-    // div and left the switch itself unnamed.
+    // `aria-*` names and describes the CONTROL, and a `data-*` handle has to
+    // name the element that acts (component contract: stable handles), so both
+    // go on the role="switch" button. On the wrapper, an `aria-label` named a
+    // div and left the switch unnamed, and a `data-*` handle named a div that
+    // ignores clicks. className, style and handlers stay on
+    // the wrapper, where they have always gone.
     const wrapperProps: Record<string, unknown> = {};
-    const controlAria: Record<string, unknown> = {};
+    const controlAttrs: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(rest)) {
-      if (key.startsWith("aria-")) controlAria[key] = value;
+      if (key.startsWith("aria-") || key.startsWith("data-")) controlAttrs[key] = value;
       else wrapperProps[key] = value;
     }
 
@@ -80,8 +95,8 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
     return (
       <div
         {...wrapperProps}
-        // View mode has no switch to name, so its aria-* stay on the wrapper.
-        {...(showControl ? undefined : controlAria)}
+        // View mode has no switch, so its aria-* and data-* stay on the wrapper.
+        {...(showControl ? undefined : controlAttrs)}
         data-react-fancy-switch="" className={cn("relative flex items-start gap-2", className)}>
         {!showControl ? (
           <span
@@ -111,7 +126,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           </span>
         ) : (
         <button
-          {...controlAria}
+          {...controlAttrs}
           ref={ref}
           id={switchId}
           type="button"
@@ -124,13 +139,15 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           }}
           onClick={() => setChecked(!checked)}
           className={cn(
-            "relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+            "relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+            SWITCH_FOCUS_RING,
+            " disabled:cursor-not-allowed disabled:opacity-50",
             trackSizes,
             // The unchecked track's fill is the switch's only boundary, so it
             // reads `border-strong` (6.15.0, WCAG 1.4.11): zinc-500 in both
             // modes. It was the `border` role, zinc-200 / zinc-600.
             checked
-              ? switchTrack[color]
+              ? (color ? switchTrack[color] : SWITCH_ACCENT_TRACK)
               : "bg-[color:var(--fancy-border-strong,var(--color-zinc-500))] dark:bg-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))]",
             dirtyRingClasses(dirty),
             error && "ring-2 ring-red-500/50",

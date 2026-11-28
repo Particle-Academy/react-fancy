@@ -46,8 +46,13 @@ const defaultClasses =
 
 // Active and checked follow the solid map's shades (scripts/solid-shades.cjs):
 // the lightest fill where white text clears 4.5:1, one step darker on hover.
+//
+// Active (with no `color`) reads the kit accent, the way the success fill reads
+// its token: fill, border and hover all take `--fancy-accent`, and each falls
+// back to the exact blue it painted before, so a host that sets nothing sees no
+// change. An explicit `color` never reaches this branch.
 const activeClasses =
-  "bg-blue-600 text-white border border-blue-700 hover:bg-blue-700 dark:bg-blue-700 dark:border-blue-600 dark:hover:bg-blue-600";
+  "bg-[color:var(--fancy-accent,var(--color-blue-600))] text-white border border-[color:var(--fancy-accent,var(--color-blue-700))] hover:bg-[color:var(--fancy-accent,var(--color-blue-700))] dark:bg-[color:var(--fancy-accent-dark,var(--color-blue-700))] dark:border-[color:var(--fancy-accent-dark,var(--color-blue-600))] dark:hover:bg-[color:var(--fancy-accent-dark,var(--color-blue-600))]";
 
 const checkedClasses =
   "bg-emerald-700 text-white border border-emerald-800 hover:bg-emerald-800 dark:bg-emerald-800 dark:border-emerald-700 dark:hover:bg-emerald-700";

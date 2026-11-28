@@ -29,7 +29,7 @@ export { NumberField } from "./NumberField";
 export type { NumberFieldProps, NumberFieldMessages } from "./NumberField";
 
 export { MultiSwitch } from "./MultiSwitch";
-export type { MultiSwitchProps, MultiSwitchOption } from "./MultiSwitch";
+export type { MultiSwitchProps, MultiSwitchOption, MultiSwitchOptionAttributes } from "./MultiSwitch";
 
 export { DatePicker } from "./DatePicker";
 export type { DatePickerProps, DatePickerSingleProps, DatePickerRangeProps } from "./DatePicker";

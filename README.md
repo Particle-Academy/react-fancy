@@ -322,7 +322,7 @@ remapping Tailwind's `zinc`. Each role is two variables: one per mode.
 | `focus` | `--fancy-focus` | `--fancy-focus-dark` | blue-500 / blue-400 | focus border + ring on fields |
 | `text-subtle` | `--fancy-text-subtle` | `--fancy-text-subtle-dark` | zinc-600 / zinc-400 | inactive nav labels (Sidebar, Menu, Navbar, MultiSwitch) |
 | `surface-hover` | `--fancy-surface-hover` | `--fancy-surface-hover-dark` | zinc-50 / zinc-800 at 50% | hover fill on nav items, options, rows |
-| `accent` | `--fancy-accent` | `--fancy-accent-dark` | blue-600 / blue-500 | checked colour (`accent-color`) of Checkbox, CheckboxGroup, RadioGroup (since 6.18.0) |
+| `accent` | `--fancy-accent` | `--fancy-accent-dark` | blue-600 / blue-500 | checked colour (`accent-color`) of Checkbox, CheckboxGroup, RadioGroup (since 6.18.0); with no `color`, the checked Switch track and focus ring, the selected MultiSwitch thumb and an `active` Button (each keeps the blue it had as its fallback) |
 | `error` | `--fancy-error` | `--fancy-error-dark` | red-600 / red-400 | validation text: error message + required asterisk of Field, Checkbox, Switch (4.5:1, WCAG 1.4.3; since 6.19.0) |
 | `success` | `--fancy-success` | `--fancy-success-dark` | emerald-700 / emerald-800 | the positive / accept fill: ChatThread's proposal accept, JsonEditor's staged-edit accept; border and hover follow it |
 | `on-success` | `--fancy-on-success` | `--fancy-on-success-dark` | white / white | text on the `success` fill (5.36:1 / 7.61:1 by default; keep 4.5:1) |

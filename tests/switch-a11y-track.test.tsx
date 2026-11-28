@@ -65,7 +65,7 @@ describe("Switch — aria-* name the control, not the wrapper", () => {
     expect(wrapper(host).hasAttribute("aria-labelledby")).toBe(false);
   });
 
-  it("className, style and data-* stay on the wrapper, as before", () => {
+  it("className and style stay on the wrapper; data-* moved to the button", () => {
     const host = mount(
       <Switch className="mt-4 my-switch" style={{ opacity: 0.5 }} data-testid="sw" aria-label="x" />,
     );
@@ -73,7 +73,9 @@ describe("Switch — aria-* name the control, not the wrapper", () => {
     expect(w.className).toContain("my-switch");
     expect(w.className).toContain("mt-4");
     expect(w.style.opacity).toBe("0.5");
-    expect(w.getAttribute("data-testid")).toBe("sw");
+    // A data-* handle names the element that acts (switch-handle-on-control.test.tsx).
+    expect(w.hasAttribute("data-testid")).toBe(false);
+    expect(control(host).getAttribute("data-testid")).toBe("sw");
     expect(control(host).className).not.toContain("my-switch");
   });
 });

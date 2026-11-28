@@ -66,10 +66,10 @@ describe("MultiSwitch — per-option colour", () => {
     expect(cls).not.toContain("--fancy-border-strong");
   });
 
-  it("an option without a colour keeps today's blue thumb and neutral border", () => {
+  it("an option without a colour takes the accent thumb (blue-600 fallback) and neutral border", () => {
     const { host } = mount(<MultiSwitch list={LIST} value="skip" />);
     expect(thumb(host).getAttribute("data-color")).toBeNull();
-    expect(thumb(host).className).toContain("bg-blue-600");
+    expect(thumb(host).className).toContain("bg-[color:var(--fancy-accent,var(--color-blue-600))]");
     expect(group(host).className).toContain("--fancy-border-strong");
   });
 
@@ -80,7 +80,9 @@ describe("MultiSwitch — per-option colour", () => {
     ];
     const { host } = mount(<MultiSwitch list={plain} value="a" />);
     expect(thumb(host).className).toBe(
-      "absolute top-0 bottom-0 rounded-lg bg-blue-600 transition-all duration-200 ease-out",
+      // The thumb reads the kit accent, falling back to the blue-600 it always
+      // was in both modes (accent-switch-multiswitch-button.test.tsx measures it).
+      "absolute top-0 bottom-0 rounded-lg bg-[color:var(--fancy-accent,var(--color-blue-600))] dark:bg-[color:var(--fancy-accent-dark,var(--color-blue-600))] transition-all duration-200 ease-out",
     );
     expect(radio(host, "A").className).toContain("text-white");
   });

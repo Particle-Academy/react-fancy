@@ -21,7 +21,7 @@ import { MultiSwitch } from "@particle-academy/react-fancy";
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `list` | `InputOption[]` | **required** | Options as strings or `{ value, label, disabled?, lang?, dir? }` |
+| `list` | `MultiSwitchOption[]` | **required** | Options as strings or `{ value, label, disabled?, lang?, dir?, color?, attributes? }`. `attributes` puts `data-*` on that option's button; every option button also carries `data-react-fancy-multi-switch-option` and `data-value`. Without `color` the selected thumb follows `--fancy-accent`, falling back to blue-600 |
 | `value` | `V` | - | Controlled selected value |
 | `defaultValue` | `V` | first option | Default selected value (uncontrolled) |
 | `onValueChange` | `(value: V) => void` | - | Callback when selection changes |

@@ -21,7 +21,7 @@ import { Switch } from "@particle-academy/react-fancy";
 | `checked` | `boolean` | - | Controlled checked state |
 | `defaultChecked` | `boolean` | `false` | Initial checked state (uncontrolled) |
 | `onCheckedChange` | `(checked: boolean) => void` | - | Callback when toggled |
-| `color` | `Color` | `"blue"` | Track color when checked. Any Tailwind color: `"zinc"`, `"red"`, `"green"`, `"blue"`, `"purple"`, etc. |
+| `color` | `Color` | kit accent | Track color when checked. Unset, it follows `--fancy-accent` / `--fancy-accent-dark`, falling back to blue-500. Any Tailwind color wins: `"zinc"`, `"red"`, `"green"`, `"blue"`, `"purple"`, etc. |
 | `label` | `string` | - | Label text next to the switch |
 | `description` | `string` | - | Helper text below the label |
 | `error` | `string` | - | Error message |
@@ -30,7 +30,8 @@ import { Switch } from "@particle-academy/react-fancy";
 | `required` | `boolean` | `false` | Red asterisk on label |
 | `disabled` | `boolean` | `false` | Disables the switch |
 | `name` | `string` | - | Form field name (renders a hidden input with value `"1"` or `"0"`) |
-| `className` | `string` | - | Additional CSS classes |
+| `className` | `string` | - | Additional CSS classes (on the wrapper) |
+| `data-*` / `aria-*` | `string` | - | Rendered on the `role="switch"` button, so a handle names the element that toggles. In view mode, on the wrapper |
 
 ## Examples
 

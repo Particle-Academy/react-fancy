@@ -11,6 +11,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`MultiSwitch` options take `attributes`, and every option has a stable
+  handle.** `{ value, label, attributes: { "data-x": "y" } }` puts those `data-*`
+  on that option's `role="radio"` button (only `data-*` keys; role, aria and
+  handlers stay the component's). Every option button now also carries
+  `data-react-fancy-multi-switch-option` and, for a string, number or boolean
+  value, `data-value`. New type `MultiSwitchOptionAttributes`. **Nothing to do:**
+  additive.
+
+### Changed
+
+- **`Switch`, `MultiSwitch` and an `active` `Button` follow the kit accent.**
+  With no `color`, the checked Switch track, the selected MultiSwitch thumb (an
+  option without its own `color`) and an `active` Button's fill, border and
+  hover read `--fancy-accent` / `--fancy-accent-dark`, like Checkbox,
+  CheckboxGroup and RadioGroup already did. Each falls back to the exact blue it
+  painted before (Switch blue-500, MultiSwitch blue-600, both in both modes;
+  active Button blue-600 / dark blue-700 with a blue-700 / dark blue-600 border).
+  An explicit `color` (or an option's `color`) still wins. **Nothing to do** if
+  you set no accent: the rendered colours are identical. If you DO set
+  `--fancy-accent`, these controls now take it; to keep one blue, pass
+  `color="blue"`. A default (not active) Button is unchanged.
+  Note: `Switch`'s `color` prop no longer defaults to `"blue"`; it is
+  `undefined` unless you pass it.
+
+### Fixed
+
+- **`Switch` puts `data-*` on its `role="switch"` button, not on the wrapper.**
+  A stable handle named a div that ignores clicks, so
+  `querySelector("[data-x]").click()` did nothing and a consumer had to re-tag
+  the button by hand. `aria-*` and `id` already went there; `className`, `style`
+  and event handlers stay on the wrapper, which keeps its own
+  `data-react-fancy-switch`. In view mode (no button) `data-*` stays on the
+  wrapper. The handle is moved, not copied, because two elements with the same
+  handle make every single-element locator (`getByTestId`, Playwright's strict
+  mode, `querySelector`, which returns the wrapper first) ambiguous or wrong.
+  **BREAKING for one selector shape: what to do.** If you selected the wrapper
+  by your `data-*` and then looked inside it (`[data-x] [role="switch"]`, or
+  `within(getByTestId("x")).getByRole("switch")`), select `[data-x]` directly:
+  it is now the switch. Anything that read the attribute off the wrapper
+  (`closest("[data-x]")` from the label) should use
+  `closest("[data-react-fancy-switch]")`. Selecting and clicking `[data-x]`
+  needs no change and now works.
+- **`Switch`'s focus ring follows the theme.** It was a hard-coded
+  `ring-blue-500/40`. It now reads `--fancy-focus` (as every other form control
+  does), then `--fancy-accent`, then the same blue-500 at 40% in both modes.
+  **Nothing to do** unless you set those tokens, in which case the ring now
+  matches them.
+
 ## [6.30.0] - 2026-11-24
 
 ### Added

@@ -15,6 +15,34 @@ import { multiSwitchColorClasses } from "./MultiSwitch.colors";
 const BORDER_DEFAULT =
   "border-[color:var(--fancy-border-strong,var(--color-zinc-500))] dark:border-[color:var(--fancy-border-strong-dark,var(--color-zinc-500))]";
 
+// No option colour: the selected thumb reads the kit accent. The fallback is
+// the blue-600 it always painted, in BOTH modes, so a host that sets nothing
+// sees no change (the accent's own dark default is blue-500).
+const THUMB_ACCENT =
+  "bg-[color:var(--fancy-accent,var(--color-blue-600))] dark:bg-[color:var(--fancy-accent-dark,var(--color-blue-600))]";
+
+/**
+ * An option's own `attributes`, filtered to `data-*` keys. Anything else
+ * (role, aria-checked, a handler) is the component's to set, and letting an
+ * option override it would break the radio semantics the group depends on.
+ */
+function optionDataAttributes(attributes: unknown): Record<string, string | number | boolean> {
+  const out: Record<string, string | number | boolean> = {};
+  if (!attributes || typeof attributes !== "object") return out;
+  for (const [key, value] of Object.entries(attributes as Record<string, unknown>)) {
+    if (!key.startsWith("data-")) continue;
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") out[key] = value;
+  }
+  return out;
+}
+
+/** `data-value` only where the value has a faithful string form. */
+function dataValue(value: unknown): string | undefined {
+  return typeof value === "string" || typeof value === "number" || typeof value === "boolean"
+    ? String(value)
+    : undefined;
+}
+
 const sizeClasses: Record<Size, string> = {
   xs: "px-2 py-1 text-xs",
   sm: "px-2.5 py-1.5 text-sm",
@@ -48,9 +76,10 @@ export function MultiSwitch<V = string>({
   // the label instead. Needs an id the label and the group both agree on.
   const labelId = label ? `${id ?? reactId}-label` : undefined;
 
-  // resolveOption hands an object option back as-is, so `color` survives it.
+  // resolveOption hands an object option back as-is, so `color` and
+  // `attributes` survive it.
   const resolvedOptions = list.map(resolveOption) as Array<
-    ReturnType<typeof resolveOption<V>> & { color?: Color }
+    ReturnType<typeof resolveOption<V>> & { color?: Color; attributes?: unknown }
   >;
   const fallback = defaultValue ?? resolvedOptions[0]?.value;
   const resolvedMode = useFieldMode(mode);
@@ -144,7 +173,7 @@ export function MultiSwitch<V = string>({
           className={
             colorClasses
               ? `absolute top-0 bottom-0 rounded-lg ${colorClasses.thumb} transition-all duration-200 ease-out`
-              : "absolute top-0 bottom-0 rounded-lg bg-blue-600 transition-all duration-200 ease-out"
+              : `absolute top-0 bottom-0 rounded-lg ${THUMB_ACCENT} transition-all duration-200 ease-out`
           }
           style={indicator.rtl ? { right: indicator.left, width: indicator.width } : { left: indicator.left, width: indicator.width }}
         />
@@ -153,7 +182,10 @@ export function MultiSwitch<V = string>({
         const isSelected = option.value === value;
         return (
           <button
+            {...optionDataAttributes(option.attributes)}
             key={String(option.value)}
+            data-react-fancy-multi-switch-option=""
+            data-value={dataValue(option.value)}
             ref={(el) => { itemRefs.current[index] = el; }}
             type="button"
             role="radio"

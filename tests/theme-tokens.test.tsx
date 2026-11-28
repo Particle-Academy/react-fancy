@@ -132,6 +132,20 @@ const KEEPS_TODAYS_COLOUR = new Set<string>([
   "dark:hover:text-[color:var(--fancy-modal-header-text-dark,var(--fancy-text-soft-dark,var(--color-zinc-300)))]",
   "hover:bg-[color:var(--fancy-modal-header-bg,var(--fancy-surface-muted,var(--color-zinc-100)))]",
   "dark:hover:bg-[color:var(--fancy-modal-header-bg-dark,var(--fancy-surface-muted-dark,var(--color-zinc-800)))]",
+  // The accent reaches Switch, MultiSwitch and an active Button, each keeping
+  // the blue it painted: Switch's track and ring were blue-500 in both modes,
+  // MultiSwitch's thumb blue-600 in both, an active Button blue-600 / blue-700
+  // with a blue-700 / blue-600 border and hover. Switch's ring reads the focus
+  // token first, then the accent.
+  "bg-[color:var(--fancy-accent,var(--color-blue-500))]",
+  "dark:bg-[color:var(--fancy-accent-dark,var(--color-blue-600))]",
+  "dark:bg-[color:var(--fancy-accent-dark,var(--color-blue-700))]",
+  "border-[color:var(--fancy-accent,var(--color-blue-700))]",
+  "dark:border-[color:var(--fancy-accent-dark,var(--color-blue-600))]",
+  "hover:bg-[color:var(--fancy-accent,var(--color-blue-700))]",
+  "dark:hover:bg-[color:var(--fancy-accent-dark,var(--color-blue-600))]",
+  "focus-visible:ring-[color:var(--fancy-focus,var(--fancy-accent,var(--color-blue-500)))]/40",
+  "dark:focus-visible:ring-[color:var(--fancy-focus-dark,var(--fancy-accent-dark,var(--color-blue-500)))]/40",
 ]);
 
 describe("THEME_TOKENS — the table", () => {

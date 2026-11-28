@@ -65,6 +65,7 @@ export type {
   NumberFieldMessages,
   MultiSwitchProps,
   MultiSwitchOption,
+  MultiSwitchOptionAttributes,
   DatePickerProps,
   FieldMode,
   FormProps,
