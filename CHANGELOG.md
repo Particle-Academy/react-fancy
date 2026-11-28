@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.32.0] - 2026-11-28
+
+### Fixed
+
+- **A popup opened inside a natively full-screen element is visible.** In the
+  browser Fullscreen API only the full-screen element's subtree is painted, so a
+  `Select` listbox, `Dropdown`, `Tooltip` or `Popover` portalled to `<body>`
+  from inside any element made full screen with `requestFullscreen()` (a
+  fancy-3d viewer, a fancy-graph view, a host's own wrapper) opened invisibly.
+  `PortalContainerContext` covered only react-fancy's own `<FullScreen>`. A
+  `<Portal>` with no `portalContainer`, `container` or context provider now
+  renders into `document.fullscreenElement` (or Safari's
+  `webkitFullscreenElement`) while there is one, and moves back to `<body>`
+  when full screen ends. A full-screen `<video>`, `<canvas>`, `<img>` or
+  `<iframe>` cannot hold children and is skipped. **Nothing to do:** an
+  explicit container or context still wins, and outside full screen nothing
+  changes.
+
 ## [6.31.0] - 2026-11-28
 
 ### Added

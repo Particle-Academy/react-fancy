@@ -6,13 +6,15 @@ import {
   useContext,
   useEffect,
   useState,
+  useSyncExternalStore,
   type ReactElement,
   type ReactNode,
 } from "react";
 
 /**
- * Where a `<Portal>` without an explicit `container` renders. `null` means
- * `document.body`, which is what every Portal did before this existed.
+ * Where a `<Portal>` without an explicit `container` renders. `null` means the
+ * browser's native full-screen element while there is one, else
+ * `document.body`.
  *
  * A full-screen surface provides its own element here while it is active. In the
  * browser's Fullscreen API only the full-screen element's subtree is painted, so
@@ -51,12 +53,43 @@ export function Portal({ children, container, portalContainer }: PortalProps) {
   }, []);
 
   const dark = useRootDark(mounted);
+  const fullscreenElement = useNativeFullscreenElement();
 
   if (!mounted || typeof document === "undefined") return null;
 
-  const target = portalContainer ?? container ?? contextContainer ?? document.body;
+  const target = portalContainer ?? container ?? contextContainer ?? fullscreenElement ?? document.body;
 
   return createPortal(<PortalRoot dark={dark}>{children}</PortalRoot>, target);
+}
+
+/** Elements whose children the browser never paints: a popup portalled into one would vanish. */
+const CANNOT_HOST = new Set(["VIDEO", "AUDIO", "CANVAS", "IMG", "IFRAME", "OBJECT", "EMBED"]);
+
+function subscribeFullscreen(onChange: () => void): () => void {
+  document.addEventListener("fullscreenchange", onChange);
+  document.addEventListener("webkitfullscreenchange", onChange);
+  return () => {
+    document.removeEventListener("fullscreenchange", onChange);
+    document.removeEventListener("webkitfullscreenchange", onChange);
+  };
+}
+
+function fullscreenSnapshot(): HTMLElement | null {
+  const d = document as Document & { webkitFullscreenElement?: Element | null };
+  const el = d.fullscreenElement ?? d.webkitFullscreenElement ?? null;
+  return el instanceof HTMLElement && !CANNOT_HOST.has(el.tagName) ? el : null;
+}
+
+/**
+ * The element the browser is showing full screen (the Fullscreen API, or
+ * Safari's prefixed one), followed live; `null` when none, or when it is one
+ * that cannot hold children. In native full screen only that element's subtree
+ * is painted, so a Portal with nowhere else to go renders there instead of
+ * `<body>`: a menu opened from a full-screen 3D viewer or graph stays visible,
+ * whoever made it full screen.
+ */
+function useNativeFullscreenElement(): HTMLElement | null {
+  return useSyncExternalStore(subscribeFullscreen, fullscreenSnapshot, () => null);
 }
 
 /**

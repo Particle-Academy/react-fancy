@@ -75,6 +75,17 @@ function App() {
 A popup portalled into a container with `overflow: hidden` or a transform can
 be clipped or mispositioned; `<main>` normally has neither.
 
+## Native full screen
+
+While the browser shows an element full screen (`element.requestFullscreen()`,
+or Safari's prefixed API), only that element's subtree is painted. A Portal
+with no `portalContainer`, `container` or `PortalContainerContext` then renders
+into `document.fullscreenElement` instead of `<body>`, and moves back when full
+screen ends, so a menu, listbox or tooltip opened from a full-screen surface
+stays visible whoever made it full screen (a fancy-3d viewer, a fancy-graph
+view, the host's own code). A full-screen element that cannot hold children (a
+`<video>`, `<canvas>`, `<img>` or `<iframe>`) is skipped and `<body>` is used.
+
 Returns `null` during SSR and on the first client render (hydration-safe), then
 portals after mount.
 
