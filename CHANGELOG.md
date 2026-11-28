@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.31.0] - 2026-11-28
+
 ### Added
 
 - **`MultiSwitch` options take `attributes`, and every option has a stable
